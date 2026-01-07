@@ -11,7 +11,7 @@ binding = "ASSETS"
 
 # Build configuration
 [build]
-command = "npm run build"
+command = "pnpm build"
 cwd = "."
 watch_dir = ["packages/backend/src", "packages/frontend/src", "packages/shared/src"]
 
