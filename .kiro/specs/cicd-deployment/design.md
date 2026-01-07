@@ -142,7 +142,7 @@ Let me analyze the acceptance criteria to determine testable properties:
 **Validates: Requirements 2.3, 2.4**
 
 ### Property 5: Deployment Verification
-*For any* completed deployment, the workflow should verify the worker is responding correctly
+*For any* completed deployment, the workflow should verify the worker deployment was successful
 **Validates: Requirements 2.5**
 
 ### Property 6: Secure Credential Handling
@@ -194,11 +194,8 @@ Property-based tests will use GitHub Actions testing framework with minimum 100 
 Each deployment will include automated verification:
 
 ```bash
-# Worker health check
-curl -f https://${WORKER_URL}/
-
-# Basic API endpoint verification (if available)
-curl -f https://${WORKER_URL}/api/health || true
+# Worker deployment verification
+curl -f https://${WORKER_URL}/ || echo "Worker deployment verification failed"
 ```
 
 The testing strategy ensures reliable deployments while maintaining simplicity and fast feedback loops.

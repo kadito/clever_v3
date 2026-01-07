@@ -20,6 +20,9 @@ importers:
       eslint-plugin-vue:
         specifier: ^9.0.0
         version: 9.33.0(eslint@8.57.1)
+      js-yaml:
+        specifier: ^4.1.1
+        version: 4.1.1
       prettier:
         specifier: ^3.0.0
         version: 3.7.4

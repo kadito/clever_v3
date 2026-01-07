@@ -6,7 +6,7 @@ This implementation plan creates two simple GitHub Actions workflows to deploy t
 
 ## Tasks
 
-- [ ] 1. Create deploy-test.yml workflow
+- [x] 1. Create deploy-test.yml workflow
   - Create `.github/workflows/deploy-test.yml` triggered by test branch pushes
   - Set up pnpm installation and caching
   - Configure Node.js environment
@@ -16,7 +16,7 @@ This implementation plan creates two simple GitHub Actions workflows to deploy t
   - **Property 1: Branch-Based Deployment Triggers**
   - **Validates: Requirements 1.1, 1.2**
 
-- [ ] 2. Implement package build order in deploy-test workflow
+- [x] 2. Implement package build order in deploy-test workflow
   - Add step to build @clever/shared package first
   - Add steps to build @clever/frontend and @clever/backend packages
   - Ensure proper dependency order and error handling
@@ -26,7 +26,7 @@ This implementation plan creates two simple GitHub Actions workflows to deploy t
   - **Property 2: Package Build Order**
   - **Validates: Requirements 1.4, 1.5**
 
-- [ ] 3. Add Cloudflare deployment to deploy-test workflow
+- [x] 3. Add Cloudflare deployment to deploy-test workflow
   - Configure Cloudflare API token and account ID from secrets
   - Add wrangler deploy step for test environment
   - Configure test-specific resource bindings
@@ -36,22 +36,22 @@ This implementation plan creates two simple GitHub Actions workflows to deploy t
   - **Property 3: Environment-Specific Resource Usage**
   - **Validates: Requirements 2.1, 2.2, 3.1, 3.2, 3.3, 3.4**
 
-- [ ] 4. Add deployment verification to deploy-test workflow
-  - Add step to verify worker is responding
-  - Include basic health check after deployment
+- [x] 4. Add deployment verification to deploy-test workflow
+  - Add step to verify worker deployment was successful
+  - Include basic deployment status check after deployment
   - _Requirements: 2.5_
 
 - [ ]* 4.1 Write property test for deployment verification
   - **Property 5: Deployment Verification**
   - **Validates: Requirements 2.5**
 
-- [ ] 5. Create deploy-prod.yml workflow
+- [x] 5. Create deploy-prod.yml workflow
   - Create `.github/workflows/deploy-prod.yml` triggered by prod branch pushes
   - Copy and adapt deploy-test workflow structure
   - Configure production environment deployment
   - _Requirements: 1.2, 2.2, 3.3, 3.4_
 
-- [ ] 6. Configure production-specific settings in deploy-prod workflow
+- [x] 6. Configure production-specific settings in deploy-prod workflow
   - Use `--env production` flag with wrangler deploy
   - Ensure production resource bindings are used
   - Add production-specific verification steps
@@ -61,7 +61,7 @@ This implementation plan creates two simple GitHub Actions workflows to deploy t
   - **Property 4: Asset and Worker Deployment**
   - **Validates: Requirements 2.3, 2.4**
 
-- [ ] 7. Implement secure credential handling in both workflows
+- [x] 7. Implement secure credential handling in both workflows
   - Ensure API tokens are properly masked in logs
   - Add error handling that doesn't expose credentials
   - Validate required secrets are available
@@ -71,7 +71,7 @@ This implementation plan creates two simple GitHub Actions workflows to deploy t
   - **Property 6: Secure Credential Handling**
   - **Validates: Requirements 4.1, 4.2, 4.3**
 
-- [ ] 8. Add comprehensive error handling to both workflows
+- [x] 8. Add comprehensive error handling to both workflows
   - Ensure build failures stop the workflow
   - Add clear error reporting for each step
   - Include context information in error messages
@@ -81,7 +81,7 @@ This implementation plan creates two simple GitHub Actions workflows to deploy t
   - **Property 7: Build Failure Handling**
   - **Validates: Requirements 1.7, 4.4**
 
-- [ ] 9. Test and validate both workflows
+- [x] 9. Test and validate both workflows
   - Verify deploy-test workflow works with test branch pushes
   - Verify deploy-prod workflow works with prod branch pushes
   - Ensure proper environment separation

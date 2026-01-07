@@ -28,6 +28,7 @@
     "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.0.0",
     "eslint-plugin-vue": "^9.0.0",
+    "js-yaml": "^4.1.1",
     "prettier": "^3.0.0",
     "typescript": "^5.0.0",
     "wrangler": "^3.0.0"

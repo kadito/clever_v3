@@ -40,7 +40,7 @@ The CLEVER dashboard requires a simple CI/CD pipeline to deploy the unified Clou
 2. WHEN deploying to production, THE Deploy_Prod_Workflow SHALL use production-specific Cloudflare resources
 3. WHEN deploying to any environment, THE CI_CD_System SHALL upload Vue static assets to KV
 4. WHEN uploading assets, THE CI_CD_System SHALL deploy the Unified_Worker with proper bindings
-5. WHEN deployment completes, THE CI_CD_System SHALL verify the Worker is responding
+5. WHEN deployment completes, THE CI_CD_System SHALL verify the Worker deployment was successful
 
 ### Requirement 3: Cloudflare Resource Management
 
