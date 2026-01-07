@@ -40,14 +40,14 @@ quickly, then adding layers of functionality.
   - Set up package.json scripts for linting and formatting
   - _Requirements: 1.4, 5.5_
 
-- [ ] 4. Initialize backend package with Hono
-  - [ ] 4.1 Create backend package structure
+- [x] 4. Initialize backend package with Hono
+  - [x] 4.1 Create backend package structure
     - Create packages/backend/package.json with Hono dependencies
     - Set up packages/backend/tsconfig.json with references to shared
     - Create basic src/index.ts with Hono app
     - _Requirements: 4.1, 4.2, 4.3_
 
-  - [ ] 4.2 Implement basic API routes structure
+  - [x] 4.2 Implement basic API routes structure
     - Create src/routes/api.ts with CRUD endpoints for content types
     - Implement middleware for CORS and error handling
     - Add static asset serving middleware with KV fallback
@@ -59,7 +59,7 @@ quickly, then adding layers of functionality.
     - Test error handling middleware
     - _Requirements: 7.2, 7.4, 7.5_
 
-  - [ ] 4.4 Implement shared types usage in API handlers
+  - [x] 4.4 Implement shared types usage in API handlers
     - Import and use shared types for request/response validation
     - Ensure API responses follow shared ApiResponse interface
     - _Requirements: 4.3, 7.3_
