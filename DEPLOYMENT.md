@@ -9,7 +9,7 @@ Cloudflare Workers using the modern static assets binding.
    enabled
 2. **Wrangler CLI**: Install and authenticate Wrangler CLI
    ```bash
-   npm install -g wrangler
+   pnpm add -g wrangler
    wrangler login
    ```
 3. **KV Namespaces**: Create KV namespaces for application data (not assets)
@@ -70,12 +70,12 @@ The build process is now much simpler:
 
 ```bash
 # Build all packages
-npm run build
+pnpm build
 
 # Build individual packages
-npm run build --workspace=@clever/shared
-npm run build --workspace=@clever/frontend
-npm run build --workspace=@clever/backend
+pnpm build --filter @clever/shared
+pnpm build --filter @clever/frontend
+pnpm build --filter @clever/backend
 ```
 
 ## Deployment Commands
@@ -84,10 +84,10 @@ npm run build --workspace=@clever/backend
 
 ```bash
 # Full deployment (build + deploy)
-npm run deploy:dev
+pnpm deploy:dev
 
 # Or step by step:
-npm run build
+pnpm build
 wrangler deploy --env development
 ```
 
@@ -95,10 +95,10 @@ wrangler deploy --env development
 
 ```bash
 # Full deployment
-npm run deploy:staging
+pnpm deploy:staging
 
 # Or step by step:
-npm run build
+pnpm build
 wrangler deploy --env staging
 ```
 
@@ -106,10 +106,10 @@ wrangler deploy --env staging
 
 ```bash
 # Full deployment
-npm run deploy:prod
+pnpm deploy:prod
 
 # Or step by step:
-npm run build
+pnpm build
 wrangler deploy --env production
 ```
 
@@ -119,10 +119,10 @@ wrangler deploy --env production
 
 ```bash
 # Start development server (both frontend and backend)
-npm run dev
+pnpm dev
 
 # Start frontend only (for UI development)
-npm run dev --workspace=@clever/frontend
+pnpm dev --filter @clever/frontend
 
 # Start backend only (for API development)
 wrangler dev --config wrangler.dev.toml
@@ -132,13 +132,13 @@ wrangler dev --config wrangler.dev.toml
 
 ```bash
 # Run all tests
-npm run test
+pnpm test
 
 # Type checking
-npm run type-check
+pnpm type-check
 
 # Linting and formatting
-npm run check-all
+pnpm check-all
 ```
 
 ## Environment Configuration
@@ -196,8 +196,8 @@ wrangler r2 object get clever-documents-prod/path/to/file.pdf --file local-file.
 ### Common Issues
 
 1. **Build Failures**
-   - Ensure all dependencies are installed: `npm install`
-   - Check TypeScript errors: `npm run type-check`
+   - Ensure all dependencies are installed: `pnpm install`
+   - Check TypeScript errors: `pnpm type-check`
    - Verify package references are correct
 
 2. **Asset Serving Issues**

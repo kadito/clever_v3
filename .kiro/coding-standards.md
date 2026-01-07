@@ -1,5 +1,14 @@
 # Coding Standards
 
+## Package Management
+
+- Use pnpm for all dependency management
+- Use workspace:* protocol for internal dependencies
+- Follow pnpm workspace commands for cross-package operations
+- Maintain pnpm-lock.yaml in version control
+
+## Code Quality
+
 - TypeScript strict mode always on
 - No `any`
 - Prefer explicit return types

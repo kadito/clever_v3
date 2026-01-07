@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue';
+import { ref, computed, type Ref, type ComputedRef } from 'vue';
 import type { BaseContent, ContentType, ApiResponse, ListResponse } from '@clever/shared';
 import { apiService } from '../services/api';
 
@@ -7,7 +7,7 @@ export interface UseContentOptions {
   autoLoad?: boolean;
 }
 
-export function useContent<T extends BaseContent>(options: UseContentOptions) {
+export function useContent<T extends BaseContent>(options: UseContentOptions): any {
   const { contentType, autoLoad = true } = options;
 
   // Reactive state

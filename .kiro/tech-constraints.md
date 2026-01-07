@@ -1,5 +1,12 @@
 # Tech Constraints
 
+## Build System
+
+- **Monorepo**: pnpm workspaces with TypeScript project references
+- **Node.js**: >=18.0.0 required
+- **pnpm**: >=8.0.0 required
+- **TypeScript**: v5+ with strict mode enabled
+
 Frontend:
 
 - Vue 3

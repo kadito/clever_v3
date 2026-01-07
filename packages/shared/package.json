@@ -12,7 +12,7 @@
     }
   },
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc --build --force",
     "dev": "tsc --build --watch",
     "clean": "rm -rf dist",
     "test": "vitest --run",

@@ -8,6 +8,17 @@ and R2 for JSON document storage.
 
 ## Technology Stack
 
+### Build System & Package Management
+
+- **pnpm workspaces** with TypeScript project references
+- **Node.js** >=18.0.0 required
+- **pnpm** >=8.0.0 required for improved performance and disk efficiency
+- **Benefits of pnpm**:
+  - ~40% reduction in node_modules size through hard linking
+  - ~50% faster installs compared to npm
+  - Strict dependency management prevents phantom dependencies
+  - Content-addressable storage with intelligent hoisting
+
 ### Unified Deployment
 
 - **Single Cloudflare Worker** serving both frontend and backend
@@ -203,6 +214,31 @@ id = "{kv-namespace-id}"
 ```
 
 ## Build Process
+
+### Common Commands
+
+```bash
+# Development
+pnpm dev                              # Start full-stack development
+pnpm --filter @clever/frontend dev    # Start frontend only
+pnpm --filter @clever/backend dev     # Start backend only
+
+# Building
+pnpm build                            # Build all packages
+pnpm --filter @clever/shared build    # Build specific package
+
+# Code Quality
+pnpm check-all                       # Run all checks (type-check, lint, format)
+pnpm type-check                      # Type checking across workspaces
+pnpm lint                            # Linting across workspaces
+pnpm lint:fix                        # Fix linting issues
+pnpm format                          # Format code across workspaces
+pnpm format:check                    # Check formatting
+
+# Testing
+pnpm test                            # Run all tests
+pnpm --filter @clever/frontend test  # Test specific package
+```
 
 ### Frontend Build
 
