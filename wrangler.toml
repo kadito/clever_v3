@@ -13,12 +13,6 @@ vars = { NODE_ENV = "test", LOG_LEVEL = "debug" }
 directory = "packages/frontend/dist"
 binding = "ASSETS"
 
-# Build configuration
-[build]
-command = "pnpm build"
-cwd = "."
-watch_dir = ["packages/backend/src", "packages/frontend/src", "packages/shared/src"]
-
 # R2 bucket for test environment
 [[r2_buckets]]
 binding = "CONTENT"
