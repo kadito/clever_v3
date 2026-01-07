@@ -8,6 +8,7 @@
 - No deep nesting (>3 levels)
 
 Naming:
+
 - camelCase for variables
 - PascalCase for components
 - kebab-case for routes
@@ -15,10 +16,12 @@ Naming:
 - UI labels in Português Portugal
 
 Comments:
+
 - Why > What
 - No obvious comments
 
 Content Structure:
+
 - All content extends BaseContent interface
 - UUID-based identification
 - Audit trail (created/updated by/at)
@@ -26,6 +29,7 @@ Content Structure:
 - Soft delete support
 
 API Patterns:
+
 - RESTful endpoints: /api/content/{type}
 - Consistent CRUD operations
 - R2 key pattern: content/{type}/{type}-{uuid}.json

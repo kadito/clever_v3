@@ -2,9 +2,15 @@
 
 ## Overview
 
-This design outlines the architecture and implementation approach for initializing a monorepo-based CLEVER internal dashboard application. The system combines a Vue 3 frontend with a Hono API backend, deployed as a single Cloudflare Worker with shared TypeScript types ensuring type safety across all packages.
+This design outlines the architecture and implementation approach for
+initializing a monorepo-based CLEVER internal dashboard application. The system
+combines a Vue 3 frontend with a Hono API backend, deployed as a single
+Cloudflare Worker with shared TypeScript types ensuring type safety across all
+packages.
 
-The design follows the established technical constraints and architecture patterns, creating a foundation that supports incremental feature growth while maintaining simplicity and avoiding over-engineering.
+The design follows the established technical constraints and architecture
+patterns, creating a foundation that supports incremental feature growth while
+maintaining simplicity and avoiding over-engineering.
 
 ## Architecture
 
@@ -38,21 +44,25 @@ graph TD
 
 ### TypeScript Project References
 
-The monorepo uses TypeScript project references to enforce proper dependency boundaries and enable incremental compilation:
+The monorepo uses TypeScript project references to enforce proper dependency
+boundaries and enable incremental compilation:
 
 - **Root tsconfig.json**: Orchestrates all packages with project references
-- **Package-level tsconfig.json**: Each package has its own configuration with composite mode enabled
+- **Package-level tsconfig.json**: Each package has its own configuration with
+  composite mode enabled
 - **Build tsconfig.json**: Separate configuration for production builds
 
 ## Components and Interfaces
 
 ### Shared Package (`packages/shared`)
 
-**Purpose**: Centralized type definitions and utilities shared between frontend and backend.
+**Purpose**: Centralized type definitions and utilities shared between frontend
+and backend.
 
 **Key Components**:
 
 1. **BaseContent Interface**
+
 ```typescript
 interface BaseContent {
   uuid: string;
@@ -70,6 +80,7 @@ interface BaseContent {
 ```
 
 2. **Content Type Interfaces**
+
 ```typescript
 interface Client extends BaseContent {
   data: {
@@ -90,6 +101,7 @@ interface Contract extends BaseContent {
 ```
 
 3. **API Types**
+
 ```typescript
 interface ApiResponse<T> {
   success: boolean;
@@ -108,12 +120,28 @@ interface ListResponse<T> extends ApiResponse<T[]> {
 ```
 
 4. **Utility Types**
-```typescript
-type ContentType = 'clients' | 'contracts' | 'licenses' | 'work-sheets' | 
-                   'daily-records' | 'remote-assistance' | 'reminders' | 'pending';
 
-type CreateContentRequest<T extends BaseContent> = Omit<T, 
-  'uuid' | 'createdAt' | 'createdBy' | 'updatedAt' | 'updatedBy' | 'version' | 'isDeleted'>;
+```typescript
+type ContentType =
+  | 'clients'
+  | 'contracts'
+  | 'licenses'
+  | 'work-sheets'
+  | 'daily-records'
+  | 'remote-assistance'
+  | 'reminders'
+  | 'pending';
+
+type CreateContentRequest<T extends BaseContent> = Omit<
+  T,
+  | 'uuid'
+  | 'createdAt'
+  | 'createdBy'
+  | 'updatedAt'
+  | 'updatedBy'
+  | 'version'
+  | 'isDeleted'
+>;
 
 type UpdateContentRequest<T extends BaseContent> = Partial<Pick<T, 'data'>>;
 ```
@@ -125,6 +153,7 @@ type UpdateContentRequest<T extends BaseContent> = Partial<Pick<T, 'data'>>;
 **Key Components**:
 
 1. **Main Application Structure**
+
 ```
 src/
 ├── main.ts              # Application entry point
@@ -148,8 +177,14 @@ src/
 ```
 
 2. **API Service Layer**
+
 ```typescript
-import type { ApiResponse, ListResponse, Client, Contract } from '@clever/shared';
+import type {
+  ApiResponse,
+  ListResponse,
+  Client,
+  Contract,
+} from '@clever/shared';
 
 class ApiService {
   private baseUrl = '/api';
@@ -158,13 +193,17 @@ class ApiService {
     // Implementation using shared types
   }
 
-  async createContent<T>(type: ContentType, data: CreateContentRequest<T>): Promise<ApiResponse<T>> {
+  async createContent<T>(
+    type: ContentType,
+    data: CreateContentRequest<T>
+  ): Promise<ApiResponse<T>> {
     // Implementation using shared types
   }
 }
 ```
 
 3. **Vue Router Configuration**
+
 ```typescript
 const routes = [
   { path: '/', component: HomeView },
@@ -176,11 +215,13 @@ const routes = [
 
 ### Backend Package (`packages/backend`)
 
-**Purpose**: Hono-based API server with middleware for static asset serving and SPA fallback.
+**Purpose**: Hono-based API server with middleware for static asset serving and
+SPA fallback.
 
 **Key Components**:
 
 1. **Main Application Structure**
+
 ```
 src/
 ├── index.ts             # Worker entry point
@@ -197,6 +238,7 @@ src/
 ```
 
 2. **Route Structure**
+
 ```typescript
 import { Hono } from 'hono';
 import type { ApiResponse, BaseContent, ContentType } from '@clever/shared';
@@ -204,41 +246,45 @@ import type { ApiResponse, BaseContent, ContentType } from '@clever/shared';
 const api = new Hono();
 
 // CRUD endpoints for all content types
-api.get('/content/:type', async (c) => {
+api.get('/content/:type', async c => {
   // List content with pagination and filtering
 });
 
-api.get('/content/:type/:uuid', async (c) => {
+api.get('/content/:type/:uuid', async c => {
   // Get single content item
 });
 
-api.post('/content/:type', async (c) => {
+api.post('/content/:type', async c => {
   // Create new content item
 });
 
-api.put('/content/:type/:uuid', async (c) => {
+api.put('/content/:type/:uuid', async c => {
   // Update existing content item
 });
 
-api.delete('/content/:type/:uuid', async (c) => {
+api.delete('/content/:type/:uuid', async c => {
   // Soft delete content item
 });
 ```
 
 3. **Static Asset Middleware**
+
 ```typescript
 import { serveStatic } from 'hono/cloudflare-workers';
 
-app.use('/*', serveStatic({ 
-  root: './',
-  getContent: (path) => {
-    // Serve from KV binding
-    return env.ASSETS.get(path);
-  }
-}));
+app.use(
+  '/*',
+  serveStatic({
+    root: './',
+    getContent: path => {
+      // Serve from KV binding
+      return env.ASSETS.get(path);
+    },
+  })
+);
 
 // SPA fallback for client-side routing
-app.get('*', async (c) => {
+app.get('*', async c => {
   const indexHtml = await env.ASSETS.get('index.html');
   return c.html(indexHtml);
 });
@@ -248,7 +294,8 @@ app.get('*', async (c) => {
 
 ### Content Storage Pattern
 
-All content follows the BaseContent interface pattern with audit trail fields and a flexible data property for content-specific fields.
+All content follows the BaseContent interface pattern with audit trail fields
+and a flexible data property for content-specific fields.
 
 ### R2 Storage Structure
 
@@ -281,19 +328,24 @@ KV Namespace: ASSETS_{ENV}
 
 ## Correctness Properties
 
-*A property is a characteristic or behavior that should hold true across all valid executions of a system—essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees.*
+_A property is a characteristic or behavior that should hold true across all
+valid executions of a system—essentially, a formal statement about what the
+system should do. Properties serve as the bridge between human-readable
+specifications and machine-verifiable correctness guarantees._
 
 Let me analyze the acceptance criteria for testability:
 
-Based on the prework analysis, most acceptance criteria involve configuration verification and setup validation, which are best tested through unit tests. However, two universal properties emerge:
+Based on the prework analysis, most acceptance criteria involve configuration
+verification and setup validation, which are best tested through unit tests.
+However, two universal properties emerge:
 
-**Property 1: Type Sharing Consistency**
-*For any* type modification in the shared package, both frontend and backend packages should have access to the updated types after compilation.
-**Validates: Requirements 2.5**
+**Property 1: Type Sharing Consistency** _For any_ type modification in the
+shared package, both frontend and backend packages should have access to the
+updated types after compilation. **Validates: Requirements 2.5**
 
-**Property 2: Build Artifact Generation**
-*For any* valid project state, the build process should produce a single deployable Worker artifact that contains both frontend assets and backend code.
-**Validates: Requirements 6.6**
+**Property 2: Build Artifact Generation** _For any_ valid project state, the
+build process should produce a single deployable Worker artifact that contains
+both frontend assets and backend code. **Validates: Requirements 6.6**
 
 ## Error Handling
 
@@ -335,9 +387,11 @@ Based on the prework analysis, most acceptance criteria involve configuration ve
 
 ### Dual Testing Approach
 
-The testing strategy combines unit tests for specific configurations and property-based tests for universal behaviors:
+The testing strategy combines unit tests for specific configurations and
+property-based tests for universal behaviors:
 
 **Unit Tests**:
+
 - Configuration verification (package.json, tsconfig.json, wrangler.toml)
 - Component existence and structure validation
 - API endpoint definition verification
@@ -345,24 +399,29 @@ The testing strategy combines unit tests for specific configurations and propert
 - Development tooling setup verification
 
 **Property-Based Tests**:
+
 - Type sharing consistency across package modifications
 - Build process reliability across different project states
 - Each property test runs minimum 100 iterations
-- Tests tagged with: **Feature: project-initialization, Property {number}: {property_text}**
+- Tests tagged with: **Feature: project-initialization, Property {number}:
+  {property_text}**
 
 ### Testing Framework Configuration
 
 **Frontend Testing**:
+
 - Vitest for unit tests and component testing
 - Vue Test Utils for component testing
 - Property-based testing using fast-check library
 
 **Backend Testing**:
+
 - Vitest for unit tests and API testing
 - Hono test utilities for request/response testing
 - Property-based testing using fast-check library
 
 **Integration Testing**:
+
 - End-to-end build process validation
 - Cross-package type sharing verification
 - Development server functionality testing
@@ -394,7 +453,10 @@ packages/
 
 Each correctness property will be implemented as a separate property-based test:
 
-1. **Property 1 Test**: Modify shared types, rebuild packages, verify both frontend and backend can import and use updated types
-2. **Property 2 Test**: Generate various valid project configurations, run build process, verify single Worker artifact is produced with correct structure
+1. **Property 1 Test**: Modify shared types, rebuild packages, verify both
+   frontend and backend can import and use updated types
+2. **Property 2 Test**: Generate various valid project configurations, run build
+   process, verify single Worker artifact is produced with correct structure
 
-The property tests will use TypeScript compilation APIs and file system operations to validate the universal behaviors across many generated scenarios.
+The property tests will use TypeScript compilation APIs and file system
+operations to validate the universal behaviors across many generated scenarios.

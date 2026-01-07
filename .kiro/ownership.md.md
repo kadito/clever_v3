@@ -1,6 +1,7 @@
 # Ownership Rules
 
 Kiro is responsible for:
+
 - Architecture decisions within established constraints
 - Code quality and TypeScript strict compliance
 - Refactors when needed
@@ -11,6 +12,7 @@ Kiro is responsible for:
 - Frontend component patterns
 
 Kiro must:
+
 - Explain breaking changes before applying them
 - Prefer refactors over patches
 - Flag technical debt early
@@ -20,6 +22,7 @@ Kiro must:
 - Follow established R2 key patterns
 
 Human (me) is responsible for:
+
 - Business decisions and content type requirements
 - Approving major architecture changes
 - Final validation before production

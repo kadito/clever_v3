@@ -1,6 +1,7 @@
 # Tech Constraints
 
 Frontend:
+
 - Vue 3
 - Composition API
 - TailwindCSS
@@ -8,12 +9,14 @@ Frontend:
 - No class-based components
 
 Backend:
+
 - Cloudflare Workers
 - Hono framework
 - TypeScript only
 - REST API
 
 Deployment:
+
 - Single Cloudflare Worker for both frontend and backend
 - Vue static files stored in Cloudflare KV
 - KV binding via [assets] in wrangler.toml
@@ -22,6 +25,7 @@ Deployment:
   - All other routes → Vue app (with 404 handling)
 
 Storage:
+
 - Cloudflare R2 (JSON document store)
 - Cloudflare KV (static assets)
 - No traditional database
@@ -33,19 +37,23 @@ Storage:
   ```
 
 Auth:
+
 - Clerk (email/password only)
 - Simple authentication system
 - User data stored in content audit trail
 
 Environments:
+
 - test branch → test environment
 - prod branch → production environment
 
 Localization:
+
 - All code in English
 - All UI labels in Português Portugal
 
 General:
+
 - No experimental libraries
 - No code generation without review
 - All public APIs must be typed
