@@ -20,6 +20,23 @@ Comments:
 - Why > What
 - No obvious comments
 
+Mobile-First Development:
+
+- Design for mobile screens first (320px+)
+- Use Tailwind responsive breakpoints: sm (768px), md (1024px), lg (1280px)
+- Touch targets minimum 44px (iOS/Android guidelines)
+- Test on mobile devices regularly
+- Optimize for thumb navigation
+- Use mobile-first CSS media queries
+
+Component Standards:
+
+- Follow 4-view pattern: Home → List → Detail → Create/Edit
+- Use consistent color palette from old_src
+- Implement loading states for mobile networks
+- Handle offline scenarios gracefully
+- Use semantic HTML for accessibility
+
 Content Structure:
 
 - All content extends BaseContent interface

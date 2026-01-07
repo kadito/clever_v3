@@ -20,10 +20,13 @@ and R2 for JSON document storage.
 ### Frontend
 
 - **Vue 3** with Composition API
-- **TailwindCSS** for styling
+- **TailwindCSS** for styling with mobile-first responsive design
 - **TypeScript** strict mode
 - **Pinia** for state management
-- **Vue Router** for navigation
+- **Vue Router** for navigation with dashboard-centric routing
+- **Mobile-First Design**: Optimized for mobile devices with responsive breakpoints
+- **Color Palette**: Based on old_src (#75AE93 primary, #2c3e50 secondary)
+- **4-View Pattern**: Home (dashboard) → List (search) → Detail → Create/Edit for all content types
 
 ### Backend
 

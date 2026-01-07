@@ -1,0 +1,187 @@
+[
+  {
+    "id": 1,
+    "clientName": "Cafe do Largo",
+    "date": "2025-06-16",
+    "number": "FO001",
+    "client": {
+      "socialName": "Patiinhas da Algueda - Lda",
+      "commercialName": "Cafe do Largo",
+      "taxNumber": "518.592.545",
+      "address": "Largo de Nossa Sra. da Nazaré 40",
+      "location": "Nazaré"
+    },
+    "request": {
+      "reason": "Máquina encravada",
+      "receivedBy": "JOSÉ BATISTA",
+      "date": "2025-06-14",
+      "assistanceDate": "2025-06-16",
+      "arrivalTime": "11:15",
+      "departureTime": "11:45",
+      "totalHours": "00:30:00",
+      "minimumTaxSurcharge": "00:00:30"
+    },
+    "displacement": {
+      "roundTripKm": "80KMS",
+      "totalCalculatedHours": "01:00",
+      "displacementCost": "48.80",
+      "laborCost": "45.00",
+      "totalCostWithTax": "115.37",
+      "clientContract": "NÃO",
+      "paymentMethod": "PENDENTE",
+      "totalToPay": "115.37"
+    },
+    "otherData": {
+      "serviceReport": "Moeda de 2€ encravada. Provavelmente quando o mini pc foi desligado, não deixou fazer o circuito completo do recebedor.",
+      "technician": "JOSÉ BATISTA"
+    }
+  },
+  {
+    "id": 2,
+    "clientName": "Papelaria Central",
+    "date": "2025-06-05",
+    "number": "FO002",
+    "client": {
+      "socialName": "Papelaria Central S.A.",
+      "commercialName": "Papelaria Central",
+      "taxNumber": "501.234.567",
+      "address": "Rua da República, 45",
+      "location": "Lisboa"
+    },
+    "request": {
+      "reason": "Impressora não funciona",
+      "receivedBy": "MARIA SILVA",
+      "date": "2025-06-03",
+      "assistanceDate": "2025-06-05",
+      "arrivalTime": "09:30",
+      "departureTime": "10:15",
+      "totalHours": "00:45:00",
+      "minimumTaxSurcharge": "00:15:00"
+    },
+    "displacement": {
+      "roundTripKm": "25KMS",
+      "totalCalculatedHours": "01:15",
+      "displacementCost": "30.00",
+      "laborCost": "60.00",
+      "totalCostWithTax": "110.70",
+      "clientContract": "SIM",
+      "paymentMethod": "PAGO",
+      "totalToPay": "110.70"
+    },
+    "otherData": {
+      "serviceReport": "Cabo USB danificado. Substituído cabo e testado funcionamento. Impressora operacional.",
+      "technician": "MARIA SILVA"
+    }
+  },
+  {
+    "id": 3,
+    "clientName": "Frutaria Tropical",
+    "date": "2025-06-05",
+    "number": "FO003",
+    "client": {
+      "socialName": "Frutas do Tropico Lda",
+      "commercialName": "Frutaria Tropical",
+      "taxNumber": "502.345.678",
+      "address": "Avenida dos Descobrimentos, 123",
+      "location": "Porto"
+    },
+    "request": {
+      "reason": "Sistema POS não liga",
+      "receivedBy": "PEDRO SANTOS",
+      "date": "2025-06-04",
+      "assistanceDate": "2025-06-05",
+      "arrivalTime": "14:00",
+      "departureTime": "15:30",
+      "totalHours": "01:30:00",
+      "minimumTaxSurcharge": "00:00:00"
+    },
+    "displacement": {
+      "roundTripKm": "120KMS",
+      "totalCalculatedHours": "02:00",
+      "displacementCost": "75.00",
+      "laborCost": "90.00",
+      "totalCostWithTax": "202.95",
+      "clientContract": "NÃO",
+      "paymentMethod": "PENDENTE",
+      "totalToPay": "202.95"
+    },
+    "otherData": {
+      "serviceReport": "Fonte de alimentação avariada. Substituída fonte e configurado sistema. Tudo operacional após testes.",
+      "technician": "PEDRO SANTOS"
+    }
+  },
+  {
+    "id": 4,
+    "clientName": "Amazonia WebCafe",
+    "date": "2025-05-30",
+    "number": "FO004",
+    "client": {
+      "socialName": "WebCafe Amazonia Unipessoal Lda",
+      "commercialName": "Amazonia WebCafe",
+      "taxNumber": "503.456.789",
+      "address": "Rua das Tecnologias, 88",
+      "location": "Braga"
+    },
+    "request": {
+      "reason": "Rede WiFi instável",
+      "receivedBy": "ANA COSTA",
+      "date": "2025-05-28",
+      "assistanceDate": "2025-05-30",
+      "arrivalTime": "10:00",
+      "departureTime": "12:00",
+      "totalHours": "02:00:00",
+      "minimumTaxSurcharge": "00:00:00"
+    },
+    "displacement": {
+      "roundTripKm": "45KMS",
+      "totalCalculatedHours": "02:30",
+      "displacementCost": "35.00",
+      "laborCost": "120.00",
+      "totalCostWithTax": "190.65",
+      "clientContract": "SIM",
+      "paymentMethod": "PAGO",
+      "totalToPay": "190.65"
+    },
+    "otherData": {
+      "serviceReport": "Router antigo com problemas de conectividade. Atualizado firmware e configurações de rede. Instalado novo access point para melhor cobertura.",
+      "technician": "ANA COSTA"
+    }
+  },
+  {
+    "id": 5,
+    "clientName": "Xodo",
+    "date": "2025-05-30",
+    "number": "FO005",
+    "client": {
+      "socialName": "Xodo - Restauração e Bebidas Lda",
+      "commercialName": "Xodo",
+      "taxNumber": "504.567.890",
+      "address": "Praça do Comércio, 12",
+      "location": "Aveiro"
+    },
+    "request": {
+      "reason": "Caixa registadora bloqueada",
+      "receivedBy": "RUI FERREIRA",
+      "date": "2025-05-29",
+      "assistanceDate": "2025-05-30",
+      "arrivalTime": "16:30",
+      "departureTime": "17:00",
+      "totalHours": "00:30:00",
+      "minimumTaxSurcharge": "00:00:30"
+    },
+    "displacement": {
+      "roundTripKm": "60KMS",
+      "totalCalculatedHours": "01:00",
+      "displacementCost": "40.00",
+      "laborCost": "45.00",
+      "totalCostWithTax": "104.55",
+      "clientContract": "NÃO",
+      "paymentMethod": "PENDENTE",
+      "totalToPay": "104.55"
+    },
+    "otherData": {
+      "serviceReport": "Erro de software na aplicação de faturação. Reiniciado sistema e atualizada base de dados. Sistema operacional após verificações.",
+      "technician": "RUI FERREIRA"
+    }
+  }
+] 

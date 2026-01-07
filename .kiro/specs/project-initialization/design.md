@@ -148,7 +148,13 @@ type UpdateContentRequest<T extends BaseContent> = Partial<Pick<T, 'data'>>;
 
 ### Frontend Package (`packages/frontend`)
 
-**Purpose**: Vue 3 single-page application with TailwindCSS styling.
+**Purpose**: Vue 3 single-page application with TailwindCSS styling, following a mobile-first dashboard design pattern.
+
+**Design Philosophy**:
+- **Mobile-first approach**: All components designed for mobile screens first, then enhanced for larger screens
+- **Dashboard-centric navigation**: Home page serves as a central hub with content navigation tiles
+- **Consistent view patterns**: All content types follow the same 4-view pattern (Home → List → Detail → Create/Edit)
+- **Color scheme**: Based on the old_src palette with primary green (#75AE93) and supporting colors
 
 **Key Components**:
 
@@ -157,23 +163,82 @@ type UpdateContentRequest<T extends BaseContent> = Partial<Pick<T, 'data'>>;
 ```
 src/
 ├── main.ts              # Application entry point
-├── App.vue              # Root component
+├── App.vue              # Root component with mobile-first navigation
 ├── router/
 │   └── index.ts         # Vue Router configuration
 ├── stores/
 │   └── index.ts         # Pinia store setup
 ├── components/
 │   ├── layout/
-│   │   ├── AppLayout.vue
-│   │   └── AppNavigation.vue
-│   └── common/
-│       └── ErrorBoundary.vue
+│   │   ├── AppLayout.vue      # Mobile-first layout wrapper
+│   │   ├── AppNavigation.vue  # Mobile hamburger + desktop nav
+│   │   └── DashboardGrid.vue  # Home page content tiles
+│   ├── common/
+│   │   ├── ErrorBoundary.vue
+│   │   ├── SearchBar.vue      # Reusable search component
+│   │   ├── ContentCard.vue    # List view item component
+│   │   └── LoadingSpinner.vue
+│   └── forms/
+│       └── ContentForm.vue    # Reusable create/edit form
 ├── views/
-│   ├── HomeView.vue
-│   ├── ClientsView.vue
-│   └── [ContentType]View.vue
+│   ├── HomeView.vue           # Dashboard with navigation tiles
+│   ├── content/
+│   │   ├── ContentListView.vue    # Generic list view template
+│   │   ├── ContentDetailView.vue  # Generic detail view template
+│   │   └── ContentFormView.vue    # Generic create/edit view template
+│   └── [ContentType]/
+│       ├── [Type]ListView.vue     # Specific list implementations
+│       ├── [Type]DetailView.vue   # Specific detail implementations
+│       └── [Type]FormView.vue     # Specific form implementations
 └── services/
     └── api.ts           # API client using shared types
+```
+
+2. **Mobile-First Design System**
+
+```scss
+// Color palette from old_src
+:root {
+  --primary-color: rgb(117, 174, 147);      // Main green
+  --primary-hover: rgb(97, 154, 127);       // Darker green
+  --primary-light: rgb(137, 194, 167);      // Lighter green
+  --primary-dark: rgb(77, 134, 107);        // Darkest green
+  --secondary-color: #2c3e50;               // Dark blue-gray
+  --text-color: #333;                       // Main text
+  --text-muted: #6c757d;                    // Muted text
+  --background: #f5f5f5;                    // Light gray background
+  --white: #ffffff;                         // White
+  --border: #e9ecef;                        // Light border
+  --success: var(--primary-color);          // Success state
+  --danger: #dc3545;                        // Error state
+  --warning: #ffc107;                       // Warning state
+  --info: #17a2b8;                          // Info state
+}
+
+// Mobile-first breakpoints
+@media (min-width: 768px) { /* Tablet */ }
+@media (min-width: 1024px) { /* Desktop */ }
+```
+
+3. **View Pattern Architecture**
+
+Each content type follows a consistent 4-view pattern:
+
+- **Home View**: Dashboard with content type tiles for navigation
+- **List View**: Search/filter interface with paginated content cards
+- **Detail View**: Full content display with action buttons
+- **Form View**: Create/edit interface with validation
+
+```typescript
+// Standard view routing pattern
+const contentRoutes = [
+  { path: '/', component: HomeView },                    // Dashboard
+  { path: '/clients', component: ClientsListView },     // List
+  { path: '/clients/:id', component: ClientDetailView }, // Detail
+  { path: '/clients/new', component: ClientFormView },   // Create
+  { path: '/clients/:id/edit', component: ClientFormView }, // Edit
+  // Repeated for all content types...
+];
 ```
 
 2. **API Service Layer**
@@ -189,15 +254,35 @@ import type {
 class ApiService {
   private baseUrl = '/api';
 
-  async getContent<T>(type: ContentType): Promise<ListResponse<T>> {
-    // Implementation using shared types
+  // Generic CRUD operations for all content types
+  async getContentList<T>(
+    type: ContentType, 
+    params?: { search?: string; page?: number; limit?: number }
+  ): Promise<ListResponse<T>> {
+    // Implementation with search and pagination
+  }
+
+  async getContentById<T>(type: ContentType, id: string): Promise<ApiResponse<T>> {
+    // Implementation for detail view
   }
 
   async createContent<T>(
     type: ContentType,
     data: CreateContentRequest<T>
   ): Promise<ApiResponse<T>> {
-    // Implementation using shared types
+    // Implementation for create form
+  }
+
+  async updateContent<T>(
+    type: ContentType,
+    id: string,
+    data: UpdateContentRequest<T>
+  ): Promise<ApiResponse<T>> {
+    // Implementation for edit form
+  }
+
+  async deleteContent(type: ContentType, id: string): Promise<ApiResponse<void>> {
+    // Implementation for soft delete
   }
 }
 ```
@@ -205,11 +290,26 @@ class ApiService {
 3. **Vue Router Configuration**
 
 ```typescript
+// Mobile-first routing with dashboard-centric navigation
 const routes = [
-  { path: '/', component: HomeView },
-  { path: '/clients', component: ClientsView },
-  { path: '/contracts', component: ContractsView },
-  // Routes for all content types
+  // Dashboard home
+  { path: '/', component: HomeView, name: 'home' },
+  
+  // Content type routes following consistent pattern
+  // Clients
+  { path: '/clients', component: ClientsListView, name: 'clients-list' },
+  { path: '/clients/new', component: ClientFormView, name: 'clients-create' },
+  { path: '/clients/:id', component: ClientDetailView, name: 'clients-detail' },
+  { path: '/clients/:id/edit', component: ClientFormView, name: 'clients-edit' },
+  
+  // Contracts
+  { path: '/contracts', component: ContractsListView, name: 'contracts-list' },
+  { path: '/contracts/new', component: ContractFormView, name: 'contracts-create' },
+  { path: '/contracts/:id', component: ContractDetailView, name: 'contracts-detail' },
+  { path: '/contracts/:id/edit', component: ContractFormView, name: 'contracts-edit' },
+  
+  // Pattern repeats for all content types:
+  // licenses, work-sheets, daily-records, remote-assistance, reminders, pending
 ];
 ```
 

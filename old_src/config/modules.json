@@ -1,0 +1,116 @@
+{
+  "modules": [
+    {
+      "id": "clientes",
+      "name": "Clientes",
+      "icon": "👥",
+      "path": "/clientes",
+      "description": "Gestão de clientes",
+      "status": "complete"
+    },
+    {
+      "id": "agendamentos",
+      "name": "Agendamentos",
+      "icon": "📅",
+      "path": "/agendamentos",
+      "description": "Gerir agendamentos e marcações",
+      "status": "disabled"
+    },
+    {
+      "id": "folhas-obra",
+      "name": "Folhas de Obra",
+      "icon": "📝",
+      "path": "/folhas-obra",
+      "description": "Gestão de folhas de obra",
+      "status": "complete"
+    },
+    {
+      "id": "assistencias-remotas",
+      "name": "Assistências Remotas",
+      "icon": "📞",
+      "path": "/assistencias-remotas",
+      "description": "Gestão de assistências remotas e telefónicas",
+      "status": "complete"
+    },
+    {
+      "id": "registro-diario",
+      "name": "Registro Diário de Ativ.",
+      "icon": "📋",
+      "path": "/registo-diario",
+      "description": "Registo diário de atividades",
+      "status": "complete"
+    },
+    {
+      "id": "gestor-contratos",
+      "name": "Gestor de Contratos",
+      "icon": "📄",
+      "path": "/gestor-contratos",
+      "description": "Gestão de contratos",
+      "status": "complete"
+    },
+    {
+      "id": "gestor-licencas",
+      "name": "Gestor de Licenças",
+      "icon": "🔑",
+      "path": "/gestor-licencas",
+      "description": "Gestão de licenças",
+      "status": "complete"
+    },
+    {
+      "id": "instalacoes-programacoes",
+      "name": "Instal. e Programações",
+      "icon": "💻",
+      "path": "/instalacoes-programacoes",
+      "description": "Instalações e programações de equipamentos",
+      "status": "disabled"
+    },
+    {
+      "id": "pendentes-lembretes",
+      "name": "Pendentes e Lembretes",
+      "icon": "⏰",
+      "path": "/pendentes-lembretes",
+      "description": "Tarefas pendentes e lembretes",
+      "status": "disabled"
+    },
+    {
+      "id": "emprestimo-equip",
+      "name": "Empréstimo de Equip.",
+      "icon": "📦",
+      "path": "/equipamento-usado",
+      "description": "Gestão de equipamentos em empréstimo e controlo de stock",
+      "status": "disabled"
+    },
+    {
+      "id": "equipamentos-usados",
+      "name": "Equipamentos Usados",
+      "icon": "📟",
+      "path": "/equipamentos-usados",
+      "description": "Gestão de equipamentos usados",
+      "status": "disabled"
+    },
+    {
+      "id": "gestor-encomendas",
+      "name": "Gestor de Encomendas",
+      "icon": "📦",
+      "path": "/gestor-encomendas",
+      "description": "Gestão de encomendas",
+      "status": "disabled"
+    },
+    {
+      "id": "conta-corrente",
+      "name": "Conta Corrente",
+      "icon": "💰",
+      "path": "/conta-corrente",
+      "description": "Gestão de conta corrente",
+      "status": "disabled"
+    },
+    {
+      "id": "equipa",
+      "name": "Equipa",
+      "icon": "👷",
+      "path": "/equipa",
+      "description": "Gestão da equipa",
+      "status": "complete"
+    }
+  ]
+}

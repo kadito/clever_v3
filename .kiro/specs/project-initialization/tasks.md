@@ -8,6 +8,15 @@ specific components while ensuring proper integration with previously
 implemented parts. The approach prioritizes getting a working foundation
 quickly, then adding layers of functionality.
 
+## Design Philosophy
+
+**Mobile-First Dashboard Approach**: The frontend follows a mobile-first design philosophy with:
+- **Color Palette**: Based on old_src with primary green (#75AE93) and supporting colors
+- **Navigation Pattern**: Dashboard home → Content list → Detail view → Create/Edit form
+- **Responsive Design**: Mobile-optimized components that scale up to desktop
+- **Consistent UX**: All content types follow the same 4-view interaction pattern
+- **Touch-Friendly**: Optimized for mobile interactions with proper tap targets
+
 ## Tasks
 
 - [x] 1. Set up monorepo structure and workspace configuration
@@ -64,30 +73,53 @@ quickly, then adding layers of functionality.
     - Ensure API responses follow shared ApiResponse interface
     - _Requirements: 4.3, 7.3_
 
-- [ ] 5. Initialize frontend package with Vue 3
-  - [ ] 5.1 Create frontend package structure
-    - Create packages/frontend/package.json with Vue 3, TailwindCSS, Pinia
-      dependencies
+- [-] 5. Initialize mobile-first dashboard frontend package with Vue 3
+  - [ ] 5.1 Create frontend package structure with mobile-first setup
+    - Create packages/frontend/package.json with Vue 3, TailwindCSS, Pinia dependencies
     - Set up packages/frontend/tsconfig.json with references to shared
     - Create basic src/main.ts with Vue app initialization
-    - _Requirements: 3.1, 3.2, 3.3, 3.5, 3.6_
+    - Configure TailwindCSS with mobile-first breakpoints and old_src color palette
+    - _Requirements: 3.1, 3.2, 3.3, 3.5, 3.6, 3.8_
 
-  - [ ] 5.2 Set up Vue Router and basic components
-    - Create src/router/index.ts with routes for all content types
-    - Create src/components/layout/AppLayout.vue main layout component
-    - Create src/components/layout/AppNavigation.vue navigation component
-    - _Requirements: 3.4, 8.1, 8.2, 8.3_
+  - [ ] 5.2 Set up Vue Router with dashboard-centric navigation
+    - Create src/router/index.ts with 4-view pattern routes for all content types
+    - Implement route structure: Home (dashboard) → List → Detail → Create/Edit
+    - Configure mobile-friendly route transitions and navigation guards
+    - _Requirements: 3.4, 3.9, 8.1, 8.2_
 
-  - [ ] 5.3 Create API service with shared types
+  - [ ] 5.3 Create mobile-first layout and navigation components
+    - Create src/components/layout/AppLayout.vue with responsive mobile-first layout
+    - Create src/components/layout/AppNavigation.vue with hamburger menu for mobile
+    - Create src/components/layout/DashboardGrid.vue for home page content tiles
+    - Implement touch-friendly navigation with proper tap targets
+    - _Requirements: 3.10, 8.1, 8.3, 8.7_
+
+  - [ ] 5.4 Create reusable dashboard components
+    - Create src/components/common/SearchBar.vue for list views
+    - Create src/components/common/ContentCard.vue for mobile-optimized list items
+    - Create src/components/forms/ContentForm.vue for create/edit views
+    - Create src/views/HomeView.vue dashboard with content navigation tiles
+    - _Requirements: 8.4, 8.7, 8.8_
+
+  - [ ] 5.5 Create generic view templates following 4-view pattern
+    - Create src/views/content/ContentListView.vue generic list template
+    - Create src/views/content/ContentDetailView.vue generic detail template
+    - Create src/views/content/ContentFormView.vue generic create/edit template
+    - Ensure all templates are mobile-first and use old_src color scheme
+    - _Requirements: 3.9, 3.10, 8.8_
+
+  - [ ] 5.6 Create API service with mobile-optimized error handling
     - Create src/services/api.ts using shared types for API communication
-    - Implement error handling for API requests
-    - _Requirements: 3.6, 8.4, 8.5_
+    - Implement mobile-friendly error handling and loading states
+    - Add support for search, pagination, and CRUD operations
+    - _Requirements: 3.6, 8.5, 8.6_
 
-  - [ ]\* 5.4 Write unit tests for frontend components
-    - Test main layout component renders correctly
-    - Test navigation component includes all content type routes
-    - Test API service uses shared types correctly
-    - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
+  - [ ]\* 5.7 Write unit tests for mobile-first frontend components
+    - Test responsive layout components render correctly on different screen sizes
+    - Test navigation component includes all content type routes with mobile menu
+    - Test API service uses shared types correctly with proper error handling
+    - Test dashboard tiles navigation and touch interactions
+    - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.7_
 
 - [ ] 6. Configure build and deployment
   - [ ] 6.1 Set up frontend build configuration
