@@ -1,6 +1,7 @@
 # Project Structure
 
 ## Monorepo Organization
+
 ```
 clever-dashboard/
 ├── packages/
@@ -14,6 +15,7 @@ clever-dashboard/
 ## Package Structure Conventions
 
 ### @clever/shared
+
 ```
 packages/shared/
 ├── src/
@@ -25,6 +27,7 @@ packages/shared/
 ```
 
 ### @clever/frontend
+
 ```
 packages/frontend/
 ├── src/
@@ -44,6 +47,7 @@ packages/frontend/
 ```
 
 ### @clever/backend
+
 ```
 packages/backend/
 ├── src/
@@ -58,11 +62,13 @@ packages/backend/
 ## Naming Conventions
 
 ### Files and Directories
+
 - Use kebab-case for file and directory names
 - Vue components use PascalCase (e.g., `ClientesList.vue`)
 - TypeScript files use camelCase or kebab-case consistently
 
 ### Module Organization
+
 - Group related functionality by business domain
 - Each module should follow the 4-view pattern:
   - `ModuleList.vue` - List/search view (mobile-optimized)
@@ -73,15 +79,20 @@ packages/backend/
 - Implement consistent color scheme from old_src palette
 
 ### API Routes
+
 - Use RESTful conventions
 - Group by content type (e.g., `/api/clients`, `/api/contracts`)
 - Maintain Portuguese business terminology in URLs when appropriate
 
 ## Legacy Code Reference
-The `old_src/` directory contains the previous Vue 2 implementation and should be used as reference for:
+
+The `old_src/` directory contains the previous Vue 2 implementation and should
+be used as reference for:
+
 - Business logic patterns
 - Module structure and organization
 - Data models and relationships
 - UI/UX patterns
 
-**Important**: Do not modify files in `old_src/` - it's for reference only during the migration to the new architecture.
+**Important**: Do not modify files in `old_src/` - it's for reference only
+during the migration to the new architecture.

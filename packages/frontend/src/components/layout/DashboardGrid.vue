@@ -10,18 +10,18 @@
       <div class="content-tile-icon group-hover:scale-110 transition-transform duration-200">
         {{ getContentTypeIcon(contentType) }}
       </div>
-      
+
       <!-- Title -->
       <h3 class="content-tile-title">
         {{ getContentTypeDisplayName(contentType) }}
       </h3>
-      
+
       <!-- Arrow indicator -->
       <div class="content-tile-arrow">
-        <svg 
-          class="w-4 h-4 text-primary-400 group-hover:text-primary-600 group-hover:translate-x-1 transition-all duration-200" 
-          fill="none" 
-          stroke="currentColor" 
+        <svg
+          class="w-4 h-4 text-primary-400 group-hover:text-primary-600 group-hover:translate-x-1 transition-all duration-200"
+          fill="none"
+          stroke="currentColor"
           viewBox="0 0 24 24"
         >
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { contentTypes, getContentTypeDisplayName, getContentTypeIcon } from '../../router'
+import { contentTypes, getContentTypeDisplayName, getContentTypeIcon } from '../../router';
 </script>
 
 <style scoped>
@@ -93,19 +93,19 @@ import { contentTypes, getContentTypeDisplayName, getContentTypeIcon } from '../
   .dashboard-grid {
     @apply gap-2;
   }
-  
+
   .content-tile {
     @apply p-2 min-h-20;
   }
-  
+
   .content-tile-icon {
     @apply text-xl mb-1;
   }
-  
+
   .content-tile-title {
     @apply text-xs;
   }
-  
+
   .content-tile-arrow .w-4 {
     @apply w-3 h-3;
   }
@@ -116,11 +116,11 @@ import { contentTypes, getContentTypeDisplayName, getContentTypeIcon } from '../
   .content-tile:hover {
     @apply transform-none shadow-sm;
   }
-  
+
   .content-tile:active {
     @apply bg-gray-50 transform scale-95;
   }
-  
+
   .content-tile-arrow {
     @apply opacity-100;
   }

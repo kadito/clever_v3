@@ -15,9 +15,11 @@
     "build": "tsc --build",
     "dev": "tsc --build --watch",
     "clean": "rm -rf dist",
-    "test": "vitest --run"
+    "test": "vitest --run",
+    "type-check": "tsc --noEmit"
   },
   "devDependencies": {
+    "fast-check": "^4.5.3",
     "typescript": "^5.0.0",
     "vitest": "^1.0.0"
   }

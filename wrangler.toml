@@ -1,0 +1,49 @@
+# Wrangler configuration for CLEVER Dashboard
+main = "packages/backend/dist/index.js"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+account_id = "98dfed939a59dca09770880eab939b79"
+
+# Static assets binding
+[assets]
+directory = "packages/frontend/dist"
+binding = "ASSETS"
+
+# Build configuration
+[build]
+command = "npm run build"
+cwd = "."
+watch_dir = ["packages/backend/src", "packages/frontend/src", "packages/shared/src"]
+
+# Development configuration
+[dev]
+name = "clever-dashboard-dev"
+port = 8787
+local_protocol = "http"
+upstream_protocol = "https"
+# Enable hot reloading for frontend changes
+live_reload = true
+# Watch for changes in all source directories
+watch_dir = ["packages/backend/src", "packages/frontend/src", "packages/shared/src"]
+vars = { NODE_ENV = "development", LOG_LEVEL = "debug" }
+
+# Performance limits
+[limits]
+cpu_ms = 50
+
+# Test environment (deployed)
+name = "clever-dashboard-test"
+vars = { NODE_ENV = "test", LOG_LEVEL = "debug" }
+
+[[r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "clever-documents-test"
+
+# Production environment (deployed)
+[env.production]
+name = "clever-dashboard-prod"
+vars = { NODE_ENV = "production", LOG_LEVEL = "warn" }
+
+[[env.production.r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "clever-documents-prod"

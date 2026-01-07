@@ -1,26 +1,26 @@
-import { ref, computed } from 'vue'
-import type { ApiError } from '../services/api'
+import { ref, computed } from 'vue';
+import type { ApiError } from '../services/api';
 
 // Error display configuration
 interface ErrorDisplayConfig {
-  showToast: boolean
-  showModal: boolean
-  autoHide: boolean
-  hideDelay: number
+  showToast: boolean;
+  showModal: boolean;
+  autoHide: boolean;
+  hideDelay: number;
 }
 
 // Error notification interface
 interface ErrorNotification {
-  id: string
-  error: ApiError
-  timestamp: Date
-  dismissed: boolean
-  config: ErrorDisplayConfig
+  id: string;
+  error: ApiError;
+  timestamp: Date;
+  dismissed: boolean;
+  config: ErrorDisplayConfig;
 }
 
 // Global error state
-const errors = ref<ErrorNotification[]>([])
-const nextId = ref(1)
+const errors = ref<ErrorNotification[]>([]);
+const nextId = ref(1);
 
 /**
  * Composable for handling and displaying API errors in a mobile-friendly way
@@ -31,144 +31,141 @@ export function useErrorHandler() {
     showToast: true,
     showModal: false,
     autoHide: true,
-    hideDelay: 5000 // 5 seconds
-  }
-  
+    hideDelay: 5000, // 5 seconds
+  };
+
   // Computed properties
-  const activeErrors = computed(() => 
-    errors.value.filter(notification => !notification.dismissed)
-  )
-  
-  const hasErrors = computed(() => activeErrors.value.length > 0)
-  
+  const activeErrors = computed(() => errors.value.filter(notification => !notification.dismissed));
+
+  const hasErrors = computed(() => activeErrors.value.length > 0);
+
   const networkErrors = computed(() =>
     activeErrors.value.filter(notification => notification.error.isNetworkError)
-  )
-  
+  );
+
   const retryableErrors = computed(() =>
     activeErrors.value.filter(notification => notification.error.isRetryable)
-  )
-  
+  );
+
   // Methods
-  
+
   /**
    * Add error to the global error state
    */
-  const addError = (
-    error: ApiError, 
-    config: Partial<ErrorDisplayConfig> = {}
-  ): string => {
-    const id = `error-${nextId.value++}`
-    const finalConfig = { ...defaultConfig, ...config }
-    
+  const addError = (error: ApiError, config: Partial<ErrorDisplayConfig> = {}): string => {
+    const id = `error-${nextId.value++}`;
+    const finalConfig = { ...defaultConfig, ...config };
+
     const notification: ErrorNotification = {
       id,
       error,
       timestamp: new Date(),
       dismissed: false,
-      config: finalConfig
-    }
-    
-    errors.value.push(notification)
-    
+      config: finalConfig,
+    };
+
+    errors.value.push(notification);
+
     // Auto-hide if configured
     if (finalConfig.autoHide) {
       setTimeout(() => {
-        dismissError(id)
-      }, finalConfig.hideDelay)
+        dismissError(id);
+      }, finalConfig.hideDelay);
     }
-    
-    return id
-  }
-  
+
+    return id;
+  };
+
   /**
    * Dismiss specific error
    */
   const dismissError = (id: string) => {
-    const notification = errors.value.find(n => n.id === id)
+    const notification = errors.value.find(n => n.id === id);
     if (notification) {
-      notification.dismissed = true
+      notification.dismissed = true;
     }
-  }
-  
+  };
+
   /**
    * Dismiss all errors
    */
   const dismissAllErrors = () => {
     errors.value.forEach(notification => {
-      notification.dismissed = true
-    })
-  }
-  
+      notification.dismissed = true;
+    });
+  };
+
   /**
    * Clear dismissed errors from memory
    */
   const clearDismissedErrors = () => {
-    errors.value = errors.value.filter(notification => !notification.dismissed)
-  }
-  
+    errors.value = errors.value.filter(notification => !notification.dismissed);
+  };
+
   /**
    * Get user-friendly error message
    */
   const getErrorMessage = (error: ApiError): string => {
     // Network-specific messages for mobile users
     if (error.isNetworkError) {
-      return 'Sem ligação à internet. Verifique a sua ligação e tente novamente.'
+      return 'Sem ligação à internet. Verifique a sua ligação e tente novamente.';
     }
-    
+
     if (error.isTimeoutError) {
-      return 'A ligação demorou muito tempo. Tente novamente.'
+      return 'A ligação demorou muito tempo. Tente novamente.';
     }
-    
+
     // HTTP status specific messages
     switch (error.status) {
       case 400:
-        return 'Dados inválidos. Verifique os campos e tente novamente.'
+        return 'Dados inválidos. Verifique os campos e tente novamente.';
       case 401:
-        return 'Sessão expirada. Faça login novamente.'
+        return 'Sessão expirada. Faça login novamente.';
       case 403:
-        return 'Não tem permissão para realizar esta ação.'
+        return 'Não tem permissão para realizar esta ação.';
       case 404:
-        return 'O item solicitado não foi encontrado.'
+        return 'O item solicitado não foi encontrado.';
       case 409:
-        return 'Conflito de dados. O item pode ter sido modificado por outro utilizador.'
+        return 'Conflito de dados. O item pode ter sido modificado por outro utilizador.';
       case 429:
-        return 'Muitas tentativas. Aguarde um momento e tente novamente.'
+        return 'Muitas tentativas. Aguarde um momento e tente novamente.';
       case 500:
-        return 'Erro interno do servidor. Tente novamente mais tarde.'
+        return 'Erro interno do servidor. Tente novamente mais tarde.';
       case 503:
-        return 'Serviço temporariamente indisponível. Tente novamente mais tarde.'
+        return 'Serviço temporariamente indisponível. Tente novamente mais tarde.';
       default:
-        return error.message || 'Ocorreu um erro inesperado.'
+        return error.message || 'Ocorreu um erro inesperado.';
     }
-  }
-  
+  };
+
   /**
    * Get error action suggestions
    */
-  const getErrorActions = (error: ApiError): Array<{
-    label: string
-    action: () => void
-    primary?: boolean
+  const getErrorActions = (
+    error: ApiError
+  ): Array<{
+    label: string;
+    action: () => void;
+    primary?: boolean;
   }> => {
     const actions: Array<{
-      label: string
-      action: () => void
-      primary?: boolean
-    }> = []
-    
+      label: string;
+      action: () => void;
+      primary?: boolean;
+    }> = [];
+
     // Retry action for retryable errors
     if (error.isRetryable) {
       actions.push({
         label: 'Tentar Novamente',
         action: () => {
           // This will be implemented by the component using the error
-          console.log('Retry action triggered')
+          console.log('Retry action triggered');
         },
-        primary: true
-      })
+        primary: true,
+      });
     }
-    
+
     // Network-specific actions
     if (error.isNetworkError) {
       actions.push({
@@ -177,26 +174,26 @@ export function useErrorHandler() {
           // Open network settings or show connection status
           if ('navigator' in window && 'onLine' in navigator) {
             if (!navigator.onLine) {
-              alert('Dispositivo offline. Verifique a sua ligação à internet.')
+              alert('Dispositivo offline. Verifique a sua ligação à internet.');
             } else {
-              alert('Ligação ativa. O problema pode ser temporário.')
+              alert('Ligação ativa. O problema pode ser temporário.');
             }
           }
-        }
-      })
+        },
+      });
     }
-    
+
     // Always provide dismiss action
     actions.push({
       label: 'Dispensar',
       action: () => {
         // Will be handled by the component
-      }
-    })
-    
-    return actions
-  }
-  
+      },
+    });
+
+    return actions;
+  };
+
   /**
    * Handle error with automatic categorization and display
    */
@@ -206,46 +203,44 @@ export function useErrorHandler() {
     config?: Partial<ErrorDisplayConfig>
   ): string => {
     // Add context to error message if provided
-    const contextualError = context 
-      ? { ...error, message: `${context}: ${error.message}` }
-      : error
-    
+    const contextualError = context ? { ...error, message: `${context}: ${error.message}` } : error;
+
     // Determine display configuration based on error type
     const errorConfig: Partial<ErrorDisplayConfig> = {
-      ...config
-    }
-    
+      ...config,
+    };
+
     // Critical errors should show modal
     if (error.status === 401 || error.status === 403) {
-      errorConfig.showModal = true
-      errorConfig.showToast = false
-      errorConfig.autoHide = false
+      errorConfig.showModal = true;
+      errorConfig.showToast = false;
+      errorConfig.autoHide = false;
     }
-    
+
     // Network errors should persist longer
     if (error.isNetworkError) {
-      errorConfig.hideDelay = 10000 // 10 seconds
+      errorConfig.hideDelay = 10000; // 10 seconds
     }
-    
-    return addError(contextualError, errorConfig)
-  }
-  
+
+    return addError(contextualError, errorConfig);
+  };
+
   /**
    * Create error handler function for use in components
    */
   const createErrorHandler = (context: string) => {
     return (error: ApiError, config?: Partial<ErrorDisplayConfig>) => {
-      return handleError(error, context, config)
-    }
-  }
-  
+      return handleError(error, context, config);
+    };
+  };
+
   return {
     // State
     errors: activeErrors,
     hasErrors,
     networkErrors,
     retryableErrors,
-    
+
     // Methods
     addError,
     dismissError,
@@ -253,30 +248,30 @@ export function useErrorHandler() {
     clearDismissedErrors,
     handleError,
     createErrorHandler,
-    
+
     // Utilities
     getErrorMessage,
-    getErrorActions
-  }
+    getErrorActions,
+  };
 }
 
 // Global error handler instance
-export const globalErrorHandler = useErrorHandler()
+export const globalErrorHandler = useErrorHandler();
 
 // Vue error handler integration
 export const setupGlobalErrorHandler = (app: any) => {
   app.config.errorHandler = (error: any, instance: any, info: string) => {
-    console.error('Vue Error:', error, info)
-    
+    console.error('Vue Error:', error, info);
+
     // Convert to ApiError format
     const apiError: ApiError = {
       message: error.message || 'Erro na aplicação',
       code: 'VUE_ERROR',
       isNetworkError: false,
       isTimeoutError: false,
-      isRetryable: false
-    }
-    
-    globalErrorHandler.handleError(apiError, `Erro Vue (${info})`)
-  }
-}
+      isRetryable: false,
+    };
+
+    globalErrorHandler.handleError(apiError, `Erro Vue (${info})`);
+  };
+};

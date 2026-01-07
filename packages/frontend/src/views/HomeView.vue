@@ -8,5 +8,5 @@
 </template>
 
 <script setup lang="ts">
-import DashboardGrid from '../components/layout/DashboardGrid.vue'
+import DashboardGrid from '../components/layout/DashboardGrid.vue';
 </script>

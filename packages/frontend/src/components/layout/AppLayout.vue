@@ -7,9 +7,7 @@
           <!-- Logo and title -->
           <div class="flex items-center">
             <router-link to="/" class="flex items-center">
-              <h1 class="text-xl font-bold text-primary-600">
-                CLEVER
-              </h1>
+              <h1 class="text-xl font-bold text-primary-600">CLEVER</h1>
             </router-link>
           </div>
 
@@ -19,23 +17,33 @@
             class="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500 touch-target"
             aria-label="Abrir menu"
           >
-            <svg 
-              class="w-6 h-6" 
-              :class="{ 'hidden': isMobileMenuOpen, 'block': !isMobileMenuOpen }"
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              class="w-6 h-6"
+              :class="{ hidden: isMobileMenuOpen, block: !isMobileMenuOpen }"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
-            <svg 
-              class="w-6 h-6" 
-              :class="{ 'block': isMobileMenuOpen, 'hidden': !isMobileMenuOpen }"
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              class="w-6 h-6"
+              :class="{ block: isMobileMenuOpen, hidden: !isMobileMenuOpen }"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
 
@@ -53,10 +61,7 @@
       </div>
 
       <!-- Mobile navigation menu -->
-      <div 
-        class="md:hidden"
-        :class="{ 'block': isMobileMenuOpen, 'hidden': !isMobileMenuOpen }"
-      >
+      <div class="md:hidden" :class="{ block: isMobileMenuOpen, hidden: !isMobileMenuOpen }">
         <div class="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-gray-200">
           <AppNavigation :is-mobile="true" @navigate="closeMobileMenu" />
         </div>
@@ -96,44 +101,44 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
-import AppNavigation from './AppNavigation.vue'
+import { ref, onMounted, onUnmounted } from 'vue';
+import { useRoute } from 'vue-router';
+import AppNavigation from './AppNavigation.vue';
 
-const route = useRoute()
-const isMobileMenuOpen = ref(false)
+const route = useRoute();
+const isMobileMenuOpen = ref(false);
 
 const toggleMobileMenu = () => {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value
-}
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+};
 
 const closeMobileMenu = () => {
-  isMobileMenuOpen.value = false
-}
+  isMobileMenuOpen.value = false;
+};
 
 // Close mobile menu when route changes
 const handleRouteChange = () => {
-  closeMobileMenu()
-}
+  closeMobileMenu();
+};
 
 // Close mobile menu on escape key
 const handleKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Escape') {
-    closeMobileMenu()
+    closeMobileMenu();
   }
-}
+};
 
 onMounted(() => {
-  document.addEventListener('keydown', handleKeydown)
-})
+  document.addEventListener('keydown', handleKeydown);
+});
 
 onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeydown)
-})
+  document.removeEventListener('keydown', handleKeydown);
+});
 
 // Watch for route changes to close mobile menu
-import { watch } from 'vue'
-watch(() => route.path, handleRouteChange)
+import { watch } from 'vue';
+watch(() => route.path, handleRouteChange);
 </script>
 
 <style scoped>
@@ -149,7 +154,8 @@ watch(() => route.path, handleRouteChange)
 }
 
 /* Ensure touch targets are properly sized */
-button, a {
+button,
+a {
   min-height: 44px;
   min-width: 44px;
 }

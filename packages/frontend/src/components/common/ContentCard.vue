@@ -1,5 +1,5 @@
 <template>
-  <div 
+  <div
     class="content-card group"
     :class="{ 'content-card--clickable': clickable }"
     @click="handleClick"
@@ -14,7 +14,7 @@
           </div>
         </slot>
       </div>
-      
+
       <!-- Title and subtitle -->
       <div class="content-card__title-section">
         <h3 class="content-card__title">
@@ -24,7 +24,7 @@
           {{ subtitle }}
         </p>
       </div>
-      
+
       <!-- Actions -->
       <div class="content-card__actions">
         <slot name="actions">
@@ -35,13 +35,18 @@
             aria-label="Mais opções"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
             </svg>
           </button>
         </slot>
       </div>
     </div>
-    
+
     <!-- Card content -->
     <div v-if="$slots.default || description" class="content-card__content">
       <slot>
@@ -50,88 +55,80 @@
         </p>
       </slot>
     </div>
-    
+
     <!-- Card footer -->
     <div v-if="$slots.footer || showMetadata" class="content-card__footer">
       <slot name="footer">
         <div v-if="showMetadata" class="flex items-center justify-between text-xs text-gray-500">
-          <span v-if="createdAt">
-            Criado: {{ formatDate(createdAt) }}
-          </span>
-          <span v-if="updatedAt">
-            Atualizado: {{ formatDate(updatedAt) }}
-          </span>
+          <span v-if="createdAt"> Criado: {{ formatDate(createdAt) }} </span>
+          <span v-if="updatedAt"> Atualizado: {{ formatDate(updatedAt) }} </span>
         </div>
       </slot>
     </div>
-    
+
     <!-- Status indicator -->
-    <div 
-      v-if="status"
-      class="content-card__status"
-      :class="`content-card__status--${status}`"
-    >
+    <div v-if="status" class="content-card__status" :class="`content-card__status--${status}`">
       <div class="w-2 h-2 rounded-full"></div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 interface Props {
-  title: string
-  subtitle?: string
-  description?: string
-  clickable?: boolean
-  status?: 'active' | 'inactive' | 'pending' | 'error'
-  createdAt?: string | Date
-  updatedAt?: string | Date
-  showMetadata?: boolean
-  contentType?: string
+  title: string;
+  subtitle?: string;
+  description?: string;
+  clickable?: boolean;
+  status?: 'active' | 'inactive' | 'pending' | 'error';
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  showMetadata?: boolean;
+  contentType?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   clickable: true,
-  showMetadata: false
-})
+  showMetadata: false,
+});
 
 const emit = defineEmits<{
-  click: []
-  action: []
-}>()
+  click: [];
+  action: [];
+}>();
 
 const defaultIcon = computed(() => {
   const icons: Record<string, string> = {
-    'clientes': '👥',
-    'contratos': '📋',
-    'licencas': '🔑',
+    clientes: '👥',
+    contratos: '📋',
+    licencas: '🔑',
     'folhas-obra': '📝',
     'registo-diario': '📅',
     'assistencias-remotas': '🔧',
-    'agendamentos': '⏰',
-    'equipa': '👨‍💼'
-  }
-  
-  return icons[props.contentType || ''] || '📄'
-})
+    agendamentos: '⏰',
+    equipa: '👨‍💼',
+  };
+
+  return icons[props.contentType || ''] || '📄';
+});
 
 const handleClick = () => {
   if (props.clickable) {
-    emit('click')
+    emit('click');
   }
-}
+};
 
 const formatDate = (date: string | Date): string => {
-  if (!date) return ''
-  
-  const d = typeof date === 'string' ? new Date(date) : date
+  if (!date) return '';
+
+  const d = typeof date === 'string' ? new Date(date) : date;
   return d.toLocaleDateString('pt-PT', {
     day: '2-digit',
     month: '2-digit',
-    year: 'numeric'
-  })
-}
+    year: 'numeric',
+  });
+};
 </script>
 
 <style scoped>
@@ -208,15 +205,15 @@ const formatDate = (date: string | Date): string => {
   .content-card {
     @apply p-3;
   }
-  
+
   .content-card__header {
     @apply space-x-2 mb-2;
   }
-  
+
   .content-card__title {
     @apply text-sm;
   }
-  
+
   .content-card__subtitle {
     @apply text-xs;
   }
@@ -227,7 +224,7 @@ const formatDate = (date: string | Date): string => {
   .content-card--clickable:hover {
     @apply transform-none shadow-sm;
   }
-  
+
   .content-card--clickable:active {
     @apply bg-gray-50 transform scale-95;
   }

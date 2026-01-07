@@ -27,27 +27,33 @@
   }
 
   /* Touch-friendly interactive elements */
-  button, 
-  [role="button"], 
-  input[type="submit"], 
-  input[type="button"] {
+  button,
+  [role='button'],
+  input[type='submit'],
+  input[type='button'] {
     min-height: theme('spacing.touch');
     min-width: theme('spacing.touch');
   }
 
   /* Improve tap targets on mobile */
-  a, button, [role="button"] {
+  a,
+  button,
+  [role='button'] {
     -webkit-tap-highlight-color: rgba(117, 174, 147, 0.2);
   }
 
   /* Form elements mobile optimization */
-  input, textarea, select {
+  input,
+  textarea,
+  select {
     /* Prevent zoom on focus (iOS) */
     font-size: 16px;
   }
 
   @media (min-width: 768px) {
-    input, textarea, select {
+    input,
+    textarea,
+    select {
       font-size: 14px;
     }
   }

@@ -6,8 +6,8 @@
 </template>
 
 <script setup lang="ts">
-import AppLayout from './components/layout/AppLayout.vue'
-import ErrorNotification from './components/common/ErrorNotification.vue'
+import AppLayout from './components/layout/AppLayout.vue';
+import ErrorNotification from './components/common/ErrorNotification.vue';
 </script>
 
 <style scoped>

@@ -148,13 +148,19 @@ type UpdateContentRequest<T extends BaseContent> = Partial<Pick<T, 'data'>>;
 
 ### Frontend Package (`packages/frontend`)
 
-**Purpose**: Vue 3 single-page application with TailwindCSS styling, following a mobile-first dashboard design pattern.
+**Purpose**: Vue 3 single-page application with TailwindCSS styling, following a
+mobile-first dashboard design pattern.
 
 **Design Philosophy**:
-- **Mobile-first approach**: All components designed for mobile screens first, then enhanced for larger screens
-- **Dashboard-centric navigation**: Home page serves as a central hub with content navigation tiles
-- **Consistent view patterns**: All content types follow the same 4-view pattern (Home → List → Detail → Create/Edit)
-- **Color scheme**: Based on the old_src palette with primary green (#75AE93) and supporting colors
+
+- **Mobile-first approach**: All components designed for mobile screens first,
+  then enhanced for larger screens
+- **Dashboard-centric navigation**: Home page serves as a central hub with
+  content navigation tiles
+- **Consistent view patterns**: All content types follow the same 4-view pattern
+  (Home → List → Detail → Create/Edit)
+- **Color scheme**: Based on the old_src palette with primary green (#75AE93)
+  and supporting colors
 
 **Key Components**:
 
@@ -199,25 +205,29 @@ src/
 ```scss
 // Color palette from old_src
 :root {
-  --primary-color: rgb(117, 174, 147);      // Main green
-  --primary-hover: rgb(97, 154, 127);       // Darker green
-  --primary-light: rgb(137, 194, 167);      // Lighter green
-  --primary-dark: rgb(77, 134, 107);        // Darkest green
-  --secondary-color: #2c3e50;               // Dark blue-gray
-  --text-color: #333;                       // Main text
-  --text-muted: #6c757d;                    // Muted text
-  --background: #f5f5f5;                    // Light gray background
-  --white: #ffffff;                         // White
-  --border: #e9ecef;                        // Light border
-  --success: var(--primary-color);          // Success state
-  --danger: #dc3545;                        // Error state
-  --warning: #ffc107;                       // Warning state
-  --info: #17a2b8;                          // Info state
+  --primary-color: rgb(117, 174, 147); // Main green
+  --primary-hover: rgb(97, 154, 127); // Darker green
+  --primary-light: rgb(137, 194, 167); // Lighter green
+  --primary-dark: rgb(77, 134, 107); // Darkest green
+  --secondary-color: #2c3e50; // Dark blue-gray
+  --text-color: #333; // Main text
+  --text-muted: #6c757d; // Muted text
+  --background: #f5f5f5; // Light gray background
+  --white: #ffffff; // White
+  --border: #e9ecef; // Light border
+  --success: var(--primary-color); // Success state
+  --danger: #dc3545; // Error state
+  --warning: #ffc107; // Warning state
+  --info: #17a2b8; // Info state
 }
 
 // Mobile-first breakpoints
-@media (min-width: 768px) { /* Tablet */ }
-@media (min-width: 1024px) { /* Desktop */ }
+@media (min-width: 768px) {
+  /* Tablet */
+}
+@media (min-width: 1024px) {
+  /* Desktop */
+}
 ```
 
 3. **View Pattern Architecture**
@@ -232,10 +242,10 @@ Each content type follows a consistent 4-view pattern:
 ```typescript
 // Standard view routing pattern
 const contentRoutes = [
-  { path: '/', component: HomeView },                    // Dashboard
-  { path: '/clients', component: ClientsListView },     // List
+  { path: '/', component: HomeView }, // Dashboard
+  { path: '/clients', component: ClientsListView }, // List
   { path: '/clients/:id', component: ClientDetailView }, // Detail
-  { path: '/clients/new', component: ClientFormView },   // Create
+  { path: '/clients/new', component: ClientFormView }, // Create
   { path: '/clients/:id/edit', component: ClientFormView }, // Edit
   // Repeated for all content types...
 ];
@@ -256,13 +266,16 @@ class ApiService {
 
   // Generic CRUD operations for all content types
   async getContentList<T>(
-    type: ContentType, 
+    type: ContentType,
     params?: { search?: string; page?: number; limit?: number }
   ): Promise<ListResponse<T>> {
     // Implementation with search and pagination
   }
 
-  async getContentById<T>(type: ContentType, id: string): Promise<ApiResponse<T>> {
+  async getContentById<T>(
+    type: ContentType,
+    id: string
+  ): Promise<ApiResponse<T>> {
     // Implementation for detail view
   }
 
@@ -281,7 +294,10 @@ class ApiService {
     // Implementation for edit form
   }
 
-  async deleteContent(type: ContentType, id: string): Promise<ApiResponse<void>> {
+  async deleteContent(
+    type: ContentType,
+    id: string
+  ): Promise<ApiResponse<void>> {
     // Implementation for soft delete
   }
 }
@@ -294,20 +310,36 @@ class ApiService {
 const routes = [
   // Dashboard home
   { path: '/', component: HomeView, name: 'home' },
-  
+
   // Content type routes following consistent pattern
   // Clients
   { path: '/clients', component: ClientsListView, name: 'clients-list' },
   { path: '/clients/new', component: ClientFormView, name: 'clients-create' },
   { path: '/clients/:id', component: ClientDetailView, name: 'clients-detail' },
-  { path: '/clients/:id/edit', component: ClientFormView, name: 'clients-edit' },
-  
+  {
+    path: '/clients/:id/edit',
+    component: ClientFormView,
+    name: 'clients-edit',
+  },
+
   // Contracts
   { path: '/contracts', component: ContractsListView, name: 'contracts-list' },
-  { path: '/contracts/new', component: ContractFormView, name: 'contracts-create' },
-  { path: '/contracts/:id', component: ContractDetailView, name: 'contracts-detail' },
-  { path: '/contracts/:id/edit', component: ContractFormView, name: 'contracts-edit' },
-  
+  {
+    path: '/contracts/new',
+    component: ContractFormView,
+    name: 'contracts-create',
+  },
+  {
+    path: '/contracts/:id',
+    component: ContractDetailView,
+    name: 'contracts-detail',
+  },
+  {
+    path: '/contracts/:id/edit',
+    component: ContractFormView,
+    name: 'contracts-edit',
+  },
+
   // Pattern repeats for all content types:
   // licenses, work-sheets, daily-records, remote-assistance, reminders, pending
 ];

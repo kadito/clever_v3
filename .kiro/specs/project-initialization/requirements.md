@@ -61,21 +61,27 @@ code.
 
 ### Requirement 3: Frontend Package Setup
 
-**User Story:** As a developer, I want a Vue 3 frontend application with a mobile-first dashboard design, so that I
-can build a user interface that works seamlessly across all devices and follows a consistent navigation pattern.
+**User Story:** As a developer, I want a Vue 3 frontend application with a
+mobile-first dashboard design, so that I can build a user interface that works
+seamlessly across all devices and follows a consistent navigation pattern.
 
 #### Acceptance Criteria
 
 1. THE Frontend_Package SHALL use Vue 3 with Composition API only
-2. THE Frontend_Package SHALL use TailwindCSS for styling with mobile-first responsive design
+2. THE Frontend_Package SHALL use TailwindCSS for styling with mobile-first
+   responsive design
 3. THE Frontend_Package SHALL use TypeScript in strict mode
-4. THE Frontend_Package SHALL include Vue Router for client-side routing with dashboard-centric navigation
+4. THE Frontend_Package SHALL include Vue Router for client-side routing with
+   dashboard-centric navigation
 5. THE Frontend_Package SHALL include Pinia for state management
 6. THE Frontend_Package SHALL import types from the Shared_Package
 7. THE Frontend_Package SHALL build static assets for KV storage
-8. THE Frontend_Package SHALL implement a color scheme based on the old_src palette (primary: #75AE93, secondary: #2c3e50)
-9. THE Frontend_Package SHALL follow a 4-view pattern for all content types: Home (dashboard) → List (search) → Detail → Create/Edit
-10. THE Frontend_Package SHALL prioritize mobile experience with touch-friendly interfaces and responsive breakpoints
+8. THE Frontend_Package SHALL implement a color scheme based on the old_src
+   palette (primary: #75AE93, secondary: #2c3e50)
+9. THE Frontend_Package SHALL follow a 4-view pattern for all content types:
+   Home (dashboard) → List (search) → Detail → Create/Edit
+10. THE Frontend_Package SHALL prioritize mobile experience with touch-friendly
+    interfaces and responsive breakpoints
 
 ### Requirement 4: Backend Package Setup
 
@@ -138,16 +144,23 @@ can start implementing content management functionality.
 
 ### Requirement 8: Mobile-First Dashboard Frontend Structure
 
-**User Story:** As a developer, I want a mobile-first dashboard frontend structure with consistent view patterns, so
-that I can efficiently implement all content types following the same navigation and interaction patterns.
+**User Story:** As a developer, I want a mobile-first dashboard frontend
+structure with consistent view patterns, so that I can efficiently implement all
+content types following the same navigation and interaction patterns.
 
 #### Acceptance Criteria
 
-1. THE Frontend_Package SHALL include a mobile-first main layout component with responsive navigation
-2. THE Frontend_Package SHALL define routes following the 4-view pattern for all content types (Home → List → Detail → Create/Edit)
-3. THE Frontend_Package SHALL include a dashboard home page with content navigation tiles
-4. THE Frontend_Package SHALL include reusable components for search, content cards, and forms
+1. THE Frontend_Package SHALL include a mobile-first main layout component with
+   responsive navigation
+2. THE Frontend_Package SHALL define routes following the 4-view pattern for all
+   content types (Home → List → Detail → Create/Edit)
+3. THE Frontend_Package SHALL include a dashboard home page with content
+   navigation tiles
+4. THE Frontend_Package SHALL include reusable components for search, content
+   cards, and forms
 5. THE Frontend_Package SHALL use shared types for API communication
 6. THE Frontend_Package SHALL include error handling for API requests
-7. THE Frontend_Package SHALL implement touch-friendly interfaces optimized for mobile devices
-8. THE Frontend_Package SHALL use the old_src color palette consistently across all components
+7. THE Frontend_Package SHALL implement touch-friendly interfaces optimized for
+   mobile devices
+8. THE Frontend_Package SHALL use the old_src color palette consistently across
+   all components

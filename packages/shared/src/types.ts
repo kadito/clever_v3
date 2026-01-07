@@ -30,7 +30,7 @@ export interface ListResponse<T> extends ApiResponse<T[]> {
 }
 
 // Content type definitions
-export type ContentType = 
+export type ContentType =
   | 'clients'
   | 'contracts'
   | 'licenses'
@@ -43,13 +43,7 @@ export type ContentType =
 // Request types
 export type CreateContentRequest<T extends BaseContent> = Omit<
   T,
-  | 'uuid'
-  | 'createdAt'
-  | 'createdBy'
-  | 'updatedAt'
-  | 'updatedBy'
-  | 'version'
-  | 'isDeleted'
+  'uuid' | 'createdAt' | 'createdBy' | 'updatedAt' | 'updatedBy' | 'version' | 'isDeleted'
 >;
 
 export type UpdateContentRequest<T extends BaseContent> = Partial<Pick<T, 'data'>>;
