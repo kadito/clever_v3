@@ -1,0 +1,30 @@
+{
+  "name": "clever-dashboard",
+  "version": "1.0.0",
+  "description": "CLEVER internal dashboard application",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "dev": "wrangler dev",
+    "test": "npm run test --workspaces",
+    "lint": "eslint . --ext .ts,.vue",
+    "format": "prettier --write .",
+    "type-check": "tsc --build"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "eslint-plugin-vue": "^9.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0",
+    "wrangler": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
