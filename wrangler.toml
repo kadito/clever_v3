@@ -9,7 +9,7 @@ account_id = "98dfed939a59dca09770880eab939b79"
 [vars]
 NODE_ENV = "test"
 LOG_LEVEL = "debug"
-CLERK_PUBLISHABLE_KEY = ""  # Set via --var during deployment
+CLERK_PUBLISHABLE_KEY = "pk_test_c3RhYmxlLWJ1Y2stNTUuY2xlcmsuYWNjb3VudHMuZGV2JA"  # Set via --var during deployment
 
 # Static assets binding
 [assets]
@@ -18,7 +18,7 @@ binding = "ASSETS"
 
 # R2 bucket for test environment
 [[r2_buckets]]
-binding = "CONTENT"
+binding = "R2_BUCKET"
 bucket_name = "clever-content-test"
 
 # Development configuration
@@ -41,5 +41,5 @@ LOG_LEVEL = "warn"
 CLERK_PUBLISHABLE_KEY = ""  # Set via --var during deployment
 
 [[env.production.r2_buckets]]
-binding = "CONTENT"
+binding = "R2_BUCKET"
 bucket_name = "clever-content-prod"
