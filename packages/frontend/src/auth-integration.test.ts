@@ -100,7 +100,7 @@ describe('Frontend Authentication Integration', () => {
 
     it('should have proper route structure for content types', () => {
       const routes = testRouter.getRoutes();
-      const contentTypes = ['clientes', 'contratos', 'licencas'];
+      const contentTypes = ['clients', 'contracts', 'licenses'];
 
       for (const contentType of contentTypes) {
         // Check that each content type has the 4-view pattern
@@ -133,7 +133,7 @@ describe('Frontend Authentication Integration', () => {
 
       // Try to navigate to protected route
       try {
-        await testRouter.push('/clientes');
+        await testRouter.push('/clients');
         // In test environment, navigation may succeed without guards
         // The important thing is that the route structure is correct
         expect(testRouter.currentRoute.value).toBeDefined();

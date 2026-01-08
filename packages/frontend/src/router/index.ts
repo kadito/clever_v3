@@ -1,16 +1,16 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 
-// Content types based on the CLEVER system modules
+// Content types based on the CLEVER system modules (English for API, Portuguese for UI)
 const contentTypes = [
-  'clientes',
-  'contratos',
-  'licencas',
-  'folhas-obra',
-  'registo-diario',
-  'assistencias-remotas',
-  'agendamentos',
-  'equipa',
+  'clients',
+  'contracts', 
+  'licenses',
+  'work-sheets',
+  'daily-records',
+  'remote-assistance',
+  'reminders',
+  'pending',
 ] as const;
 
 // Generate routes following the 4-view pattern for each content type
@@ -214,14 +214,14 @@ export { contentTypes };
 // Helper function to get content type display name
 export const getContentTypeDisplayName = (contentType: string): string => {
   const displayNames: Record<string, string> = {
-    clientes: 'Clientes',
-    contratos: 'Contratos',
-    licencas: 'Licenças',
-    'folhas-obra': 'Folhas de Obra',
-    'registo-diario': 'Registo Diário',
-    'assistencias-remotas': 'Assistências Remotas',
-    agendamentos: 'Agendamentos',
-    equipa: 'Equipa',
+    clients: 'Clientes',
+    contracts: 'Contratos',
+    licenses: 'Licenças',
+    'work-sheets': 'Folhas de Obra',
+    'daily-records': 'Registo Diário',
+    'remote-assistance': 'Assistências Remotas',
+    reminders: 'Lembretes',
+    pending: 'Pendentes',
   };
 
   return displayNames[contentType] || contentType;
@@ -230,14 +230,14 @@ export const getContentTypeDisplayName = (contentType: string): string => {
 // Helper function to get content type icon (will be used in dashboard tiles)
 export const getContentTypeIcon = (contentType: string): string => {
   const icons: Record<string, string> = {
-    clientes: '👥',
-    contratos: '📋',
-    licencas: '🔑',
-    'folhas-obra': '📝',
-    'registo-diario': '📅',
-    'assistencias-remotas': '🔧',
-    agendamentos: '⏰',
-    equipa: '👨‍💼',
+    clients: '👥',
+    contracts: '📋',
+    licenses: '🔑',
+    'work-sheets': '📝',
+    'daily-records': '📅',
+    'remote-assistance': '🔧',
+    reminders: '💭',
+    pending: '⏳',
   };
 
   return icons[contentType] || '📄';
