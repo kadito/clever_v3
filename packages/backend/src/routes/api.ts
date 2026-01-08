@@ -151,9 +151,9 @@ api.post('/content/:type', validateContentType, async c => {
       uuid: crypto.randomUUID(),
       contentType: type,
       createdAt: new Date().toISOString(),
-      createdBy: user.email || user.userId,
+      createdBy: user.email,
       updatedAt: new Date().toISOString(),
-      updatedBy: user.email || user.userId,
+      updatedBy: user.email,
       version: 1,
       isDeleted: false,
       data: body,
@@ -205,7 +205,7 @@ api.put('/content/:type/:uuid', validateContentType, async c => {
       uuid,
       contentType: type,
       updatedAt: new Date().toISOString(),
-      updatedBy: user.email || user.userId,
+      updatedBy: user.email,
       version: 2, // TODO: Increment actual version
       data: body.data,
     };
@@ -253,7 +253,7 @@ api.delete('/content/:type/:uuid', validateContentType, async c => {
       contentType: type,
       isDeleted: true,
       deletedAt: new Date().toISOString(),
-      deletedBy: user.email || user.userId,
+      deletedBy: user.email,
     };
 
     const response: ApiResponse<Partial<BaseContent>> = {

@@ -10,6 +10,11 @@ import './assets/main.css';
 // Get Clerk publishable key from environment (baked in during build)
 const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
+// Get current domain info for Clerk configuration
+const currentDomain = window.location.hostname;
+const isLocalhost = currentDomain === 'localhost' || currentDomain === '127.0.0.1';
+const isWorkersSubdomain = currentDomain.includes('.workers.dev');
+
 // Initialize Clerk manually to avoid external script loading
 const initializeApp = async () => {
   try {
@@ -20,9 +25,11 @@ const initializeApp = async () => {
     const pinia = createPinia();
     app.use(pinia);
 
-    // Initialize Clerk
+    // Initialize Clerk with domain configuration for Workers deployment
     const clerk = new Clerk(clerkPublishableKey);
-    await clerk.load({
+    
+    // Configure Clerk options based on environment
+    const clerkOptions: any = {
       appearance: {
         variables: {
           colorPrimary: '#75AE93',
@@ -40,7 +47,22 @@ const initializeApp = async () => {
           headerSubtitle: 'hidden',
         },
       },
-    });
+    };
+
+    // For Workers subdomain, configure domain handling
+    if (isWorkersSubdomain) {
+      // Configure URLs for proper redirect handling
+      clerkOptions.signInUrl = '/sign-in';
+      clerkOptions.signUpUrl = '/sign-up';
+      clerkOptions.afterSignInUrl = '/';
+      clerkOptions.afterSignUpUrl = '/';
+      
+      // Allow current origin for redirects
+      clerkOptions.allowedRedirectOrigins = [window.location.origin];
+    }
+
+    console.log('Initializing Clerk with options:', clerkOptions);
+    await clerk.load(clerkOptions);
     
     // Make Clerk available globally
     window.Clerk = clerk;
