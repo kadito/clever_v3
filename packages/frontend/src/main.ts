@@ -8,7 +8,7 @@ import router from './router';
 import './assets/main.css';
 
 // Get Clerk publishable key from environment (baked in during build)
-const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || 'pk_test_your_publishable_key_here';
+const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 // Initialize Clerk manually to avoid external script loading
 const initializeApp = async () => {
