@@ -37,9 +37,25 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
+    // Configure proxy to handle CORS issues with Clerk
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8787',
+        changeOrigin: true,
+      },
+    },
   },
   test: {
     environment: 'jsdom',
     globals: true,
+  },
+  // Define global constants for Clerk
+  define: {
+    global: 'globalThis',
+  },
+  // Optimize dependencies
+  optimizeDeps: {
+    include: ['@clerk/vue'],
+    exclude: [],
   },
 });

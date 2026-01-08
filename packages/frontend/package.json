@@ -11,6 +11,8 @@
     "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@clerk/clerk-js": "^5.118.0",
+    "@clerk/vue": "^1.17.7",
     "@clever/shared": "workspace:*",
     "pinia": "^2.1.0",
     "vue": "^3.3.0",

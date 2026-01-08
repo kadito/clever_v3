@@ -13,6 +13,51 @@ export interface BaseContent {
   data: Record<string, any>;
 }
 
+// Authentication types
+/**
+ * User context interface containing authenticated user information
+ * Requirements: 3.2, 3.4
+ */
+export interface UserContext {
+  /** Unique user identifier from Clerk */
+  userId: string;
+  /** User's primary email address */
+  email: string;
+  /** User's first name */
+  firstName: string;
+  /** User's last name */
+  lastName: string;
+  /** User type from Clerk metadata */
+  userType: 'Admin' | 'User';
+  /** Session identifier */
+  sessionId: string;
+  /** Authentication status */
+  isAuthenticated: boolean;
+}
+
+/**
+ * Extended context with user information for authenticated requests
+ */
+export interface AuthenticatedContext {
+  user: UserContext;
+  [key: string]: any; // Index signature for framework compatibility
+}
+
+/**
+ * User type enumeration for type safety
+ * Requirements: 2.1, 2.2
+ */
+export type UserType = 'Admin' | 'User';
+
+/**
+ * User type display names in Portuguese
+ * Requirements: 2.4
+ */
+export const USER_TYPE_DISPLAY_NAMES: Record<UserType, string> = {
+  Admin: 'Administrador',
+  User: 'Utilizador',
+} as const;
+
 // API Response types
 export interface ApiResponse<T = any> {
   success: boolean;

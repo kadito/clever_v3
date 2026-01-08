@@ -187,16 +187,17 @@ describe('End-to-End Integration Tests', () => {
     });
 
     it('should serve both frontend and API endpoints in development', async () => {
-      // Test API endpoint
+      // Test API endpoint - should return 401 without authentication
       const apiResponse = await fetchWithTimeout(`${DEV_URL}/api/content/clients`);
-      expect(apiResponse.ok).toBe(true);
+      expect(apiResponse.status).toBe(401);
       
       const apiData = await apiResponse.json();
-      expect(apiData).toHaveProperty('success');
-      expect(apiData).toHaveProperty('data');
+      expect(apiData).toHaveProperty('success', false);
+      expect(apiData).toHaveProperty('error');
+      expect(apiData.error).toContain('Authentication failed');
       expect(apiData).toHaveProperty('timestamp');
 
-      // Test health endpoint
+      // Test health endpoint - should work without authentication
       const healthResponse = await fetchWithTimeout(`${DEV_URL}/health`);
       expect(healthResponse.ok).toBe(true);
       
@@ -243,18 +244,19 @@ describe('End-to-End Integration Tests', () => {
     }, 10000);
 
     it('should handle API errors properly in development', async () => {
-      // Test invalid content type
+      // Test invalid content type - should return 401 without authentication
       const invalidResponse = await fetchWithTimeout(`${DEV_URL}/api/content/invalid-type`);
-      expect(invalidResponse.status).toBe(400);
+      expect(invalidResponse.status).toBe(401);
       
       const errorData = await invalidResponse.json();
       expect(errorData).toHaveProperty('success', false);
       expect(errorData).toHaveProperty('error');
+      expect(errorData.error).toContain('Authentication failed');
       expect(errorData).toHaveProperty('timestamp');
 
       // Test 404 for non-existent API endpoint - may return 500 due to error handling
       const notFoundResponse = await fetchWithTimeout(`${DEV_URL}/api/nonexistent`);
-      expect([404, 500]).toContain(notFoundResponse.status);
+      expect([401, 404, 500]).toContain(notFoundResponse.status);
     }, 10000);
 
     it('should serve static assets correctly in development', async () => {
@@ -296,12 +298,14 @@ describe('End-to-End Integration Tests', () => {
           const response = await fetchWithTimeout(`${DEV_URL}/api/content/clients`);
           const data = await response.json();
           
-          // Should follow ApiResponse interface structure
+          // Should follow ApiResponse interface structure (expecting 401 for unauthenticated)
           expect(data).toHaveProperty('success');
-          expect(data).toHaveProperty('data');
+          expect(data).toHaveProperty('error');
           expect(data).toHaveProperty('timestamp');
           expect(typeof data.success).toBe('boolean');
-          expect(Array.isArray(data.data)).toBe(true);
+          expect(data.success).toBe(false); // Should be false for unauthenticated request
+          expect(typeof data.error).toBe('string');
+          expect(data.error).toContain('Authentication failed');
           expect(typeof data.timestamp).toBe('string');
         } catch (error) {
           console.warn('API response test failed:', error);

@@ -13,10 +13,12 @@
   },
   "dependencies": {
     "@clever/shared": "workspace:*",
+    "@hono/clerk-auth": "^3.0.3",
     "hono": "^3.12.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.0.0",
+    "fast-check": "^4.5.3",
     "typescript": "^5.0.0",
     "vitest": "^1.0.0",
     "wrangler": "^3.0.0"

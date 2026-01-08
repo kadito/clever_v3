@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
 // Content types based on the CLEVER system modules
 const contentTypes = [
@@ -32,7 +33,7 @@ const generateContentRoutes = (): RouteRecordRaw[] => {
         meta: {
           contentType,
           title: `${componentBase} - Lista`,
-          requiresAuth: false, // Will be implemented later
+          requiresAuth: true,
         },
       },
       // Detail view - full content display
@@ -43,7 +44,7 @@ const generateContentRoutes = (): RouteRecordRaw[] => {
         meta: {
           contentType,
           title: `${componentBase} - Detalhes`,
-          requiresAuth: false,
+          requiresAuth: true,
         },
       },
       // Create view - new content form
@@ -55,7 +56,7 @@ const generateContentRoutes = (): RouteRecordRaw[] => {
           contentType,
           title: `${componentBase} - Criar`,
           mode: 'create',
-          requiresAuth: false,
+          requiresAuth: true,
         },
       },
       // Edit view - edit existing content
@@ -67,7 +68,7 @@ const generateContentRoutes = (): RouteRecordRaw[] => {
           contentType,
           title: `${componentBase} - Editar`,
           mode: 'edit',
-          requiresAuth: false,
+          requiresAuth: true,
         },
       }
     );
@@ -80,6 +81,18 @@ const generateContentRoutes = (): RouteRecordRaw[] => {
 const router = createRouter({
   history: createWebHistory(),
   routes: [
+    // Authentication routes
+    {
+      path: '/entrar',
+      name: 'signin',
+      component: () => import('../views/SignInView.vue'),
+      meta: {
+        title: 'Entrar',
+        requiresAuth: false,
+        hideLayout: true, // Don't show the main layout for auth pages
+      },
+    },
+
     // Dashboard home - central navigation hub
     {
       path: '/',
@@ -87,7 +100,7 @@ const router = createRouter({
       component: () => import('../views/HomeView.vue'),
       meta: {
         title: 'CLEVER Dashboard',
-        requiresAuth: false,
+        requiresAuth: true,
       },
     },
 
@@ -125,16 +138,64 @@ const router = createRouter({
   },
 });
 
-// Navigation guards for mobile-optimized transitions
-router.beforeEach((to, from, next) => {
+// Navigation guards for authentication and mobile-optimized transitions
+router.beforeEach(async (to, from, next) => {
   // Set page title
   if (to.meta.title) {
     document.title = `${to.meta.title} | CLEVER`;
   }
 
-  // Add loading state for mobile (will be implemented with stores)
-  // This helps with perceived performance on slower mobile connections
+  // Get auth store - fail fast if not available
+  const authStore = useAuthStore();
+  if (!authStore) {
+    throw new Error('Auth store not available in router guard');
+  }
 
+  // Wait for auth state to be loaded
+  if (!authStore.isLoaded) {
+    // Wait for auth to be loaded (with timeout)
+    let attempts = 0;
+    const maxAttempts = 50; // 5 seconds max wait
+    
+    while (!authStore.isLoaded && attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+    }
+    
+    // If still not loaded after timeout, proceed anyway
+    if (!authStore.isLoaded) {
+      console.warn('Auth state not loaded after timeout, proceeding with navigation');
+    }
+  }
+
+  // Check if route requires authentication
+  const requiresAuth = to.meta.requiresAuth !== false; // Default to true unless explicitly false
+  
+  // If route doesn't require auth (like SignIn page), allow access
+  if (!requiresAuth) {
+    // If user is already authenticated and trying to access SignIn, redirect to home
+    if (to.name === 'signin' && authStore.isAuthenticated) {
+      next({ name: 'home' });
+      return;
+    }
+    next();
+    return;
+  }
+
+  // Check if user is authenticated
+  if (!authStore.isAuthenticated) {
+    // Store the intended destination for redirect after login
+    const redirectPath = to.fullPath !== '/entrar' ? to.fullPath : '/';
+    
+    // Redirect to SignIn page with return path
+    next({
+      name: 'signin',
+      query: { redirect: redirectPath }
+    });
+    return;
+  }
+
+  // User is authenticated, allow access
   next();
 });
 

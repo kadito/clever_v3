@@ -6,7 +6,11 @@ compatibility_flags = ["nodejs_compat"]
 account_id = "98dfed939a59dca09770880eab939b79"
 
 # Environment variables for test (default)
-vars = { NODE_ENV = "test", LOG_LEVEL = "debug" }
+[vars]
+NODE_ENV = "test"
+LOG_LEVEL = "debug"
+CLERK_PUBLISHABLE_KEY = "pk_test_c3RhYmxlLWJ1Y2stNTUuY2xlcmsuYWNjb3VudHMuZGV2JA"
+# CLERK_SECRET_KEY is set via wrangler secret put
 
 # Static assets binding
 [assets]
@@ -31,7 +35,12 @@ cpu_ms = 50
 # Production environment (deployed)
 [env.production]
 name = "clever-dashboard-prod"
-vars = { NODE_ENV = "production", LOG_LEVEL = "warn" }
+
+[env.production.vars]
+NODE_ENV = "production"
+LOG_LEVEL = "warn"
+CLERK_PUBLISHABLE_KEY = "pk_live_your_publishable_key_here"
+# CLERK_SECRET_KEY is set via wrangler secret put
 
 [[env.production.r2_buckets]]
 binding = "CONTENT"

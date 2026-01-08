@@ -6,7 +6,11 @@ import type {
   ContentType,
   CreateContentRequest,
   UpdateContentRequest,
+  UserContext,
+  AuthenticatedContext,
+  UserType,
 } from './types.js';
+import { USER_TYPE_DISPLAY_NAMES } from './types.js';
 
 describe('BaseContent interface', () => {
   it('should have all required properties with correct types', () => {
@@ -325,5 +329,103 @@ describe('Type exports', () => {
     expect(apiResponse).toBeDefined();
     expect(listResponse).toBeDefined();
     expect(contentType).toBeDefined();
+  });
+});
+
+describe('UserContext interface', () => {
+  it('should have all required properties with correct types', () => {
+    const mockUserContext: UserContext = {
+      userId: 'user-123',
+      email: 'test@example.com',
+      firstName: 'Test',
+      lastName: 'User',
+      userType: 'User',
+      sessionId: 'session-123',
+      isAuthenticated: true,
+    };
+
+    expect(typeof mockUserContext.userId).toBe('string');
+    expect(typeof mockUserContext.email).toBe('string');
+    expect(typeof mockUserContext.firstName).toBe('string');
+    expect(typeof mockUserContext.lastName).toBe('string');
+    expect(typeof mockUserContext.userType).toBe('string');
+    expect(typeof mockUserContext.sessionId).toBe('string');
+    expect(typeof mockUserContext.isAuthenticated).toBe('boolean');
+  });
+
+  it('should support Admin user type', () => {
+    const adminUser: UserContext = {
+      userId: 'admin-123',
+      email: 'admin@example.com',
+      firstName: 'Admin',
+      lastName: 'User',
+      userType: 'Admin',
+      sessionId: 'session-123',
+      isAuthenticated: true,
+    };
+
+    expect(adminUser.userType).toBe('Admin');
+  });
+
+  it('should support User user type', () => {
+    const regularUser: UserContext = {
+      userId: 'user-123',
+      email: 'user@example.com',
+      firstName: 'Regular',
+      lastName: 'User',
+      userType: 'User',
+      sessionId: 'session-123',
+      isAuthenticated: true,
+    };
+
+    expect(regularUser.userType).toBe('User');
+  });
+});
+
+describe('AuthenticatedContext interface', () => {
+  it('should contain user context and allow additional properties', () => {
+    const mockUserContext: UserContext = {
+      userId: 'user-123',
+      email: 'test@example.com',
+      firstName: 'Test',
+      lastName: 'User',
+      userType: 'User',
+      sessionId: 'session-123',
+      isAuthenticated: true,
+    };
+
+    const authContext: AuthenticatedContext = {
+      user: mockUserContext,
+      additionalProperty: 'test',
+    };
+
+    expect(authContext.user).toEqual(mockUserContext);
+    expect(authContext.additionalProperty).toBe('test');
+  });
+});
+
+describe('UserType type', () => {
+  it('should include Admin and User types', () => {
+    const adminType: UserType = 'Admin';
+    const userType: UserType = 'User';
+
+    expect(adminType).toBe('Admin');
+    expect(userType).toBe('User');
+  });
+});
+
+describe('USER_TYPE_DISPLAY_NAMES constant', () => {
+  it('should provide Portuguese display names for user types', () => {
+    expect(USER_TYPE_DISPLAY_NAMES.Admin).toBe('Administrador');
+    expect(USER_TYPE_DISPLAY_NAMES.User).toBe('Utilizador');
+  });
+
+  it('should have entries for all user types', () => {
+    const userTypes: UserType[] = ['Admin', 'User'];
+    
+    userTypes.forEach(type => {
+      expect(USER_TYPE_DISPLAY_NAMES[type]).toBeDefined();
+      expect(typeof USER_TYPE_DISPLAY_NAMES[type]).toBe('string');
+    });
   });
 });

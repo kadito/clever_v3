@@ -25,24 +25,24 @@ describe('Main App', () => {
   });
 
   describe('API Routes Integration', () => {
-    it('should route API requests to API handler', async () => {
+    it('should return 401 for unauthenticated API requests (authentication working)', async () => {
       const res = await app.request('/api/content/clients');
       
-      expect(res.status).toBe(200);
-      
-      const body = await res.json();
-      expect(body.success).toBe(true);
-      expect(body.data).toEqual([]);
-    });
-
-    it('should handle invalid API routes with proper error response', async () => {
-      const res = await app.request('/api/content/invalid-type');
-      
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(401);
       
       const body: ApiResponse = await res.json();
       expect(body.success).toBe(false);
-      expect(body.error).toContain('Invalid content type');
+      expect(body.error).toContain('Authentication');
+    });
+
+    it('should return 401 for unauthenticated invalid API routes (authentication takes precedence)', async () => {
+      const res = await app.request('/api/content/invalid-type');
+      
+      expect(res.status).toBe(401);
+      
+      const body: ApiResponse = await res.json();
+      expect(body.success).toBe(false);
+      expect(body.error).toContain('Authentication');
     });
   });
 
@@ -53,13 +53,6 @@ describe('Main App', () => {
         headers: { 'Content-Type': 'text/html' }
       });
       mockAssetsFetch.mockResolvedValueOnce(mockResponse);
-
-      // Create a request with the mocked environment
-      const request = new Request('http://localhost/index.html');
-      const context = {
-        req: { raw: request },
-        env: mockEnv
-      };
 
       // Test that static assets are handled by ASSETS binding
       const res = await app.request('/index.html', {}, mockEnv);
