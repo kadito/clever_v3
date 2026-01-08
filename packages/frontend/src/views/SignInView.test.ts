@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createRouter, createWebHistory } from 'vue-router';
 import { createPinia } from 'pinia';
+import { ref } from 'vue';
 import SignInView from './SignInView.vue';
 
 // Mock Clerk components
@@ -12,20 +13,20 @@ vi.mock('@clerk/vue', () => ({
     props: ['appearance', 'redirect-url'],
   },
   useAuth: () => ({
-    isLoaded: { value: true },
-    isSignedIn: { value: false },
+    isLoaded: ref(true),
+    isSignedIn: ref(false),
   }),
   useUser: () => ({
-    user: { value: null },
+    user: ref(null),
   }),
 }));
 
-// Mock the auth composable
+// Mock the auth composable with proper refs
 vi.mock('@/composables/useAuth', () => ({
   useAuth: () => ({
-    isLoaded: { value: true },
-    isSignedIn: { value: false },
-    user: { value: null },
+    isLoaded: ref(true),
+    isSignedIn: ref(false),
+    user: ref(null),
   }),
 }));
 
@@ -65,9 +66,13 @@ describe('SignInView', () => {
   it('shows the Clerk SignIn component', () => {
     const wrapper = createWrapper();
     
-    // Check that the Clerk SignIn component is rendered
-    const clerkSignIn = wrapper.find('[data-testid="clerk-signin"]');
-    expect(clerkSignIn.exists()).toBe(true);
+    // Check that the Clerk SignIn container is rendered
+    const clerkContainer = wrapper.find('.clerk-signin-container');
+    expect(clerkContainer.exists()).toBe(true);
+    
+    // Check that the div inside the container exists (where Clerk mounts)
+    const signInDiv = clerkContainer.find('div');
+    expect(signInDiv.exists()).toBe(true);
   });
 
   it('displays the correct Portuguese labels', () => {

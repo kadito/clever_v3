@@ -3,6 +3,7 @@ import type {
   BaseContent,
   ApiResponse,
   ListResponse,
+  SearchResponse,
   ContentType,
   CreateContentRequest,
   UpdateContentRequest,
@@ -167,6 +168,64 @@ describe('ListResponse interface', () => {
   });
 });
 
+describe('SearchResponse interface', () => {
+  it('should extend ApiResponse with query and count', () => {
+    const searchResponse: SearchResponse<BaseContent> = {
+      success: true,
+      data: [
+        {
+          uuid: 'test-1',
+          contentType: 'clients',
+          createdAt: '2024-01-01T00:00:00Z',
+          createdBy: 'user-123',
+          updatedAt: '2024-01-01T00:00:00Z',
+          updatedBy: 'user-123',
+          version: 1,
+          isDeleted: false,
+          data: { name: 'Client 1' },
+        },
+      ],
+      query: 'test search',
+      count: 1,
+      timestamp: '2024-01-01T00:00:00Z',
+    };
+
+    expect(Array.isArray(searchResponse.data)).toBe(true);
+    expect(searchResponse.query).toBe('test search');
+    expect(searchResponse.count).toBe(1);
+    expect(searchResponse.data?.length).toBe(1);
+  });
+
+  it('should work with empty search results', () => {
+    const emptySearchResponse: SearchResponse<BaseContent> = {
+      success: true,
+      data: [],
+      query: 'no results',
+      count: 0,
+      timestamp: '2024-01-01T00:00:00Z',
+    };
+
+    expect(emptySearchResponse.data).toEqual([]);
+    expect(emptySearchResponse.query).toBe('no results');
+    expect(emptySearchResponse.count).toBe(0);
+  });
+
+  it('should work with error response', () => {
+    const errorSearchResponse: SearchResponse<never> = {
+      success: false,
+      error: 'Search failed',
+      query: 'failed search',
+      count: 0,
+      timestamp: '2024-01-01T00:00:00Z',
+    };
+
+    expect(errorSearchResponse.success).toBe(false);
+    expect(errorSearchResponse.error).toBe('Search failed');
+    expect(errorSearchResponse.query).toBe('failed search');
+    expect(errorSearchResponse.count).toBe(0);
+  });
+});
+
 describe('ContentType union type', () => {
   it('should include all expected content types', () => {
     const validTypes: ContentType[] = [
@@ -323,11 +382,20 @@ describe('Type exports', () => {
       timestamp: '2024-01-01T00:00:00Z',
     };
 
+    const searchResponse: SearchResponse<BaseContent> = {
+      success: true,
+      data: [baseContent],
+      query: 'test',
+      count: 1,
+      timestamp: '2024-01-01T00:00:00Z',
+    };
+
     const contentType: ContentType = 'clients';
 
     expect(baseContent).toBeDefined();
     expect(apiResponse).toBeDefined();
     expect(listResponse).toBeDefined();
+    expect(searchResponse).toBeDefined();
     expect(contentType).toBeDefined();
   });
 });

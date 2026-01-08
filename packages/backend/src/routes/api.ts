@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { requireAuth, getUserContext, requireUserContext } from '../middleware/clerk';
+import { requireAuth, getUserContext, requireUserContext, extractJwtToken, verifyClerkJwt } from '../middleware/clerk';
+import { createContentRoutes, createStandardContentConfig, contentErrorHandler } from './content-route-template';
+import clientsRouter from './clients';
 import type {
   BaseContent,
   ApiResponse,
@@ -8,6 +10,7 @@ import type {
   ContentType,
   CreateContentRequest,
   UpdateContentRequest,
+  UserContext,
 } from '@clever/shared';
 
 // Create API router with basic typing
@@ -35,249 +38,102 @@ const CONTENT_TYPES: ContentType[] = [
   'pending',
 ];
 
-// Validate content type middleware
-const validateContentType = async (c: any, next: any) => {
-  const type = c.req.param('type');
-  if (!CONTENT_TYPES.includes(type as ContentType)) {
+// Apply authentication to all API routes except health check
+api.use('/*', async (c, next) => {
+  // Skip authentication for health check
+  if (c.req.path === '/api/health') {
+    await next();
+    return;
+  }
+  
+  // Extract JWT token from request
+  const token = extractJwtToken(c);
+  
+  if (!token) {
     const response: ApiResponse = {
       success: false,
-      error: `Invalid content type: ${type}`,
+      error: 'Authentication failed',
       timestamp: new Date().toISOString(),
     };
-    return c.json(response, 400);
+    return c.json(response, 401);
   }
-  await next();
-};
 
-// Authentication error handling middleware
-const handleAuthError = async (c: any, next: any) => {
   try {
+    const payload = await verifyClerkJwt(token);
+    
+    // Extract user information from JWT payload
+    const userContext: UserContext = {
+      userId: payload.sub || '',
+      email: '', // Email not available in session JWT, would need separate API call
+      firstName: '', // Name not available in session JWT
+      lastName: '', // Name not available in session JWT
+      userType: (payload.o?.rol === 'admin' ? 'Admin' : 'User') as 'Admin' | 'User',
+      sessionId: payload.sid || '',
+      isAuthenticated: true,
+    };
+
+    // Make user context available to route handlers
+    c.set('user', userContext);
+    
     await next();
   } catch (error) {
-    if (error instanceof Error && error.message.includes('authentication required')) {
-      const response: ApiResponse = {
-        success: false,
-        error: 'Authentication required. Please sign in to access this resource.',
-        timestamp: new Date().toISOString(),
-      };
-      return c.json(response, 401);
-    }
-    throw error; // Re-throw non-auth errors
-  }
-};
-
-// CRUD endpoints for content types
-
-// Apply authentication to all content routes
-// Requirements: 5.4, 5.5 - Protect all API endpoints except health checks
-api.use('/content/*', requireAuth, handleAuthError);
-
-// List content items
-api.get('/content/:type', validateContentType, async c => {
-  const type = c.req.param('type') as ContentType;
-  
-  try {
-    // Ensure user context is available
-    // Requirements: 3.5 - User context available to all protected endpoints
-    const user = requireUserContext(c);
-    
-    // TODO: Implement actual data retrieval from R2/KV
-    // For now, return empty list with user context validation
-    const response: ListResponse<BaseContent> = {
-      success: true,
-      data: [],
-      pagination: {
-        page: 1,
-        limit: 50,
-        total: 0,
-      },
-      timestamp: new Date().toISOString(),
-    };
-
-    return c.json(response);
-  } catch (error) {
+    console.error('Error extracting user context:', error);
     const response: ApiResponse = {
       success: false,
-      error: 'Failed to retrieve content items',
+      error: 'Authentication failed',
       timestamp: new Date().toISOString(),
     };
-    return c.json(response, 500);
+    return c.json(response, 401);
   }
 });
 
-// Get single content item
-api.get('/content/:type/:uuid', validateContentType, async c => {
-  const type = c.req.param('type') as ContentType;
-  const uuid = c.req.param('uuid');
-  
-  try {
-    // Ensure user context is available
-    // Requirements: 3.5 - User context available to all protected endpoints
-    const user = requireUserContext(c);
-    
-    // TODO: Implement actual data retrieval from R2/KV
-    // For now, return null with user context validation
-    const response: ApiResponse<BaseContent | null> = {
-      success: true,
-      data: null,
-      timestamp: new Date().toISOString(),
-    };
+// Mount content-specific routes using the generic template
+// Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 8.6, 10.1, 10.4
 
-    return c.json(response);
-  } catch (error) {
-    const response: ApiResponse = {
-      success: false,
-      error: 'Failed to retrieve content item',
-      timestamp: new Date().toISOString(),
-    };
-    return c.json(response, 500);
-  }
-});
+// Clients route with alphabetical sorting and custom validation
+api.route('/content/clients', clientsRouter);
 
-// Create new content item
-api.post('/content/:type', validateContentType, async c => {
-  const type = c.req.param('type') as ContentType;
-  
-  try {
-    // Ensure user context is available
-    // Requirements: 3.5 - User context available to all protected endpoints
-    const user = requireUserContext(c);
-    
-    const body = await c.req.json();
+// Generic routes for other content types using standard configuration
+const contractsRouter = createContentRoutes<BaseContent>(
+  createStandardContentConfig('contracts', 'date-desc')
+);
+api.route('/content/contracts', contractsRouter);
 
-    // Create new content item following BaseContent interface
-    // Requirements: 3.2, 3.4, 3.5 - Use authenticated user context
-    const newContent: BaseContent = {
-      uuid: crypto.randomUUID(),
-      contentType: type,
-      createdAt: new Date().toISOString(),
-      createdBy: user.email,
-      updatedAt: new Date().toISOString(),
-      updatedBy: user.email,
-      version: 1,
-      isDeleted: false,
-      data: body,
-    };
+const licensesRouter = createContentRoutes<BaseContent>(
+  createStandardContentConfig('licenses', 'date-desc')
+);
+api.route('/content/licenses', licensesRouter);
 
-    // TODO: Implement actual data creation and storage
-    const response: ApiResponse<BaseContent> = {
-      success: true,
-      data: newContent,
-      timestamp: new Date().toISOString(),
-    };
+const workSheetsRouter = createContentRoutes<BaseContent>(
+  createStandardContentConfig('work-sheets', 'date-desc')
+);
+api.route('/content/work-sheets', workSheetsRouter);
 
-    return c.json(response, 201);
-  } catch (error) {
-    if (error instanceof SyntaxError) {
-      const response: ApiResponse = {
-        success: false,
-        error: 'Invalid JSON body',
-        timestamp: new Date().toISOString(),
-      };
-      return c.json(response, 400);
-    }
-    
-    const response: ApiResponse = {
-      success: false,
-      error: 'Failed to create content item',
-      timestamp: new Date().toISOString(),
-    };
-    return c.json(response, 500);
-  }
-});
+const dailyRecordsRouter = createContentRoutes<BaseContent>(
+  createStandardContentConfig('daily-records', 'date-desc')
+);
+api.route('/content/daily-records', dailyRecordsRouter);
 
-// Update existing content item
-api.put('/content/:type/:uuid', validateContentType, async c => {
-  const type = c.req.param('type') as ContentType;
-  const uuid = c.req.param('uuid');
-  
-  try {
-    // Ensure user context is available
-    // Requirements: 3.5 - User context available to all protected endpoints
-    const user = requireUserContext(c);
-    
-    const body: UpdateContentRequest<BaseContent> = await c.req.json();
+const remoteAssistanceRouter = createContentRoutes<BaseContent>(
+  createStandardContentConfig('remote-assistance', 'date-desc')
+);
+api.route('/content/remote-assistance', remoteAssistanceRouter);
 
-    // TODO: Implement actual data update
-    // For now, create a mock updated content item
-    // Requirements: 3.2, 3.4, 3.5 - Use authenticated user context
-    const updatedContent: Partial<BaseContent> = {
-      uuid,
-      contentType: type,
-      updatedAt: new Date().toISOString(),
-      updatedBy: user.email,
-      version: 2, // TODO: Increment actual version
-      data: body.data,
-    };
+const remindersRouter = createContentRoutes<BaseContent>(
+  createStandardContentConfig('reminders', 'date-desc')
+);
+api.route('/content/reminders', remindersRouter);
 
-    const response: ApiResponse<Partial<BaseContent>> = {
-      success: true,
-      data: updatedContent,
-      timestamp: new Date().toISOString(),
-    };
-
-    return c.json(response);
-  } catch (error) {
-    if (error instanceof SyntaxError) {
-      const response: ApiResponse = {
-        success: false,
-        error: 'Invalid JSON body',
-        timestamp: new Date().toISOString(),
-      };
-      return c.json(response, 400);
-    }
-    
-    const response: ApiResponse = {
-      success: false,
-      error: 'Failed to update content item',
-      timestamp: new Date().toISOString(),
-    };
-    return c.json(response, 500);
-  }
-});
-
-// Soft delete content item
-api.delete('/content/:type/:uuid', validateContentType, async c => {
-  const type = c.req.param('type') as ContentType;
-  const uuid = c.req.param('uuid');
-  
-  try {
-    // Ensure user context is available
-    // Requirements: 3.5 - User context available to all protected endpoints
-    const user = requireUserContext(c);
-    
-    // TODO: Implement actual soft delete
-    // Requirements: 3.2, 3.4, 3.5 - Use authenticated user context
-    const deletedContent: Partial<BaseContent> = {
-      uuid,
-      contentType: type,
-      isDeleted: true,
-      deletedAt: new Date().toISOString(),
-      deletedBy: user.email,
-    };
-
-    const response: ApiResponse<Partial<BaseContent>> = {
-      success: true,
-      data: deletedContent,
-      timestamp: new Date().toISOString(),
-    };
-
-    return c.json(response);
-  } catch (error) {
-    const response: ApiResponse = {
-      success: false,
-      error: 'Failed to delete content item',
-      timestamp: new Date().toISOString(),
-    };
-    return c.json(response, 500);
-  }
-});
+const pendingRouter = createContentRoutes<BaseContent>(
+  createStandardContentConfig('pending', 'date-desc')
+);
+api.route('/content/pending', pendingRouter);
 
 // User profile endpoints - protected
 // Requirements: 5.4 - Protect all API endpoints except health checks
 
 // Get current user profile
-api.get('/user/profile', requireAuth, handleAuthError, async c => {
+api.get('/user/profile', async c => {
   try {
     const user = requireUserContext(c);
     
@@ -299,7 +155,7 @@ api.get('/user/profile', requireAuth, handleAuthError, async c => {
 });
 
 // Update user preferences (protected endpoint example)
-api.put('/user/preferences', requireAuth, handleAuthError, async c => {
+api.put('/user/preferences', async c => {
   try {
     const user = requireUserContext(c);
     const body = await c.req.json();

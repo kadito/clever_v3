@@ -31,7 +31,8 @@ packages/
             └── {content-type}/
                 ├── {Type}ListView.vue    # List/search view
                 ├── {Type}DetailView.vue  # Detail view
-                ├── {Type}FormView.vue    # Create/edit form
+                ├── {Type}CreateView.vue  # Create form
+                ├── {Type}UpdateView.vue  # Update form
                 └── index.ts              # Component exports
 ```
 
@@ -415,6 +416,53 @@ class ContentStorageService<T extends BaseContent> {
 
 Based on analysis of the legacy components, the frontend follows this pattern:
 
+##### Five-View Pattern Architecture
+
+The system uses a **Five-View Pattern** for each content type, providing better separation of concerns:
+
+1. **ListView**: Browse and search content
+2. **DetailView**: View individual item details
+3. **CreateView**: Create new content with creation-specific logic
+4. **UpdateView**: Edit existing content with update-specific logic
+5. **HomeView**: Dashboard navigation tiles
+
+**Benefits of Separate Create/Update Views:**
+- **Different Validation Rules**: Create might require all fields, Update might allow partial updates
+- **Field Behavior**: Some fields disabled on update (e.g., creation date, unique identifiers)
+- **Business Logic**: Different workflows for creation vs modification
+- **User Experience**: Tailored interfaces for different user intents
+- **Maintainability**: Clear separation of concerns, easier to modify independently
+
+##### Routing Configuration
+
+Each content type follows this routing pattern:
+
+```typescript
+// Example routes for clients content type
+const clientRoutes = [
+  {
+    path: '/clients',
+    name: 'ClientsList',
+    component: () => import('@/views/clients/ClientsListView.vue')
+  },
+  {
+    path: '/clients/create',
+    name: 'ClientsCreate', 
+    component: () => import('@/views/clients/ClientsCreateView.vue')
+  },
+  {
+    path: '/clients/:uuid',
+    name: 'ClientsDetail',
+    component: () => import('@/views/clients/ClientsDetailView.vue')
+  },
+  {
+    path: '/clients/:uuid/update',
+    name: 'ClientsUpdate',
+    component: () => import('@/views/clients/ClientsUpdateView.vue')
+  }
+];
+```
+
 ##### List View Component
 
 ```vue
@@ -601,50 +649,66 @@ import ErrorComponent from '@/components/ErrorComponent.vue';
 </template>
 ```
 
-##### Form View Component
+##### Create View Component
 
 ```vue
-<!-- Mobile-first form with validation -->
+<!-- Example: packages/frontend/src/views/clients/ClientsCreateView.vue -->
 <template>
-  <div class="content-form-container">
-    <div class="form-header">
-      <BackButton :to="cancelRoute" variant="inline" />
-      <h1>{{ isEditing ? 'Editar' : 'Novo' }} Cliente</h1>
-    </div>
-
-    <ErrorComponent v-if="error" :error="error" @close="clearError" />
-
-    <form @submit.prevent="handleSubmit" class="content-form" v-if="!loading">
-      <!-- Mobile-optimized form sections -->
-      <section class="form-section">
-        <h2>INFORMAÇÃO BÁSICA</h2>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="nomeEmpresa">NOME DA EMPRESA *</label>
-            <input 
-              type="text" 
-              id="nomeEmpresa" 
-              v-model="form.nomeEmpresa" 
-              class="form-control"
-              required
-            >
-          </div>
-          <!-- More fields... -->
-        </div>
-      </section>
-
-      <!-- Form actions -->
-      <div class="form-actions">
-        <button type="button" @click="navigateBack" class="btn btn-secondary">
-          Cancelar
-        </button>
-        <button type="submit" class="btn btn-primary" :disabled="!validateForm()">
-          {{ isEditing ? 'Atualizar' : 'Criar' }} Cliente
-        </button>
-      </div>
-    </form>
-  </div>
+  <ContentFormTemplate
+    :form-sections="createFormSections"
+    :is-editing="false"
+    create-title="Criar Cliente"
+    subtitle="Adicionar um novo cliente ao sistema"
+    :custom-validator="validateCreateForm"
+    @submit="handleCreate"
+    @cancel="handleCancel"
+  >
+    <!-- Custom form sections for creation -->
+    <template #customSections="{ formData, errors }">
+      <!-- Creation-specific fields or sections -->
+    </template>
+  </ContentFormTemplate>
 </template>
+
+<script setup lang="ts">
+// Creation-specific logic:
+// - All fields enabled
+// - Creation validation rules
+// - Default values setup
+// - No pre-population needed
+</script>
+```
+
+##### Update View Component
+
+```vue
+<!-- Example: packages/frontend/src/views/clients/ClientsUpdateView.vue -->
+<template>
+  <ContentFormTemplate
+    :form-sections="updateFormSections"
+    :initial-data="existingClientData"
+    :is-editing="true"
+    edit-title="Editar Cliente"
+    subtitle="Atualizar informações do cliente"
+    :custom-validator="validateUpdateForm"
+    @submit="handleUpdate"
+    @cancel="handleCancel"
+  >
+    <!-- Custom form sections for updates -->
+    <template #customSections="{ formData, errors }">
+      <!-- Update-specific fields or sections -->
+      <!-- Some fields might be disabled or read-only -->
+    </template>
+  </ContentFormTemplate>
+</template>
+
+<script setup lang="ts">
+// Update-specific logic:
+// - Some fields may be disabled (e.g., creation date, ID fields)
+// - Different validation rules (e.g., optional fields that were required on creation)
+// - Pre-population from existing data
+// - Audit trail considerations
+</script>
 ```
 
 ## Data Models

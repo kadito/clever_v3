@@ -1,27 +1,25 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
-import { useAuth } from './useAuth';
 import { createPinia, setActivePinia } from 'pinia';
 
-// Mock Clerk Vue
-vi.mock('@clerk/vue', () => ({
-  useAuth: vi.fn(() => ({
-    isLoaded: ref(true),
-    isSignedIn: ref(false),
+// Mock window.Clerk
+Object.defineProperty(window, 'Clerk', {
+  value: {
     signOut: vi.fn(),
-  })),
-  useUser: vi.fn(() => ({
-    user: ref(null),
-  })),
-}));
+  },
+  writable: true,
+});
 
 describe('useAuth', () => {
   beforeEach(() => {
     // Create a fresh Pinia instance for each test
     setActivePinia(createPinia());
+    vi.clearAllMocks();
   });
 
-  it('should initialize with default state', () => {
+  it('should initialize with default state', async () => {
+    // Import after setting up Pinia
+    const { useAuth } = await import('./useAuth');
     const auth = useAuth();
     
     expect(auth.isLoaded.value).toBe(true);
@@ -32,9 +30,15 @@ describe('useAuth', () => {
     expect(auth.userName.value).toBe('');
   });
 
-  it('should provide sign out functionality', () => {
+  it('should provide sign out functionality', async () => {
+    // Import after setting up Pinia
+    const { useAuth } = await import('./useAuth');
     const auth = useAuth();
     
     expect(typeof auth.signOut).toBe('function');
+    
+    // Test sign out functionality
+    await auth.signOut();
+    expect(window.Clerk.signOut).toHaveBeenCalled();
   });
 });

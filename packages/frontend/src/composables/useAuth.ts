@@ -1,10 +1,11 @@
 import { computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import type { Clerk } from '@clerk/clerk-js';
 
 // Global Clerk instance (set in main.ts)
 declare global {
   interface Window {
-    Clerk: any;
+    Clerk?: Clerk;
   }
 }
 

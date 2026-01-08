@@ -11,7 +11,7 @@ This specification defines the standard implementation pattern for all content t
 - **R2_Storage**: Cloudflare R2 bucket used for JSON document storage
 - **Search_Index**: JSON file maintaining searchable metadata for content items
 - **Mobile_First_UI**: User interface designed primarily for mobile devices, then enhanced for larger screens
-- **Four_View_Pattern**: Standard navigation pattern: Home → List → Detail → Create/Edit
+- **Five_View_Pattern**: Standard navigation pattern: Home → List → Detail → Create → Update
 - **Worker**: Single Cloudflare Worker serving both frontend and backend
 - **Content_Item**: Individual instance of a content type with unique UUID
 
@@ -72,10 +72,10 @@ This specification defines the standard implementation pattern for all content t
 
 #### Acceptance Criteria
 
-1. THE System SHALL implement the Four_View_Pattern for each content type: Home tile → List view → Detail view → Create/Edit form
+1. THE System SHALL implement the Five_View_Pattern for each content type: Home tile → List view → Detail view → Create form → Update form
 2. WHEN displaying content lists, THE System SHALL use mobile-optimized cards with touch-friendly tap targets (minimum 44px)
 3. WHEN showing content details, THE System SHALL use responsive layouts that work on screens from 320px width
-4. WHEN creating or editing content, THE System SHALL provide mobile-optimized forms with appropriate input types
+4. WHEN creating or updating content, THE System SHALL provide mobile-optimized forms with appropriate input types and different validation rules for create vs update scenarios
 5. THE System SHALL use the established color palette (#75AE93 primary, #2c3e50 secondary) consistently across all content types
 
 ### Requirement 6: Individual Content Type Structure
@@ -124,8 +124,8 @@ This specification defines the standard implementation pattern for all content t
 1. THE System SHALL create individual Vue component folders for each content type
 2. WHEN implementing List views, THE System SHALL use mobile-optimized card layouts with touch-friendly interactions
 3. WHEN implementing Detail views, THE System SHALL display information in mobile-friendly formats
-4. WHEN implementing Form views, THE System SHALL use appropriate mobile input types and validation
-5. THE System SHALL follow the Four_View_Pattern with mobile-first responsive design
+4. WHEN implementing Create and Update views, THE System SHALL use appropriate mobile input types and validation with different rules for each scenario
+5. THE System SHALL follow the Five_View_Pattern with mobile-first responsive design
 
 ### Requirement 10: Authentication Integration
 

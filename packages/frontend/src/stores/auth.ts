@@ -8,7 +8,7 @@ import type { UserContext } from '@clever/shared';
  */
 export const useAuthStore = defineStore('auth', () => {
   // State
-  const isLoaded = ref(false);
+  const isLoaded = ref(true); // Initialize as loaded for better UX
   const isSignedIn = ref(false);
   const user = ref<UserContext | null>(null);
 

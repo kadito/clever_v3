@@ -10,7 +10,7 @@ import type { UserContext, ApiResponse, UserType } from '@clever/shared';
 /**
  * Extract JWT token from request cookies or Authorization header
  */
-function extractJwtToken(c: Context): string | null {
+export function extractJwtToken(c: Context): string | null {
   // Try Authorization header first
   const authHeader = c.req.header('Authorization');
   if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -29,7 +29,7 @@ function extractJwtToken(c: Context): string | null {
 /**
  * Verify Clerk JWT token
  */
-async function verifyClerkJwt(token: string): Promise<any> {
+export async function verifyClerkJwt(token: string): Promise<any> {
   try {
     // For now, we'll decode the JWT without verification for development
     // In production, you should use proper JWT verification
@@ -63,7 +63,7 @@ export const extractUserContext = createMiddleware(async (c, next) => {
   if (!token) {
     const response: ApiResponse = {
       success: false,
-      error: 'Authentication required. Please sign in to access this resource.',
+      error: 'Authentication failed',
       timestamp: new Date().toISOString(),
     };
     return c.json(response, 401);
@@ -91,7 +91,7 @@ export const extractUserContext = createMiddleware(async (c, next) => {
     console.error('Error extracting user context:', error);
     const response: ApiResponse = {
       success: false,
-      error: 'Authentication failed. Invalid or expired token.',
+      error: 'Authentication failed',
       timestamp: new Date().toISOString(),
     };
     return c.json(response, 401);

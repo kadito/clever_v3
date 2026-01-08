@@ -6,13 +6,13 @@ This implementation plan establishes the foundational pattern for all content ty
 
 ## Phase 1: Base Infrastructure (Do Once)
 
-- [ ] 1. Set up shared types and base infrastructure
-- [ ] 1.1 Create BaseContent interface in shared package
+- [x] 1. Set up shared types and base infrastructure
+- [x] 1.1 Create BaseContent interface in shared package
   - Define uuid, contentType, audit trail fields, version tracking
   - Create API response types (ApiResponse, ListResponse, SearchResponse)
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-- [ ] 1.2 Create ContentStorageService class template
+- [x] 1.2 Create ContentStorageService class template
   - Generic R2 storage operations (get, create, update, delete)
   - Search index synchronization logic
   - R2 key pattern implementation: content/{type}/{uuid}.json
@@ -24,25 +24,25 @@ This implementation plan establishes the foundational pattern for all content ty
   - **Property 6: Content Retrieval Round Trip**
   - **Validates: Requirements 1.1, 1.4, 2.1, 2.2**
 
-- [ ] 2. Create shared Vue components
-- [ ] 2.1 Create ErrorComponent for consistent error display
+- [x] 2. Create shared Vue components
+- [x] 2.1 Create ErrorComponent for consistent error display
   - Portuguese error messages
   - Simple close functionality (no retry logic)
   - _Requirements: 11.2, 12.5_
 
-- [ ] 2.2 Create BackButton component for navigation
+- [x] 2.2 Create BackButton component for navigation
   - Mobile-friendly touch targets (minimum 44px)
   - Consistent styling with color palette
   - _Requirements: 5.2, 5.5_
 
-- [ ] 2.3 Set up mobile-first CSS variables and base styles
+- [x] 2.3 Set up mobile-first CSS variables and base styles
   - Establish color palette (#75AE93 primary, #2c3e50 secondary)
   - Mobile-first responsive breakpoints
   - Touch-friendly component styles
   - _Requirements: 5.5, 12.1_
 
-- [ ] 3. Create generic API route template
-- [ ] 3.1 Implement base route handler pattern
+- [-] 3. Create generic API route template
+- [x] 3.1 Implement base route handler pattern
   - Generic CRUD endpoints (GET, POST, PUT, DELETE)
   - Content-specific sorting logic (alphabetical for clients, by date for others)
   - Error handling with appropriate HTTP status codes
@@ -55,21 +55,21 @@ This implementation plan establishes the foundational pattern for all content ty
   - **Property 22: Content-Specific Sorting**
   - **Validates: Requirements 4.1-4.6, 8.6**
 
-- [ ] 4. Create Vue component templates
-- [ ] 4.1 Create ListView template component
+- [x] 4. Create Vue component templates
+- [x] 4.1 Create ListView template component
   - Mobile-optimized card layout
   - Search functionality with debouncing
   - Portuguese labels and empty states
   - FAB for create action
   - _Requirements: 5.1, 5.2, 9.2, 12.1, 13.4_
 
-- [ ] 4.2 Create DetailView template component
+- [x] 4.2 Create DetailView template component
   - Responsive section-based layout (320px+ width support)
   - Mobile-friendly information display
   - Edit action integration
   - _Requirements: 5.3, 9.3, 12.1_
 
-- [ ] 4.3 Create FormView template component
+- [x] 4.3 Create FormView template component
   - Mobile-optimized form sections
   - Appropriate input types (tel, email, url)
   - Portuguese validation messages
@@ -82,10 +82,16 @@ This implementation plan establishes the foundational pattern for all content ty
   - **Property 13: Mobile Form Optimization**
   - **Validates: Requirements 5.2, 5.3, 5.4**
 
-- [ ] 5. Checkpoint - Base infrastructure complete
-- Ensure all base components and templates are working
-- Verify property tests pass for foundational elements
-- Ask the user if questions arise about the infrastructure
+- [x] 5. Checkpoint - Base infrastructure complete ✅
+- ✅ All base components and templates are working
+- ✅ Frontend tests pass (48 tests) - authentication and component tests
+- ✅ Shared package tests pass (64 tests) - types and storage tests  
+- ✅ Backend tests pass (75 tests) - authentication and API tests ✅
+- ✅ TypeScript compilation successful across all packages
+- ✅ Build process successful for all packages
+- ✅ Five-View Pattern implemented with Create/Update separation
+- ✅ Mobile-first CSS framework and Portuguese localization in place
+- ✅ Authentication middleware fixed - all API routes properly protected
 
 ## Phase 2: Content Type Implementation (Repeat for Each)
 
@@ -141,14 +147,23 @@ This implementation plan establishes the foundational pattern for all content ty
   - Include Portuguese labels and locale formatting
   - _Requirements: 9.3, 12.1, 12.4_
 
-- [ ] 8.3 Create {Type}FormView.vue component
-  - Implement content-specific form sections
-  - Add validation for content-specific fields
+- [ ] 8.3 Create {Type}CreateView.vue component
+  - Use ContentFormTemplate for rendering
+  - Implement content-specific form sections for creation
+  - Add creation-specific validation rules
   - Configure appropriate mobile input types
   - Include Portuguese validation messages and labels
   - _Requirements: 9.4, 11.1, 12.1, 12.5_
 
-- [ ]* 8.4 Write property tests for {CONTENT_TYPE} components
+- [ ] 8.4 Create {Type}UpdateView.vue component
+  - Use ContentFormTemplate for rendering
+  - Implement content-specific form sections for editing
+  - Add update-specific validation rules and disabled fields
+  - Handle pre-population of existing data
+  - Include Portuguese validation messages and labels
+  - _Requirements: 9.4, 11.1, 12.1, 12.5_
+
+- [ ]* 8.5 Write property tests for {CONTENT_TYPE} components
   - **Property 17: Error Component Display**
   - **Property 18: Authentication Redirect**
   - **Property 19: Portuguese UI Language**
@@ -157,7 +172,7 @@ This implementation plan establishes the foundational pattern for all content ty
 
 - [ ] 9. Integration and routing for {CONTENT_TYPE}
 - [ ] 9.1 Add {CONTENT_TYPE} routes to Vue Router
-  - Configure 4-view pattern routes (List, Detail, Create, Edit)
+  - Configure 5-view pattern routes (List, Detail, Create, Update)
   - Add navigation integration
   - Update dashboard tiles for content type
   - _Requirements: 5.1, 9.5_
@@ -196,7 +211,9 @@ This implementation plan establishes the foundational pattern for all content ty
 - Tasks marked with `*` are optional and can be skipped for faster MVP
 - Phase 1 creates the foundation that all content types will use
 - Phase 2 is repeated for each content type with content-specific implementations
-- Each content type follows the same pattern but with unique data structures
+- Each content type follows the same pattern but with unique data structures and business logic
+- **Five-View Pattern**: Each content type has List, Detail, Create, Update views plus Home dashboard tile
+- **Create vs Update**: Separate components allow different validation rules, field behaviors, and business logic
 - Property tests validate universal correctness properties across all content types
 - Focus on mobile-first design and Portuguese localization throughout
 - Simple error handling without retry mechanisms

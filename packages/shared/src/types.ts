@@ -74,6 +74,11 @@ export interface ListResponse<T> extends ApiResponse<T[]> {
   };
 }
 
+export interface SearchResponse<T> extends ApiResponse<T[]> {
+  query: string;
+  count: number;
+}
+
 // Content type definitions
 export type ContentType =
   | 'clients'
