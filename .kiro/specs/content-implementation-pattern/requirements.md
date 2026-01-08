@@ -1,0 +1,176 @@
+# Requirements Document
+
+## Introduction
+
+This specification defines the standard implementation pattern for all content types in the CLEVER dashboard system. This pattern will be applied consistently across all content types (Clientes, Contratos, Licenças, Folhas de Obra, Registo Diário, Assistências Remotas, Lembretes, Pendentes) to ensure consistency, maintainability, and a unified user experience.
+
+## Glossary
+
+- **Content_Type**: A specific business entity type (e.g., clients, contracts, licenses)
+- **BaseContent**: The foundational interface that all content types extend
+- **R2_Storage**: Cloudflare R2 bucket used for JSON document storage
+- **Search_Index**: JSON file maintaining searchable metadata for content items
+- **Mobile_First_UI**: User interface designed primarily for mobile devices, then enhanced for larger screens
+- **Four_View_Pattern**: Standard navigation pattern: Home → List → Detail → Create/Edit
+- **Worker**: Single Cloudflare Worker serving both frontend and backend
+- **Content_Item**: Individual instance of a content type with unique UUID
+
+## Requirements
+
+### Requirement 1: BaseContent Interface Implementation
+
+**User Story:** As a system architect, I want all content types to follow a consistent data structure, so that storage, retrieval, and management operations are standardized across the system.
+
+#### Acceptance Criteria
+
+1. THE Content_Type SHALL extend the BaseContent interface with uuid, contentType, audit trail fields, and version tracking
+2. WHEN a Content_Item is created, THE System SHALL generate a unique UUID and set initial audit trail values
+3. WHEN a Content_Item is updated, THE System SHALL increment version number and update audit trail
+4. THE Content_Type SHALL include a data field containing business-specific properties
+5. THE System SHALL support soft delete functionality with isDeleted flag and deletion audit trail
+
+### Requirement 2: R2 Storage Operations
+
+**User Story:** As a developer, I want standardized storage operations for all content types, so that data persistence is consistent and reliable across the system.
+
+#### Acceptance Criteria
+
+1. WHEN storing a Content_Item, THE System SHALL save it to R2 using the pattern content/{type}/{uuid}.json
+2. WHEN retrieving a Content_Item, THE System SHALL fetch it from R2 using the UUID-based key
+3. WHEN listing Content_Items, THE System SHALL use the search index for efficient querying
+4. WHEN a Content_Item is modified, THE System SHALL update both the individual file and the search index
+5. THE System SHALL handle R2 storage errors gracefully and return appropriate error responses
+
+### Requirement 3: Search Index Management
+
+**User Story:** As a user, I want fast search and filtering capabilities, so that I can quickly find the content I need without waiting for slow queries.
+
+#### Acceptance Criteria
+
+1. THE System SHALL maintain a search index file at indexes/{type}-index.json for each content type
+2. WHEN a Content_Item is created, THE System SHALL add its metadata to the search index
+3. WHEN a Content_Item is updated, THE System SHALL update its metadata in the search index
+4. WHEN a Content_Item is soft deleted, THE System SHALL mark it as deleted in the search index
+5. THE Search_Index SHALL contain searchable fields like title, description, dates, and status for efficient filtering
+
+### Requirement 4: RESTful API Endpoints
+
+**User Story:** As a frontend developer, I want consistent API endpoints for all content types, so that I can build reusable components and maintain predictable data access patterns.
+
+#### Acceptance Criteria
+
+1. THE System SHALL provide GET /api/content/{type} endpoint for listing items with search and filter support
+2. THE System SHALL provide GET /api/content/{type}/{uuid} endpoint for retrieving individual items
+3. THE System SHALL provide POST /api/content/{type} endpoint for creating new items
+4. THE System SHALL provide PUT /api/content/{type}/{uuid} endpoint for updating existing items
+5. THE System SHALL provide DELETE /api/content/{type}/{uuid} endpoint for soft deleting items
+6. WHEN API endpoints receive invalid requests, THE System SHALL return appropriate HTTP status codes and error messages
+
+### Requirement 5: Mobile-First Frontend Components
+
+**User Story:** As a field worker, I want all content management interfaces to work seamlessly on my mobile device, so that I can manage data efficiently while on-site.
+
+#### Acceptance Criteria
+
+1. THE System SHALL implement the Four_View_Pattern for each content type: Home tile → List view → Detail view → Create/Edit form
+2. WHEN displaying content lists, THE System SHALL use mobile-optimized cards with touch-friendly tap targets (minimum 44px)
+3. WHEN showing content details, THE System SHALL use responsive layouts that work on screens from 320px width
+4. WHEN creating or editing content, THE System SHALL provide mobile-optimized forms with appropriate input types
+5. THE System SHALL use the established color palette (#75AE93 primary, #2c3e50 secondary) consistently across all content types
+
+### Requirement 6: Individual Content Type Structure
+
+**User Story:** As a developer, I want each content type to have its own dedicated folder structure, so that content-specific logic is organized and maintainable.
+
+#### Acceptance Criteria
+
+1. THE System SHALL create individual folders for each content type in shared/src/types/{content-type}/
+2. THE System SHALL create individual API route files for each content type in backend/src/routes/{content-type}.ts
+3. THE System SHALL create individual Vue component folders for each content type in frontend/src/views/{content-type}/
+4. WHEN implementing a content type, THE System SHALL analyze old_src components to understand the content schema
+5. THE System SHALL create TypeScript interfaces based on the legacy Vue component data structures
+
+### Requirement 7: Schema Analysis from Legacy Code
+
+**User Story:** As a developer, I want to understand existing content schemas from the legacy system, so that I can maintain data compatibility and business logic.
+
+#### Acceptance Criteria
+
+1. WHEN implementing a content type, THE System SHALL analyze the corresponding old_src Vue components
+2. THE System SHALL extract data structures from legacy Detail and Form views
+3. THE System SHALL create TypeScript interfaces based on the legacy data schema analysis
+4. THE System SHALL identify required fields, validation rules, and relationships from legacy components
+5. THE System SHALL create clean, modern data structures optimized for the new system
+
+### Requirement 8: CRUD API Implementation
+
+**User Story:** As a frontend developer, I want dedicated API endpoints for each content type, so that I can perform all necessary data operations with proper indexing support.
+
+#### Acceptance Criteria
+
+1. THE System SHALL create individual route files for each content type with full CRUD operations
+2. WHEN creating content, THE System SHALL validate against the content-specific schema
+3. WHEN updating content, THE System SHALL maintain search index synchronization
+4. WHEN deleting content, THE System SHALL perform soft delete and update indexes
+5. THE System SHALL implement search and filtering capabilities using the maintained indexes
+6. WHEN listing or searching content, THE System SHALL sort clients alphabetically and all other content types by creation date (most recent first)
+
+### Requirement 9: Mobile-First Vue Components
+
+**User Story:** As a field worker, I want content-specific interfaces that work perfectly on mobile devices, so that I can manage data efficiently while on-site.
+
+#### Acceptance Criteria
+
+1. THE System SHALL create individual Vue component folders for each content type
+2. WHEN implementing List views, THE System SHALL use mobile-optimized card layouts with touch-friendly interactions
+3. WHEN implementing Detail views, THE System SHALL display information in mobile-friendly formats
+4. WHEN implementing Form views, THE System SHALL use appropriate mobile input types and validation
+5. THE System SHALL follow the Four_View_Pattern with mobile-first responsive design
+
+### Requirement 10: Authentication Integration
+
+**User Story:** As a system user, I want all content operations to be secure and audited, so that data access is controlled and changes are traceable.
+
+#### Acceptance Criteria
+
+1. WHEN accessing any content endpoint, THE System SHALL require valid Clerk authentication
+2. WHEN creating or updating content, THE System SHALL record the authenticated user in audit trail fields
+3. THE System SHALL include user information in createdBy and updatedBy fields using Clerk user data
+4. WHEN authentication fails, THE System SHALL return 401 Unauthorized responses
+5. THE System SHALL validate user permissions for content operations (Phase 2 requirement)
+
+### Requirement 11: Simple Error Handling
+
+**User Story:** As a user, I want clear feedback when operations fail, so that I can understand what went wrong and take appropriate action.
+
+#### Acceptance Criteria
+
+1. WHEN content validation fails, THE System SHALL return detailed error messages with field-specific feedback
+2. WHEN API requests fail, THE Vue App SHALL display the error using an Error component
+3. WHEN API requests return 401 Unauthorized, THE System SHALL redirect to the sign-in page
+4. WHEN R2 operations fail, THE System SHALL display the error message without retry attempts
+5. THE System SHALL validate required fields and data types before attempting storage operations
+
+### Requirement 12: Portuguese UI Labels
+
+**User Story:** As a Portuguese user, I want all user interface elements to be in Portuguese, so that the system is accessible and intuitive for local users.
+
+#### Acceptance Criteria
+
+1. THE System SHALL display all UI labels, buttons, and messages in Portuguese (Portugal variant)
+2. WHEN showing content type names, THE System SHALL use Portuguese labels (Clientes, Contratos, etc.)
+3. THE System SHALL maintain English code identifiers while displaying Portuguese labels to users
+4. WHEN displaying dates and numbers, THE System SHALL use Portuguese locale formatting
+5. THE System SHALL provide Portuguese error messages and validation feedback
+
+### Requirement 13: Performance Optimization
+
+**User Story:** As a mobile user with limited bandwidth, I want the system to load quickly and work efficiently, so that I can be productive even with slower connections.
+
+#### Acceptance Criteria
+
+1. WHEN loading content lists, THE System SHALL implement pagination or virtual scrolling for large datasets
+2. WHEN displaying content, THE System SHALL lazy load non-critical data and images
+3. THE System SHALL cache frequently accessed data using appropriate browser caching strategies
+4. WHEN searching content, THE System SHALL debounce search inputs to avoid excessive API calls
+5. THE System SHALL provide loading states and skeleton screens for better perceived performance

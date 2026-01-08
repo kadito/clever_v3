@@ -1,0 +1,202 @@
+# Implementation Plan: Content Implementation Pattern
+
+## Overview
+
+This implementation plan establishes the foundational pattern for all content types in the CLEVER dashboard system, then provides a repeatable process for implementing each content type individually following the established pattern.
+
+## Phase 1: Base Infrastructure (Do Once)
+
+- [ ] 1. Set up shared types and base infrastructure
+- [ ] 1.1 Create BaseContent interface in shared package
+  - Define uuid, contentType, audit trail fields, version tracking
+  - Create API response types (ApiResponse, ListResponse, SearchResponse)
+  - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
+
+- [ ] 1.2 Create ContentStorageService class template
+  - Generic R2 storage operations (get, create, update, delete)
+  - Search index synchronization logic
+  - R2 key pattern implementation: content/{type}/{uuid}.json
+  - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
+
+- [ ]* 1.3 Write property tests for base infrastructure
+  - **Property 1: BaseContent Interface Compliance**
+  - **Property 5: R2 Storage Key Pattern**
+  - **Property 6: Content Retrieval Round Trip**
+  - **Validates: Requirements 1.1, 1.4, 2.1, 2.2**
+
+- [ ] 2. Create shared Vue components
+- [ ] 2.1 Create ErrorComponent for consistent error display
+  - Portuguese error messages
+  - Simple close functionality (no retry logic)
+  - _Requirements: 11.2, 12.5_
+
+- [ ] 2.2 Create BackButton component for navigation
+  - Mobile-friendly touch targets (minimum 44px)
+  - Consistent styling with color palette
+  - _Requirements: 5.2, 5.5_
+
+- [ ] 2.3 Set up mobile-first CSS variables and base styles
+  - Establish color palette (#75AE93 primary, #2c3e50 secondary)
+  - Mobile-first responsive breakpoints
+  - Touch-friendly component styles
+  - _Requirements: 5.5, 12.1_
+
+- [ ] 3. Create generic API route template
+- [ ] 3.1 Implement base route handler pattern
+  - Generic CRUD endpoints (GET, POST, PUT, DELETE)
+  - Content-specific sorting logic (alphabetical for clients, by date for others)
+  - Error handling with appropriate HTTP status codes
+  - Authentication integration with Clerk
+  - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 8.6, 10.1, 10.4_
+
+- [ ]* 3.2 Write property tests for API pattern
+  - **Property 9: API Endpoint Completeness**
+  - **Property 10: API Error Response Consistency**
+  - **Property 22: Content-Specific Sorting**
+  - **Validates: Requirements 4.1-4.6, 8.6**
+
+- [ ] 4. Create Vue component templates
+- [ ] 4.1 Create ListView template component
+  - Mobile-optimized card layout
+  - Search functionality with debouncing
+  - Portuguese labels and empty states
+  - FAB for create action
+  - _Requirements: 5.1, 5.2, 9.2, 12.1, 13.4_
+
+- [ ] 4.2 Create DetailView template component
+  - Responsive section-based layout (320px+ width support)
+  - Mobile-friendly information display
+  - Edit action integration
+  - _Requirements: 5.3, 9.3, 12.1_
+
+- [ ] 4.3 Create FormView template component
+  - Mobile-optimized form sections
+  - Appropriate input types (tel, email, url)
+  - Portuguese validation messages
+  - Touch-friendly form controls
+  - _Requirements: 5.4, 9.4, 11.1, 12.1, 12.5_
+
+- [ ]* 4.4 Write property tests for Vue templates
+  - **Property 11: Mobile Touch Target Compliance**
+  - **Property 12: Responsive Layout Compatibility**
+  - **Property 13: Mobile Form Optimization**
+  - **Validates: Requirements 5.2, 5.3, 5.4**
+
+- [ ] 5. Checkpoint - Base infrastructure complete
+- Ensure all base components and templates are working
+- Verify property tests pass for foundational elements
+- Ask the user if questions arise about the infrastructure
+
+## Phase 2: Content Type Implementation (Repeat for Each)
+
+### Process for Each Content Type (Start with Clientes)
+
+- [ ] 6. Analyze legacy components for {CONTENT_TYPE}
+- [ ] 6.1 Analyze old_src Detail view for {CONTENT_TYPE}
+  - Read old_src/views/{content-type}/{Type}Detail.vue
+  - Extract data structure and display fields
+  - Identify conditional logic and business rules
+  - Document field relationships and formatting
+  - _Requirements: 7.1, 7.2_
+
+- [ ] 6.2 Analyze old_src Form view for {CONTENT_TYPE}
+  - Read old_src/views/{content-type}/{Type}Form.vue
+  - Extract form fields and input types
+  - Identify validation rules and required fields
+  - Document form sections and conditional fields
+  - _Requirements: 7.1, 7.2_
+
+- [ ] 6.3 Create TypeScript interfaces for {CONTENT_TYPE}
+  - Extend BaseContent interface with content-specific data structure
+  - Create validation schemas based on form analysis
+  - Optimize data structure for new system (clean, modern design)
+  - _Requirements: 7.3, 7.4, 7.5_
+
+- [ ] 7. Implement backend for {CONTENT_TYPE}
+- [ ] 7.1 Create {content-type}.ts route file
+  - Implement all CRUD endpoints using the generic pattern
+  - Add content-specific validation logic
+  - Configure content-specific sorting (alphabetical for clients, by date for others)
+  - Implement search index with content-specific searchable fields
+  - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6_
+
+- [ ]* 7.2 Write property tests for {CONTENT_TYPE} API
+  - **Property 15: Authentication Requirement**
+  - **Property 16: Audit Trail User Recording**
+  - **Property 7: Index-Storage Synchronization**
+  - **Validates: Requirements 8.2, 8.3, 8.4, 10.1, 10.2**
+
+- [ ] 8. Implement frontend for {CONTENT_TYPE}
+- [ ] 8.1 Create {Type}ListView.vue component
+  - Implement content-specific display functions (getDisplayTitle, getDisplayMeta1, etc.)
+  - Configure Portuguese labels for the content type
+  - Add content-specific search and filter logic
+  - Use mobile-first card layout with touch targets
+  - _Requirements: 9.1, 9.2, 12.2, 12.3_
+
+- [ ] 8.2 Create {Type}DetailView.vue component
+  - Implement content-specific sections based on legacy analysis
+  - Add content-specific field displays and formatting
+  - Configure mobile-friendly responsive layouts
+  - Include Portuguese labels and locale formatting
+  - _Requirements: 9.3, 12.1, 12.4_
+
+- [ ] 8.3 Create {Type}FormView.vue component
+  - Implement content-specific form sections
+  - Add validation for content-specific fields
+  - Configure appropriate mobile input types
+  - Include Portuguese validation messages and labels
+  - _Requirements: 9.4, 11.1, 12.1, 12.5_
+
+- [ ]* 8.4 Write property tests for {CONTENT_TYPE} components
+  - **Property 17: Error Component Display**
+  - **Property 18: Authentication Redirect**
+  - **Property 19: Portuguese UI Language**
+  - **Property 20: Portuguese Locale Formatting**
+  - **Validates: Requirements 11.2, 11.3, 12.1-12.4**
+
+- [ ] 9. Integration and routing for {CONTENT_TYPE}
+- [ ] 9.1 Add {CONTENT_TYPE} routes to Vue Router
+  - Configure 4-view pattern routes (List, Detail, Create, Edit)
+  - Add navigation integration
+  - Update dashboard tiles for content type
+  - _Requirements: 5.1, 9.5_
+
+- [ ] 9.2 Test end-to-end functionality for {CONTENT_TYPE}
+  - Verify complete CRUD workflows
+  - Test mobile responsiveness across breakpoints
+  - Validate Portuguese localization
+  - Test authentication and error handling
+  - _Requirements: 11.3, 11.4, 13.5_
+
+- [ ]* 9.3 Write integration tests for {CONTENT_TYPE}
+  - Test complete user workflows
+  - Verify mobile touch interactions
+  - Test loading states and performance
+  - **Property 21: Search Input Debouncing**
+  - **Property 23: Loading State Provision**
+  - **Validates: Requirements 13.4, 13.5**
+
+- [ ] 10. Checkpoint for {CONTENT_TYPE}
+- Ensure all {CONTENT_TYPE} functionality works correctly
+- Verify all property tests pass
+- Test on mobile devices
+- Ask the user if questions arise about this content type
+
+## Implementation Order
+
+1. **Complete Phase 1** (Base Infrastructure) - Do this once
+2. **Start with Clientes** - Apply Phase 2 process
+3. **Then Contratos** - Apply Phase 2 process  
+4. **Then Licenças** - Apply Phase 2 process
+5. **Continue with remaining content types** as needed
+
+## Notes
+
+- Tasks marked with `*` are optional and can be skipped for faster MVP
+- Phase 1 creates the foundation that all content types will use
+- Phase 2 is repeated for each content type with content-specific implementations
+- Each content type follows the same pattern but with unique data structures
+- Property tests validate universal correctness properties across all content types
+- Focus on mobile-first design and Portuguese localization throughout
+- Simple error handling without retry mechanisms

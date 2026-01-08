@@ -38,7 +38,7 @@ Storage:
 - No traditional database
 - R2 bucket structure:
   ```
-  ├── content/{type}/{type}-{uuid}.json
+  ├── content/{type}/{uuid}.json
   ├── indexes/{type}-index.json
   └── migrations/
   ```

@@ -62,21 +62,21 @@ and R2 for JSON document storage.
 ```
 ├── content/
 │   ├── clients/
-│   │   └── clients-{uuid}.json
+│   │   └── {uuid}.json
 │   ├── contracts/
-│   │   └── contracts-{uuid}.json
+│   │   └── {uuid}.json
 │   ├── licenses/
-│   │   └── licenses-{uuid}.json
+│   │   └── {uuid}.json
 │   ├── work-sheets/
-│   │   └── work-sheets-{uuid}.json
+│   │   └── {uuid}.json
 │   ├── daily-records/
-│   │   └── daily-records-{uuid}.json
+│   │   └── {uuid}.json
 │   ├── remote-assistance/
-│   │   └── remote-assistance-{uuid}.json
+│   │   └── {uuid}.json
 │   ├── reminders/
-│   │   └── reminders-{uuid}.json
+│   │   └── {uuid}.json
 │   └── pending/
-│       └── pending-{uuid}.json
+│       └── {uuid}.json
 ├── indexes/
 │   ├── clients-index.json
 │   ├── contracts-index.json

@@ -435,9 +435,9 @@ and a flexible data property for content-specific fields.
 R2 Bucket: clever-dashboard-{env}
 ├── content/
 │   ├── clients/
-│   │   └── clients-{uuid}.json
+│   │   └── {uuid}.json
 │   ├── contracts/
-│   │   └── contracts-{uuid}.json
+│   │   └── {uuid}.json
 │   └── [other content types]/
 ├── indexes/
 │   ├── clients-index.json

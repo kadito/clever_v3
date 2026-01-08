@@ -58,5 +58,5 @@ API Patterns:
 
 - RESTful endpoints: /api/content/{type}
 - Consistent CRUD operations
-- R2 key pattern: content/{type}/{type}-{uuid}.json
+- R2 key pattern: content/{type}/{uuid}.json
 - Index pattern: indexes/{type}-index.json
