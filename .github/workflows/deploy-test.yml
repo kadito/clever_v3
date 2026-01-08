@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: test
     
     steps:
       - name: Checkout code
@@ -44,17 +45,20 @@ jobs:
         
       - name: Build frontend package
         run: pnpm --filter @clever/frontend build
+        env:
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ vars.CLERK_PUBLISHABLE_KEY }}
         
       - name: Build backend package
         run: pnpm --filter @clever/backend build
         
-      - name: Setup Wrangler
+      - name: Deploy with Wrangler
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy
+          command: deploy --var CLERK_PUBLISHABLE_KEY:${{ vars.CLERK_PUBLISHABLE_KEY }}
         env:
           NODE_ENV: test
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
           
           

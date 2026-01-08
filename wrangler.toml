@@ -9,8 +9,7 @@ account_id = "98dfed939a59dca09770880eab939b79"
 [vars]
 NODE_ENV = "test"
 LOG_LEVEL = "debug"
-CLERK_PUBLISHABLE_KEY = "pk_test_c3RhYmxlLWJ1Y2stNTUuY2xlcmsuYWNjb3VudHMuZGV2JA"
-# CLERK_SECRET_KEY is set via wrangler secret put
+CLERK_PUBLISHABLE_KEY = ""  # Set via --var during deployment
 
 # Static assets binding
 [assets]
@@ -39,8 +38,7 @@ name = "clever-dashboard-prod"
 [env.production.vars]
 NODE_ENV = "production"
 LOG_LEVEL = "warn"
-CLERK_PUBLISHABLE_KEY = "pk_live_your_publishable_key_here"
-# CLERK_SECRET_KEY is set via wrangler secret put
+CLERK_PUBLISHABLE_KEY = ""  # Set via --var during deployment
 
 [[env.production.r2_buckets]]
 binding = "CONTENT"
