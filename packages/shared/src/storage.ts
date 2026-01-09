@@ -7,7 +7,10 @@ import type { BaseContent } from './types.js';
  */
 export interface StorageBucket {
   get(key: string): Promise<StorageObject | null>;
-  put(key: string, value: string): Promise<StorageObject>;
+  put(key: string, value: string, options?: { 
+    httpMetadata?: { contentType?: string; cacheControl?: string; };
+    customMetadata?: Record<string, string>;
+  }): Promise<StorageObject>;
   delete(key: string): Promise<void>;
 }
 
@@ -189,11 +192,23 @@ export class ContentStorageService<T extends BaseContent> {
   /**
    * Save content item to R2 storage
    * Uses key pattern: content/{type}/{uuid}.json
+   * Sets proper Content-Type metadata for R2 dashboard preview
    * Requirements: 2.1
    */
   private async save(content: T): Promise<void> {
     const key = `content/${this.contentType}/${content.uuid}.json`;
-    await this.r2Bucket.put(key, JSON.stringify(content));
+    await this.r2Bucket.put(key, JSON.stringify(content, null, 2), {
+      httpMetadata: {
+        contentType: 'application/json',
+        cacheControl: 'public, max-age=3600'
+      },
+      customMetadata: {
+        contentType: this.contentType,
+        version: content.version.toString(),
+        createdAt: content.createdAt,
+        updatedAt: content.updatedAt
+      }
+    });
   }
 
   /**
@@ -247,7 +262,17 @@ export class ContentStorageService<T extends BaseContent> {
     index.lastUpdated = new Date().toISOString();
     
     // Save updated index
-    await this.r2Bucket.put(indexKey, JSON.stringify(index));
+    await this.r2Bucket.put(indexKey, JSON.stringify(index, null, 2), {
+      httpMetadata: {
+        contentType: 'application/json',
+        cacheControl: 'public, max-age=300'
+      },
+      customMetadata: {
+        contentType: `${this.contentType}-index`,
+        lastUpdated: index.lastUpdated,
+        itemCount: index.items.length.toString()
+      }
+    });
   }
 
   /**
