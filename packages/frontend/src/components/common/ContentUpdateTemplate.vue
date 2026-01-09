@@ -16,8 +16,8 @@
     @clear-error="clearError"
   >
     <!-- Custom form sections for update-specific fields -->
-    <template #customSections="{ formData, errors }">
-      <slot name="updateSections" :form-data="formData" :errors="errors" />
+    <template #customSections="{ formData, errors, updateFieldValue }">
+      <slot name="updateSections" :form-data="formData" :errors="errors" :update-field-value="updateFieldValue" />
     </template>
 
     <!-- Custom field overrides -->

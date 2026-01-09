@@ -3,6 +3,7 @@
  */
 
 import type { UserContext, AuthenticatedContext } from '@clever/shared';
+import type { Context } from 'hono';
 
 // Re-export shared types for convenience
 export type { UserContext, AuthenticatedContext };
@@ -17,3 +18,18 @@ export interface ClerkBindings {
   CLERK_SECRET_KEY: string;
   [key: string]: any; // Index signature for Hono compatibility
 }
+
+/**
+ * Extended Hono context with user information
+ */
+export interface AppContext {
+  Variables: {
+    user: UserContext;
+  };
+  Bindings: ClerkBindings;
+}
+
+/**
+ * Typed Hono context for authenticated routes
+ */
+export type AuthenticatedHonoContext = Context<AppContext>;

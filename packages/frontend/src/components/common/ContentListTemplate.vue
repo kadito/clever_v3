@@ -7,15 +7,12 @@
           <div class="flex items-center space-x-3">
             <BackButton :to="backRoute" variant="inline" />
             <div>
-              <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
+              <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
                 {{ displayName }}
                 <span v-if="!isLoading && totalCount !== null" class="text-lg text-gray-500 font-normal">
                   ({{ totalCount }})
                 </span>
               </h1>
-              <p class="text-gray-600 text-sm sm:text-base">
-                {{ description || `Gerir ${displayName.toLowerCase()} do sistema` }}
-              </p>
             </div>
           </div>
 
@@ -41,7 +38,8 @@
       <!-- Mobile-optimized search -->
       <div class="mb-6">
         <SearchBar
-          v-model="searchQuery"
+          :model-value="localSearchQuery"
+          @update:model-value="localSearchQuery = $event"
           :placeholder="searchPlaceholder"
           :debounce-ms="300"
           @search="handleSearch"

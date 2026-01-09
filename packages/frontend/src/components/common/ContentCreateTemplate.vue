@@ -15,8 +15,8 @@
     @clear-error="clearError"
   >
     <!-- Custom form sections for creation-specific fields -->
-    <template #customSections="{ formData, errors }">
-      <slot name="createSections" :form-data="formData" :errors="errors" />
+    <template #customSections="{ formData, errors, updateFieldValue }">
+      <slot name="createSections" :form-data="formData" :errors="errors" :update-field-value="updateFieldValue" />
     </template>
 
     <!-- Custom field overrides -->
@@ -27,7 +27,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 import ContentFormTemplate from './ContentFormTemplate.vue';
 import type { FormSection } from './types';
 
@@ -67,21 +66,19 @@ const emit = defineEmits<{
 
 // Create-specific validation that can be overridden
 const validateCreateForm = (data: Record<string, any>): Record<string, string> => {
-  const errors: Record<string, string> = {};
+  // If custom validator is provided, use it exclusively
+  if (props.customValidator) {
+    return props.customValidator(data);
+  }
   
   // Default create validation - all required fields must be present
+  const errors: Record<string, string> = {};
   for (const section of props.formSections) {
     for (const field of section.fields) {
       if (field.required && (!data[field.key] || (typeof data[field.key] === 'string' && data[field.key].trim() === ''))) {
         errors[field.key] = `${field.label} é obrigatório`;
       }
     }
-  }
-  
-  // Apply custom validation if provided
-  if (props.customValidator) {
-    const customErrors = props.customValidator(data);
-    Object.assign(errors, customErrors);
   }
   
   return errors;

@@ -23,12 +23,13 @@
           <!-- Actions -->
           <div class="flex items-center space-x-2 ml-3">
             <slot name="headerActions" :item="item">
+              <!-- Edit button - visible on desktop, hidden on mobile -->
               <button
                 v-if="showEditButton"
                 @click="handleEdit"
-                class="btn-primary inline-flex items-center text-sm"
+                class="hidden sm:inline-flex btn-secondary text-sm"
               >
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -75,10 +76,6 @@
               <div v-if="getStatus(item)" class="flex items-center">
                 <span class="text-gray-500 mr-2">Estado:</span>
                 <span class="badge badge-primary">{{ getStatus(item) }}</span>
-              </div>
-              <div class="flex items-center">
-                <span class="text-gray-500 mr-2">Criado:</span>
-                <span class="text-gray-900">{{ formatDate(item.createdAt) }}</span>
               </div>
               <div v-if="item.updatedAt !== item.createdAt" class="flex items-center">
                 <span class="text-gray-500 mr-2">Atualizado:</span>
@@ -129,7 +126,7 @@
                   <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                   <div class="flex-1">
                     <p class="text-sm text-gray-900">
-                      <strong>Criado</strong> por {{ item.createdBy || 'Sistema' }}
+                      <strong>Criado</strong> por {{ getUserDisplayName(item.createdBy) }}
                     </p>
                     <p class="text-xs text-gray-500">{{ formatDateTime(item.createdAt) }}</p>
                   </div>
@@ -138,7 +135,7 @@
                   <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                   <div class="flex-1">
                     <p class="text-sm text-gray-900">
-                      <strong>Atualizado</strong> por {{ item.updatedBy || 'Sistema' }}
+                      <strong>Atualizado</strong> por {{ getUserDisplayName(item.updatedBy) }}
                     </p>
                     <p class="text-xs text-gray-500">{{ formatDateTime(item.updatedAt) }}</p>
                   </div>
@@ -203,6 +200,7 @@ import { computed } from 'vue';
 import type { BaseContent } from '@clever/shared';
 import BackButton from './BackButton.vue';
 import ErrorComponent from './ErrorComponent.vue';
+import { useAuth } from '@/composables/useAuth';
 
 interface DetailSection {
   key: string;
@@ -353,6 +351,23 @@ const handleBack = () => {
 
 const clearError = () => {
   emit('clearError');
+};
+
+// Auth composable
+const { user } = useAuth();
+
+// User display name function
+const getUserDisplayName = (userId: string | undefined): string => {
+  if (!userId) return 'Sistema';
+  
+  // If it's the current user, show their email
+  if (user.value && user.value.userId === userId) {
+    return user.value.email || user.value.userId;
+  }
+  
+  // For other users, show the user ID for now
+  // In the future, this could be enhanced with a user lookup service
+  return userId;
 };
 </script>
 

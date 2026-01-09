@@ -13,7 +13,39 @@ const contentTypes = [
   'pending',
 ] as const;
 
-// Generate routes following the 4-view pattern for each content type
+// Helper function to get content type display name
+const getContentTypeDisplayName = (contentType: string): string => {
+  const displayNames: Record<string, string> = {
+    clients: 'Clientes',
+    contracts: 'Contratos',
+    licenses: 'Licenças',
+    'work-sheets': 'Folhas de Obra',
+    'daily-records': 'Registo Diário',
+    'remote-assistance': 'Assistências Remotas',
+    reminders: 'Lembretes',
+    pending: 'Pendentes',
+  };
+
+  return displayNames[contentType] || contentType;
+};
+
+// Helper function to get content type icon (will be used in dashboard tiles)
+const getContentTypeIcon = (contentType: string): string => {
+  const icons: Record<string, string> = {
+    clients: '👥',
+    contracts: '📋',
+    licenses: '🔑',
+    'work-sheets': '📝',
+    'daily-records': '📅',
+    'remote-assistance': '🔧',
+    reminders: '💭',
+    pending: '⏳',
+  };
+
+  return icons[contentType] || '📄';
+};
+
+// Generate routes following the 5-view pattern for each content type
 const generateContentRoutes = (): RouteRecordRaw[] => {
   const routes: RouteRecordRaw[] = [];
 
@@ -24,54 +56,110 @@ const generateContentRoutes = (): RouteRecordRaw[] => {
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join('');
 
-    routes.push(
-      // List view - search/filter interface
-      {
-        path: routeBase,
-        name: `${contentType}-list`,
-        component: () => import(`../views/content/ContentListView.vue`),
-        meta: {
-          contentType,
-          title: `${componentBase} - Lista`,
-          requiresAuth: true,
+    // Check if specific components exist, otherwise fall back to generic
+    const hasSpecificComponents = contentType === 'clients'; // Only clients has specific components for now
+
+    if (hasSpecificComponents) {
+      // Use specific components for implemented content types
+      routes.push(
+        // List view - search/filter interface
+        {
+          path: routeBase,
+          name: `${contentType}-list`,
+          component: () => import(`../views/${contentType}/${componentBase}ListView.vue`),
+          meta: {
+            contentType,
+            title: `${getContentTypeDisplayName(contentType)} - Lista`,
+            requiresAuth: true,
+          },
         },
-      },
-      // Detail view - full content display
-      {
-        path: `${routeBase}/:id`,
-        name: `${contentType}-detail`,
-        component: () => import(`../views/content/ContentDetailView.vue`),
-        meta: {
-          contentType,
-          title: `${componentBase} - Detalhes`,
-          requiresAuth: true,
+        // Create view - new content form (MUST come before /:uuid route)
+        {
+          path: `${routeBase}/criar`,
+          name: `${contentType}-create`,
+          component: () => import(`../views/${contentType}/${componentBase}CreateView.vue`),
+          meta: {
+            contentType,
+            title: `${getContentTypeDisplayName(contentType)} - Criar`,
+            mode: 'create',
+            requiresAuth: true,
+          },
         },
-      },
-      // Create view - new content form
-      {
-        path: `${routeBase}/novo`,
-        name: `${contentType}-create`,
-        component: () => import(`../views/content/ContentFormView.vue`),
-        meta: {
-          contentType,
-          title: `${componentBase} - Criar`,
-          mode: 'create',
-          requiresAuth: true,
+        // Update view - edit existing content (MUST come before /:uuid route)
+        {
+          path: `${routeBase}/:uuid/editar`,
+          name: `${contentType}-update`,
+          component: () => import(`../views/${contentType}/${componentBase}UpdateView.vue`),
+          meta: {
+            contentType,
+            title: `${getContentTypeDisplayName(contentType)} - Editar`,
+            mode: 'update',
+            requiresAuth: true,
+          },
         },
-      },
-      // Edit view - edit existing content
-      {
-        path: `${routeBase}/:id/editar`,
-        name: `${contentType}-edit`,
-        component: () => import(`../views/content/ContentFormView.vue`),
-        meta: {
-          contentType,
-          title: `${componentBase} - Editar`,
-          mode: 'edit',
-          requiresAuth: true,
+        // Detail view - full content display (MUST come after specific routes)
+        {
+          path: `${routeBase}/:uuid`,
+          name: `${contentType}-detail`,
+          component: () => import(`../views/${contentType}/${componentBase}DetailView.vue`),
+          meta: {
+            contentType,
+            title: `${getContentTypeDisplayName(contentType)} - Detalhes`,
+            requiresAuth: true,
+          },
+        }
+      );
+    } else {
+      // Use generic components for not-yet-implemented content types
+      routes.push(
+        // List view - search/filter interface
+        {
+          path: routeBase,
+          name: `${contentType}-list`,
+          component: () => import(`../views/content/ContentListView.vue`),
+          meta: {
+            contentType,
+            title: `${getContentTypeDisplayName(contentType)} - Lista`,
+            requiresAuth: true,
+          },
         },
-      }
-    );
+        // Create view - new content form (MUST come before /:uuid route)
+        {
+          path: `${routeBase}/criar`,
+          name: `${contentType}-create`,
+          component: () => import(`../views/content/ContentFormView.vue`),
+          meta: {
+            contentType,
+            title: `${getContentTypeDisplayName(contentType)} - Criar`,
+            mode: 'create',
+            requiresAuth: true,
+          },
+        },
+        // Update view - edit existing content (MUST come before /:uuid route)
+        {
+          path: `${routeBase}/:uuid/editar`,
+          name: `${contentType}-update`,
+          component: () => import(`../views/content/ContentFormView.vue`),
+          meta: {
+            contentType,
+            title: `${getContentTypeDisplayName(contentType)} - Editar`,
+            mode: 'update',
+            requiresAuth: true,
+          },
+        },
+        // Detail view - full content display (MUST come after specific routes)
+        {
+          path: `${routeBase}/:uuid`,
+          name: `${contentType}-detail`,
+          component: () => import(`../views/content/ContentDetailView.vue`),
+          meta: {
+            contentType,
+            title: `${getContentTypeDisplayName(contentType)} - Detalhes`,
+            requiresAuth: true,
+          },
+        }
+      );
+    }
   });
 
   return routes;
@@ -106,6 +194,16 @@ const router = createRouter({
 
     // Generate all content type routes
     ...generateContentRoutes(),
+
+    // Redirect old English routes to Portuguese routes for better UX
+    {
+      path: '/clients/create',
+      redirect: '/clients/criar'
+    },
+    {
+      path: '/clients/:uuid/update',
+      redirect: to => `/clients/${to.params.uuid}/editar`
+    },
 
     // Catch-all route for 404 handling
     {
@@ -211,34 +309,5 @@ export default router;
 // Export content types for use in other components
 export { contentTypes };
 
-// Helper function to get content type display name
-export const getContentTypeDisplayName = (contentType: string): string => {
-  const displayNames: Record<string, string> = {
-    clients: 'Clientes',
-    contracts: 'Contratos',
-    licenses: 'Licenças',
-    'work-sheets': 'Folhas de Obra',
-    'daily-records': 'Registo Diário',
-    'remote-assistance': 'Assistências Remotas',
-    reminders: 'Lembretes',
-    pending: 'Pendentes',
-  };
-
-  return displayNames[contentType] || contentType;
-};
-
-// Helper function to get content type icon (will be used in dashboard tiles)
-export const getContentTypeIcon = (contentType: string): string => {
-  const icons: Record<string, string> = {
-    clients: '👥',
-    contracts: '📋',
-    licenses: '🔑',
-    'work-sheets': '📝',
-    'daily-records': '📅',
-    'remote-assistance': '🔧',
-    reminders: '💭',
-    pending: '⏳',
-  };
-
-  return icons[contentType] || '📄';
-};
+// Export helper functions
+export { getContentTypeDisplayName, getContentTypeIcon };

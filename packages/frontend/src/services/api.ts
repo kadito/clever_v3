@@ -61,6 +61,9 @@ class ApiService {
     }
 
     const url = `${this.baseUrl}${endpoint}`;
+    console.log('API request - making request to URL:', url);
+    console.log('API request - method:', fetchOptions.method || 'GET');
+    
     const requestOptions: RequestInit = {
       ...fetchOptions,
       signal: controller.signal,
@@ -235,7 +238,11 @@ class ApiService {
     data: Partial<T>,
     options: RequestOptions = {}
   ): Promise<ApiResponse<T>> {
-    return this.request<ApiResponse<T>>(`/content/${contentType}`, {
+    const endpoint = `/content/${contentType}`;
+    console.log('API createContent - endpoint:', endpoint);
+    console.log('API createContent - full URL will be:', `${this.baseUrl}${endpoint}`);
+    
+    return this.request<ApiResponse<T>>(endpoint, {
       method: 'POST',
       body: JSON.stringify(data),
       ...options,

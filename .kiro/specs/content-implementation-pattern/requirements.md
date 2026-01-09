@@ -74,8 +74,8 @@ This specification defines the standard implementation pattern for all content t
 
 1. THE System SHALL implement the Five_View_Pattern for each content type: Home tile → List view → Detail view → Create form → Update form
 2. WHEN displaying content lists, THE System SHALL use mobile-optimized cards with touch-friendly tap targets (minimum 44px)
-3. WHEN showing content details, THE System SHALL use responsive layouts that work on screens from 320px width
-4. WHEN creating or updating content, THE System SHALL provide mobile-optimized forms with appropriate input types and different validation rules for create vs update scenarios
+3. WHEN showing content details, THE System SHALL use responsive layouts that work on screens from 320px width with responsive edit button (hidden on mobile, visible on desktop)
+4. WHEN creating or updating content, THE System SHALL provide mobile-optimized forms with appropriate input types, multiselect dropdowns, conditional fields, and different validation rules for create vs update scenarios
 5. THE System SHALL use the established color palette (#75AE93 primary, #2c3e50 secondary) consistently across all content types
 
 ### Requirement 6: Individual Content Type Structure
@@ -123,9 +123,9 @@ This specification defines the standard implementation pattern for all content t
 
 1. THE System SHALL create individual Vue component folders for each content type
 2. WHEN implementing List views, THE System SHALL use mobile-optimized card layouts with touch-friendly interactions
-3. WHEN implementing Detail views, THE System SHALL display information in mobile-friendly formats
-4. WHEN implementing Create and Update views, THE System SHALL use appropriate mobile input types and validation with different rules for each scenario
-5. THE System SHALL follow the Five_View_Pattern with mobile-first responsive design
+3. WHEN implementing Detail views, THE System SHALL display information in mobile-friendly formats with user email display in audit trail
+4. WHEN implementing Create and Update views, THE System SHALL use shared form data composable, JSON configuration for form sections, multiselect dropdowns, conditional fields, and appropriate mobile input types with different validation rules for each scenario
+5. THE System SHALL follow the Five_View_Pattern with mobile-first responsive design and consistent section ordering (Services → Software → Observations)
 
 ### Requirement 10: Authentication Integration
 
@@ -163,7 +163,43 @@ This specification defines the standard implementation pattern for all content t
 4. WHEN displaying dates and numbers, THE System SHALL use Portuguese locale formatting
 5. THE System SHALL provide Portuguese error messages and validation feedback
 
-### Requirement 13: Performance Optimization
+### Requirement 13: Enhanced Form Field Support
+
+**User Story:** As a user, I want comprehensive form field types including multiselect dropdowns and conditional fields, so that I can efficiently configure complex data relationships.
+
+#### Acceptance Criteria
+
+1. THE System SHALL support multiselect dropdown fields with touch-friendly interface and tag-based selection display
+2. WHEN using multiselect fields, THE System SHALL provide click-outside closing, individual item removal, and proper mobile optimization
+3. THE System SHALL support conditional fields that show/hide based on other field values
+4. WHEN implementing conditional fields, THE System SHALL use proper dependency tracking and dynamic visibility updates
+5. THE System SHALL maintain all form sections in JSON configuration files for better maintainability
+
+### Requirement 14: Dynamic Configuration Management
+
+**User Story:** As a user, I want comprehensive configuration options for content-specific features, so that I can properly track all relevant information.
+
+#### Acceptance Criteria
+
+1. THE System SHALL support dynamic addition and removal of configuration items
+2. WHEN configuring items, THE System SHALL provide type-specific suboptions and conditional fields
+3. THE System SHALL implement edit mode for individual configurations with proper validation
+4. WHEN managing configurations, THE System SHALL use mobile-optimized cards with touch-friendly controls
+5. THE System SHALL maintain backward compatibility with existing data structures
+
+### Requirement 15: Section Ordering Standards
+
+**User Story:** As a user, I want consistent section ordering across all content types, so that I can efficiently navigate and understand the interface.
+
+#### Acceptance Criteria
+
+1. THE System SHALL implement standard section ordering: Basic → Contact → Address → Financial → Services → Configuration → Observations
+2. WHEN displaying content, THE System SHALL ensure Observations is always the last section
+3. THE System SHALL maintain consistent ordering between Create, Update, and Detail views
+4. WHEN implementing new content types, THE System SHALL follow the established section ordering pattern
+5. THE System SHALL use Services section before Configuration section in all views
+
+### Requirement 16: Performance Optimization
 
 **User Story:** As a mobile user with limited bandwidth, I want the system to load quickly and work efficiently, so that I can be productive even with slower connections.
 
@@ -174,3 +210,51 @@ This specification defines the standard implementation pattern for all content t
 3. THE System SHALL cache frequently accessed data using appropriate browser caching strategies
 4. WHEN searching content, THE System SHALL debounce search inputs to avoid excessive API calls
 5. THE System SHALL provide loading states and skeleton screens for better perceived performance
+
+### Requirement 17: Shared Form Data Management
+
+**User Story:** As a developer, I want form data to persist across component recreation, so that users don't lose their input when navigating or when Vue components are recreated.
+
+#### Acceptance Criteria
+
+1. THE System SHALL use a shared form data composable (`useSharedFormData`) to handle Vue component recreation issues
+2. WHEN form components are recreated, THE System SHALL maintain form data persistence
+3. THE System SHALL provide proper initialization of form data with all field keys from form sections
+4. WHEN updating field values, THE System SHALL clear validation errors for the updated field
+5. THE System SHALL provide methods to clear form data when navigation is complete
+
+### Requirement 18: Multiselect Dropdown Implementation
+
+**User Story:** As a user, I want touch-friendly multiselect dropdowns instead of individual checkboxes, so that I can efficiently select multiple options on mobile devices.
+
+#### Acceptance Criteria
+
+1. THE System SHALL implement multiselect dropdowns with tag-based selection display
+2. WHEN using multiselect fields, THE System SHALL provide click-outside closing functionality
+3. THE System SHALL allow individual item removal from selected tags
+4. WHEN interacting with multiselect on mobile, THE System SHALL provide proper touch targets (minimum 44px)
+5. THE System SHALL maintain backward compatibility with individual boolean flags for existing data structures
+
+### Requirement 19: Conditional Field Support
+
+**User Story:** As a user, I want form fields to appear dynamically based on my selections, so that I only see relevant configuration options.
+
+#### Acceptance Criteria
+
+1. THE System SHALL support conditional fields that show/hide based on other field values
+2. WHEN implementing conditional fields, THE System SHALL use proper dependency tracking
+3. THE System SHALL provide dynamic visibility updates when dependent field values change
+4. WHEN conditional fields are hidden, THE System SHALL not validate their values
+5. THE System SHALL maintain conditional field configuration in JSON form sections
+
+### Requirement 20: Enhanced Audit Trail Display
+
+**User Story:** As a user, I want to see user email addresses in audit trails instead of user IDs, so that I can easily identify who made changes.
+
+#### Acceptance Criteria
+
+1. THE System SHALL display user email addresses in audit trail instead of user IDs
+2. WHEN showing audit information, THE System SHALL identify the current user and display their email
+3. THE System SHALL provide fallback handling for system actions (display "Sistema")
+4. WHEN user email is not available, THE System SHALL fall back to displaying the user ID
+5. THE System SHALL use the `useAuth()` composable to access current user information

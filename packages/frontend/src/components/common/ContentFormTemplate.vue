@@ -103,7 +103,7 @@
                   <div class="p-4 sm:p-6">
                     <div class="form-grid">
                       <div
-                        v-for="field in section.fields"
+                        v-for="field in getVisibleFields(section.fields, formData)"
                         :key="field.key"
                         :class="field.fullWidth ? 'col-span-full' : ''"
                         class="form-group"
@@ -122,9 +122,9 @@
                         <div class="relative">
                           <!-- Text input -->
                           <input
-                            v-if="field.type === 'text' || field.type === 'email' || field.type === 'tel' || field.type === 'url'"
+                            v-if="field.type === 'text' || field.type === 'email' || field.type === 'tel' || field.type === 'url' || field.type === 'password'"
                             :id="field.key"
-                            v-model="formData[field.key]"
+                            :value="formData[field.key]"
                             :type="field.type"
                             :placeholder="field.placeholder"
                             :required="field.required"
@@ -133,14 +133,14 @@
                             class="form-input"
                             :class="{ 'border-red-500': validationErrors[field.key] }"
                             @blur="validateField(field.key)"
-                            @input="clearFieldError(field.key)"
+                            @input="(e) => updateFieldValue(field.key, (e.target as HTMLInputElement).value)"
                           />
 
                           <!-- Number input -->
                           <input
                             v-else-if="field.type === 'number'"
                             :id="field.key"
-                            v-model.number="formData[field.key]"
+                            :value="formData[field.key]"
                             type="number"
                             :placeholder="field.placeholder"
                             :required="field.required"
@@ -151,14 +151,14 @@
                             class="form-input"
                             :class="{ 'border-red-500': validationErrors[field.key] }"
                             @blur="validateField(field.key)"
-                            @input="clearFieldError(field.key)"
+                            @input="(e) => updateFieldValue(field.key, Number((e.target as HTMLInputElement).value))"
                           />
 
                           <!-- Textarea -->
                           <textarea
                             v-else-if="field.type === 'textarea'"
                             :id="field.key"
-                            v-model="formData[field.key]"
+                            :value="formData[field.key]"
                             :placeholder="field.placeholder"
                             :required="field.required"
                             :disabled="field.disabled"
@@ -167,20 +167,20 @@
                             class="form-textarea"
                             :class="{ 'border-red-500': validationErrors[field.key] }"
                             @blur="validateField(field.key)"
-                            @input="clearFieldError(field.key)"
+                            @input="(e) => updateFieldValue(field.key, (e.target as HTMLTextAreaElement).value)"
                           />
 
                           <!-- Select -->
                           <select
                             v-else-if="field.type === 'select'"
                             :id="field.key"
-                            v-model="formData[field.key]"
+                            :value="formData[field.key]"
                             :required="field.required"
                             :disabled="field.disabled"
                             class="form-select"
                             :class="{ 'border-red-500': validationErrors[field.key] }"
                             @blur="validateField(field.key)"
-                            @change="clearFieldError(field.key)"
+                            @change="(e) => updateFieldValue(field.key, (e.target as HTMLSelectElement).value)"
                           >
                             <option value="" disabled>{{ field.placeholder || 'Selecionar...' }}</option>
                             <option
@@ -192,15 +192,69 @@
                             </option>
                           </select>
 
+                          <!-- Multi-select -->
+                          <div v-else-if="field.type === 'multiselect'" class="multiselect-container">
+                            <div
+                              class="multiselect-input"
+                              :class="{ 'border-red-500': validationErrors[field.key] }"
+                              @click="toggleMultiselect(field.key)"
+                            >
+                              <div v-if="getSelectedOptions(field, formData[field.key]).length === 0" class="multiselect-placeholder">
+                                {{ field.placeholder || 'Selecionar...' }}
+                              </div>
+                              <div v-else class="multiselect-selected">
+                                <span
+                                  v-for="option in getSelectedOptions(field, formData[field.key])"
+                                  :key="option.value"
+                                  class="multiselect-tag"
+                                >
+                                  {{ option.label }}
+                                  <button
+                                    type="button"
+                                    @click.stop="removeSelectedOption(field.key, option.value)"
+                                    class="multiselect-tag-remove"
+                                  >
+                                    ×
+                                  </button>
+                                </span>
+                              </div>
+                              <svg class="multiselect-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                              </svg>
+                            </div>
+                            
+                            <div
+                              v-if="openMultiselects[field.key]"
+                              class="multiselect-dropdown"
+                              @click.stop
+                            >
+                              <div
+                                v-for="option in field.options"
+                                :key="option.value"
+                                class="multiselect-option"
+                                :class="{ 'selected': isOptionSelected(field.key, option.value) }"
+                                @click="toggleOption(field.key, option.value)"
+                              >
+                                <input
+                                  type="checkbox"
+                                  :checked="isOptionSelected(field.key, option.value)"
+                                  class="multiselect-checkbox"
+                                  readonly
+                                >
+                                <span>{{ option.label }}</span>
+                              </div>
+                            </div>
+                          </div>
+
                           <!-- Checkbox -->
                           <div v-else-if="field.type === 'checkbox'" class="flex items-center">
                             <input
                               :id="field.key"
-                              v-model="formData[field.key]"
+                              :checked="formData[field.key]"
                               type="checkbox"
                               :disabled="field.disabled"
                               class="form-checkbox"
-                              @change="clearFieldError(field.key)"
+                              @change="(e) => updateFieldValue(field.key, (e.target as HTMLInputElement).checked)"
                             />
                             <label :for="field.key" class="ml-2 text-sm text-gray-700">
                               {{ field.checkboxLabel || field.label }}
@@ -211,7 +265,7 @@
                           <input
                             v-else-if="field.type === 'date'"
                             :id="field.key"
-                            v-model="formData[field.key]"
+                            :value="formData[field.key]"
                             type="date"
                             :required="field.required"
                             :disabled="field.disabled"
@@ -220,7 +274,7 @@
                             class="form-input"
                             :class="{ 'border-red-500': validationErrors[field.key] }"
                             @blur="validateField(field.key)"
-                            @change="clearFieldError(field.key)"
+                            @change="(e) => updateFieldValue(field.key, (e.target as HTMLInputElement).value)"
                           />
 
                           <!-- Custom field slot -->
@@ -232,6 +286,8 @@
                             :error="validationErrors[field.key]"
                             :update-value="(value: any) => updateFieldValue(field.key, value)"
                             :clear-error="() => clearFieldError(field.key)"
+                            :form-data="formData"
+                            :update-field-value="updateFieldValue"
                           />
                         </div>
 
@@ -253,7 +309,14 @@
           </div>
 
           <!-- Custom form sections -->
-          <slot name="customSections" :form-data="formData" :errors="validationErrors" />
+          <slot name="customSections" :form-data="formData" :errors="validationErrors" :update-field-value="updateFieldValue" />
+
+          <!-- Invisible overlay to close multiselect dropdowns when clicking outside -->
+          <div
+            v-if="hasOpenMultiselects"
+            class="multiselect-overlay"
+            @click="closeAllMultiselects"
+          ></div>
         </form>
       </div>
     </main>
@@ -302,11 +365,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import type { BaseContent } from '@clever/shared';
 import BackButton from './BackButton.vue';
 import ErrorComponent from './ErrorComponent.vue';
 import type { FormField, FormSection } from './types';
+import { useSharedFormData } from '@/composables/useSharedFormData';
 
 interface Props {
   // Form state
@@ -350,16 +414,43 @@ const emit = defineEmits<{
   clearError: [];
 }>();
 
-// Form state
-const formData = reactive<Record<string, any>>({ ...props.initialData });
-const validationErrors = reactive<Record<string, string>>({});
+// Form state - use shared form data to handle component recreation
+const formKey = 'content-form'; // Could be made dynamic if needed
+const { 
+  formData, 
+  validationErrors, 
+  initializeFormData: initSharedFormData, 
+  updateFieldValue: updateSharedFieldValue,
+  getFormData
+} = useSharedFormData(formKey);
+
 const hasValidated = ref(false);
+
+// Initialize form data with all field keys
+const initializeFormData = () => {
+  initSharedFormData(props.initialData, props.formSections);
+};
+
+// Initialize form data when component mounts
+initializeFormData();
 
 // Watch for initial data changes
 watch(
   () => props.initialData,
   (newData) => {
-    Object.assign(formData, newData);
+    Object.assign(formData.value, newData);
+  },
+  { deep: true }
+);
+
+// Watch for form sections changes (in case they're loaded dynamically)
+watch(
+  () => props.formSections,
+  (_, oldSections) => {
+    // Only reinitialize if this is the first time sections are loaded
+    if (!oldSections || oldSections.length === 0) {
+      initializeFormData();
+    }
   },
   { deep: true }
 );
@@ -368,10 +459,12 @@ watch(
 const isFormValid = computed(() => {
   if (!hasValidated.value && !props.validateOnSubmit) return true;
   
+  const currentFormData = getFormData();
+  
   // Check required fields
   for (const section of props.formSections) {
     for (const field of section.fields) {
-      if (field.required && !formData[field.key]) {
+      if (field.required && !currentFormData[field.key]) {
         return false;
       }
       if (validationErrors[field.key]) {
@@ -383,16 +476,13 @@ const isFormValid = computed(() => {
   return true;
 });
 
-const formGrid = computed(() => {
-  return 'grid grid-cols-1 gap-4 sm:grid-cols-2';
-});
-
 // Validation functions
 const validateField = (fieldKey: string) => {
   const field = findField(fieldKey);
   if (!field) return;
   
-  const value = formData[fieldKey];
+  const currentFormData = getFormData();
+  const value = currentFormData[fieldKey];
   
   // Clear existing error
   delete validationErrors[fieldKey];
@@ -460,7 +550,8 @@ const validateForm = () => {
   
   // Custom form validation
   if (props.customValidator) {
-    const customErrors = props.customValidator(formData);
+    const currentFormData = getFormData();
+    const customErrors = props.customValidator(currentFormData);
     Object.assign(validationErrors, customErrors);
   }
   
@@ -477,11 +568,13 @@ const findField = (fieldKey: string): FormField | undefined => {
 
 // Event handlers
 const handleSubmit = () => {
+  const currentFormData = getFormData();
+  
   if (props.validateOnSubmit && !validateForm()) {
     return;
   }
   
-  emit('submit', { ...formData });
+  emit('submit', { ...currentFormData });
 };
 
 const handleCancel = () => {
@@ -497,8 +590,99 @@ const clearFieldError = (fieldKey: string) => {
 };
 
 const updateFieldValue = (fieldKey: string, value: any) => {
-  formData[fieldKey] = value;
-  clearFieldError(fieldKey);
+  updateSharedFieldValue(fieldKey, value);
+};
+
+// Multiselect state and methods
+const openMultiselects = ref<Record<string, boolean>>({});
+
+const toggleMultiselect = (fieldKey: string) => {
+  openMultiselects.value[fieldKey] = !openMultiselects.value[fieldKey];
+};
+
+const closeMultiselect = (fieldKey: string) => {
+  openMultiselects.value[fieldKey] = false;
+};
+
+const closeAllMultiselects = () => {
+  Object.keys(openMultiselects.value).forEach(key => {
+    openMultiselects.value[key] = false;
+  });
+};
+
+const hasOpenMultiselects = computed(() => {
+  return Object.values(openMultiselects.value).some(isOpen => isOpen);
+});
+
+const getVisibleFields = (fields: FormField[], formData: Record<string, any>): FormField[] => {
+  return fields.filter(field => {
+    if (!field.conditional) return true;
+    
+    const dependentValue = formData[field.conditional.dependsOn];
+    return field.conditional.showWhen(dependentValue);
+  });
+};
+
+const isOptionSelected = (fieldKey: string, optionValue: string): boolean => {
+  const selectedValues = formData.value[fieldKey] || [];
+  return Array.isArray(selectedValues) && selectedValues.includes(optionValue);
+};
+
+const toggleOption = (fieldKey: string, optionValue: string) => {
+  const currentValues = formData.value[fieldKey] || [];
+  const newValues = Array.isArray(currentValues) ? [...currentValues] : [];
+  
+  const index = newValues.indexOf(optionValue);
+  if (index > -1) {
+    newValues.splice(index, 1);
+  } else {
+    newValues.push(optionValue);
+  }
+  
+  updateFieldValue(fieldKey, newValues);
+  
+  // Update individual service flags for backward compatibility
+  if (fieldKey === 'selectedServices') {
+    const serviceFlags = {
+      temAnydesk: newValues.includes('temAnydesk'),
+      manutencao: newValues.includes('manutencao'),
+      manutencao24: newValues.includes('manutencao24'),
+      dumps: newValues.includes('dumps'),
+      atcud: newValues.includes('atcud'),
+      vectronConnect: newValues.includes('vectronConnect')
+    };
+    
+    Object.entries(serviceFlags).forEach(([key, value]) => {
+      updateFieldValue(key, value);
+    });
+  }
+};
+
+const removeSelectedOption = (fieldKey: string, optionValue: string) => {
+  const currentValues = formData.value[fieldKey] || [];
+  const newValues = Array.isArray(currentValues) ? currentValues.filter(v => v !== optionValue) : [];
+  updateFieldValue(fieldKey, newValues);
+  
+  // Update individual service flags for backward compatibility
+  if (fieldKey === 'selectedServices') {
+    const serviceFlags = {
+      temAnydesk: newValues.includes('temAnydesk'),
+      manutencao: newValues.includes('manutencao'),
+      manutencao24: newValues.includes('manutencao24'),
+      dumps: newValues.includes('dumps'),
+      atcud: newValues.includes('atcud'),
+      vectronConnect: newValues.includes('vectronConnect')
+    };
+    
+    Object.entries(serviceFlags).forEach(([key, value]) => {
+      updateFieldValue(key, value);
+    });
+  }
+};
+
+const getSelectedOptions = (field: FormField, selectedValues: any) => {
+  if (!field.options || !Array.isArray(selectedValues)) return [];
+  return field.options.filter(option => selectedValues.includes(option.value));
 };
 </script>
 
@@ -556,7 +740,8 @@ const updateFieldValue = (fieldKey: string, value: any) => {
 .form-input.border-red-500:focus,
 .form-textarea.border-red-500:focus,
 .form-select.border-red-500:focus {
-  @apply ring-red-500 border-red-500;
+  --tw-ring-color: rgb(239 68 68);
+  border-color: rgb(239 68 68);
 }
 
 /* Responsive layout adjustments */
@@ -637,6 +822,81 @@ const updateFieldValue = (fieldKey: string, value: any) => {
   .form-section {
     break-inside: avoid;
     margin-bottom: 1rem;
+  }
+}
+
+/* Multiselect component styling */
+.multiselect-container {
+  @apply relative;
+}
+
+.multiselect-input {
+  @apply block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm cursor-pointer bg-white min-h-touch;
+  @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+  @apply transition-colors duration-200;
+}
+
+.multiselect-input:hover {
+  @apply border-gray-400;
+}
+
+.multiselect-placeholder {
+  @apply text-gray-500;
+}
+
+.multiselect-selected {
+  @apply flex flex-wrap gap-1;
+}
+
+.multiselect-tag {
+  @apply inline-flex items-center px-2 py-1 bg-primary-100 text-primary-800 text-xs font-medium rounded;
+  @apply max-w-full;
+}
+
+.multiselect-tag-remove {
+  @apply ml-1 text-primary-600 hover:text-primary-800 font-bold text-sm leading-none;
+  @apply w-4 h-4 flex items-center justify-center rounded-full hover:bg-primary-200;
+  @apply transition-colors duration-150;
+}
+
+.multiselect-arrow {
+  @apply absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none;
+}
+
+.multiselect-dropdown {
+  @apply absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto;
+}
+
+.multiselect-option {
+  @apply flex items-center px-3 py-2 cursor-pointer hover:bg-gray-50 transition-colors duration-150;
+  @apply min-h-touch;
+}
+
+.multiselect-option.selected {
+  @apply bg-primary-50 text-primary-900;
+}
+
+.multiselect-checkbox {
+  @apply mr-2 rounded border-gray-300 text-primary-600 focus:ring-primary-500;
+  @apply w-4 h-4;
+}
+
+.multiselect-overlay {
+  @apply fixed inset-0 z-40;
+}
+
+/* Mobile optimizations for multiselect */
+@media (max-width: 767px) {
+  .multiselect-tag {
+    @apply text-xs px-1.5 py-0.5;
+  }
+  
+  .multiselect-dropdown {
+    @apply max-h-48;
+  }
+  
+  .multiselect-option {
+    @apply py-3;
   }
 }
 </style>

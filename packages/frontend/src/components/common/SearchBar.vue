@@ -3,8 +3,8 @@
     <div class="relative">
       <!-- Search input -->
       <div class="relative">
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -17,7 +17,7 @@
           v-model="searchQuery"
           type="text"
           :placeholder="placeholder"
-          class="form-input pl-10 pr-4 py-3 w-full text-base"
+          class="block w-full pl-12 pr-10 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200 text-base"
           @input="handleSearch"
           @keydown.enter="handleEnter"
           @focus="handleFocus"
@@ -201,6 +201,23 @@ const toggleFilter = (filterKey: string) => {
   @apply block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200;
   /* Prevent zoom on iOS */
   font-size: 16px;
+}
+
+/* Ensure placeholder is positioned correctly next to icon */
+.form-input::placeholder {
+  color: #9ca3af;
+  opacity: 1;
+  /* Ensure proper text alignment */
+  text-align: left;
+}
+
+.form-input:focus::placeholder {
+  opacity: 0.5;
+}
+
+/* Ensure proper icon positioning */
+.search-bar .relative .absolute {
+  z-index: 1;
 }
 
 @media (min-width: 768px) {

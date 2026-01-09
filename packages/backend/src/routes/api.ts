@@ -3,6 +3,7 @@ import { cors } from 'hono/cors';
 import { requireAuth, getUserContext, requireUserContext, extractJwtToken, verifyClerkJwt } from '../middleware/clerk';
 import { createContentRoutes, createStandardContentConfig, contentErrorHandler } from './content-route-template';
 import clientsRouter from './clients';
+import type { AppContext } from '../types/auth';
 import type {
   BaseContent,
   ApiResponse,
@@ -13,8 +14,8 @@ import type {
   UserContext,
 } from '@clever/shared';
 
-// Create API router with basic typing
-const api = new Hono();
+// Create API router with proper typing
+const api = new Hono<AppContext>();
 
 // CORS middleware for development
 api.use(

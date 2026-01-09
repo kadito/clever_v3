@@ -3,13 +3,14 @@
 export interface FormField {
   key: string;
   label: string;
-  type: 'text' | 'email' | 'tel' | 'url' | 'number' | 'textarea' | 'select' | 'checkbox' | 'date' | 'custom';
+  type: 'text' | 'email' | 'tel' | 'url' | 'password' | 'number' | 'textarea' | 'select' | 'multiselect' | 'checkbox' | 'date' | 'custom';
   placeholder?: string;
   help?: string;
   required?: boolean;
   disabled?: boolean;
   readonly?: boolean;
   fullWidth?: boolean;
+  defaultValue?: any;
   
   // Text/Number specific
   maxLength?: number;
@@ -20,11 +21,17 @@ export interface FormField {
   // Textarea specific
   rows?: number;
   
-  // Select specific
+  // Select/Multiselect specific
   options?: Array<{ value: any; label: string }>;
   
   // Checkbox specific
   checkboxLabel?: string;
+  
+  // Conditional field support
+  conditional?: {
+    dependsOn: string;
+    showWhen: (value: any) => boolean;
+  };
   
   // Validation
   validator?: (value: any) => string | null;

@@ -4,7 +4,468 @@
 
 This design defines the standard implementation pattern for all content types in the CLEVER dashboard system. The pattern establishes a consistent architecture across shared types, backend API endpoints, and frontend Vue components, ensuring maintainability and a unified user experience.
 
-The design follows the established mobile-first approach with the Four-View Pattern (Home → List → Detail → Create/Edit) and integrates with the existing monorepo structure using individual folders for each content type.
+The design follows the established mobile-first approach with the Five-View Pattern (Home → List → Detail → Create → Update) and integrates with the existing monorepo structure using individual folders for each content type.
+
+## Key Improvements from Implementation Experience
+
+### Form Data Management Architecture
+
+During implementation, we discovered and solved critical issues with Vue component recreation that affected form data persistence:
+
+#### Shared Form Data Composable
+```typescript
+// packages/frontend/src/composables/useSharedFormData.ts
+import { ref, reactive } from 'vue';
+
+// Global shared form data for handling component recreation issues
+const globalFormData = ref<Record<string, any>>({});
+const globalValidationErrors = reactive<Record<string, string>>({});
+
+export function useSharedFormData(formKey: string) {
+  const initializeFormData = (initialData: Record<string, any>, formSections: any[]) => {
+    // Create a new object
+    const newFormData: Record<string, any> = {};
+    
+    // Start with initial data
+    Object.assign(newFormData, initialData);
+    
+    // Ensure all form fields have keys
+    for (const section of formSections) {
+      for (const field of section.fields) {
+        if (!(field.key in newFormData)) {
+          // Set default values based on field type
+          switch (field.type) {
+            case 'checkbox':
+              newFormData[field.key] = false;
+              break;
+            case 'number':
+              newFormData[field.key] = field.defaultValue ?? null;
+              break;
+            default:
+              newFormData[field.key] = field.defaultValue ?? '';
+          }
+        }
+      }
+    }
+    
+    // Replace the global form data
+    globalFormData.value = newFormData;
+  };
+
+  const updateFieldValue = (fieldKey: string, value: any) => {
+    if (!globalFormData.value) {
+      console.warn('Global form data not initialized');
+      return;
+    }
+    
+    globalFormData.value[fieldKey] = value;
+    
+    // Clear validation error for this field
+    delete globalValidationErrors[fieldKey];
+  };
+
+  const getFormData = () => {
+    return globalFormData.value;
+  };
+
+  const clearFormData = () => {
+    globalFormData.value = {};
+    Object.keys(globalValidationErrors).forEach(key => {
+      delete globalValidationErrors[key];
+    });
+  };
+
+  return {
+    formData: globalFormData,
+    validationErrors: globalValidationErrors,
+    initializeFormData,
+    updateFieldValue,
+    getFormData,
+    clearFormData
+  };
+}
+```
+
+#### Component Architecture Split
+The form handling was split into two components for better separation of concerns:
+
+1. **ContentFormTemplate.vue**: Core form rendering engine
+   - Handles form field rendering and input types (including multiselect)
+   - Manages form validation and error display
+   - Uses shared form data composable
+   - Mobile-first responsive design
+   - Supports conditional fields based on other field values
+
+2. **ContentCreateTemplate.vue**: Creation-specific wrapper
+   - Handles creation-specific validation logic
+   - Manages create vs update differences
+   - Provides default validation fallbacks
+
+### Multiselect Dropdown Implementation
+
+#### Enhanced Form Field Types
+Added multiselect support to form fields with touch-friendly dropdown interface:
+
+```typescript
+// packages/frontend/src/components/common/types.ts
+export interface FormField {
+  key: string;
+  label: string;
+  type: 'text' | 'email' | 'tel' | 'url' | 'number' | 'textarea' | 'select' | 'checkbox' | 'date' | 'multiselect' | 'password';
+  required?: boolean;
+  placeholder?: string;
+  help?: string;
+  disabled?: boolean;
+  fullWidth?: boolean;
+  
+  // Type-specific options
+  maxLength?: number;
+  min?: number;
+  max?: number;
+  step?: number;
+  rows?: number;
+  options?: Array<{ value: string; label: string }>;
+  checkboxLabel?: string;
+  defaultValue?: any;
+  
+  // Conditional field support
+  conditional?: {
+    dependsOn: string;
+    showWhen: (value: any) => boolean;
+  };
+  
+  // Validation
+  validator?: (value: any) => string | null;
+}
+```
+
+#### Multiselect Component Features
+- Touch-friendly dropdown with proper mobile optimization
+- Click-outside closing functionality
+- Tag-based selected items display with individual remove buttons
+- Checkbox-style selection within dropdown
+- Proper keyboard navigation support
+- Responsive design for mobile and desktop
+
+### Conditional Fields Support
+
+#### Dynamic Field Visibility
+Form fields can now be conditionally shown based on other field values:
+
+```typescript
+// Example conditional field configuration
+{
+  key: 'conditionalField',
+  label: 'Conditional Field',
+  type: 'url',
+  fullWidth: true,
+  placeholder: 'https://example.com/...',
+  conditional: {
+    dependsOn: 'selectedOptions',
+    showWhen: (value: any) => Array.isArray(value) && value.includes('specificOption')
+  }
+}
+```
+
+### JSON Configuration for Form Sections
+
+#### Centralized Form Configuration
+All form sections moved to JSON configuration files for better maintenance:
+
+```typescript
+// packages/frontend/src/config/{content-type}-form-sections.ts
+export const {contentType}FormSections: FormSection[] = [
+  {
+    key: 'basic',
+    title: 'Informação Básica',
+    description: 'Dados fundamentais do {content-type}',
+    fields: [
+      // Content-specific field definitions...
+    ]
+  },
+  {
+    key: 'services',
+    title: 'Serviços',
+    description: 'Selecione os serviços contratados',
+    fields: [
+      {
+        key: 'selectedServices',
+        label: 'Serviços Contratados',
+        type: 'multiselect',
+        fullWidth: true,
+        options: [
+          // Content-specific service options...
+        ],
+        placeholder: 'Selecione os serviços...'
+      }
+    ]
+  },
+  {
+    key: 'conditionalFields',
+    title: 'Configurações Adicionais',
+    description: 'Configurações específicas dos serviços selecionados',
+    fields: [
+      // Conditional fields based on selected services...
+    ]
+  }
+];
+```
+
+### Audit Trail Enhancement
+
+#### User Email Display
+Modified `ContentDetailTemplate.vue` to show user email addresses instead of user IDs:
+
+```typescript
+// Auth composable integration
+const { user } = useAuth();
+
+// User display name function
+const getUserDisplayName = (userId: string | undefined): string => {
+  if (!userId) return 'Sistema';
+  
+  // If it's the current user, show their email
+  if (user.value && user.value.userId === userId) {
+    return user.value.email || user.value.userId;
+  }
+  
+  // For other users, show the user ID for now
+  // Future enhancement: user lookup service
+  return userId;
+};
+```
+
+#### Template Updates
+```vue
+<template>
+  <!-- Audit trail section -->
+  <div class="audit-trail">
+    <p><strong>Criado</strong> por {{ getUserDisplayName(item.createdBy) }}</p>
+    <p><strong>Atualizado</strong> por {{ getUserDisplayName(item.updatedBy) }}</p>
+  </div>
+</template>
+```
+
+#### Responsive Edit Button
+Edit button now shows conditionally based on screen size:
+- Hidden on mobile (available in mobile action bar)
+- Visible on desktop (≥768px) in header
+
+```vue
+<template>
+  <button
+    v-if="showEditButton"
+    @click="handleEdit"
+    class="btn-primary hidden sm:inline-flex items-center text-sm"
+  >
+    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+      />
+    </svg>
+    Editar
+  </button>
+</template>
+```
+
+### Software Configuration Management
+
+#### Complete Software Configuration
+Implemented comprehensive software configuration system matching the legacy system:
+
+**Generic Software Types**:
+- Model/Product selection with type-specific options
+- Version fields (software version, license version)
+- Serial number tracking
+- Conditional modules for specific products
+- Dynamic software management (add/remove/edit)
+
+#### Dynamic Software Management
+- Add/remove software instances dynamically
+- Edit mode for individual software configurations
+- Proper validation for required software fields
+- Mobile-optimized software cards with touch-friendly controls
+
+### Section Ordering Requirements
+
+#### Consistent Section Order
+Established standard section ordering for all content types:
+
+**Form Views (Create/Update)**:
+1. Basic Information
+2. Contact Information  
+3. Address Information
+4. Financial Information
+5. Services (multiselect)
+6. Conditional Fields (based on services)
+7. Software Configuration
+8. Observations (always last)
+
+**Detail Views**:
+1. Basic Information
+2. Contact Information
+3. Address Information
+4. Financial Information
+5. Serviços
+6. Software
+7. Observações (always last)
+
+### Validation Architecture Improvements
+All validation logic moved to shared package for consistency:
+
+```typescript
+// packages/shared/src/types/{content-type}/validation.ts
+export function validate{ContentType}Creation(data: {ContentType}Data): string[] {
+  const errors: string[] = [];
+  
+  if (!data.requiredField?.trim()) {
+    errors.push('Campo obrigatório é necessário');
+  }
+  
+  if (!data.anotherRequiredField?.trim()) {
+    errors.push('Outro campo obrigatório é necessário');
+  }
+  
+  // Additional validation rules...
+  return errors;
+}
+```
+
+#### Custom Validator Integration
+Content-specific validation can override or extend default validation:
+
+```typescript
+// In ContentCreateTemplate.vue
+const validateCreateForm = (data: Record<string, any>): Record<string, string> => {
+  // If custom validator is provided, use it exclusively
+  if (props.customValidator) {
+    return props.customValidator(data);
+  }
+  
+  // Default validation fallback
+  const errors: Record<string, string> = {};
+  for (const section of props.formSections) {
+    for (const field of section.fields) {
+      if (field.required && (!data[field.key] || data[field.key].trim() === '')) {
+        errors[field.key] = `${field.label} é obrigatório`;
+      }
+    }
+  }
+  
+  return errors;
+};
+```
+
+### Mobile-First Enhancements
+
+#### Touch Target Compliance
+All interactive elements meet the 44px minimum requirement:
+
+```css
+.form-input,
+.form-textarea,
+.form-select {
+  @apply min-h-touch; /* 44px minimum */
+}
+
+.form-checkbox {
+  @apply w-5 h-5; /* Larger touch target */
+}
+
+.btn-icon-action {
+  @apply p-2 rounded-touch transition-colors duration-200 touch-target;
+}
+```
+
+#### Input Type Optimization
+Proper HTML5 input types for mobile keyboards:
+
+```typescript
+// Form field definitions
+{
+  key: 'phoneField',
+  label: 'Telefone',
+  type: 'tel', // Mobile keyboard with numbers
+  placeholder: '+351 123 456 789'
+},
+{
+  key: 'emailField',
+  label: 'E-mail',
+  type: 'email', // Mobile keyboard with @ symbol
+  placeholder: 'exemplo@dominio.com'
+},
+{
+  key: 'urlField',
+  label: 'Website',
+  type: 'url', // Mobile keyboard optimized for URLs
+  placeholder: 'https://exemplo.com/...'
+}
+```
+
+#### Responsive Form Sections
+Forms adapt from mobile to desktop layouts:
+
+```css
+.form-grid {
+  @apply grid grid-cols-1 gap-4;
+}
+
+@media (min-width: 640px) {
+  .form-grid {
+    @apply grid-cols-2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .form-grid {
+    @apply grid-cols-3;
+  }
+}
+```
+
+### Error Handling Improvements
+
+#### Portuguese Error Messages
+All error messages are in Portuguese with proper field mapping:
+
+```typescript
+const validateCreateForm = (data: Record<string, any>): Record<string, string> => {
+  const errors: Record<string, string> = {};
+  
+  validationErrors.forEach((errorMessage) => {
+    if (errorMessage.includes('Campo obrigatório')) {
+      errors.requiredField = errorMessage;
+    } else if (errorMessage.includes('Email inválido')) {
+      errors.emailField = errorMessage;
+    }
+    // Additional error mapping...
+  });
+  
+  return errors;
+};
+```
+
+#### Null Safety Improvements
+Added proper null checking throughout the components:
+
+```typescript
+// Display functions with null safety
+const getContentTitle = (item: BaseContent | null): string => {
+  if (!item || !item.data) return 'Item';
+  const content = item as ContentType;
+  return content.data.title || content.data.name || 'Item';
+};
+
+// Event handlers with null safety
+const handleEdit = (item: BaseContent | null) => {
+  if (!item) return;
+  const content = item as ContentType;
+  router.push(`/{content-type}/${content.uuid}/editar`);
+};
+```
 
 ## Architecture
 
@@ -42,14 +503,17 @@ Based on analysis of the legacy system, content types follow this naming convent
 
 | Code Name           | Portuguese Label            | Legacy Reference    |
 | ------------------- | --------------------------- | ------------------- |
-| `clients`           | Clientes                    | old_src/clientes   |
-| `contracts`         | Contratos                   | old_src/contratos  |
-| `licenses`          | Licenças                    | old_src/licencas   |
-| `work-sheets`       | Folhas de Obra              | old_src/folhas-obra |
-| `daily-records`     | Registo Diário de Atividade | old_src/registo-diario-atividade |
-| `remote-assistance` | Assistências Remotas        | old_src/assistencias-remotas |
-| `reminders`         | Lembretes                   | (new content type) |
-| `pending`           | Pendentes                   | (new content type) |
+| `{content-type}`    | {Portuguese Label}          | old_src/{legacy-folder} |
+
+**Examples**:
+- `clients` → Clientes → old_src/clientes
+- `contracts` → Contratos → old_src/contratos  
+- `licenses` → Licenças → old_src/licencas
+- `work-sheets` → Folhas de Obra → old_src/folhas-obra
+- `daily-records` → Registo Diário de Atividade → old_src/registo-diario-atividade
+- `remote-assistance` → Assistências Remotas → old_src/assistencias-remotas
+- `reminders` → Lembretes → (new content type)
+- `pending` → Pendentes → (new content type)
 
 ## Components and Interfaces
 
@@ -79,8 +543,8 @@ Each content type extends BaseContent with its own data structure. The data stru
 
 ```typescript
 // Pattern: packages/shared/src/types/{content-type}/types.ts
-interface ContentType extends BaseContent {
-  contentType: string; // e.g., 'clients', 'contracts', 'licenses'
+interface {ContentType} extends BaseContent {
+  contentType: '{content-type}'; // e.g., 'clients', 'contracts', 'licenses'
   data: {
     // Content-specific fields extracted from legacy Detail and Form views
     // Each content type will have different fields based on old_src analysis
@@ -94,14 +558,10 @@ interface ContentType extends BaseContent {
 3. Create TypeScript interfaces matching the legacy schema
 
 **Example Analysis Pattern** (to be applied to all content types):
-- **Clients**: Analyze `old_src/views/clientes/ClienteDetail.vue` and `ClienteForm.vue`
-- **Contracts**: Analyze `old_src/views/contratos/ContratoDetail.vue` and `ContratoForm.vue`
-- **Licenses**: Analyze `old_src/views/licencas/LicencaDetail.vue` and `LicencaForm.vue`
-- **Work Sheets**: Analyze `old_src/views/folhas-obra/` components
-- **Daily Records**: Analyze `old_src/views/registo-diario-atividade/` components
-- **Remote Assistance**: Analyze `old_src/views/assistencias-remotas/` components
-- **Reminders**: New content type (no legacy reference)
-- **Pending**: New content type (no legacy reference)
+- **Content Type A**: Analyze `old_src/views/{content-type-a}/` components
+- **Content Type B**: Analyze `old_src/views/{content-type-b}/` components
+- **Content Type C**: Analyze `old_src/views/{content-type-c}/` components
+- **New Content Types**: Design from requirements (no legacy reference)
 
 #### API Response Types
 
@@ -136,7 +596,7 @@ Each content type gets its own route file following this pattern:
 ```typescript
 // Pattern: packages/backend/src/routes/{content-type}.ts
 import { Hono } from 'hono';
-import type { ContentType, ApiResponse, ListResponse } from '@clever/shared';
+import type { {ContentType}, ApiResponse, ListResponse } from '@clever/shared';
 
 const contentRouter = new Hono();
 
@@ -156,7 +616,7 @@ contentRouter.get('/', async (c) => {
         query,
         count: results.length,
         timestamp: new Date().toISOString()
-      } as SearchResponse<ContentType>);
+      } as SearchResponse<{ContentType}>);
     } else {
       // List all from index
       const results = await listContent(page, limit);
@@ -169,7 +629,7 @@ contentRouter.get('/', async (c) => {
           total: results.total
         },
         timestamp: new Date().toISOString()
-      } as ListResponse<ContentType>);
+      } as ListResponse<{ContentType}>);
     }
   } catch (error) {
     return c.json({
@@ -198,7 +658,7 @@ contentRouter.get('/:uuid', async (c) => {
       success: true,
       data: item,
       timestamp: new Date().toISOString()
-    } as ApiResponse<ContentType>);
+    } as ApiResponse<{ContentType}>);
   } catch (error) {
     return c.json({
       success: false,
@@ -218,7 +678,7 @@ contentRouter.post('/', async (c) => {
       success: true,
       data: item,
       timestamp: new Date().toISOString()
-    } as ApiResponse<ContentType>, 201);
+    } as ApiResponse<{ContentType}>, 201);
   } catch (error) {
     return c.json({
       success: false,
@@ -240,7 +700,7 @@ contentRouter.put('/:uuid', async (c) => {
       success: true,
       data: item,
       timestamp: new Date().toISOString()
-    } as ApiResponse<ContentType>);
+    } as ApiResponse<{ContentType}>);
   } catch (error) {
     return c.json({
       success: false,
@@ -438,27 +898,27 @@ The system uses a **Five-View Pattern** for each content type, providing better 
 Each content type follows this routing pattern:
 
 ```typescript
-// Example routes for clients content type
-const clientRoutes = [
+// Example routes for {content-type} content type
+const {contentType}Routes = [
   {
-    path: '/clients',
-    name: 'ClientsList',
-    component: () => import('@/views/clients/ClientsListView.vue')
+    path: '/{content-type}',
+    name: '{ContentType}List',
+    component: () => import('@/views/{content-type}/{ContentType}ListView.vue')
   },
   {
-    path: '/clients/create',
-    name: 'ClientsCreate', 
-    component: () => import('@/views/clients/ClientsCreateView.vue')
+    path: '/{content-type}/create',
+    name: '{ContentType}Create', 
+    component: () => import('@/views/{content-type}/{ContentType}CreateView.vue')
   },
   {
-    path: '/clients/:uuid',
-    name: 'ClientsDetail',
-    component: () => import('@/views/clients/ClientsDetailView.vue')
+    path: '/{content-type}/:uuid',
+    name: '{ContentType}Detail',
+    component: () => import('@/views/{content-type}/{ContentType}DetailView.vue')
   },
   {
-    path: '/clients/:uuid/update',
-    name: 'ClientsUpdate',
-    component: () => import('@/views/clients/ClientsUpdateView.vue')
+    path: '/{content-type}/:uuid/update',
+    name: '{ContentType}Update',
+    component: () => import('@/views/{content-type}/{ContentType}UpdateView.vue')
   }
 ];
 ```
@@ -466,13 +926,13 @@ const clientRoutes = [
 ##### List View Component
 
 ```vue
-<!-- Example: packages/frontend/src/views/clients/ClientsListView.vue -->
+<!-- Example: packages/frontend/src/views/{content-type}/{ContentType}ListView.vue -->
 <template>
   <div class="content-list-container">
     <!-- Mobile-first header -->
     <div class="list-header">
       <BackButton to="/" variant="inline" />
-      <h1>Clientes ({{ displayedItems.length }})</h1>
+      <h1>{Portuguese Label} ({{ displayedItems.length }})</h1>
       <button @click="refreshData" :disabled="loading" class="btn-refresh">
         🔄
       </button>
@@ -484,7 +944,7 @@ const clientRoutes = [
         type="text" 
         v-model="searchQuery" 
         @input="handleSearch"
-        placeholder="Pesquisar clientes..." 
+        placeholder="Pesquisar {portuguese label}..." 
         class="search-input"
       >
       <span class="search-icon">🔍</span>
@@ -492,7 +952,7 @@ const clientRoutes = [
 
     <!-- Loading state -->
     <div v-if="loading" class="loading-state">
-      <p>A carregar clientes...</p>
+      <p>A carregar {portuguese label}...</p>
     </div>
 
     <!-- Error state -->
@@ -507,14 +967,13 @@ const clientRoutes = [
         @click="navigateToDetail(item)"
       >
         <div class="card-main">
-          <h3>{{ item.data.nomeComercial || item.data.nomeEmpresa }}</h3>
+          <h3>{{ getDisplayTitle(item) }}</h3>
           <div class="card-meta">
-            <span class="meta-item">{{ item.data.contribuinte || 'Sem NIF' }}</span>
-            <span class="meta-item">{{ item.data.localidade || 'Sem localidade' }}</span>
+            <span class="meta-item">{{ getDisplayMeta1(item) }}</span>
+            <span class="meta-item">{{ getDisplayMeta2(item) }}</span>
           </div>
-          <div class="card-contact" v-if="item.data.responsavel || item.data.telefoneContato">
-            <span v-if="item.data.responsavel">{{ item.data.responsavel }}</span>
-            <span v-if="item.data.telefoneContato">📞 {{ item.data.telefoneContato }}</span>
+          <div class="card-contact" v-if="getDisplayContact(item)">
+            <span>{{ getDisplayContact(item) }}</span>
           </div>
         </div>
         <div class="card-actions">
@@ -525,12 +984,12 @@ const clientRoutes = [
 
     <!-- Empty state -->
     <div v-if="!loading && displayedItems.length === 0" class="empty-state">
-      <h3>Nenhum cliente encontrado</h3>
+      <h3>Nenhum {portuguese label} encontrado</h3>
       <p v-if="searchQuery">
-        Não foram encontrados clientes com o termo "{{ searchQuery }}".
+        Não foram encontrados {portuguese label} com o termo "{{ searchQuery }}".
       </p>
       <p v-else>
-        Não há clientes cadastrados no sistema.
+        Não há {portuguese label} cadastrados no sistema.
       </p>
     </div>
 
@@ -542,7 +1001,7 @@ const clientRoutes = [
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import type { Client } from '@clever/shared';
+import type { {ContentType} } from '@clever/shared';
 import BackButton from '@/components/BackButton.vue';
 import ErrorComponent from '@/components/ErrorComponent.vue';
 
@@ -610,12 +1069,12 @@ import ErrorComponent from '@/components/ErrorComponent.vue';
   <div class="content-detail-container">
     <!-- Mobile header with actions -->
     <div class="detail-header">
-      <BackButton :to="`/clients`" variant="inline" />
+      <BackButton :to="`/{content-type}`" variant="inline" />
       <div class="header-content">
-        <h1>{{ item?.data.nomeComercial || item?.data.nomeEmpresa || 'Cliente' }}</h1>
+        <h1>{{ getDisplayTitle(item) }}</h1>
         <div class="header-meta">
-          <span v-if="item?.data.contribuinte">NIF: {{ item.data.contribuinte }}</span>
-          <span v-if="item?.data.localidade">{{ item.data.localidade }}</span>
+          <span>{{ getDisplayMeta1(item) }}</span>
+          <span>{{ getDisplayMeta2(item) }}</span>
         </div>
       </div>
       <div class="header-actions">
@@ -625,7 +1084,7 @@ import ErrorComponent from '@/components/ErrorComponent.vue';
 
     <!-- Loading/Error states -->
     <div v-if="loading" class="loading-state">
-      <p>A carregar cliente...</p>
+      <p>A carregar {portuguese label}...</p>
     </div>
 
     <ErrorComponent v-if="error" :error="error" @close="clearError" />
@@ -636,8 +1095,18 @@ import ErrorComponent from '@/components/ErrorComponent.vue';
         <h3>INFORMAÇÃO BÁSICA</h3>
         <div class="detail-grid">
           <div class="detail-item">
-            <label>NOME DA EMPRESA</label>
-            <span>{{ item.data.nomeEmpresa || '-' }}</span>
+            <label>CAMPO PRINCIPAL</label>
+            <span>{{ item.data.mainField || '-' }}</span>
+          </div>
+          <!-- More content-specific fields... -->
+        </div>
+      </section>
+      
+      <!-- Additional sections following the same pattern -->
+    </div>
+  </div>
+</template>
+```
           </div>
           <!-- More fields... -->
         </div>
@@ -652,43 +1121,204 @@ import ErrorComponent from '@/components/ErrorComponent.vue';
 ##### Create View Component
 
 ```vue
-<!-- Example: packages/frontend/src/views/clients/ClientsCreateView.vue -->
+<!-- Example: packages/frontend/src/views/{content-type}/{ContentType}CreateView.vue -->
 <template>
-  <ContentFormTemplate
+  <ContentCreateTemplate
+    content-type="{content-type}"
+    create-title="Criar {Portuguese Label}"
+    subtitle="Adicionar um novo {portuguese label} ao sistema"
+    cancel-route="/{content-type}"
     :form-sections="createFormSections"
-    :is-editing="false"
-    create-title="Criar Cliente"
-    subtitle="Adicionar um novo cliente ao sistema"
+    :is-loading="isLoading"
+    :is-saving="isSaving"
+    :error="error"
     :custom-validator="validateCreateForm"
-    @submit="handleCreate"
+    @create="handleCreate"
     @cancel="handleCancel"
+    @clear-error="clearError"
   >
-    <!-- Custom form sections for creation -->
-    <template #customSections="{ formData, errors }">
-      <!-- Creation-specific fields or sections -->
+    <!-- Custom sections for content creation -->
+    <template #createSections="{ formData }">
+      <!-- Content-specific form sections -->
+      <div class="form-section">
+        <div class="section-header">
+          <h2 class="section-title">Configurações Específicas</h2>
+          <p class="section-description">Configure as opções específicas do {portuguese label}</p>
+        </div>
+        
+        <!-- Complex form logic for content-specific features -->
+        <div class="content-specific-management">
+          <!-- Dynamic content-specific configuration forms -->
+        </div>
+      </div>
     </template>
-  </ContentFormTemplate>
+  </ContentCreateTemplate>
 </template>
 
 <script setup lang="ts">
-// Creation-specific logic:
-// - All fields enabled
-// - Creation validation rules
-// - Default values setup
-// - No pre-population needed
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import type { {ContentType}Data, {ContentType} } from '@clever/shared';
+import { validate{ContentType}Creation } from '@clever/shared';
+import ContentCreateTemplate from '@/components/common/ContentCreateTemplate.vue';
+import type { FormSection } from '@/components/common/types';
+import { useApi } from '@/composables/useApi';
+
+// Router and composables
+const router = useRouter();
+const api = useApi<{ContentType}>('{content-type}');
+
+// State management
+const isLoading = ref(false);
+const isSaving = ref(false);
+const error = ref<string | null>(null);
+
+// Form sections configuration
+const createFormSections: FormSection[] = [
+  {
+    key: 'basic',
+    title: 'Informação Básica',
+    description: 'Dados fundamentais do {portuguese label}',
+    fields: [
+      {
+        key: 'mainField',
+        label: 'Campo Principal',
+        type: 'text',
+        required: true,
+        placeholder: 'Valor principal'
+      },
+      {
+        key: 'secondaryField',
+        label: 'Campo Secundário',
+        type: 'text',
+        required: true,
+        placeholder: 'Valor secundário'
+      },
+      // Additional fields...
+    ]
+  },
+  // Additional sections...
+];
+
+// Validation function using shared validation
+const validateCreateForm = (data: Record<string, any>): Record<string, string> => {
+  const errors: Record<string, string> = {};
+  
+  try {
+    const contentData: {ContentType}Data = {
+      mainField: data.mainField || '',
+      secondaryField: data.secondaryField || '',
+      // Map all form data to ContentData structure...
+    };
+    
+    // Use shared validation
+    const validationErrors = validate{ContentType}Creation(contentData);
+    
+    // Convert validation errors to form errors with Portuguese messages
+    validationErrors.forEach((errorMessage) => {
+      if (errorMessage.includes('Campo principal')) {
+        errors.mainField = errorMessage;
+      } else if (errorMessage.includes('Campo secundário')) {
+        errors.secondaryField = errorMessage;
+      }
+      // Additional error mapping...
+    });
+  } catch (err) {
+    console.error('Error in validation:', err);
+    errors.general = 'Erro na validação dos dados';
+  }
+  
+  return errors;
+};
+
+// Event handlers
+const handleCreate = async (formData: Record<string, any>) => {
+  try {
+    isSaving.value = true;
+    clearError();
+    
+    const contentData: {ContentType}Data = {
+      // Map form data to ContentData structure
+    };
+    
+    const response = await api.create({ data: contentData } as any);
+    
+    if (response) {
+      router.push(`/{content-type}/${response.uuid}`);
+    } else {
+      throw new Error('Erro ao criar {portuguese label}');
+    }
+  } catch (err) {
+    console.error('Error creating {content-type}:', err);
+    error.value = err instanceof Error ? err.message : 'Erro ao criar {portuguese label}';
+  } finally {
+    isSaving.value = false;
+  }
+};
+
+const handleCancel = () => {
+  router.push('/{content-type}');
+};
+
+const clearError = () => {
+  error.value = null;
+};
 </script>
+
+<style scoped>
+/* Content-specific styling */
+.content-specific-management {
+  @apply space-y-4;
+}
+
+.content-card {
+  @apply bg-white border border-gray-200 rounded-touch p-4 transition-all duration-200;
+}
+
+.content-card.editing {
+  @apply border-primary-300 bg-primary-50;
+}
+
+/* Mobile-first responsive adjustments */
+@media (max-width: 640px) {
+  .content-card {
+    @apply p-3;
+  }
+}
+</style>
 ```
 
 ##### Update View Component
 
 ```vue
-<!-- Example: packages/frontend/src/views/clients/ClientsUpdateView.vue -->
+<!-- Example: packages/frontend/src/views/{content-type}/{ContentType}UpdateView.vue -->
 <template>
   <ContentFormTemplate
     :form-sections="updateFormSections"
-    :initial-data="existingClientData"
+    :initial-data="existing{ContentType}Data"
     :is-editing="true"
-    edit-title="Editar Cliente"
+    edit-title="Editar {Portuguese Label}"
+    subtitle="Atualizar informações do {portuguese label}"
+    :custom-validator="validateUpdateForm"
+    @submit="handleUpdate"
+    @cancel="handleCancel"
+  >
+    <!-- Custom form sections for updates -->
+    <template #customSections="{ formData, errors }">
+      <!-- Update-specific fields or sections -->
+      <!-- Some fields might be disabled or read-only -->
+    </template>
+  </ContentFormTemplate>
+</template>
+
+<script setup lang="ts">
+// Update-specific logic:
+// - Some fields may be disabled (e.g., creation date, ID fields)
+// - Different validation rules (e.g., optional fields that were required on creation)
+// - Pre-population from existing data
+// - Audit trail considerations
+</script>
+```
     subtitle="Atualizar informações do cliente"
     :custom-validator="validateUpdateForm"
     @submit="handleUpdate"

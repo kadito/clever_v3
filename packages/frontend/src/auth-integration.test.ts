@@ -107,18 +107,18 @@ describe('Frontend Authentication Integration', () => {
         const listRoute = routes.find(route => route.name === `${contentType}-list`);
         const detailRoute = routes.find(route => route.name === `${contentType}-detail`);
         const createRoute = routes.find(route => route.name === `${contentType}-create`);
-        const editRoute = routes.find(route => route.name === `${contentType}-edit`);
+        const updateRoute = routes.find(route => route.name === `${contentType}-update`);
 
         expect(listRoute).toBeDefined();
         expect(detailRoute).toBeDefined();
         expect(createRoute).toBeDefined();
-        expect(editRoute).toBeDefined();
+        expect(updateRoute).toBeDefined();
 
         // All should require authentication
         expect(listRoute?.meta?.requiresAuth).toBe(true);
         expect(detailRoute?.meta?.requiresAuth).toBe(true);
         expect(createRoute?.meta?.requiresAuth).toBe(true);
-        expect(editRoute?.meta?.requiresAuth).toBe(true);
+        expect(updateRoute?.meta?.requiresAuth).toBe(true);
       }
     });
 

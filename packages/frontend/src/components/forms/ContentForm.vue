@@ -268,7 +268,7 @@ defineExpose({
 }
 
 .form-input:invalid {
-  @apply border-red-500;
+  border-color: rgb(239 68 68);
 }
 
 .form-error {

@@ -1,104 +1,53 @@
 /**
  * Clients API routes using the generic content route template
- * Demonstrates the implementation pattern for content-specific routes
+ * Implements full CRUD operations with client-specific validation and sorting
  * Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6
  */
 
 import { Hono } from 'hono';
 import { createContentRoutes, createClientContentConfig, contentErrorHandler } from './content-route-template';
-import type { BaseContent } from '@clever/shared';
-
-/**
- * Client content interface extending BaseContent
- * Based on analysis of old_src/views/clientes/ components
- */
-export interface ClientContent extends BaseContent {
-  contentType: 'clients';
-  data: {
-    // Basic company information
-    nomeEmpresa: string;
-    nomeComercial?: string;
-    contribuinte?: string;
-    localidade?: string;
-    
-    // Contact information
-    responsavel?: string;
-    telefoneContato?: string;
-    email?: string;
-    
-    // Address information
-    morada?: string;
-    codigoPostal?: string;
-    
-    // Additional fields based on legacy analysis
-    // These will be populated when analyzing old_src components
-    [key: string]: any;
-  };
-}
+import type { Client, ClientData } from '@clever/shared';
+import { 
+  validateClientCreation, 
+  validateClientUpdate, 
+  sanitizeClientData,
+  createClientSearchText 
+} from '@clever/shared';
 
 /**
  * Client-specific validation for create operations
+ * Uses the comprehensive validation from shared package
+ * Requirements: 8.2 - Content-specific validation logic
  */
-function validateClientCreate(data: any): void {
-  if (!data.nomeEmpresa || typeof data.nomeEmpresa !== 'string' || data.nomeEmpresa.trim() === '') {
-    throw new Error('Nome da empresa é obrigatório');
-  }
+function validateClientCreate(requestData: any): void {
+  // Extract the actual client data from the request
+  const clientData = requestData.data || requestData;
   
-  // Validate email format if provided
-  if (data.email && typeof data.email === 'string') {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(data.email)) {
-      throw new Error('Formato de email inválido');
-    }
-  }
+  // Sanitize the data first
+  const sanitizedData = sanitizeClientData(clientData as ClientData);
   
-  // Validate phone format if provided (Portuguese format)
-  if (data.telefoneContato && typeof data.telefoneContato === 'string') {
-    const phoneRegex = /^(\+351\s?)?[0-9]{9}$/;
-    if (!phoneRegex.test(data.telefoneContato.replace(/\s/g, ''))) {
-      throw new Error('Formato de telefone inválido (deve ter 9 dígitos)');
-    }
-  }
+  // Use the comprehensive validation from shared package
+  const errors = validateClientCreation(sanitizedData);
   
-  // Validate NIF (Portuguese tax number) if provided
-  if (data.contribuinte && typeof data.contribuinte === 'string') {
-    const nifRegex = /^[0-9]{9}$/;
-    if (!nifRegex.test(data.contribuinte)) {
-      throw new Error('NIF deve ter 9 dígitos');
-    }
+  if (errors.length > 0) {
+    throw new Error(errors[0]); // Return first error for API response
   }
 }
 
 /**
  * Client-specific validation for update operations
+ * Uses the comprehensive validation from shared package
+ * Requirements: 8.2 - Content-specific validation logic
  */
-function validateClientUpdate(data: any): void {
-  // For updates, fields are optional but must be valid if provided
-  if (data.nomeEmpresa !== undefined) {
-    if (!data.nomeEmpresa || typeof data.nomeEmpresa !== 'string' || data.nomeEmpresa.trim() === '') {
-      throw new Error('Nome da empresa não pode estar vazio');
-    }
-  }
+function validateClientUpdateData(requestData: any): void {
+  // Extract the actual client data from the request
+  const clientData = requestData.data || requestData;
   
-  if (data.email !== undefined && data.email !== null && data.email !== '') {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(data.email)) {
-      throw new Error('Formato de email inválido');
-    }
-  }
+  // Use the update validation from shared package
+  const errors = validateClientUpdate(clientData as Partial<ClientData>);
   
-  if (data.telefoneContato !== undefined && data.telefoneContato !== null && data.telefoneContato !== '') {
-    const phoneRegex = /^(\+351\s?)?[0-9]{9}$/;
-    if (!phoneRegex.test(data.telefoneContato.replace(/\s/g, ''))) {
-      throw new Error('Formato de telefone inválido (deve ter 9 dígitos)');
-    }
-  }
-  
-  if (data.contribuinte !== undefined && data.contribuinte !== null && data.contribuinte !== '') {
-    const nifRegex = /^[0-9]{9}$/;
-    if (!nifRegex.test(data.contribuinte)) {
-      throw new Error('NIF deve ter 9 dígitos');
-    }
+  if (errors.length > 0) {
+    throw new Error(errors[0]); // Return first error for API response
   }
 }
 
@@ -108,15 +57,50 @@ const clientsRouter = new Hono();
 // Apply error handling middleware
 clientsRouter.use('*', contentErrorHandler);
 
-// Create client-specific configuration with alphabetical sorting
-const clientConfig = createClientContentConfig<ClientContent>();
+// Create client-specific configuration with alphabetical sorting and search functionality
+// Requirements: 8.6 - Alphabetical sorting for clients, content-specific searchable fields
+const clientConfig = createClientContentConfig<Client>();
+
+// Override the search text extraction to use the comprehensive client search function
+clientConfig.extractSearchableText = (content: Client) => {
+  return createClientSearchText(content.data);
+};
+
+// Override the index fields extraction for client-specific search and display
+// Requirements: 8.5 - Search index with content-specific searchable fields
+clientConfig.extractIndexFields = (content: Client) => {
+  const data = content.data;
+  return {
+    // Basic information for search and display
+    nomeEmpresa: data.nomeEmpresa || '',
+    nomeComercial: data.nomeComercial || '',
+    contribuinte: data.contribuinte || '',
+    localidade: data.localidade || '',
+    responsavel: data.responsavel || '',
+    telefoneContato: data.telefoneContato || '',
+    email: data.email || '',
+    emailContato: data.emailContato || '',
+    
+    // Service flags for filtering
+    temAnydesk: data.temAnydesk || false,
+    manutencao: data.manutencao || false,
+    manutencao24: data.manutencao24 || false,
+    atcud: data.atcud || false,
+    dumps: data.dumps || false,
+    vectronConnect: data.vectronConnect || false,
+    
+    // Software information for search
+    softwareNames: data.softwares?.map(s => s.name) || [],
+    softwareProducts: data.softwares?.map(s => s.product).filter(Boolean) || [],
+  };
+};
 
 // Add validation functions
 clientConfig.validateCreate = validateClientCreate;
-clientConfig.validateUpdate = validateClientUpdate;
+clientConfig.validateUpdate = validateClientUpdateData;
 
 // Create and mount the generic CRUD routes
-const crudRoutes = createContentRoutes<ClientContent>(clientConfig);
+const crudRoutes = createContentRoutes<Client>(clientConfig);
 clientsRouter.route('/', crudRoutes);
 
 export default clientsRouter;

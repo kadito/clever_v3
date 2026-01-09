@@ -301,7 +301,9 @@ export function createContentRoutes<T extends BaseContent>(
         config
       );
 
-      const newItem = await storage.create(requestData, { userId: user.userId });
+      // Extract the actual content data from the request
+      const contentData = requestData.data || requestData;
+      const newItem = await storage.create(contentData, { userId: user.userId });
 
       const response: ApiResponse<T> = {
         success: true,
@@ -384,7 +386,9 @@ export function createContentRoutes<T extends BaseContent>(
       );
 
       try {
-        const updatedItem = await storage.update(uuid, requestData, { userId: user.userId });
+        // Extract the actual content data from the request
+        const contentData = requestData.data || requestData;
+        const updatedItem = await storage.update(uuid, contentData, { userId: user.userId });
 
         const response: ApiResponse<T> = {
           success: true,
