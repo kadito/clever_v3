@@ -37,7 +37,7 @@ export function useSharedFormData(formKey: string) {
 
   const updateFieldValue = (fieldKey: string, value: any) => {
     if (!globalFormData.value) {
-      console.warn('Global form data not initialized');
+      console.warn('❌ Global form data not initialized');
       return;
     }
     

@@ -123,11 +123,21 @@ This implementation plan establishes the foundational pattern for all content ty
   - Appropriate input types (tel, email, url, textarea, select, checkbox)
   - _Requirements: 5.4, 9.4, 11.1, 12.1, 12.5_
 
-- [ ]* 4.4 Write property tests for Vue templates
+- [x] 4.4 Enhance ClientSearchInput component for cross-content integration
+  - Reduce debounce time from 500ms to 300ms for better responsiveness
+  - Ensure component works seamlessly across all content forms (contracts, licenses, work sheets, daily records)
+  - Verify mobile-first responsive design and touch-friendly interactions
+  - Test integration with form templates and shared form data composable
+  - Validate Portuguese localization and error messages
+  - Ensure proper client data display in readonly/disabled modes
+  - _Requirements: 21.1, 21.2, 21.3, 21.4, 21.5, 21.6, 21.7, 21.8, 21.9, 21.10_
+
+- [ ]* 4.5 Write property tests for Vue templates
   - **Property 11: Mobile Touch Target Compliance**
   - **Property 12: Responsive Layout Compatibility**
   - **Property 13: Mobile Form Optimization**
-  - **Validates: Requirements 5.2, 5.3, 5.4**
+  - **Property 24: Client Search Debouncing**
+  - **Validates: Requirements 5.2, 5.3, 5.4, 21.2**
 
 - [x] 5. Checkpoint - Base infrastructure complete ✅
 - ✅ All base components and templates are working
@@ -142,52 +152,52 @@ This implementation plan establishes the foundational pattern for all content ty
 
 ## Phase 2: Content Type Implementation (Repeat for Each)  
 
-### Process for Each Content Type (Start with Any Content Type)
+### Process for Each Content Type (Licenças Implementation)
 
-- [x] 6. Analyze legacy components for {content-type}
-- [x] 6.1 Analyze old_src Detail view for {content-type}
-  - Read old_src/views/{content-type}/{ContentType}Detail.vue
+- [x] 6. Analyze legacy components for licenças
+- [x] 6.1 Analyze old_src Detail view for licenças
+  - Read old_src/views/licencas/LicencasDetail.vue
   - Extract data structure and display fields
   - Identify conditional logic and business rules
   - Document field relationships and formatting
   - _Requirements: 7.1, 7.2_
 
-- [x] 6.2 Analyze old_src Form view for {content-type}
-  - Read old_src/views/{content-type}/{ContentType}Form.vue
+- [x] 6.2 Analyze old_src Form view for licenças
+  - Read old_src/views/licencas/LicencasForm.vue
   - Extract form fields and input types
   - Identify validation rules and required fields
   - Document form sections and conditional fields
   - _Requirements: 7.1, 7.2_
 
-- [x] 6.3 Create TypeScript interfaces for {content-type}
+- [x] 6.3 Create TypeScript interfaces for licenças
   - Extend BaseContent interface with content-specific data structure
   - Create validation schemas based on form analysis
   - Optimize data structure for new system (clean, modern design)
   - _Requirements: 7.3, 7.4, 7.5_
 
-- [ ] 7. Implement backend for {content-type}
-- [x] 7.1 Create {content-type}.ts route file
+- [ ] 7. Implement backend for licenças
+- [x] 7.1 Create licenses.ts route file
   - Implement all CRUD endpoints using the generic pattern
   - Add content-specific validation logic
-  - Configure content-specific sorting (alphabetical for clients, by date for others)
+  - Configure content-specific sorting (by date for licenses)
   - Implement search index with content-specific searchable fields
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6_
 
-- [ ]* 7.2 Write property tests for {content-type} API
+- [ ]* 7.2 Write property tests for licenças API
   - **Property 15: Authentication Requirement**
   - **Property 16: Audit Trail User Recording**
   - **Property 7: Index-Storage Synchronization**
   - **Validates: Requirements 8.2, 8.3, 8.4, 10.1, 10.2**
 
-- [x] 8. Implement frontend for {content-type}
-- [x] 8.1 Create {ContentType}ListView.vue component
+- [ ] 8. Implement frontend for licenças
+- [x] 8.1 Create LicensesListView.vue component
   - Implement content-specific display functions (getDisplayTitle, getDisplayMeta1, etc.)
   - Configure Portuguese labels for the content type
   - Add content-specific search and filter logic
   - Use mobile-first card layout with touch targets
   - _Requirements: 9.1, 9.2, 12.2, 12.3_
 
-- [x] 8.2 Create {ContentType}DetailView.vue component
+- [x] 8.2 Create LicensesDetailView.vue component
   - Use ContentDetailTemplate with enhanced audit trail display
   - Implement content-specific sections based on legacy analysis
   - Add content-specific field displays and formatting
@@ -196,7 +206,7 @@ This implementation plan establishes the foundational pattern for all content ty
   - Display user email addresses in audit trail instead of user IDs
   - _Requirements: 9.3, 12.1, 12.4_
 
-- [x] 8.3 Create {ContentType}CreateView.vue component
+- [x] 8.3 Create LicensesCreateView.vue component
   - Use ContentCreateTemplate wrapper with ContentFormTemplate for rendering
   - Implement content-specific form sections for creation
   - Add creation-specific validation rules using shared validation functions
@@ -204,43 +214,45 @@ This implementation plan establishes the foundational pattern for all content ty
   - Include Portuguese validation messages and labels
   - Handle form data persistence across component recreation
   - Implement multiselect dropdowns and conditional fields
-  - Add dynamic configuration management (e.g., software management)
+  - Add dynamic software management with custom field templates
+  - Add dynamic invoice management with custom field templates
   - _Requirements: 9.4, 11.1, 12.1, 12.5, 17.1, 18.1, 19.1_
 
-- [x] 8.4 Create {ContentType}UpdateView.vue component
+- [x] 8.4 Create LicensesUpdateView.vue component
   - Use ContentFormTemplate for rendering
   - Implement content-specific form sections for editing
   - Add update-specific validation rules and disabled fields
   - Handle pre-population of existing data
   - Include Portuguese validation messages and labels
   - Support multiselect dropdowns and conditional fields
-  - Support dynamic configuration management in edit mode
+  - Support dynamic software management in edit mode with custom field templates
+  - Support dynamic invoice management in edit mode with custom field templates
   - _Requirements: 9.4, 11.1, 12.1, 12.5, 18.1, 19.1_
 
-- [ ]* 8.5 Write property tests for {content-type} components
+- [ ]* 8.5 Write property tests for licenças components
   - **Property 17: Error Component Display**
   - **Property 18: Authentication Redirect**
   - **Property 19: Portuguese UI Language**
   - **Property 20: Portuguese Locale Formatting**
   - **Validates: Requirements 11.2, 11.3, 12.1-12.4**
 
-- [x] 9. Integration and routing for {content-type}
-- [x] 9.1 Add {content-type} routes to Vue Router
+- [ ] 9. Integration and routing for licenças
+- [x] 9.1 Add licenses routes to Vue Router
   - Configure 5-view pattern routes (List, Detail, Create, Update)
   - Add navigation integration
   - Update dashboard tiles for content type
   - _Requirements: 5.1, 9.5_
 
-- [x] 9.2 Test end-to-end functionality for {content-type}
+- [x] 9.2 Test end-to-end functionality for licenças
   - Verify complete CRUD workflows
   - Test mobile responsiveness across breakpoints
   - Validate Portuguese localization
   - Test authentication and error handling
   - Test multiselect dropdowns and conditional fields
-  - Test dynamic configuration management
+  - Test dynamic software management
   - _Requirements: 11.3, 11.4, 13.5, 17.1, 18.1, 19.1_
 
-- [ ]* 9.3 Write integration tests for {content-type}
+- [ ]* 9.3 Write integration tests for licenças
   - Test complete user workflows
   - Verify mobile touch interactions
   - Test loading states and performance
@@ -248,11 +260,14 @@ This implementation plan establishes the foundational pattern for all content ty
   - **Property 23: Loading State Provision**
   - **Validates: Requirements 13.4, 13.5**
 
-- [x] 10. Checkpoint for {content-type}
-- Ensure all {content-type} functionality works correctly
-- Verify all property tests pass
-- Test on mobile devices
-- Ask the user if questions arise about this content type
+- [x] 10. Checkpoint for licenças
+- ✅ All licenças functionality works correctly
+- ✅ All builds pass (shared, backend, frontend packages)
+- ✅ TypeScript compilation successful across all packages
+- ✅ Vue Router updated with licenses routes
+- ✅ Mobile-first responsive design implemented
+- ✅ Portuguese localization in place
+- ✅ Following established patterns from clients implementation
 
 ## Implementation Order
 

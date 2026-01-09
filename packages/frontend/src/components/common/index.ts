@@ -7,6 +7,7 @@ export { default as SearchBar } from './SearchBar.vue';
 export { default as UserAvatar } from './UserAvatar.vue';
 export { default as UserProfile } from './UserProfile.vue';
 export { default as ErrorNotification } from './ErrorNotification.vue';
+export { default as ClientSearchInput } from './ClientSearchInput.vue';
 
 // Template components
 export { default as ContentListTemplate } from './ContentListTemplate.vue';

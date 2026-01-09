@@ -8,3 +8,4 @@ export * from './storage';
 
 // Content type exports
 export * from './types/clients';
+export * from './types/licenses';

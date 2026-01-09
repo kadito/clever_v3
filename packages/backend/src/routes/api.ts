@@ -3,6 +3,7 @@ import { cors } from 'hono/cors';
 import { requireAuth, getUserContext, requireUserContext, extractJwtToken, verifyClerkJwt } from '../middleware/clerk';
 import { createContentRoutes, createStandardContentConfig, contentErrorHandler } from './content-route-template';
 import clientsRouter from './clients';
+import licensesRouter from './licenses';
 import type { AppContext } from '../types/auth';
 import type {
   BaseContent,
@@ -94,16 +95,14 @@ api.use('/*', async (c, next) => {
 // Clients route with alphabetical sorting and custom validation
 api.route('/content/clients', clientsRouter);
 
+// Licenses route with date-based sorting and custom validation
+api.route('/content/licenses', licensesRouter);
+
 // Generic routes for other content types using standard configuration
 const contractsRouter = createContentRoutes<BaseContent>(
   createStandardContentConfig('contracts', 'date-desc')
 );
 api.route('/content/contracts', contractsRouter);
-
-const licensesRouter = createContentRoutes<BaseContent>(
-  createStandardContentConfig('licenses', 'date-desc')
-);
-api.route('/content/licenses', licensesRouter);
 
 const workSheetsRouter = createContentRoutes<BaseContent>(
   createStandardContentConfig('work-sheets', 'date-desc')

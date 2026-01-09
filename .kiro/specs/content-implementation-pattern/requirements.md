@@ -14,6 +14,8 @@ This specification defines the standard implementation pattern for all content t
 - **Five_View_Pattern**: Standard navigation pattern: Home → List → Detail → Create → Update
 - **Worker**: Single Cloudflare Worker serving both frontend and backend
 - **Content_Item**: Individual instance of a content type with unique UUID
+- **ClientSearchInput**: Reusable component for searching and selecting clients across all content forms
+- **Client_Relationship**: Association between content items and client records for business context
 
 ## Requirements
 
@@ -258,3 +260,20 @@ This specification defines the standard implementation pattern for all content t
 3. THE System SHALL provide fallback handling for system actions (display "Sistema")
 4. WHEN user email is not available, THE System SHALL fall back to displaying the user ID
 5. THE System SHALL use the `useAuth()` composable to access current user information
+
+### Requirement 21: Client Search Integration
+
+**User Story:** As a user creating content that relates to clients, I want a consistent and efficient way to search and select clients across all content forms, so that I can quickly associate content with the correct client and see their basic information.
+
+#### Acceptance Criteria
+
+1. THE System SHALL provide a ClientSearchInput component that can be reused across all content types that relate to clients
+2. WHEN a user types in the ClientSearchInput, THE System SHALL trigger a debounced search request after 300ms of inactivity
+3. WHEN the ClientSearchInput receives focus, THE System SHALL make an initial search request even without text input to show recent clients
+4. WHEN search results are returned, THE System SHALL display client basic information including company name, commercial name, tax number, and location
+5. WHEN a client is selected, THE System SHALL display the client's detailed information including contact details in a dedicated section
+6. THE ClientSearchInput SHALL work seamlessly on mobile devices with touch-friendly interactions and proper responsive design
+7. WHEN used in readonly or disabled mode, THE System SHALL display the selected client's information without allowing changes
+8. THE System SHALL emit both the client UUID and full client object when a selection is made for form integration
+9. WHEN no search results are found, THE System SHALL display appropriate Portuguese feedback messages
+10. THE System SHALL handle loading states with visual indicators during search operations

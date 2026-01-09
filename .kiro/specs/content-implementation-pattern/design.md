@@ -587,6 +587,50 @@ interface SearchResponse<T> extends ApiResponse<T[]> {
 }
 ```
 
+#### ClientSearchInput Component Interface
+
+The ClientSearchInput component provides a reusable client search and selection interface for all content types that relate to clients:
+
+```typescript
+// Component Props Interface
+interface ClientSearchInputProps {
+  modelValue?: string; // clientId
+  placeholder?: string;
+  disabled?: boolean;
+  readonly?: boolean;
+  hasError?: boolean;
+}
+
+// Component Emits Interface
+interface ClientSearchInputEmits {
+  (e: 'update:modelValue', value: string): void;
+  (e: 'clientSelected', client: Client | null): void;
+}
+```
+
+**Key Features:**
+- **Debounced Search**: 300ms delay after user stops typing to trigger search requests
+- **Initial Load**: Makes search request on focus even without text input to show recent clients
+- **Mobile-First Design**: Touch-friendly interactions with proper responsive breakpoints
+- **Client Information Display**: Shows company name, commercial name, tax number, and location
+- **Detailed View**: When selected, displays comprehensive client information including contact details
+- **State Management**: Handles loading, error, and empty states with Portuguese feedback
+- **Integration Ready**: Emits both client UUID and full client object for form integration
+- **Accessibility**: Proper keyboard navigation and screen reader support
+
+**Usage Pattern:**
+```vue
+<template>
+  <ClientSearchInput
+    v-model="formData.clientId"
+    placeholder="Selecionar cliente..."
+    :disabled="isLoading"
+    :has-error="!!validationErrors.clientId"
+    @client-selected="handleClientSelected"
+  />
+</template>
+```
+
 ### Backend Package Implementation
 
 #### Route Handler Pattern
@@ -1492,6 +1536,14 @@ Based on the prework analysis, I'll now convert the testable acceptance criteria
 **Property 22: Loading State Provision**
 *For any* content loading operation, the interface should provide loading states or skeleton screens for better user experience.
 **Validates: Requirements 13.5**
+
+**Property 23: Client Search Debouncing**
+*For any* ClientSearchInput component usage, search requests should be debounced with a 300ms delay after the user stops typing to prevent excessive API calls.
+**Validates: Requirements 21.2**
+
+**Property 24: Client Search Integration**
+*For any* content form that uses ClientSearchInput, selecting a client should emit both the client UUID and full client object for proper form integration.
+**Validates: Requirements 21.8**
 
 ## Error Handling
 

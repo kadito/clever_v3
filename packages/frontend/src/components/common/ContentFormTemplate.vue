@@ -28,7 +28,7 @@
             <button
               type="submit"
               form="content-form"
-              :disabled="!isFormValid || isSaving"
+              :disabled="!isFormValidSimple || isSaving"
               class="btn-primary text-sm"
             >
               <svg
@@ -278,6 +278,18 @@
                           />
 
                           <!-- Custom field slot -->
+                          <div v-else-if="field.type === 'custom' && field.key === 'clientId'">
+                            <ClientSearchInput
+                              :model-value="formData[field.key]"
+                              :placeholder="field.placeholder"
+                              :disabled="field.disabled"
+                              :has-error="!!validationErrors[field.key]"
+                              @update:model-value="(value) => updateFieldValue(field.key, value)"
+                              @client-selected="(client) => handleClientSelected(client)"
+                            />
+                          </div>
+
+                          <!-- Generic custom field slot -->
                           <slot
                             v-else
                             :name="`field-${field.key}`"
@@ -334,7 +346,7 @@
         <button
           type="submit"
           form="content-form"
-          :disabled="!isFormValid || isSaving"
+          :disabled="!isFormValidSimple || isSaving"
           class="btn-primary flex-1 justify-center"
         >
           <svg
@@ -366,9 +378,10 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import type { BaseContent } from '@clever/shared';
+import type { BaseContent, Client } from '@clever/shared';
 import BackButton from './BackButton.vue';
 import ErrorComponent from './ErrorComponent.vue';
+import ClientSearchInput from './ClientSearchInput.vue';
 import type { FormField, FormSection } from './types';
 import { useSharedFormData } from '@/composables/useSharedFormData';
 
@@ -412,6 +425,7 @@ const emit = defineEmits<{
   submit: [data: Record<string, any>];
   cancel: [];
   clearError: [];
+  clientSelected: [client: Client | null];
 }>();
 
 // Form state - use shared form data to handle component recreation
@@ -424,15 +438,63 @@ const {
   getFormData
 } = useSharedFormData(formKey);
 
-const hasValidated = ref(false);
-
-// Initialize form data with all field keys
+// Initialize form data with all field keys first
 const initializeFormData = () => {
   initSharedFormData(props.initialData, props.formSections);
 };
 
 // Initialize form data when component mounts
 initializeFormData();
+
+// Computed property for form validity (after formData is initialized)
+const isFormValidSimple = computed(() => {
+  // Ensure formData is available
+  if (!formData.value) {
+    return false;
+  }
+  
+  const currentFormData = formData.value;
+  
+  // Check validation errors first
+  if (Object.keys(validationErrors).length > 0) {
+    return false;
+  }
+  
+  // Check required fields
+  for (const section of props.formSections) {
+    for (const field of section.fields) {
+      if (field.required) {
+        const value = currentFormData[field.key];
+        const isEmpty = !value || (typeof value === 'string' && value.trim() === '');
+        
+        if (isEmpty) {
+          return false;
+        }
+      }
+    }
+  }
+  
+  return true;
+});
+
+// Watch for changes in form validity
+watch(
+  () => isFormValidSimple.value,
+  (newValue, oldValue) => {
+    // Form validity changed - button state will update automatically
+  }
+);
+
+const hasValidated = ref(false);
+
+// Watch for form data changes
+watch(
+  () => formData.value,
+  (newFormData) => {
+    // Form validity is now handled by the computed property
+  },
+  { deep: true, immediate: true }
+);
 
 // Watch for initial data changes
 watch(
@@ -454,27 +516,6 @@ watch(
   },
   { deep: true }
 );
-
-// Computed properties
-const isFormValid = computed(() => {
-  if (!hasValidated.value && !props.validateOnSubmit) return true;
-  
-  const currentFormData = getFormData();
-  
-  // Check required fields
-  for (const section of props.formSections) {
-    for (const field of section.fields) {
-      if (field.required && !currentFormData[field.key]) {
-        return false;
-      }
-      if (validationErrors[field.key]) {
-        return false;
-      }
-    }
-  }
-  
-  return true;
-});
 
 // Validation functions
 const validateField = (fieldKey: string) => {
@@ -555,7 +596,9 @@ const validateForm = () => {
     Object.assign(validationErrors, customErrors);
   }
   
-  return Object.keys(validationErrors).length === 0;
+  const hasErrors = Object.keys(validationErrors).length > 0;
+  
+  return !hasErrors;
 };
 
 const findField = (fieldKey: string): FormField | undefined => {
@@ -570,8 +613,11 @@ const findField = (fieldKey: string): FormField | undefined => {
 const handleSubmit = () => {
   const currentFormData = getFormData();
   
-  if (props.validateOnSubmit && !validateForm()) {
-    return;
+  if (props.validateOnSubmit) {
+    const isValid = validateForm();
+    if (!isValid) {
+      return;
+    }
   }
   
   emit('submit', { ...currentFormData });
@@ -585,12 +631,18 @@ const clearError = () => {
   emit('clearError');
 };
 
+const handleClientSelected = (client: Client | null) => {
+  // Emit the client selection event for parent components to handle
+  emit('clientSelected', client);
+};
+
 const clearFieldError = (fieldKey: string) => {
   delete validationErrors[fieldKey];
 };
 
 const updateFieldValue = (fieldKey: string, value: any) => {
   updateSharedFieldValue(fieldKey, value);
+  // Form validity is now handled by the computed property automatically
 };
 
 // Multiselect state and methods
