@@ -12,7 +12,9 @@ import type {
   ContentType,
   CreateContentRequest,
   UpdateContentRequest,
-  UserContext,
+  UserContext
+} from '@clever/shared';
+import {
   validateContractCreation,
   validateContractUpdate,
   validateWorkSheetCreation,

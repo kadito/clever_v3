@@ -51,7 +51,7 @@ This implementation plan creates a simple content relations system that automati
 
 ### Phase 3: Frontend Components
 
-- [ ] 6. Create RelationInfoDisplay component
+- [x] 6. Create RelationInfoDisplay component
   - Implement reusable component for displaying relation information
   - Add responsive design for mobile and desktop (mobile-first)
   - Include proper Portuguese labels for relation types and fields
@@ -61,7 +61,7 @@ This implementation plan creates a simple content relations system that automati
   - Ensure consistent layout for same relation types across all content types
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 8.4_
 
-- [ ] 7. Update shared types and interfaces
+- [x] 7. Update shared types and interfaces
   - Add `ContentWithRelations`, `RelationResult`, `ResolvedRelation`, `RelationError` interfaces to shared package
   - Export relation system types and utilities
   - Update API response documentation with error handling examples

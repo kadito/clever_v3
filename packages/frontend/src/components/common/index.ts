@@ -8,6 +8,7 @@ export { default as UserAvatar } from './UserAvatar.vue';
 export { default as UserProfile } from './UserProfile.vue';
 export { default as ErrorNotification } from './ErrorNotification.vue';
 export { default as ClientSearchInput } from './ClientSearchInput.vue';
+export { default as RelationInfoDisplay } from './RelationInfoDisplay.vue';
 
 // Template components
 export { default as ContentListTemplate } from './ContentListTemplate.vue';
@@ -24,5 +25,8 @@ export type {
   FormSection, 
   ContentListProps, 
   ContentDetailProps, 
-  ContentFormProps 
+  ContentFormProps,
+  RelationInfoDisplayProps,
+  RelationFieldConfig,
+  RelationDisplayConfig
 } from './types';

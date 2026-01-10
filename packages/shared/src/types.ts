@@ -99,22 +99,57 @@ export type CreateContentRequest<T extends BaseContent> = Omit<
 export type UpdateContentRequest<T extends BaseContent> = Partial<Pick<T, 'data'>>;
 
 // Relation system types
+/**
+ * Represents successfully resolved relation data
+ * Contains the UUID, content type, and basic fields from the related content
+ * 
+ * Requirements: 2.5, 7.3, 7.4, 8.1
+ */
 export interface ResolvedRelation {
+  /** UUID of the related content item */
   uuid: string;
+  /** Content type of the related content */
   contentType: string;
-  [key: string]: any; // Basic data fields from related content
+  /** Basic data fields from the related content (varies by content type) */
+  [key: string]: any; // Basic data fields
 }
 
+/**
+ * Represents a relation resolution error
+ * Used when referenced content cannot be found or accessed
+ * 
+ * Requirements: 2.5, 8.1, 8.2
+ */
 export interface RelationError {
+  /** Always 'error' to distinguish from resolved relations */
   type: 'error';
+  /** HTTP-style error code (404 for not found, 500 for server error) */
   code: 404 | 500;
+  /** Human-readable error message */
   message: string;
 }
 
+/**
+ * Union type representing either a successfully resolved relation or an error
+ * Used in the relations field of ContentWithRelations
+ * 
+ * Requirements: 2.5, 8.1, 8.2
+ */
 export type RelationResult = ResolvedRelation | RelationError;
 
+/**
+ * Enhanced content interface that includes resolved relations
+ * All API responses use this structure to provide relation data alongside content
+ * 
+ * Requirements: 2.1, 2.2, 2.3, 2.5, 7.3, 7.4
+ */
 export interface ContentWithRelations<T extends Record<string, any> = any> extends BaseContent {
+  /** The content-specific data */
   data: T;
+  /** 
+   * Resolved relations keyed by relation name (e.g., 'client' for clientId)
+   * Each relation is either successfully resolved data or an error object
+   */
   relations: Record<string, RelationResult>;
 }
 
