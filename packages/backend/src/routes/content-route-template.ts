@@ -18,6 +18,7 @@ import type {
   CreateContentRequest,
   UpdateContentRequest,
   UserContext,
+  ContentWithRelations,
 } from '@clever/shared';
 
 /**
@@ -150,7 +151,7 @@ export function createContentRoutes<T extends BaseContent>(
       if (searchQuery) {
         // Search content
         const results = await storage.search(searchQuery);
-        const response: SearchResponse<T> = {
+        const response: SearchResponse<ContentWithRelations<any>> = {
           success: true,
           data: results,
           query: searchQuery,
@@ -161,7 +162,7 @@ export function createContentRoutes<T extends BaseContent>(
       } else {
         // List content with pagination
         const { items, total } = await storage.list(page, limit);
-        const response: ListResponse<T> = {
+        const response: ListResponse<ContentWithRelations<any>> = {
           success: true,
           data: items,
           pagination: {
@@ -233,7 +234,7 @@ export function createContentRoutes<T extends BaseContent>(
         return c.json(response, 404);
       }
 
-      const response: ApiResponse<T> = {
+      const response: ApiResponse<ContentWithRelations<any>> = {
         success: true,
         data: item,
         timestamp: new Date().toISOString(),
@@ -295,6 +296,10 @@ export function createContentRoutes<T extends BaseContent>(
         }
       }
 
+      // Note: Relation validation is handled within the validation functions
+      // This allows content creation with relation IDs without validating referenced content exists
+      // Requirements: 1.1, 1.3 - Allow creation without validating referenced content exists
+
       const storage = new ConfigurableContentStorageService<T>(
         r2Bucket,
         config.contentType,
@@ -305,7 +310,7 @@ export function createContentRoutes<T extends BaseContent>(
       const contentData = requestData.data || requestData;
       const newItem = await storage.create(contentData, { userId: user.userId });
 
-      const response: ApiResponse<T> = {
+      const response: ApiResponse<ContentWithRelations<any>> = {
         success: true,
         data: newItem,
         timestamp: new Date().toISOString(),
@@ -379,6 +384,10 @@ export function createContentRoutes<T extends BaseContent>(
         }
       }
 
+      // Note: Relation validation is handled within the validation functions
+      // This allows content updates with relation IDs without validating referenced content exists
+      // Requirements: 1.1, 1.3 - Allow updates without validating referenced content exists
+
       const storage = new ConfigurableContentStorageService<T>(
         r2Bucket,
         config.contentType,
@@ -390,7 +399,7 @@ export function createContentRoutes<T extends BaseContent>(
         const contentData = requestData.data || requestData;
         const updatedItem = await storage.update(uuid, contentData, { userId: user.userId });
 
-        const response: ApiResponse<T> = {
+        const response: ApiResponse<ContentWithRelations<any>> = {
           success: true,
           data: updatedItem,
           timestamp: new Date().toISOString(),

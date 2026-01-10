@@ -97,3 +97,60 @@ export type CreateContentRequest<T extends BaseContent> = Omit<
 >;
 
 export type UpdateContentRequest<T extends BaseContent> = Partial<Pick<T, 'data'>>;
+
+// Relation system types
+export interface ResolvedRelation {
+  uuid: string;
+  contentType: string;
+  [key: string]: any; // Basic data fields from related content
+}
+
+export interface RelationError {
+  type: 'error';
+  code: 404 | 500;
+  message: string;
+}
+
+export type RelationResult = ResolvedRelation | RelationError;
+
+export interface ContentWithRelations<T extends Record<string, any> = any> extends BaseContent {
+  data: T;
+  relations: Record<string, RelationResult>;
+}
+
+// Re-export relation validation utilities
+export {
+  validateRelationFields,
+  sanitizeRelationFields,
+  extractRelationChanges,
+  hasRelationFields,
+  getRelationFieldNames,
+  validateBackwardCompatibility,
+  CONTENT_RELATION_CONFIGS,
+  type RelationFieldConfig
+} from './relation-validation.js';
+
+// Re-export generic content validation utilities
+export {
+  validateGenericContentCreation,
+  validateGenericContentUpdate,
+  sanitizeGenericContentData,
+  validateContractCreation,
+  validateContractUpdate,
+  sanitizeContractData,
+  validateWorkSheetCreation,
+  validateWorkSheetUpdate,
+  sanitizeWorkSheetData,
+  validateRemoteAssistanceCreation,
+  validateRemoteAssistanceUpdate,
+  sanitizeRemoteAssistanceData,
+  validateDailyRecordCreation,
+  validateDailyRecordUpdate,
+  sanitizeDailyRecordData,
+  validateReminderCreation,
+  validateReminderUpdate,
+  sanitizeReminderData,
+  validatePendingCreation,
+  validatePendingUpdate,
+  sanitizePendingData
+} from './content-validation.js';

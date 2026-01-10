@@ -2,15 +2,22 @@ import { describe, it, expect } from 'vitest';
 import * as SharedModule from './index.js';
 
 describe('Shared module exports', () => {
-  it('should export all types from types.ts', () => {
-    // Test that all expected types are exported
+  it('should export all utilities from utils.ts', () => {
+    // Test that all expected utilities are exported
     const expectedExports = [
-      'placeholder', // from utils.ts
+      'detectRelationFields',
+      'getContentTypeFromRelation', 
+      'RELATION_TYPE_MAPPING'
     ];
 
     // Check that the module has exports
     expect(typeof SharedModule).toBe('object');
     expect(SharedModule).toBeDefined();
+    
+    // Check that relation utilities are exported
+    expect(SharedModule.detectRelationFields).toBeDefined();
+    expect(SharedModule.getContentTypeFromRelation).toBeDefined();
+    expect(SharedModule.RELATION_TYPE_MAPPING).toBeDefined();
   });
 
   it('should export BaseContent type (via type import)', () => {
@@ -23,21 +30,27 @@ describe('Shared module exports', () => {
     });
   });
 
-  it('should export utils placeholder', () => {
-    expect(SharedModule.placeholder).toBe(true);
+  it('should export relation utilities', () => {
+    expect(typeof SharedModule.detectRelationFields).toBe('function');
+    expect(typeof SharedModule.getContentTypeFromRelation).toBe('function');
+    expect(typeof SharedModule.RELATION_TYPE_MAPPING).toBe('object');
   });
 
   it('should have proper module structure', () => {
     // Ensure the module exports are structured correctly
-    expect(SharedModule).toHaveProperty('placeholder');
+    expect(SharedModule).toHaveProperty('detectRelationFields');
+    expect(SharedModule).toHaveProperty('getContentTypeFromRelation');
+    expect(SharedModule).toHaveProperty('RELATION_TYPE_MAPPING');
   });
 });
 
 describe('Type imports work correctly', () => {
-  it('should allow importing types from the main module', async () => {
-    // Test that we can import types through the main index
-    const { placeholder } = await import('./index.js');
-    expect(placeholder).toBe(true);
+  it('should allow importing utilities from the main module', async () => {
+    // Test that we can import utilities through the main index
+    const { detectRelationFields, getContentTypeFromRelation, RELATION_TYPE_MAPPING } = await import('./index.js');
+    expect(detectRelationFields).toBeDefined();
+    expect(getContentTypeFromRelation).toBeDefined();
+    expect(RELATION_TYPE_MAPPING).toBeDefined();
   });
 
   it('should allow importing types directly', async () => {

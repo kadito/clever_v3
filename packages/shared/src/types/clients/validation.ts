@@ -1,4 +1,5 @@
 import type { ClientData, ClientSoftware, CreateClientInput, UpdateClientInput } from './types'
+import { validateRelationFields, sanitizeRelationFields } from '../../relation-validation.js';
 
 /**
  * Validation rules for client data
@@ -10,6 +11,11 @@ import type { ClientData, ClientSoftware, CreateClientInput, UpdateClientInput }
  */
 export function validateClientCreation(data: ClientData): string[] {
   const errors: string[] = []
+  
+  // Validate relation fields (currently none for clients, but ensures consistency)
+  // Requirements: 1.1, 1.3 - Allow creation without validating referenced content exists
+  const relationErrors = validateRelationFields('clients', data);
+  errors.push(...relationErrors);
   
   // Required fields
   if (!data.nomeEmpresa?.trim()) {
@@ -66,6 +72,11 @@ export function validateClientCreation(data: ClientData): string[] {
  */
 export function validateClientUpdate(data: Partial<ClientData>): string[] {
   const errors: string[] = []
+  
+  // Validate relation fields (currently none for clients, but ensures consistency)
+  // Requirements: 1.1, 1.3 - Allow updates without validating referenced content exists
+  const relationErrors = validateRelationFields('clients', data as Record<string, any>);
+  errors.push(...relationErrors);
   
   // Only validate provided fields
   if (data.nomeEmpresa !== undefined && !data.nomeEmpresa?.trim()) {
@@ -217,8 +228,12 @@ function isValidURL(url: string): boolean {
  * Sanitizes client data for storage
  */
 export function sanitizeClientData(data: ClientData): ClientData {
+  // First sanitize relation fields using the centralized utility
+  // Requirements: 1.4 - Allow null/empty relation IDs for optional relationships
+  const sanitizedRelations = sanitizeRelationFields('clients', data);
+  
   return {
-    ...data,
+    ...sanitizedRelations,
     // Trim string fields
     nomeEmpresa: data.nomeEmpresa?.trim() || '',
     nomeComercial: data.nomeComercial?.trim() || '',
@@ -258,7 +273,7 @@ export function sanitizeClientData(data: ClientData): ClientData {
     
     // Preserve contract references as-is
     contratos: data.contratos || []
-  }
+  } as ClientData;
 }
 
 /**

@@ -1,4 +1,5 @@
 import type { LicenseData, LicenseSoftware } from './types';
+import { validateRelationFields, sanitizeRelationFields } from '../../relation-validation.js';
 
 /**
  * Validates license creation data
@@ -8,10 +9,11 @@ import type { LicenseData, LicenseSoftware } from './types';
 export function validateLicenseCreation(data: LicenseData): string[] {
   const errors: string[] = [];
 
-  // Required fields validation
-  if (!data.clientId?.trim()) {
-    errors.push('Cliente é obrigatório');
-  }
+  // Validate relation fields (clientId) without checking referential integrity
+  // This allows license creation with any clientId value, including non-existent clients
+  // Requirements: 1.1, 1.3 - Allow creation without validating referenced content exists
+  const relationErrors = validateRelationFields('licenses', data);
+  errors.push(...relationErrors);
 
   // Software-specific validation (only if software is provided)
   if (data.software?.name && data.software.name.length > 0) {
@@ -54,10 +56,11 @@ export function validateLicenseCreation(data: LicenseData): string[] {
 export function validateLicenseUpdate(data: Partial<LicenseData>): string[] {
   const errors: string[] = [];
 
-  // Only validate provided fields for updates
-  if (data.clientId !== undefined && !data.clientId?.trim()) {
-    errors.push('Cliente não pode estar vazio');
-  }
+  // Validate relation fields (clientId) without checking referential integrity
+  // This allows license updates with any clientId value, including non-existent clients
+  // Requirements: 1.1, 1.3 - Allow updates without validating referenced content exists
+  const relationErrors = validateRelationFields('licenses', data as Record<string, any>);
+  errors.push(...relationErrors);
 
   if (data.software?.name !== undefined && data.software.name.length === 0) {
     errors.push('Pelo menos um software deve ser selecionado');
@@ -132,9 +135,12 @@ function validateSoftwareConfiguration(software: LicenseSoftware): string[] {
  * @returns Sanitized license data
  */
 export function sanitizeLicenseData(data: LicenseData): LicenseData {
+  // First sanitize relation fields using the centralized utility
+  // Requirements: 1.4 - Allow null/empty relation IDs for optional relationships
+  const sanitizedRelations = sanitizeRelationFields('licenses', data);
+  
   return {
-    ...data,
-    clientId: data.clientId?.trim() || '',
+    ...sanitizedRelations,
     clientName: data.clientName?.trim() || undefined,
     versao: data.versao?.trim() || undefined,
     numeroSerie: data.numeroSerie?.trim() || undefined,
@@ -146,7 +152,7 @@ export function sanitizeLicenseData(data: LicenseData): LicenseData {
       ano: invoice.ano?.trim() || undefined,
       numeroFatura: invoice.numeroFatura?.trim() || undefined
     })) || []
-  };
+  } as LicenseData;
 }
 
 /**

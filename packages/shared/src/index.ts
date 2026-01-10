@@ -9,3 +9,6 @@ export * from './storage';
 // Content type exports
 export * from './types/clients';
 export * from './types/licenses';
+
+// Re-export specific utilities for convenience
+export { resolveContentRelations, type ContentFetcher } from './utils';

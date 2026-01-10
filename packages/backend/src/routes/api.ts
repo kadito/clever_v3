@@ -13,6 +13,18 @@ import type {
   CreateContentRequest,
   UpdateContentRequest,
   UserContext,
+  validateContractCreation,
+  validateContractUpdate,
+  validateWorkSheetCreation,
+  validateWorkSheetUpdate,
+  validateRemoteAssistanceCreation,
+  validateRemoteAssistanceUpdate,
+  validateDailyRecordCreation,
+  validateDailyRecordUpdate,
+  validateReminderCreation,
+  validateReminderUpdate,
+  validatePendingCreation,
+  validatePendingUpdate
 } from '@clever/shared';
 
 // Create API router with proper typing
@@ -98,35 +110,77 @@ api.route('/content/clients', clientsRouter);
 // Licenses route with date-based sorting and custom validation
 api.route('/content/licenses', licensesRouter);
 
-// Generic routes for other content types using standard configuration
-const contractsRouter = createContentRoutes<BaseContent>(
-  createStandardContentConfig('contracts', 'date-desc')
-);
+// Generic routes for other content types using standard configuration with relation validation
+const contractsConfig = createStandardContentConfig('contracts', 'date-desc');
+contractsConfig.validateCreate = (data: any) => {
+  const errors = validateContractCreation(data.data || data);
+  if (errors.length > 0) throw new Error(errors[0]);
+};
+contractsConfig.validateUpdate = (data: any) => {
+  const errors = validateContractUpdate(data.data || data);
+  if (errors.length > 0) throw new Error(errors[0]);
+};
+const contractsRouter = createContentRoutes<BaseContent>(contractsConfig);
 api.route('/content/contracts', contractsRouter);
 
-const workSheetsRouter = createContentRoutes<BaseContent>(
-  createStandardContentConfig('work-sheets', 'date-desc')
-);
+const workSheetsConfig = createStandardContentConfig('work-sheets', 'date-desc');
+workSheetsConfig.validateCreate = (data: any) => {
+  const errors = validateWorkSheetCreation(data.data || data);
+  if (errors.length > 0) throw new Error(errors[0]);
+};
+workSheetsConfig.validateUpdate = (data: any) => {
+  const errors = validateWorkSheetUpdate(data.data || data);
+  if (errors.length > 0) throw new Error(errors[0]);
+};
+const workSheetsRouter = createContentRoutes<BaseContent>(workSheetsConfig);
 api.route('/content/work-sheets', workSheetsRouter);
 
-const dailyRecordsRouter = createContentRoutes<BaseContent>(
-  createStandardContentConfig('daily-records', 'date-desc')
-);
+const dailyRecordsConfig = createStandardContentConfig('daily-records', 'date-desc');
+dailyRecordsConfig.validateCreate = (data: any) => {
+  const errors = validateDailyRecordCreation(data.data || data);
+  if (errors.length > 0) throw new Error(errors[0]);
+};
+dailyRecordsConfig.validateUpdate = (data: any) => {
+  const errors = validateDailyRecordUpdate(data.data || data);
+  if (errors.length > 0) throw new Error(errors[0]);
+};
+const dailyRecordsRouter = createContentRoutes<BaseContent>(dailyRecordsConfig);
 api.route('/content/daily-records', dailyRecordsRouter);
 
-const remoteAssistanceRouter = createContentRoutes<BaseContent>(
-  createStandardContentConfig('remote-assistance', 'date-desc')
-);
+const remoteAssistanceConfig = createStandardContentConfig('remote-assistance', 'date-desc');
+remoteAssistanceConfig.validateCreate = (data: any) => {
+  const errors = validateRemoteAssistanceCreation(data.data || data);
+  if (errors.length > 0) throw new Error(errors[0]);
+};
+remoteAssistanceConfig.validateUpdate = (data: any) => {
+  const errors = validateRemoteAssistanceUpdate(data.data || data);
+  if (errors.length > 0) throw new Error(errors[0]);
+};
+const remoteAssistanceRouter = createContentRoutes<BaseContent>(remoteAssistanceConfig);
 api.route('/content/remote-assistance', remoteAssistanceRouter);
 
-const remindersRouter = createContentRoutes<BaseContent>(
-  createStandardContentConfig('reminders', 'date-desc')
-);
+const remindersConfig = createStandardContentConfig('reminders', 'date-desc');
+remindersConfig.validateCreate = (data: any) => {
+  const errors = validateReminderCreation(data.data || data);
+  if (errors.length > 0) throw new Error(errors[0]);
+};
+remindersConfig.validateUpdate = (data: any) => {
+  const errors = validateReminderUpdate(data.data || data);
+  if (errors.length > 0) throw new Error(errors[0]);
+};
+const remindersRouter = createContentRoutes<BaseContent>(remindersConfig);
 api.route('/content/reminders', remindersRouter);
 
-const pendingRouter = createContentRoutes<BaseContent>(
-  createStandardContentConfig('pending', 'date-desc')
-);
+const pendingConfig = createStandardContentConfig('pending', 'date-desc');
+pendingConfig.validateCreate = (data: any) => {
+  const errors = validatePendingCreation(data.data || data);
+  if (errors.length > 0) throw new Error(errors[0]);
+};
+pendingConfig.validateUpdate = (data: any) => {
+  const errors = validatePendingUpdate(data.data || data);
+  if (errors.length > 0) throw new Error(errors[0]);
+};
+const pendingRouter = createContentRoutes<BaseContent>(pendingConfig);
 api.route('/content/pending', pendingRouter);
 
 // User profile endpoints - protected

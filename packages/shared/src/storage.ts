@@ -1,4 +1,6 @@
-import type { BaseContent } from './types.js';
+import type { BaseContent, ContentWithRelations } from './types.js';
+import { resolveContentRelations, type ContentFetcher } from './utils.js';
+import { extractRelationChanges, hasRelationFields } from './relation-validation.js';
 
 /**
  * R2-like storage interface for type safety
@@ -21,6 +23,7 @@ export interface StorageObject {
 /**
  * Generic content storage service for R2 operations
  * Provides CRUD operations and search index synchronization
+ * Includes automatic relation resolution for all API responses
  * Requirements: 2.1, 2.2, 2.3, 2.4, 2.5
  */
 export class ContentStorageService<T extends BaseContent> {
@@ -30,11 +33,23 @@ export class ContentStorageService<T extends BaseContent> {
   ) {}
 
   /**
-   * Retrieve a content item by UUID
-   * Uses R2 key pattern: content/{type}/{uuid}.json
-   * Requirements: 2.2
+   * Content fetcher implementation for relation resolution
+   * Uses the same storage service to fetch related content
    */
-  async get(uuid: string): Promise<T | null> {
+  private createContentFetcher(): ContentFetcher {
+    return async (contentType: string, uuid: string) => {
+      // Create a temporary storage service for the target content type
+      const targetStorage = new ContentStorageService(this.r2Bucket, contentType);
+      return await targetStorage.getWithoutRelations(uuid);
+    };
+  }
+
+  /**
+   * Retrieve a content item by UUID without relation resolution
+   * Internal method used by relation resolution to avoid circular dependencies
+   * Uses R2 key pattern: content/{type}/{uuid}.json
+   */
+  private async getWithoutRelations(uuid: string): Promise<T | null> {
     const key = `content/${this.contentType}/${uuid}.json`;
     const object = await this.r2Bucket.get(key);
     
@@ -45,11 +60,26 @@ export class ContentStorageService<T extends BaseContent> {
   }
 
   /**
-   * Create a new content item
+   * Retrieve a content item by UUID with resolved relations
+   * Uses R2 key pattern: content/{type}/{uuid}.json
+   * Requirements: 2.2
+   */
+  async get(uuid: string): Promise<ContentWithRelations<T['data']> | null> {
+    const content = await this.getWithoutRelations(uuid);
+    
+    if (!content) return null;
+    
+    // Resolve relations and return enhanced content
+    const contentFetcher = this.createContentFetcher();
+    return await resolveContentRelations(content, contentFetcher);
+  }
+
+  /**
+   * Create a new content item with resolved relations
    * Generates UUID and sets initial audit trail values
    * Requirements: 2.1, 2.4
    */
-  async create(data: T['data'], userContext: { userId: string }): Promise<T> {
+  async create(data: T['data'], userContext: { userId: string }): Promise<ContentWithRelations<T['data']>> {
     const uuid = crypto.randomUUID();
     const now = new Date().toISOString();
     
@@ -68,19 +98,29 @@ export class ContentStorageService<T extends BaseContent> {
     await this.save(content);
     await this.updateIndex(content, 'create');
     
-    return content;
+    // Resolve relations and return enhanced content
+    const contentFetcher = this.createContentFetcher();
+    return await resolveContentRelations(content, contentFetcher);
   }
 
   /**
-   * Update an existing content item
+   * Update an existing content item with resolved relations
    * Increments version and updates audit trail
-   * Requirements: 2.4
+   * Maintains audit trail for relation changes
+   * Requirements: 2.4, 1.5 - Maintain audit trail for relation changes
    */
-  async update(uuid: string, data: Partial<T['data']>, userContext: { userId: string }): Promise<T> {
-    const existing = await this.get(uuid);
+  async update(uuid: string, data: Partial<T['data']>, userContext: { userId: string }): Promise<ContentWithRelations<T['data']>> {
+    const existing = await this.getWithoutRelations(uuid);
     if (!existing) throw new Error('Content not found');
     
     const now = new Date().toISOString();
+    
+    // Extract relation changes for audit trail
+    const relationChanges = extractRelationChanges(
+      this.contentType,
+      existing.data,
+      { ...existing.data, ...data }
+    );
     
     const updated: T = {
       ...existing,
@@ -90,10 +130,19 @@ export class ContentStorageService<T extends BaseContent> {
       version: existing.version + 1
     };
 
+    // Log relation changes if any occurred
+    if (Object.keys(relationChanges).length > 0) {
+      console.log(`Relation changes for ${this.contentType} ${uuid}:`, relationChanges);
+      // In a production system, this would be stored in a proper audit log
+      // For now, we log to console for debugging and audit purposes
+    }
+
     await this.save(updated);
     await this.updateIndex(updated, 'update');
     
-    return updated;
+    // Resolve relations and return enhanced content
+    const contentFetcher = this.createContentFetcher();
+    return await resolveContentRelations(updated, contentFetcher);
   }
 
   /**
@@ -102,7 +151,7 @@ export class ContentStorageService<T extends BaseContent> {
    * Requirements: 2.4
    */
   async delete(uuid: string, userContext: { userId: string }): Promise<void> {
-    const existing = await this.get(uuid);
+    const existing = await this.getWithoutRelations(uuid);
     if (!existing) throw new Error('Content not found');
     
     const now = new Date().toISOString();
@@ -120,11 +169,11 @@ export class ContentStorageService<T extends BaseContent> {
   }
 
   /**
-   * List content items with pagination
+   * List content items with pagination and resolved relations
    * Uses search index for efficient querying
    * Requirements: 2.3
    */
-  async list(page: number = 1, limit: number = 50): Promise<{ items: T[]; total: number }> {
+  async list(page: number = 1, limit: number = 50): Promise<{ items: ContentWithRelations<T['data']>[]; total: number }> {
     const indexKey = `indexes/${this.contentType}-index.json`;
     
     const indexObject = await this.r2Bucket.get(indexKey);
@@ -143,12 +192,15 @@ export class ContentStorageService<T extends BaseContent> {
     const endIndex = startIndex + limit;
     const paginatedItems = sortedItems.slice(startIndex, endIndex);
     
-    // Fetch full content for paginated items
-    const items: T[] = [];
+    // Fetch full content for paginated items and resolve relations
+    const contentFetcher = this.createContentFetcher();
+    const items: ContentWithRelations<T['data']>[] = [];
+    
     for (const indexItem of paginatedItems) {
-      const content = await this.get(indexItem.uuid);
+      const content = await this.getWithoutRelations(indexItem.uuid);
       if (content) {
-        items.push(content);
+        const contentWithRelations = await resolveContentRelations(content, contentFetcher);
+        items.push(contentWithRelations);
       }
     }
     
@@ -156,11 +208,11 @@ export class ContentStorageService<T extends BaseContent> {
   }
 
   /**
-   * Search content items
+   * Search content items with resolved relations
    * Uses search index with searchable text
    * Requirements: 2.3
    */
-  async search(query: string): Promise<T[]> {
+  async search(query: string): Promise<ContentWithRelations<T['data']>[]> {
     const indexKey = `indexes/${this.contentType}-index.json`;
     
     const indexObject = await this.r2Bucket.get(indexKey);
@@ -177,12 +229,15 @@ export class ContentStorageService<T extends BaseContent> {
       item.searchableText.includes(searchTerm)
     );
     
-    // Fetch full content for matching items
-    const items: T[] = [];
+    // Fetch full content for matching items and resolve relations
+    const contentFetcher = this.createContentFetcher();
+    const items: ContentWithRelations<T['data']>[] = [];
+    
     for (const indexItem of matchingItems) {
-      const content = await this.get(indexItem.uuid);
+      const content = await this.getWithoutRelations(indexItem.uuid);
       if (content) {
-        items.push(content);
+        const contentWithRelations = await resolveContentRelations(content, contentFetcher);
+        items.push(contentWithRelations);
       }
     }
     

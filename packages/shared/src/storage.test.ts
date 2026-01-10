@@ -60,7 +60,10 @@ describe('ContentStorageService', () => {
       const result = await storageService.get('test-uuid-123');
 
       expect(mockR2Bucket.get).toHaveBeenCalledWith('content/test-content/test-uuid-123.json');
-      expect(result).toEqual(mockContent);
+      expect(result).toEqual({
+        ...mockContent,
+        relations: {}
+      });
     });
 
     it('should return null when content does not exist', async () => {
@@ -134,17 +137,40 @@ describe('ContentStorageService', () => {
       expect(result.version).toBe(1);
       expect(result.isDeleted).toBe(false);
       expect(result.data).toEqual(createData);
+      expect(result.relations).toEqual({});
 
-      // Verify R2 operations
+      // Verify R2 operations - content is saved without relations
+      const expectedSavedContent = {
+        uuid: mockUUID,
+        contentType: 'test-content',
+        createdAt: mockDate,
+        createdBy: 'user-123',
+        updatedAt: mockDate,
+        updatedBy: 'user-123',
+        version: 1,
+        isDeleted: false,
+        data: createData
+      };
+      
       expect(mockR2Bucket.put).toHaveBeenCalledWith(
         `content/test-content/${mockUUID}.json`,
-        JSON.stringify(result)
+        JSON.stringify(expectedSavedContent, null, 2),
+        expect.objectContaining({
+          httpMetadata: expect.objectContaining({
+            contentType: 'application/json'
+          })
+        })
       );
 
       // Verify index update
       expect(mockR2Bucket.put).toHaveBeenCalledWith(
         'indexes/test-content-index.json',
-        expect.stringContaining(mockUUID)
+        expect.stringContaining(mockUUID),
+        expect.objectContaining({
+          httpMetadata: expect.objectContaining({
+            contentType: 'application/json'
+          })
+        })
       );
     });
   });
@@ -275,9 +301,31 @@ describe('ContentStorageService', () => {
       await storageService.delete('test-uuid-123', mockUserContext);
 
       // Verify soft delete was saved
+      const expectedDeletedContent = {
+        uuid: 'test-uuid-123',
+        contentType: 'test-content',
+        createdAt: '2024-01-01T00:00:00Z',
+        createdBy: 'user-123',
+        updatedAt: '2024-01-01T00:00:00Z',
+        updatedBy: 'user-123',
+        version: 2,
+        isDeleted: true,
+        data: {
+          name: 'Content to Delete',
+          description: 'This will be deleted',
+        },
+        deletedAt: mockDate,
+        deletedBy: 'user-123'
+      };
+      
       expect(mockR2Bucket.put).toHaveBeenCalledWith(
         'content/test-content/test-uuid-123.json',
-        expect.stringContaining('"isDeleted":true')
+        JSON.stringify(expectedDeletedContent, null, 2),
+        expect.objectContaining({
+          httpMetadata: expect.objectContaining({
+            contentType: 'application/json'
+          })
+        })
       );
 
       // Verify audit trail

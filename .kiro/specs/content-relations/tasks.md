@@ -8,14 +8,14 @@ This implementation plan creates a simple content relations system that automati
 
 ### Phase 1: Core Relation System
 
-- [ ] 1. Create relation detection utility
+- [x] 1. Create relation detection utility
   - Implement `detectRelationFields` function to find fields ending in 'Id'
   - Create `RELATION_TYPE_MAPPING` for relation type to content type mapping
   - Add `getContentTypeFromRelation` helper function
   - Write unit tests for relation detection with various field patterns
   - _Requirements: 1.1, 1.2, 3.1, 3.2_
 
-- [ ] 2. Create basic data extraction utility
+- [x] 2. Create basic data extraction utility
   - Implement `extractBasicFields` function with content-type specific logic
   - Add basic field definitions for clients (nomeEmpresa, nomeComercial, contribuinte, localidade)
   - Add basic field definitions for contracts (numeroContrato, dataInicio, dataFim)
@@ -23,7 +23,7 @@ This implementation plan creates a simple content relations system that automati
   - Write unit tests for basic data extraction
   - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-- [ ] 3. Implement relation resolution utility
+  - [x] 3. Implement relation resolution utility
   - Create `resolveContentRelations` function that uses detection and extraction utilities
   - Use sequential resolution approach (resolve relations one by one for simplicity)
   - Add structured error handling for missing/invalid relations (return error objects with code and message)
@@ -34,7 +34,7 @@ This implementation plan creates a simple content relations system that automati
 
 ### Phase 2: Backend Integration
 
-- [ ] 4. Update ContentStorageService with relation resolution
+- [x] 4. Update ContentStorageService with relation resolution
   - Modify `getContentById` to resolve relations before returning
   - Update `getContentList` to resolve relations for all items
   - Update `createContent` to resolve relations in response
@@ -42,7 +42,7 @@ This implementation plan creates a simple content relations system that automati
   - Ensure backward compatibility with existing API clients
   - _Requirements: 2.1, 2.2, 2.3, 7.1, 7.2_
 
-- [ ] 5. Add relation validation to content operations
+- [x] 5. Add relation validation to content operations
   - Allow creation/update of content with relation IDs without validating referenced content exists
   - Allow null/empty relation IDs for optional relationships
   - Maintain audit trail for relation changes
