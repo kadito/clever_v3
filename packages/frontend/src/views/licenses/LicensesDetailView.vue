@@ -18,6 +18,9 @@
     <!-- Custom content sections -->
     <template #content="{ item }">
       <div v-if="item && item.data" class="space-y-6">
+        <!-- Client Information Section (First Priority) -->
+        <ClientInfoSection :client-relation="license.relations?.client" />
+
         <!-- Basic Information Section -->
         <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
@@ -26,10 +29,6 @@
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
-                <div class="detail-item">
-                  <label class="detail-label">Cliente</label>
-                  <div class="detail-value">{{ item.data.clientName || '-' }}</div>
-                </div>
                 <div class="detail-item">
                   <label class="detail-label">Versão</label>
                   <div class="detail-value">{{ item.data.versao || '-' }}</div>
@@ -45,43 +44,6 @@
                       {{ getLicenseStatus(item) }}
                     </span>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Client Information Section -->
-        <div v-if="clientInfo" class="detail-section">
-          <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-              <h2 class="text-lg font-semibold text-gray-900">Informação do Cliente</h2>
-            </div>
-            <div class="p-4 sm:p-6">
-              <div class="detail-grid">
-                <div class="detail-item">
-                  <label class="detail-label">Nome da Empresa</label>
-                  <div class="detail-value">{{ clientInfo.nomeEmpresa || '-' }}</div>
-                </div>
-                <div v-if="clientInfo.nomeComercial" class="detail-item">
-                  <label class="detail-label">Nome Comercial</label>
-                  <div class="detail-value">{{ clientInfo.nomeComercial }}</div>
-                </div>
-                <div v-if="clientInfo.contribuinte" class="detail-item">
-                  <label class="detail-label">NIF</label>
-                  <div class="detail-value font-mono">{{ clientInfo.contribuinte }}</div>
-                </div>
-                <div v-if="clientInfo.localidade" class="detail-item">
-                  <label class="detail-label">Localidade</label>
-                  <div class="detail-value">{{ clientInfo.localidade }}</div>
-                </div>
-                <div v-if="clientInfo.telefoneContato" class="detail-item">
-                  <label class="detail-label">Telefone</label>
-                  <div class="detail-value">{{ clientInfo.telefoneContato }}</div>
-                </div>
-                <div v-if="clientInfo.emailContato" class="detail-item">
-                  <label class="detail-label">Email</label>
-                  <div class="detail-value">{{ clientInfo.emailContato }}</div>
                 </div>
               </div>
             </div>
@@ -252,10 +214,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import type { License, BaseContent, Client } from '@clever/shared';
+import type { License, BaseContent, Client, ContentWithRelations } from '@clever/shared';
 import ContentDetailTemplate from '@/components/common/ContentDetailTemplate.vue';
+import RelationInfoDisplay from '@/components/common/RelationInfoDisplay.vue';
+import ClientInfoSection from '@/components/common/ClientInfoSection.vue';
 import { useApi } from '@/composables/useApi';
 import { useErrorHandler } from '@/composables/useErrorHandler';
 
@@ -265,12 +229,10 @@ const router = useRouter();
 
 // Composables
 const api = useApi<License>('licenses');
-const clientsApi = useApi<Client>('clients');
 const errorHandler = useErrorHandler();
 
 // State
-const license = ref<License | null>(null);
-const clientInfo = ref<any>(null);
+const license = ref<ContentWithRelations<License['data']> | null>(null);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
 
@@ -402,12 +364,7 @@ const loadLicense = async () => {
     await api.fetchById(licenseId);
     
     if (api.currentItem.value) {
-      license.value = api.currentItem.value;
-      
-      // Load client information if clientId exists
-      if (license.value.data.clientId) {
-        await loadClientInfo(license.value.data.clientId);
-      }
+      license.value = api.currentItem.value as ContentWithRelations<License['data']>;
     } else {
       throw new Error('Licença não encontrada');
     }
@@ -416,19 +373,6 @@ const loadLicense = async () => {
     error.value = err instanceof Error ? err.message : 'Erro ao carregar licença';
   } finally {
     isLoading.value = false;
-  }
-};
-
-const loadClientInfo = async (clientId: string) => {
-  try {
-    await clientsApi.fetchById(clientId);
-    
-    if (clientsApi.currentItem.value) {
-      clientInfo.value = clientsApi.currentItem.value.data;
-    }
-  } catch (err) {
-    console.error('Error loading client info:', err);
-    // Don't show error for client info, just log it
   }
 };
 
@@ -513,6 +457,10 @@ onMounted(() => {
   grid-column: 1 / -1;
 }
 
+.detail-item.col-span-full {
+  grid-column: 1 / -1;
+}
+
 .detail-label {
   @apply text-xs font-medium text-gray-500 uppercase tracking-wide;
 }
@@ -525,6 +473,29 @@ onMounted(() => {
 .detail-value,
 .status-badge {
   @apply text-portuguese;
+}
+
+/* Touch-friendly interactions */
+.touch-target {
+  @apply min-h-[44px] flex items-center;
+}
+
+@media (hover: none) {
+  .touch-target:active {
+    @apply bg-opacity-80;
+  }
+}
+
+/* Collapsible animations */
+.collapse-enter-active,
+.collapse-leave-active {
+  transition: all 0.3s ease;
+}
+
+.collapse-enter-from,
+.collapse-leave-to {
+  opacity: 0;
+  max-height: 0;
 }
 
 /* Mobile-first responsive adjustments */

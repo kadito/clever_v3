@@ -5,7 +5,7 @@
     edit-title="Editar Licença"
     subtitle="Atualizar informações da licença"
     cancel-route="/licenses"
-    :form-sections="licensesFormSections"
+    :form-sections="modifiedFormSections"
     :is-loading="isLoading"
     :is-saving="isSaving"
     :error="error"
@@ -16,21 +16,6 @@
     @cancel="handleCancel"
     @clear-error="clearError"
   >
-    <!-- Client field custom implementation (read-only in update mode) -->
-    <template #field-clientId="{ formData, updateFieldValue }">
-      <div class="client-field">
-        <ClientSearchInput
-          v-model="formData.clientId"
-          :readonly="true"
-          :has-error="!!fieldErrors.clientId"
-          @client-selected="onClientSelected"
-        />
-        <div v-if="fieldErrors.clientId" class="field-error">
-          {{ fieldErrors.clientId }}
-        </div>
-      </div>
-    </template>
-
     <!-- Software field custom implementation -->
     <template #field-software="{ formData, updateFieldValue }">
       <div class="software-management">
@@ -433,7 +418,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { License, LicenseData, LicenseInvoice } from '@clever/shared';
 import { validateLicenseUpdate, SOFTWARE_OPTIONS, VECTRON_MODELS, PIX_PRODUCTS, PIX_MODULES, ZONSOFT_PRODUCTS, ZONSOFT_VERSIONS, PTCERT_LICENSE_TYPES } from '@clever/shared';
@@ -478,6 +463,22 @@ const disabledFields = ['uuid', 'createdAt', 'createdBy', 'version'];
 
 // Fields that should be read-only (shown but not editable)
 const readOnlyFields: string[] = [];
+
+// Create modified form sections with readonly clientId field
+const modifiedFormSections = computed(() => {
+  return licensesFormSections.map(section => ({
+    ...section,
+    fields: section.fields.map(field => {
+      if (field.key === 'clientId') {
+        return {
+          ...field,
+          readonly: true
+        };
+      }
+      return field;
+    })
+  }));
+});
 
 // Utility functions
 const formatDateTime = (dateString?: string): string => {

@@ -84,7 +84,7 @@
       <div class="max-w-4xl mx-auto">
         <form
           id="content-form"
-          @submit.prevent="handleSubmit"
+          @submit.prevent="handleSubmit()"
           class="space-y-6"
           novalidate
         >
@@ -283,6 +283,7 @@
                               :model-value="formData[field.key]"
                               :placeholder="field.placeholder"
                               :disabled="field.disabled"
+                              :readonly="field.readonly"
                               :has-error="!!validationErrors[field.key]"
                               @update:model-value="(value) => updateFieldValue(field.key, value)"
                               @client-selected="(client) => handleClientSelected(client)"

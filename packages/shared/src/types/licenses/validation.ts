@@ -15,7 +15,8 @@ export function validateLicenseCreation(data: LicenseData): string[] {
   const relationErrors = validateRelationFields('licenses', data);
   errors.push(...relationErrors);
 
-  // Software-specific validation (only if software is provided)
+  // Software-specific validation (only if software is provided and has content)
+  // Software is optional - empty software arrays are allowed
   if (data.software?.name && data.software.name.length > 0) {
     const softwareErrors = validateSoftwareConfiguration(data.software);
     errors.push(...softwareErrors);
@@ -62,14 +63,14 @@ export function validateLicenseUpdate(data: Partial<LicenseData>): string[] {
   const relationErrors = validateRelationFields('licenses', data as Record<string, any>);
   errors.push(...relationErrors);
 
-  if (data.software?.name !== undefined && data.software.name.length === 0) {
-    errors.push('Pelo menos um software deve ser selecionado');
-  }
-
-  // Software-specific validation if software is being updated
-  if (data.software) {
-    const softwareErrors = validateSoftwareConfiguration(data.software);
-    errors.push(...softwareErrors);
+  // Only validate software if it's being updated and has content
+  if (data.software !== undefined) {
+    // Software-specific validation if software is being updated and has content
+    // Software is optional - empty software arrays are allowed
+    if (data.software.name && data.software.name.length > 0) {
+      const softwareErrors = validateSoftwareConfiguration(data.software);
+      errors.push(...softwareErrors);
+    }
   }
 
   // Date validation if both dates are provided
@@ -90,11 +91,12 @@ export function validateLicenseUpdate(data: Partial<LicenseData>): string[] {
  * @param software Software configuration to validate
  * @returns Array of validation error messages in Portuguese
  */
-function validateSoftwareConfiguration(software: LicenseSoftware): string[] {
+function validateSoftwareConfiguration(software: Partial<LicenseSoftware>): string[] {
   const errors: string[] = [];
 
+  // If no name is provided or it's empty, skip validation
   if (!software.name || software.name.length === 0) {
-    return errors; // Already validated at higher level
+    return errors;
   }
 
   // Vectron-specific validation
@@ -134,7 +136,7 @@ function validateSoftwareConfiguration(software: LicenseSoftware): string[] {
  * @param data License data to sanitize
  * @returns Sanitized license data
  */
-export function sanitizeLicenseData(data: LicenseData): LicenseData {
+export function sanitizeLicenseData(data: Partial<LicenseData>): Partial<LicenseData> {
   // First sanitize relation fields using the centralized utility
   // Requirements: 1.4 - Allow null/empty relation IDs for optional relationships
   const sanitizedRelations = sanitizeRelationFields('licenses', data);
@@ -146,13 +148,13 @@ export function sanitizeLicenseData(data: LicenseData): LicenseData {
     numeroSerie: data.numeroSerie?.trim() || undefined,
     modalidade: data.modalidade?.trim() || undefined,
     duracaoContrato: data.duracaoContrato?.trim() || undefined,
-    software: sanitizeSoftwareData(data.software),
+    software: data.software ? sanitizeSoftwareData(data.software) : undefined,
     invoices: data.invoices?.map(invoice => ({
       ...invoice,
       ano: invoice.ano?.trim() || undefined,
       numeroFatura: invoice.numeroFatura?.trim() || undefined
-    })) || []
-  } as LicenseData;
+    })) || undefined
+  } as Partial<LicenseData>;
 }
 
 /**
@@ -160,7 +162,7 @@ export function sanitizeLicenseData(data: LicenseData): LicenseData {
  * @param software Software data to sanitize
  * @returns Sanitized software data
  */
-function sanitizeSoftwareData(software: LicenseSoftware): LicenseSoftware {
+function sanitizeSoftwareData(software: Partial<LicenseSoftware>): Partial<LicenseSoftware> {
   return {
     ...software,
     name: software.name || [],

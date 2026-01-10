@@ -35,7 +35,7 @@ export interface ContentRouteConfig<T extends BaseContent> {
   sortStrategy: SortStrategy;
   searchFields?: string[];
   validateCreate?: (data: any) => Promise<void> | void;
-  validateUpdate?: (data: any) => Promise<void> | void;
+  validateUpdate?: (data: any, existingContent?: T) => Promise<void> | void;
   extractSearchableText?: (content: T) => string;
   extractIndexFields?: (content: T) => Record<string, any>;
 }
@@ -373,7 +373,23 @@ export function createContentRoutes<T extends BaseContent>(
       // Validate request data if validator is provided
       if (config.validateUpdate) {
         try {
-          await config.validateUpdate(requestData);
+          // Fetch existing content for validation that requires comparison
+          const storage = new ConfigurableContentStorageService<T>(
+            r2Bucket,
+            config.contentType,
+            config
+          );
+          
+          let existingContent: T | undefined;
+          try {
+            const contentWithRelations = await storage.get(uuid);
+            existingContent = contentWithRelations as unknown as T;
+          } catch (error) {
+            // If content doesn't exist, validation will handle it
+            existingContent = undefined;
+          }
+          
+          await config.validateUpdate(requestData, existingContent);
         } catch (validationError) {
           const response: ApiResponse = {
             success: false,

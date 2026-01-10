@@ -2,9 +2,9 @@
 
 ## Build System
 
-- **Monorepo**: npm workspaces with TypeScript project references
+- **Monorepo**: pnpm workspaces with TypeScript project references
 - **Node.js**: >=18.0.0 required
-- **npm**: >=9.0.0 required
+- **pnpm**: >=8.0.0 required
 - **TypeScript**: v5+ with strict mode enabled
 
 ## Frontend Stack
@@ -43,51 +43,56 @@
 
 ```bash
 # Start development (uses wrangler for full-stack)
-npm run dev
+pnpm dev
 
 # Start frontend only
-npm run dev --workspace=@clever/frontend
+pnpm --filter @clever/frontend dev
 
 # Start backend only
-npm run dev --workspace=@clever/backend
+pnpm --filter @clever/backend dev
 ```
 
 ### Building
 
 ```bash
 # Build all packages
-npm run build
+pnpm build
 
 # Build specific package
-npm run build --workspace=@clever/shared
+pnpm --filter @clever/shared build
 ```
 
 ### Code Quality
 
 ```bash
 # Run all checks (type-check, lint, format)
-npm run check-all
+pnpm check-all
 
 # Type checking
-npm run type-check
+pnpm type-check
 
 # Linting
-npm run lint
-npm run lint:fix
+pnpm lint
+pnpm lint:fix
 
 # Formatting
-npm run format
-npm run format:check
+pnpm format
+pnpm format:check
 ```
 
 ### Testing
 
 ```bash
 # Run all tests
-npm run test
+pnpm test
 
-# Test specific package
-npm run test --workspace=@clever/frontend
+# Test specific package (replace WORKSPACE with package name)
+pnpm --filter @clever/WORKSPACE test
+
+# Examples:
+pnpm --filter @clever/frontend test
+pnpm --filter @clever/backend test
+pnpm --filter @clever/shared test
 ```
 
 ## Package Structure

@@ -315,7 +315,12 @@ pnpm format:check                    # Check formatting
 
 # Testing
 pnpm test                            # Run all tests
-pnpm --filter @clever/frontend test  # Test specific package
+pnpm --filter @clever/WORKSPACE test # Test specific package (replace WORKSPACE with package name)
+
+# Examples:
+pnpm --filter @clever/frontend test  # Test frontend package
+pnpm --filter @clever/backend test   # Test backend package
+pnpm --filter @clever/shared test    # Test shared package
 ```
 
 ### Frontend Build

@@ -86,7 +86,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import type { License, BaseContent } from '@clever/shared';
+import type { License, BaseContent, ContentWithRelations } from '@clever/shared';
 import { calculateLicenseStatus } from '@clever/shared';
 import ContentListTemplate from '@/components/common/ContentListTemplate.vue';
 import { useApi } from '@/composables/useApi';
@@ -100,7 +100,7 @@ const api = useApi<License>('licenses');
 const errorHandler = useErrorHandler();
 
 // State
-const licenses = ref<License[]>([]);
+const licenses = ref<ContentWithRelations<License['data']>[]>([]);
 const isLoading = ref(false);
 const searchQuery = ref('');
 const error = ref<string | null>(null);
@@ -140,12 +140,29 @@ const displayedLicenses = computed(() => {
 
 // Display functions for ContentListTemplate
 const getLicenseTitle = (item: BaseContent): string => {
-  const license = item as License;
+  const license = item as ContentWithRelations<License['data']>;
+  
+  // Try to get client name from resolved relations first
+  if (license.relations?.client) {
+    const clientRelation = license.relations.client;
+    
+    // Check if it's a resolved relation with client data
+    if (clientRelation && typeof clientRelation === 'object' && 'nomeEmpresa' in clientRelation) {
+      return clientRelation.nomeEmpresa || 'Cliente sem nome';
+    }
+    
+    // Check if it's an error
+    if (clientRelation && typeof clientRelation === 'object' && 'type' in clientRelation && clientRelation.type === 'error') {
+      return 'Cliente não encontrado';
+    }
+  }
+  
+  // Fallback to stored client name or default
   return license.data.clientName || 'Licença sem cliente';
 };
 
 const getLicenseSubtitle = (item: BaseContent): string => {
-  const license = item as License;
+  const license = item as ContentWithRelations<License['data']>;
   const parts = [];
   
   if (license.data.software?.name && license.data.software.name.length > 0) {
@@ -160,7 +177,7 @@ const getLicenseSubtitle = (item: BaseContent): string => {
 };
 
 const getLicenseMeta1 = (item: BaseContent): string => {
-  const license = item as License;
+  const license = item as ContentWithRelations<License['data']>;
   if (license.data.dataVencimento) {
     const status = calculateLicenseStatus(license.data.dataVencimento);
     const statusText = {
@@ -174,7 +191,7 @@ const getLicenseMeta1 = (item: BaseContent): string => {
 };
 
 const getLicenseMeta2 = (item: BaseContent): string => {
-  const license = item as License;
+  const license = item as ContentWithRelations<License['data']>;
   const softwareCount = license.data.software?.name?.length || 0;
   if (softwareCount > 0) {
     return `${softwareCount} software${softwareCount > 1 ? 's' : ''}`;
@@ -184,8 +201,19 @@ const getLicenseMeta2 = (item: BaseContent): string => {
 
 // Helper functions for custom template slots
 const getLicenseInitials = (item: BaseContent): string => {
-  const license = item as License;
-  const name = license.data.clientName || 'L';
+  const license = item as ContentWithRelations<License['data']>;
+  
+  // Try to get client name from resolved relations first
+  let name = 'L';
+  if (license.relations?.client) {
+    const clientRelation = license.relations.client;
+    if (clientRelation && typeof clientRelation === 'object' && 'nomeEmpresa' in clientRelation) {
+      name = clientRelation.nomeEmpresa || 'L';
+    }
+  } else if (license.data.clientName) {
+    name = license.data.clientName;
+  }
+  
   return name
     .split(' ')
     .map(word => word.charAt(0))
@@ -195,7 +223,13 @@ const getLicenseInitials = (item: BaseContent): string => {
 };
 
 const getLicenseIconClass = (item: BaseContent): string => {
-  const license = item as License;
+  const license = item as ContentWithRelations<License['data']>;
+  
+  // Check if there's a client relation error
+  if (license.relations?.client && typeof license.relations.client === 'object' && 'type' in license.relations.client && license.relations.client.type === 'error') {
+    return 'bg-red-500 text-white'; // Error state
+  }
+  
   if (license.data.dataVencimento) {
     const status = calculateLicenseStatus(license.data.dataVencimento);
     switch (status) {
@@ -208,7 +242,13 @@ const getLicenseIconClass = (item: BaseContent): string => {
 };
 
 const getLicenseStatusClass = (item: BaseContent): string => {
-  const license = item as License;
+  const license = item as ContentWithRelations<License['data']>;
+  
+  // Check if there's a client relation error
+  if (license.relations?.client && typeof license.relations.client === 'object' && 'type' in license.relations.client && license.relations.client.type === 'error') {
+    return 'bg-red-100 text-red-800'; // Error state
+  }
+  
   if (license.data.dataVencimento) {
     const status = calculateLicenseStatus(license.data.dataVencimento);
     switch (status) {
@@ -221,7 +261,13 @@ const getLicenseStatusClass = (item: BaseContent): string => {
 };
 
 const getLicenseStatusText = (item: BaseContent): string => {
-  const license = item as License;
+  const license = item as ContentWithRelations<License['data']>;
+  
+  // Check if there's a client relation error
+  if (license.relations?.client && typeof license.relations.client === 'object' && 'type' in license.relations.client && license.relations.client.type === 'error') {
+    return 'Erro Cliente'; // Error state
+  }
+  
   if (license.data.dataVencimento) {
     const status = calculateLicenseStatus(license.data.dataVencimento);
     switch (status) {
@@ -249,7 +295,7 @@ const handleClearSearch = () => {
 };
 
 const handleLicenseClick = (item: BaseContent) => {
-  const license = item as License;
+  const license = item as ContentWithRelations<License['data']>;
   router.push(`/licenses/${license.uuid}`);
 };
 
@@ -258,7 +304,7 @@ const handleCreate = () => {
 };
 
 const handleEdit = (item: BaseContent) => {
-  const license = item as License;
+  const license = item as ContentWithRelations<License['data']>;
   router.push(`/licenses/${license.uuid}/editar`);
 };
 
@@ -272,7 +318,7 @@ const loadLicenses = async () => {
     
     if (api.items.value) {
       // Sort licenses by creation date (most recent first)
-      licenses.value = api.items.value.sort((a, b) => {
+      licenses.value = (api.items.value as ContentWithRelations<License['data']>[]).sort((a, b) => {
         const dateA = new Date(a.createdAt);
         const dateB = new Date(b.createdAt);
         return dateB.getTime() - dateA.getTime();

@@ -13,6 +13,9 @@ Kiro is responsible for:
 - R2 storage patterns and index maintenance
 - API endpoint consistency with automatic relation resolution
 - Frontend component patterns including RelationInfoDisplay with error state handling
+- Relation component integration patterns and mobile-first responsive design
+- Type guard utilities and safe relation handling patterns
+- Comprehensive testing patterns for relation systems (unit, integration, e2e)
 
 Kiro must:
 

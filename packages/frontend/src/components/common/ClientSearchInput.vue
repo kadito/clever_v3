@@ -1,6 +1,6 @@
 <template>
   <div class="client-search-wrapper">
-    <!-- Search Input -->
+    <!-- Search Input with Dropdown -->
     <div class="relative">
       <input
         type="text"
@@ -16,6 +16,7 @@
         @input="onSearchInput"
         @focus="onFocus"
         @blur="onBlur"
+        @keydown="onKeyDown"
       >
       
       <!-- Search Icon -->
@@ -28,58 +29,58 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
       </div>
-    </div>
 
-    <!-- Dropdown Results -->
-    <div 
-      v-if="showDropdown && (searchResults.length > 0 || isLoading || (searchQuery && searchQuery.length >= 2) || !searchQuery)"
-      class="search-dropdown"
-    >
-      <!-- Loading State -->
-      <div v-if="isLoading" class="search-option loading">
-        <div class="flex items-center">
-          <svg class="animate-spin h-4 w-4 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          <span class="text-gray-600">Pesquisando clientes...</span>
-        </div>
-      </div>
-
-      <!-- No Results -->
-      <div v-else-if="searchQuery && searchQuery.length >= 2 && searchResults.length === 0" class="search-option no-results">
-        <div class="flex items-center justify-center py-2">
-          <svg class="h-5 w-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-          </svg>
-          <span class="text-gray-500">Nenhum cliente encontrado</span>
-        </div>
-      </div>
-
-      <!-- Instruction when query has 1 character -->
-      <div v-else-if="searchQuery && searchQuery.length === 1" class="search-option instruction">
-        <div class="flex items-center justify-center py-2">
-          <svg class="h-5 w-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          <span class="text-gray-500">Digite pelo menos 2 caracteres para pesquisar</span>
-        </div>
-      </div>
-
-      <!-- Results -->
+      <!-- Dropdown Results - positioned relative to this input container -->
       <div 
-        v-else
-        v-for="client in searchResults" 
-        :key="client.uuid"
-        class="search-option"
-        @click="selectClient(client)"
+        v-if="!readonly && !disabled && showDropdown && (searchResults.length > 0 || isLoading || (searchQuery && searchQuery.length >= 2) || !searchQuery)"
+        class="search-dropdown"
       >
-        <div class="client-info">
-          <div class="client-name">{{ client.data.nomeEmpresa }}</div>
-          <div class="client-details">
-            <span v-if="client.data.nomeComercial" class="detail">{{ client.data.nomeComercial }}</span>
-            <span v-if="client.data.contribuinte" class="detail">NIF: {{ client.data.contribuinte }}</span>
-            <span v-if="client.data.localidade" class="detail">{{ client.data.localidade }}</span>
+        <!-- Loading State -->
+        <div v-if="isLoading" class="search-option loading">
+          <div class="flex items-center">
+            <svg class="animate-spin h-4 w-4 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="text-gray-600">Pesquisando clientes...</span>
+          </div>
+        </div>
+
+        <!-- No Results -->
+        <div v-else-if="searchQuery && searchQuery.length >= 2 && searchResults.length === 0" class="search-option no-results">
+          <div class="flex items-center justify-center py-2">
+            <svg class="h-5 w-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <span class="text-gray-500">Nenhum cliente encontrado</span>
+          </div>
+        </div>
+
+        <!-- Instruction when query has 1 character -->
+        <div v-else-if="searchQuery && searchQuery.length === 1" class="search-option instruction">
+          <div class="flex items-center justify-center py-2">
+            <svg class="h-5 w-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-gray-500">Digite pelo menos 2 caracteres para pesquisar</span>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div 
+          v-else
+          v-for="client in searchResults" 
+          :key="client.uuid"
+          class="search-option"
+          @click="selectClient(client)"
+        >
+          <div class="client-info">
+            <div class="client-name">{{ client.data.nomeEmpresa }}</div>
+            <div class="client-details">
+              <span v-if="client.data.nomeComercial" class="detail">{{ client.data.nomeComercial }}</span>
+              <span v-if="client.data.contribuinte" class="detail">NIF: {{ client.data.contribuinte }}</span>
+              <span v-if="client.data.localidade" class="detail">{{ client.data.localidade }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -227,6 +228,11 @@ const searchClients = async (query: string) => {
 };
 
 const onSearchInput = () => {
+  // Prevent search input when readonly or disabled
+  if (props.readonly || props.disabled) {
+    return;
+  }
+
   // Clear previous timeout
   if (searchTimeout.value) {
     clearTimeout(searchTimeout.value);
@@ -281,7 +287,20 @@ const onBlur = () => {
   }, 200);
 };
 
+const onKeyDown = (event: KeyboardEvent) => {
+  // Prevent all keyboard input when readonly or disabled
+  if (props.readonly || props.disabled) {
+    event.preventDefault();
+    return false;
+  }
+};
+
 const selectClient = (client: Client) => {
+  // Prevent selection when readonly or disabled
+  if (props.readonly || props.disabled) {
+    return;
+  }
+  
   selectedClient.value = client;
   searchQuery.value = client.data.nomeEmpresa;
   showDropdown.value = false;
@@ -319,9 +338,25 @@ watch(() => props.modelValue, (newClientId) => {
     loadClientById(newClientId);
   } else if (!newClientId) {
     selectedClient.value = null;
-    searchQuery.value = '';
+    // Only clear search query if not readonly (to preserve display)
+    if (!props.readonly) {
+      searchQuery.value = '';
+    }
   }
 }, { immediate: true });
+
+// Watch for readonly prop changes to prevent input modifications
+watch(() => props.readonly, (isReadonly) => {
+  if (isReadonly) {
+    // When switching to readonly, close dropdown and stop any pending searches
+    showDropdown.value = false;
+    if (searchTimeout.value) {
+      clearTimeout(searchTimeout.value);
+      searchTimeout.value = null;
+    }
+    isLoading.value = false;
+  }
+});
 
 // Click outside to close dropdown
 const handleClickOutside = (event: Event) => {
@@ -350,7 +385,7 @@ onBeforeUnmount(() => {
 }
 
 .search-dropdown {
-  @apply absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-touch shadow-lg z-50 max-h-60 overflow-y-auto;
+  @apply absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-touch shadow-lg z-[9999] max-h-60 overflow-y-auto;
 }
 
 .search-option {

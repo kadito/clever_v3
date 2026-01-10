@@ -79,3 +79,36 @@ API Patterns:
 - R2 key pattern: content/{type}/{uuid}.json
 - Index pattern: indexes/{type}-index.json
 - All responses include resolved relations automatically
+
+Testing Patterns for Relations:
+
+- Use comprehensive test suites covering all relation states (resolved, error, missing)
+- Test relation resolution at API level with mock storage buckets
+- Test frontend components with all relation states (success, 404, 500, null)
+- Use property-based testing for relation type guards and utilities
+- Test eventual consistency scenarios (content created before relations exist)
+- Test relation changes through update operations
+- Test performance with multiple relations and realistic datasets
+- Use structured test organization: unit tests for utilities, integration tests for API endpoints, component tests for UI
+- Mock storage buckets for backend testing with Map-based implementations
+- Test error handling with structured error objects and proper HTTP status codes
+
+Type Safety for Relations:
+
+- Use type guard utilities from @clever/shared for safe relation handling
+- Always check relation results with `isRelationError()` and `isResolvedRelation()` before accessing data
+- Use helper functions like `getResolvedRelation()` and `getRelationError()` for null-safe access
+- Prefer type-safe utilities over direct property access on relation results
+- Use `hasResolvedRelations()` and `hasRelationErrors()` for content-level checks
+- Use `getRelationSummary()` for debugging and logging relation status
+
+Frontend Component Patterns for Relations:
+
+- Use `RelationInfoDisplay` component for consistent relation display across all content types
+- Create content-specific wrapper components (e.g., `ClientInfoSection`) for specialized layouts
+- Place relation displays prominently in detail views (typically first section after header)
+- Use explicit component integration - each content type decides where to show relations
+- Import unused components are acceptable for future extensibility (e.g., RelationInfoDisplay in detail views)
+- Handle relation prop passing with optional chaining: `license.relations?.client`
+- Maintain consistent Portuguese labels across all relation displays
+- Use mobile-first responsive design for all relation components

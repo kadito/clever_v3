@@ -26,8 +26,22 @@ function validateLicenseCreate(requestData: any): void {
   // Sanitize the data first
   const sanitizedData = sanitizeLicenseData(licenseData as LicenseData);
   
+  // Ensure required fields are present for creation validation
+  const completeData: LicenseData = {
+    clientId: sanitizedData.clientId || '',
+    clientName: sanitizedData.clientName || '',
+    versao: sanitizedData.versao,
+    numeroSerie: sanitizedData.numeroSerie,
+    dataInicio: sanitizedData.dataInicio,
+    dataVencimento: sanitizedData.dataVencimento,
+    modalidade: sanitizedData.modalidade,
+    duracaoContrato: sanitizedData.duracaoContrato,
+    software: sanitizedData.software || { name: [], modules: [] },
+    invoices: sanitizedData.invoices || []
+  };
+  
   // Use the comprehensive validation from shared package
-  const errors = validateLicenseCreation(sanitizedData);
+  const errors = validateLicenseCreation(completeData);
   
   if (errors.length > 0) {
     throw new Error(errors[0]); // Return first error for API response
@@ -38,10 +52,16 @@ function validateLicenseCreate(requestData: any): void {
  * License-specific validation for update operations
  * Uses the comprehensive validation from shared package
  * Requirements: 8.2 - Content-specific validation logic
+ * IMPORTANT: Client cannot be changed during updates for data integrity
  */
-function validateLicenseUpdateData(requestData: any): void {
+function validateLicenseUpdateData(requestData: any, existingContent?: License): void {
   // Extract the actual license data from the request
   const licenseData = requestData.data || requestData;
+  
+  // Prevent client changes during updates for data integrity
+  if (existingContent && licenseData.clientId && licenseData.clientId !== existingContent.data.clientId) {
+    throw new Error('Cliente não pode ser alterado durante atualizações');
+  }
   
   // Use the update validation from shared package
   const errors = validateLicenseUpdate(licenseData as Partial<LicenseData>);

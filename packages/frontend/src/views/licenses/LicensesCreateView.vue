@@ -421,11 +421,6 @@ const selectedClientData = ref<any>(null);
 const onClientSelected = (client: any, updateFieldValue?: (key: string, value: any) => void) => {
   selectedClientData.value = client;
   
-  // Update the form data with the client ID if updateFieldValue is provided
-  if (updateFieldValue && client) {
-    updateFieldValue('clientId', client.uuid);
-  }
-  
   // Clear any client-related errors
   if (fieldErrors.value.clientId) {
     delete fieldErrors.value.clientId;
