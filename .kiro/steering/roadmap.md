@@ -20,6 +20,12 @@ Phase 2: Core Features
   - Assistências Remotas (Remote Assistance)
   - Lembretes (Reminders)
   - Pendentes (Pending Items)
+- Content Relations System:
+  - Automatic relation detection and resolution
+  - License → Client relations
+  - Contract → Client relations
+  - Work Sheet → Client relations
+  - Remote Assistance → Client relations
 - Schema validation
 - Comprehensive testing
 - User permissions (Admin/Employee)

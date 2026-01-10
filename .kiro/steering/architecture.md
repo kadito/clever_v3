@@ -120,6 +120,82 @@ interface BaseContent {
 }
 ```
 
+### Content Relations System
+
+CLEVER implements a simple content relations system that automatically resolves relationships between content types:
+
+- **Relation Storage**: Content stores only relation IDs (e.g., `clientId`) in the data field
+- **No Creation Validation**: Relation IDs can be stored without validating referenced content exists
+- **Display-Time Validation**: Relations are validated and resolved when serving API responses
+- **Structured Error Handling**: Failed relations return error objects with type, code (404/500), and message
+- **Automatic Resolution**: All API responses include resolved relation data under a `relations` field
+- **Pattern Detection**: Relations are detected by field naming patterns (fields ending in 'Id')
+- **Hard-coded Mappings**: Relation type to content type mappings are explicitly defined in shared files
+- **Sequential Resolution**: Relations resolved one by one for simplicity
+- **No Caching**: Always fetch fresh data - no caching for relations, detail views, or list views
+- **Basic Data Only**: Only essential fields from related content are included (company name, tax number, etc.)
+- **No Configuration**: System uses simple conventions without complex schema configuration
+- **Explicit Integration**: Each content type explicitly includes relation display where needed
+- **Consistent UI**: Same relation type uses identical layout across all content types
+
+```typescript
+// Enhanced API response with relations and error handling
+interface ContentWithRelations<T> extends BaseContent {
+  data: T;
+  relations: Record<string, RelationResult>;
+}
+
+type RelationResult = ResolvedRelation | RelationError;
+
+interface ResolvedRelation {
+  uuid: string;
+  contentType: string;
+  [key: string]: any; // Basic data fields
+}
+
+interface RelationError {
+  type: 'error';
+  code: 404 | 500;
+  message: string;
+}
+
+// Example: License with resolved client relation
+const licenseResponse = {
+  uuid: "license-uuid",
+  contentType: "licenses",
+  data: { clientId: "client-uuid", versao: "2024" },
+  relations: {
+    client: {
+      uuid: "client-uuid",
+      contentType: "clients",
+      nomeEmpresa: "Empresa ABC Lda",
+      contribuinte: "123456789"
+    }
+  }
+};
+
+// Example: License with client resolution error
+const licenseWithErrorResponse = {
+  uuid: "license-uuid",
+  contentType: "licenses",
+  data: { clientId: "invalid-uuid", versao: "2024" },
+  relations: {
+    client: {
+      type: 'error',
+      code: 404,
+      message: 'Not found'
+    }
+  }
+};
+```
+
+#### Supported Relations
+
+- **License → Client**: `clientId` field resolves to client basic data
+- **Contract → Client**: `clientId` field resolves to client basic data
+- **Work Sheet → Client**: `clientId` field resolves to client basic data
+- **Remote Assistance → Client**: `clientId` field resolves to client basic data
+
 ## Content Types
 
 | Code Name           | Portuguese Label            | Frequency      | Description            |
@@ -154,13 +230,15 @@ Incoming Request
 ### API Endpoints
 
 ```
-GET    /api/content/{type}           # List with search/filter
-GET    /api/content/{type}/{uuid}    # Get single item
-POST   /api/content/{type}           # Create new item
-PUT    /api/content/{type}/{uuid}    # Update item
+GET    /api/content/{type}           # List with search/filter + resolved relations
+GET    /api/content/{type}/{uuid}    # Get single item + resolved relations
+POST   /api/content/{type}           # Create new item + return with resolved relations
+PUT    /api/content/{type}/{uuid}    # Update item + return with resolved relations
 DELETE /api/content/{type}/{uuid}    # Soft delete item
 POST   /api/migrate/{type}           # Import old data
 ```
+
+All content API responses automatically include resolved relations in the `relations` field.
 
 ### Static Asset Serving
 
