@@ -19,11 +19,13 @@
 ## Design Philosophy
 
 - **Mobile-First**: All components designed for mobile screens first, then
-  enhanced for larger screens
-- **4-View Pattern**: Home (dashboard) → List (search) → Detail → Create/Edit
-  for all content types
+  enhanced for larger screens with 44px minimum touch targets
+- **5-View Pattern**: Home (dashboard) → List (search) → Detail → Create → Update
+  for all content types (separate Create/Update components)
 - **Color Palette**: Based on old_src (#75AE93 primary, #2c3e50 secondary)
 - **Touch-Friendly**: Optimized for mobile interactions with proper tap targets
+- **Form Architecture**: Shared form data composable with component recreation handling
+- **UI Patterns**: Multiselect dropdowns, conditional fields, dynamic configuration management
 
 ## Backend Stack
 

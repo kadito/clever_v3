@@ -38,8 +38,24 @@ and R2 for JSON document storage.
 - **Mobile-First Design**: Optimized for mobile devices with responsive
   breakpoints
 - **Color Palette**: Based on old_src (#75AE93 primary, #2c3e50 secondary)
-- **4-View Pattern**: Home (dashboard) → List (search) → Detail → Create/Edit
-  for all content types
+- **5-View Pattern**: Home (dashboard) → List (search) → Detail → Create → Update
+  for all content types (separate Create/Update components)
+
+### Form Architecture
+
+- **Shared Form Data**: Use `useSharedFormData` composable to handle Vue component recreation issues
+- **Component Split**: `ContentFormTemplate.vue` (core rendering) + `ContentCreateTemplate.vue` (wrapper)
+- **Data Persistence**: Form data persists across component recreation during navigation
+- **Multiselect Dropdowns**: Replace individual checkboxes with touch-friendly multiselect interfaces
+- **Conditional Fields**: Dynamic field visibility based on form selections via JSON configuration
+- **Dynamic Configuration**: Add/remove/edit functionality for complex configuration items
+- **Mobile Input Types**: Use proper HTML5 input types (tel, email, url) for mobile keyboards
+
+### Audit Trail Enhancement
+
+- **User Email Display**: Show user email addresses instead of user IDs in audit trails
+- **Current User Recognition**: Use `useAuth()` composable to identify current user
+- **Fallback Handling**: Show "Sistema" for system actions, user ID for unknown users
 
 ### Backend
 

@@ -40,11 +40,13 @@ Mobile-First Development:
 
 Component Standards:
 
-- Follow 4-view pattern: Home → List → Detail → Create/Edit
-- Use consistent color palette from old_src
+- Follow 5-view pattern: Home → List → Detail → Create → Update (separate Create/Update components)
+- Use consistent color palette from old_src (#75AE93 primary, #2c3e50 secondary)
 - Implement loading states for mobile networks
 - Handle offline scenarios gracefully
 - Use semantic HTML for accessibility
+- Standardize section ordering: Basic → Contact → Address → Financial → Services → Configuration → Observations
+- Always place observations section at the end across all views
 
 Content Structure:
 
