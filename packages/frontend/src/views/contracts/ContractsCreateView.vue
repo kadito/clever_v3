@@ -836,8 +836,16 @@ const handleCreate = async (data: Record<string, any>) => {
     
     console.log('API create completed');
     console.log('API result:', JSON.stringify(result, null, 2));
-    console.log('API currentItem:', JSON.stringify(api.currentItem, null, 2));
-    console.log('API currentItem.value:', api.currentItem?.value);
+    console.log('API error:', JSON.stringify(api.error.value, null, 2));
+    
+    // Check if API returned an error
+    if (api.error.value) {
+      console.error('API returned error:', api.error.value);
+      error.value = typeof api.error.value === 'string' 
+        ? api.error.value 
+        : api.error.value.message || 'Erro ao criar contrato';
+      return;
+    }
     
     if (api.currentItem?.value) {
       console.log('Navigating to contract detail:', api.currentItem.value.uuid);
@@ -856,7 +864,7 @@ const handleCreate = async (data: Record<string, any>) => {
       throw new Error('Erro ao criar contrato');
     }
   } catch (err) {
-    console.error('Error creating contract:', err);
+    console.error('Error creating contract:', JSON.stringify(err, null, 2));
     error.value = err instanceof Error ? err.message : 'Erro ao criar contrato';
   } finally {
     isSaving.value = false;

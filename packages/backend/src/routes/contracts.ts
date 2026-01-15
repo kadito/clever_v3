@@ -102,19 +102,12 @@ function validateContractCreate(requestData: any): void {
     modalidadePagamentoSH: contractData.modalidadePagamentoSH || '',
     inicioContratoSH: contractData.inicioContratoSH || '',
     fimContratoSH: contractData.fimContratoSH || '',
-    modeloPSO: contractData.modeloPSO || '',
-    numeroSeriePSO: contractData.numeroSeriePSO || '',
-    softwarePSO: contractData.softwarePSO || '',
     horasAssistenciaAnual: contractData.horasAssistenciaAnual || 0,
     deslocacoesPorAno: contractData.deslocacoesPorAno || 0,
     manutencoesPorAno: contractData.manutencoesPorAno || 0,
     metodoPagamento: contractData.metodoPagamento || '',
     cpaEquipments: contractData.cpaEquipments || [],
-    modeloCPA: contractData.modeloCPA || '',
-    numeroSerieCPA: contractData.numeroSerieCPA || '',
-    planoContrato: contractData.planoContrato || '',
-    temCPA: contractData.temCPA || false,
-    temPSO: contractData.temPSO || false
+    shEquipments: contractData.shEquipments || []
   };
   
   // Use the comprehensive validation from shared package directly
@@ -160,19 +153,12 @@ function validateContractUpdateData(requestData: any, existingContent?: Contract
     modalidadePagamentoSH: contractData.modalidadePagamentoSH || '',
     inicioContratoSH: contractData.inicioContratoSH || '',
     fimContratoSH: contractData.fimContratoSH || '',
-    modeloPSO: contractData.modeloPSO || '',
-    numeroSeriePSO: contractData.numeroSeriePSO || '',
-    softwarePSO: contractData.softwarePSO || '',
     horasAssistenciaAnual: contractData.horasAssistenciaAnual || 0,
     deslocacoesPorAno: contractData.deslocacoesPorAno || 0,
     manutencoesPorAno: contractData.manutencoesPorAno || 0,
     metodoPagamento: contractData.metodoPagamento || '',
     cpaEquipments: contractData.cpaEquipments || [],
-    modeloCPA: contractData.modeloCPA || '',
-    numeroSerieCPA: contractData.numeroSerieCPA || '',
-    planoContrato: contractData.planoContrato || '',
-    temCPA: contractData.temCPA || false,
-    temPSO: contractData.temPSO || false
+    shEquipments: contractData.shEquipments || []
   };
   
   // Use the update validation from shared package directly
@@ -220,18 +206,16 @@ function createContractSearchText(data: ContractData): string {
     });
   }
   
-  // Legacy equipment fields
-  if (data.modeloCPA) searchTerms.push(data.modeloCPA.toLowerCase());
-  if (data.numeroSerieCPA) searchTerms.push(data.numeroSerieCPA.toLowerCase());
-  if (data.modeloPSO) searchTerms.push(data.modeloPSO.toLowerCase());
-  if (data.numeroSeriePSO) searchTerms.push(data.numeroSeriePSO.toLowerCase());
-  if (data.softwarePSO) searchTerms.push(data.softwarePSO.toLowerCase());
+  if (data.shEquipments && data.shEquipments.length > 0) {
+    data.shEquipments.forEach(equipment => {
+      if (equipment.modelo) searchTerms.push(equipment.modelo.toLowerCase());
+      if (equipment.numeroSerie) searchTerms.push(equipment.numeroSerie.toLowerCase());
+      if (equipment.software) searchTerms.push(equipment.software.toLowerCase());
+    });
+  }
   
   // Payment method
   if (data.metodoPagamento) searchTerms.push(data.metodoPagamento.toLowerCase());
-  
-  // Legacy fields
-  if (data.planoContrato) searchTerms.push(data.planoContrato.toLowerCase());
   
   return searchTerms.join(' ');
 }
@@ -288,14 +272,9 @@ contractConfig.extractIndexFields = (content: Contract) => {
     // Equipment information for search
     cpaEquipmentModels: data.cpaEquipments?.map(e => e.modelo).filter(Boolean) || [],
     cpaEquipmentSerials: data.cpaEquipments?.map(e => e.numeroSerie).filter(Boolean) || [],
-    equipmentCount: data.cpaEquipments?.length || 0,
-    
-    // Legacy equipment fields
-    modeloCPA: data.modeloCPA || '',
-    numeroSerieCPA: data.numeroSerieCPA || '',
-    modeloPSO: data.modeloPSO || '',
-    numeroSeriePSO: data.numeroSeriePSO || '',
-    softwarePSO: data.softwarePSO || '',
+    shEquipmentModels: data.shEquipments?.map(e => e.modelo).filter(Boolean) || [],
+    shEquipmentSerials: data.shEquipments?.map(e => e.numeroSerie).filter(Boolean) || [],
+    equipmentCount: (data.cpaEquipments?.length || 0) + (data.shEquipments?.length || 0),
     
     // Service details
     horasAssistenciaAnual: data.horasAssistenciaAnual || 0,
@@ -310,11 +289,6 @@ contractConfig.extractIndexFields = (content: Contract) => {
     // Contract period information
     startDate: summary.startDate,
     endDate: summary.endDate,
-    
-    // Legacy fields
-    planoContrato: data.planoContrato || '',
-    temCPA: data.temCPA || false,
-    temPSO: data.temPSO || false,
   };
 };
 
