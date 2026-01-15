@@ -794,6 +794,8 @@ const validateContractCreate = (data: Record<string, any>): Record<string, strin
 const handleCreate = async (data: Record<string, any>) => {
   console.log('ContractsCreateView handleCreate called');
   console.log('Received data:', JSON.stringify(data, null, 2));
+  console.log('CPA Equipments:', JSON.stringify(cpaEquipments.value, null, 2));
+  console.log('S&H Equipments:', JSON.stringify(shEquipments.value, null, 2));
   
   try {
     isSaving.value = true;
@@ -819,21 +821,12 @@ const handleCreate = async (data: Record<string, any>) => {
       modalidadePagamentoSH: data.modalidadePagamentoSH || '',
       inicioContratoSH: data.inicioContratoSH || '',
       fimContratoSH: data.fimContratoSH || '',
-      modeloPSO: data.modeloPSO || '',
-      numeroSeriePSO: data.numeroSeriePSO || '',
-      softwarePSO: data.softwarePSO || '',
       horasAssistenciaAnual: data.horasAssistenciaAnual || 0,
       deslocacoesPorAno: data.deslocacoesPorAno || 0,
       manutencoesPorAno: data.manutencoesPorAno || 0,
       metodoPagamento: data.metodoPagamento || '',
       cpaEquipments: cpaEquipments.value,
-      shEquipments: shEquipments.value,
-      // Legacy fields
-      modeloCPA: data.modeloCPA || '',
-      numeroSerieCPA: data.numeroSerieCPA || '',
-      planoContrato: data.planoContrato || '',
-      temCPA: data.temCPA || false,
-      temPSO: data.temPSO || false
+      shEquipments: shEquipments.value
     };
     
     console.log('Prepared contract data:', JSON.stringify(contractData, null, 2));
@@ -843,14 +836,14 @@ const handleCreate = async (data: Record<string, any>) => {
     
     console.log('API create completed');
     console.log('API result:', JSON.stringify(result, null, 2));
-    console.log('API item:', JSON.stringify(api.item, null, 2));
-    console.log('API item.value:', api.item?.value);
+    console.log('API currentItem:', JSON.stringify(api.currentItem, null, 2));
+    console.log('API currentItem.value:', api.currentItem?.value);
     
-    if (api.item?.value) {
-      console.log('Navigating to contract detail:', api.item.value.uuid);
-      router.push(`/contracts/${api.item.value.uuid}`);
+    if (api.currentItem?.value) {
+      console.log('Navigating to contract detail:', api.currentItem.value.uuid);
+      router.push(`/contracts/${api.currentItem.value.uuid}`);
     } else if (result) {
-      // If api.item is not set but we have a result, use that
+      // If api.currentItem is not set but we have a result, use that
       console.log('Using result directly:', result);
       const uuid = result.uuid || result.data?.uuid;
       if (uuid) {

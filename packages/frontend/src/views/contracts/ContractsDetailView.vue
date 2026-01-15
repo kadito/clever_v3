@@ -133,21 +133,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- Legacy CPA Equipment -->
-            <div v-else-if="contract.data.modeloCPA || contract.data.numeroSerieCPA" class="mt-6">
-              <h3 class="text-md font-semibold text-gray-900 mb-4">Equipamento CPA (Legacy)</h3>
-              <div class="detail-grid">
-                <div class="detail-item">
-                  <label class="detail-label">Modelo</label>
-                  <div class="detail-value">{{ contract.data.modeloCPA || '-' }}</div>
-                </div>
-                <div class="detail-item">
-                  <label class="detail-label">Número de Série</label>
-                  <div class="detail-value">{{ contract.data.numeroSerieCPA || '-' }}</div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -183,20 +168,33 @@
             </div>
 
             <!-- S&H Equipment -->
-            <div v-if="contract.data.modeloPSO || contract.data.numeroSeriePSO || contract.data.softwarePSO" class="mt-6">
-              <h3 class="text-md font-semibold text-gray-900 mb-4">Equipamento S&H</h3>
-              <div class="detail-grid">
-                <div class="detail-item">
-                  <label class="detail-label">Modelo PSO</label>
-                  <div class="detail-value">{{ contract.data.modeloPSO || '-' }}</div>
-                </div>
-                <div class="detail-item">
-                  <label class="detail-label">Número de Série PSO</label>
-                  <div class="detail-value">{{ contract.data.numeroSeriePSO || '-' }}</div>
-                </div>
-                <div class="detail-item">
-                  <label class="detail-label">Software PSO</label>
-                  <div class="detail-value">{{ contract.data.softwarePSO || '-' }}</div>
+            <div v-if="contract.data.shEquipments && contract.data.shEquipments.length > 0" class="mt-6">
+              <h3 class="text-md font-semibold text-gray-900 mb-4">Equipamentos S&H</h3>
+              <div class="space-y-3">
+                <div 
+                  v-for="(equipment, index) in contract.data.shEquipments" 
+                  :key="equipment.id"
+                  class="equipment-card"
+                >
+                  <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                      <div class="flex items-center space-x-2 mb-2">
+                        <span class="equipment-number">{{ index + 1 }}</span>
+                        <h4 class="font-medium text-gray-900">{{ equipment.modelo || 'Modelo não especificado' }}</h4>
+                      </div>
+                      <div class="text-sm text-gray-600 space-y-1">
+                        <p v-if="equipment.numeroSerie">
+                          <strong>Número de Série:</strong> {{ equipment.numeroSerie }}
+                        </p>
+                        <p v-if="equipment.software">
+                          <strong>Software:</strong> {{ equipment.software }}
+                        </p>
+                        <p v-if="equipment.observacoes">
+                          <strong>Observações:</strong> {{ equipment.observacoes }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -227,35 +225,6 @@
               <div v-if="contract?.data.metodoPagamento" class="detail-item">
                 <label class="detail-label">Método de Pagamento</label>
                 <div class="detail-value">{{ formatPaymentMethod(contract.data.metodoPagamento) }}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Legacy Fields Section (if any exist) -->
-      <div v-if="hasLegacyFields(contract?.data)" class="detail-section">
-        <div class="bg-white rounded-touch border border-gray-200">
-          <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-yellow-50 rounded-t-touch">
-            <h2 class="text-lg font-semibold text-yellow-900">Campos Legacy</h2>
-          </div>
-          <div class="p-4 sm:p-6">
-            <div class="detail-grid">
-              <div v-if="contract?.data.planoContrato" class="detail-item">
-                <label class="detail-label">Plano Contrato (Legacy)</label>
-                <div class="detail-value">{{ contract.data.planoContrato }}</div>
-              </div>
-              <div v-if="contract?.data.temCPA" class="detail-item">
-                <label class="detail-label">Tem CPA (Legacy)</label>
-                <div class="detail-value">
-                  <span class="badge badge-blue">{{ contract.data.temCPA ? 'Sim' : 'Não' }}</span>
-                </div>
-              </div>
-              <div v-if="contract?.data.temPSO" class="detail-item">
-                <label class="detail-label">Tem PSO (Legacy)</label>
-                <div class="detail-value">
-                  <span class="badge badge-green">{{ contract.data.temPSO ? 'Sim' : 'Não' }}</span>
-                </div>
               </div>
             </div>
           </div>
@@ -440,26 +409,17 @@ const getEquipmentCount = (item: BaseContent | null): number => {
   
   let count = 0;
   
-  // Count CPA equipments (new format)
+  // Count CPA equipments
   if (contractItem.data.cpaEquipments && contractItem.data.cpaEquipments.length > 0) {
     count += contractItem.data.cpaEquipments.length;
   }
   
-  // Count legacy equipment fields
-  if (contractItem.data.modeloCPA || contractItem.data.numeroSerieCPA) {
-    count += 1;
-  }
-  
-  if (contractItem.data.modeloPSO || contractItem.data.numeroSeriePSO) {
-    count += 1;
+  // Count S&H equipments
+  if (contractItem.data.shEquipments && contractItem.data.shEquipments.length > 0) {
+    count += contractItem.data.shEquipments.length;
   }
   
   return count;
-};
-
-const hasLegacyFields = (data: Contract['data'] | undefined): boolean => {
-  if (!data) return false;
-  return !!(data.planoContrato || data.temCPA || data.temPSO);
 };
 
 const formatDate = (dateString: string | undefined): string => {

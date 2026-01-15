@@ -30,12 +30,8 @@ export interface ContractData {
   modalidadePagamentoCPA: 'MENSAL' | 'TRIMESTRAL' | 'SEMESTRAL' | 'ANUAL' | '';
   hasPOSPackage: boolean; // Optional POS assistance package for CPA_1500 PREMIUM
   
-  // CPA Equipment (new format - array of equipments)
+  // CPA Equipment (array of equipments)
   cpaEquipments: ContractEquipment[];
-  
-  // CPA Equipment (legacy format - for backward compatibility)
-  modeloCPA: string;
-  numeroSerieCPA: string;
   
   // CPA Contract Dates
   inicioContratoCPA: string; // ISO date string
@@ -48,13 +44,8 @@ export interface ContractData {
   distanceSH: 'under180km' | 'over180km' | '';
   modalidadePagamentoSH: 'MENSAL' | 'TRIMESTRAL' | 'SEMESTRAL' | 'ANUAL' | '';
   
-  // S&H Equipment Information
-  modeloPSO: string;
-  numeroSeriePSO: string;
-  softwarePSO: string;
-  
-  // S&H Equipment (new format - array of equipments)
-  shEquipments?: Array<{
+  // S&H Equipment (array of equipments)
+  shEquipments: Array<{
     id: string;
     modelo: string;
     numeroSerie: string;
@@ -71,13 +62,8 @@ export interface ContractData {
   deslocacoesPorAno: number;
   manutencoesPorAno: number;
 
-  // Additional Information
+  // Payment Method
   metodoPagamento: 'TRANSFERENCIA_BANCARIA' | 'DEBITO_DIRETO' | 'MULTIBANCO' | 'CHEQUE' | 'NUMERARIO' | 'MB_WAY' | '';
-
-  // Legacy fields (for backward compatibility)
-  planoContrato: string; // Combined plan description
-  temCPA: boolean; // Legacy flag
-  temPSO: boolean; // Legacy flag
 }
 
 /**
