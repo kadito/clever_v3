@@ -1,0 +1,289 @@
+{
+  "CPA_1500": {
+    "name": "Contratos de Assistência e Manutenção - Cashlogy (1500)",
+    "description": "Contratos de manutenção preventiva e assistência técnica para equipamentos Cashlogy - Planos 1500",
+    "plans": [
+      {
+        "id": "cpa_1500_essential",
+        "name": "ESSENTIAL CARE",
+        "description": "1 (uma) manutenção por ano;\n1 (uma) deslocação em caso de avaria que iniba o funcionamento do equipamento, de Segunda a Sexta-Feira, entre as 9:00 e as 19:00;\nAssistência Remota - Segunda a Sexta-Feira entre as 9:00 e as 19:00.",
+        "maintenancePerYear": 1,
+        "callouts": 1,
+        "remoteSupport": "De Segunda a Sexta-Feira entre as 9:00 e as 19:00",
+        "weekendSupport": false,
+        "prices": {
+          "monthly": 30.00,
+          "quarterly": 100.00,
+          "semiannual": 170.00,
+          "annual": 325.00
+        }
+      },
+      {
+        "id": "cpa_1500_professional",
+        "name": "PROFESSIONAL CARE",
+        "description": "2 (duas) manutenções por ano;\n2 (duas) deslocações em caso de avaria que iniba o funcionamento do equipamento, de Segunda a Sexta-Feira, entre as 9:00 e as 20:00;\nAssistência Remota - Segunda a Sexta-Feira entre as 9:00 e as 22:00.",
+        "maintenancePerYear": 2,
+        "callouts": 2,
+        "remoteSupport": "De Segunda a Sexta-Feira entre as 9:00 e as 22:00",
+        "weekendSupport": false,
+        "prices": {
+          "monthly": 60.00,
+          "quarterly": 190.00,
+          "semiannual": 345.00,
+          "annual": 675.00
+        }
+      },
+      {
+        "id": "cpa_1500_premium",
+        "name": "PREMIUM CARE",
+        "description": "3 (três) manutenções por ano;\n3 (três) deslocações em caso de avaria que iniba o funcionamento do equipamento, incluindo ao Fim de Semana;\nAssistência Remota - Segunda a Sexta-Feira entre as 8:00 e as 00:00, Fim de Semana entre as 10:00 e as 18:00.\nPor mais € 100,00/ano poderá beneficiar de um pack de 10h de assistência para o seu POS.",
+        "maintenancePerYear": 3,
+        "callouts": 3,
+        "remoteSupport": "Segunda a Sexta-Feira entre as 8:00 e as 00:00, Fim de Semana entre as 10:00 e as 18:00",
+        "weekendSupport": true,
+        "additionalPackage": {
+          "description": "Pack de 10h de assistência para POS",
+          "price": 100.00
+        },
+        "prices": {
+          "monthly": 75.00,
+          "quarterly": 235.00,
+          "semiannual": 420.00,
+          "annual": 825.00
+        }
+      }
+    ]
+  },
+  "CPA": {
+    "name": "Contratos de Assistência e Manutenção - Cashlogy (2023)",
+    "description": "Contratos de manutenção preventiva e assistência técnica para equipamentos Cashlogy - Planos 2023",
+    "plans": [
+      {
+        "id": "cpa_essential",
+        "name": "ESSENTIAL CARE",
+        "description": "Assistência Remota: De Segunda a Sexta entre as 9:00 e as 19:00;\nAssistência Presencial: 1 (uma) manutenção/ano;\nIntervenções necessárias adicionais: € 150,00.",
+        "maintenancePerYear": 1,
+        "callouts": "Intervenções necessárias adicionais",
+        "remoteSupport": "De Segunda a Sexta entre as 9:00 e as 19:00",
+        "weekendSupport": false,
+        "prices": {
+          "under180km": {
+            "monthly": 30.00,
+            "quarterly": 130.00,
+            "semiannual": 185.00,
+            "annual": 330.00
+          },
+          "over180km": {
+            "monthly": 35.00,
+            "quarterly": 150.00,
+            "semiannual": 215.00,
+            "annual": 390.00
+          }
+        }
+      },
+      {
+        "id": "cpa_professional",
+        "name": "PROFESSIONAL CARE",
+        "description": "Assistência Remota: De Segunda a Sábado entre as 8:00 e as 23:00;\nAssistência Presencial: Sempre que o problema não seja possível de resolver remotamente, no dia útil seguinte;\nSem limite de deslocações.",
+        "maintenancePerYear": 0,
+        "callouts": "Sem limite de deslocações",
+        "remoteSupport": "De Segunda a Sábado entre as 8:00 e as 23:00",
+        "weekendSupport": true,
+        "prices": {
+          "under180km": {
+            "monthly": 60.00,
+            "quarterly": 240.00,
+            "semiannual": 350.00,
+            "annual": 660.00
+          },
+          "over180km": {
+            "monthly": 65.00,
+            "quarterly": 260.00,
+            "semiannual": 380.00,
+            "annual": 720.00
+          }
+        }
+      },
+      {
+        "id": "cpa_premium",
+        "name": "PREMIUM CARE",
+        "description": "Assistência Remota: 24h de Segunda a Domingo;\nAssistência Presencial: Sempre que o problema não seja possível de resolver remotamente;\nSem limite de deslocações.",
+        "maintenancePerYear": 0,
+        "callouts": "Sem limite de deslocações",
+        "remoteSupport": "24 horas por dia, 7 dias por semana",
+        "weekendSupport": true,
+        "weekendCallouts": true,
+        "prices": {
+          "under180km": {
+            "monthly": 75.00,
+            "quarterly": 295.00,
+            "semiannual": 435.00,
+            "annual": 825.00
+          },
+          "over180km": {
+            "monthly": 80.00,
+            "quarterly": 315.00,
+            "semiannual": 465.00,
+            "annual": 885.00
+          }
+        }
+      }
+    ]
+  },
+  "S&H": {
+    "name": "Contratos de Assistência - Software e Hardware",
+    "description": "Contratos de assistência técnica para software e hardware com diferentes níveis de suporte",
+    "plans": [
+      {
+        "id": "sh_simple",
+        "name": "SIMPLE",
+        "description": "Pacote de 10:00/ano\nDuas deslocações/ano - Seg. a Sexta-Feira entre as 9:00 e as 19:00\nAssistência Remota - Seg. a Sexta-Feira entre as 9:00 e as 23:00\nObs: A contabilização do tempo é efetuada por períodos de 15min.",
+        "hoursPerYear": 10,
+        "displacementsIncluded": 2,
+        "remoteSupport": "Segunda a Sexta-Feira entre as 9:00 e as 23:00",
+        "weekendSupport": false,
+        "softwareUpdates": false,
+        "prioritySupport": false,
+        "prices": {
+          "under180km": {
+            "monthly": 30.00,
+            "quarterly": 130.00,
+            "semiannual": 185.00,
+            "annual": 330.00
+          },
+          "over180km": {
+            "monthly": 35.00,
+            "quarterly": 150.00,
+            "semiannual": 215.00,
+            "annual": 390.00
+          }
+        }
+      },
+      {
+        "id": "sh_brass",
+        "name": "BRASS",
+        "description": "Pacote de 10:00/ano\nDuas deslocações/ano - Seg. a Sexta-Feira entre as 9:00 e as 19:00 e aos Sábados entre as 10:00 e as 18:00\nAssistência Remota - Seg. a Sábado entre as 9:00 e as 23:00\nObs: A contabilização do tempo é efetuada por períodos de 15min.",
+        "hoursPerYear": 10,
+        "displacementsIncluded": 2,
+        "remoteSupport": "Segunda a Sábado entre as 9:00 e as 23:00",
+        "weekendSupport": true,
+        "softwareUpdates": false,
+        "prioritySupport": false,
+        "prices": {
+          "under180km": {
+            "monthly": 35.00,
+            "quarterly": 150.00,
+            "semiannual": 215.00,
+            "annual": 385.00
+          },
+          "over180km": {
+            "monthly": 40.00,
+            "quarterly": 170.00,
+            "semiannual": 245.00,
+            "annual": 445.00
+          }
+        }
+      },
+      {
+        "id": "sh_silver",
+        "name": "SILVER",
+        "description": "Pacote de 10:00/ano\nDuas deslocações/ano - Seg. a Sexta-Feira entre as 9:00 e as 19:00 e aos Fins de Semana entre as 10:00 e as 18:00\nAssistência Remota - Seg. a Domingo entre as 9:00 e as 23:00\nObs: A contabilização do tempo é efetuada por períodos de 15min.",
+        "hoursPerYear": 10,
+        "displacementsIncluded": 2,
+        "remoteSupport": "Segunda a Domingo entre as 9:00 e as 23:00",
+        "weekendSupport": true,
+        "softwareUpdates": false,
+        "prioritySupport": false,
+        "prices": {
+          "under180km": {
+            "monthly": 45.00,
+            "quarterly": 185.00,
+            "semiannual": 270.00,
+            "annual": 495.00
+          },
+          "over180km": {
+            "monthly": 50.00,
+            "quarterly": 205.00,
+            "semiannual": 300.00,
+            "annual": 555.00
+          }
+        }
+      },
+      {
+        "id": "sh_gold",
+        "name": "GOLD",
+        "description": "Pacote de 15:00/ano\nTrês deslocações/ano - Seg. a Sexta-Feira entre as 9:00 e as 19:00\nAssistência Remota - Seg. a Sexta-Feira entre as 9:00 e as 23:00\nObs: A contabilização do tempo é efetuada por períodos de 15min.",
+        "hoursPerYear": 15,
+        "displacementsIncluded": 3,
+        "remoteSupport": "Segunda a Sexta-Feira entre as 9:00 e as 23:00",
+        "weekendSupport": false,
+        "softwareUpdates": false,
+        "prioritySupport": false,
+        "prices": {
+          "under180km": {
+            "monthly": 50.00,
+            "quarterly": 205.00,
+            "semiannual": 295.00,
+            "annual": 550.00
+          },
+          "over180km": {
+            "monthly": 55.00,
+            "quarterly": 225.00,
+            "semiannual": 325.00,
+            "annual": 610.00
+          }
+        }
+      },
+      {
+        "id": "sh_diamond",
+        "name": "DIAMOND",
+        "description": "Pacote de 15:00/ano\nTrês deslocações/ano - Seg. a Sexta-Feira entre as 9:00 e as 19:00 e aos Sábados entre as 10:00 e as 18:00\nAssistência Remota - Seg. a Sábado entre as 9:00 e as 23:00\nObs: A contabilização do tempo é efetuada por períodos de 15min.",
+        "hoursPerYear": 15,
+        "displacementsIncluded": 3,
+        "remoteSupport": "Segunda a Sábado entre as 9:00 e as 23:00",
+        "weekendSupport": true,
+        "softwareUpdates": false,
+        "prioritySupport": false,
+        "prices": {
+          "under180km": {
+            "monthly": 55.00,
+            "quarterly": 220.00,
+            "semiannual": 325.00,
+            "annual": 605.00
+          },
+          "over180km": {
+            "monthly": 60.00,
+            "quarterly": 240.00,
+            "semiannual": 355.00,
+            "annual": 665.00
+          }
+        }
+      },
+      {
+        "id": "sh_platinum",
+        "name": "PLATINUM",
+        "description": "Pacote de 15:00/ano\nTrês deslocações/ano - Seg. a Sexta-Feira entre as 9:00 e as 19:00 e aos Fins de Semana entre as 10:00 e as 18:00\nAssistência Remota - Seg. a Domingo entre as 9:00 e as 23:00\nObs: A contabilização do tempo é efetuada por períodos de 15min.",
+        "hoursPerYear": 15,
+        "displacementsIncluded": 3,
+        "remoteSupport": "Segunda a Domingo entre as 9:00 e as 23:00",
+        "weekendSupport": true,
+        "softwareUpdates": false,
+        "prioritySupport": false,
+        "prices": {
+          "under180km": {
+            "monthly": 65.00,
+            "quarterly": 260.00,
+            "semiannual": 380.00,
+            "annual": 715.00
+          },
+          "over180km": {
+            "monthly": 70.00,
+            "quarterly": 280.00,
+            "semiannual": 410.00,
+            "annual": 775.00
+          }
+        }
+      }
+    ]
+  }
+}

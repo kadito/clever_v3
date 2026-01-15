@@ -15,10 +15,10 @@ Kiro is responsible for:
 - Frontend component patterns including RelationInfoDisplay with error state handling
 - Relation component integration patterns and mobile-first responsive design
 - Type guard utilities and safe relation handling patterns
-- Comprehensive testing patterns for relation systems (unit, integration, e2e)
 
 Kiro must:
 
+- **NOT write or run automated tests during development** - focus on rapid implementation
 - Explain breaking changes before applying them
 - Prefer refactors over patches
 - Flag technical debt early

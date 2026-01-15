@@ -165,6 +165,11 @@ export {
   type RelationFieldConfig
 } from './relation-validation.js';
 
+// Re-export content type modules
+export * from './types/clients';
+export * from './types/licenses';
+export * from './types/contracts';
+
 // Re-export generic content validation utilities
 export {
   validateGenericContentCreation,

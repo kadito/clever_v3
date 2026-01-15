@@ -57,7 +57,7 @@ const generateContentRoutes = (): RouteRecordRaw[] => {
       .join('');
 
     // Check if specific components exist, otherwise fall back to generic
-    const hasSpecificComponents = contentType === 'clients' || contentType === 'licenses'; // Clients and licenses have specific components
+    const hasSpecificComponents = contentType === 'clients' || contentType === 'licenses' || contentType === 'contracts'; // Clients, licenses, and contracts have specific components
 
     if (hasSpecificComponents) {
       // Use specific components for implemented content types

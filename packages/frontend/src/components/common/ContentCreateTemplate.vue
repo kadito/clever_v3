@@ -86,14 +86,19 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
 
 // Event handlers
 const handleCreate = (data: Record<string, any>) => {
+  console.log('ContentCreateTemplate handleCreate called');
+  console.log('Data received:', JSON.stringify(data, null, 2));
+  console.log('Emitting create event');
   emit('create', data);
 };
 
 const handleCancel = () => {
+  console.log('ContentCreateTemplate handleCancel called');
   emit('cancel');
 };
 
 const clearError = () => {
+  console.log('ContentCreateTemplate clearError called');
   emit('clearError');
 };
 </script>

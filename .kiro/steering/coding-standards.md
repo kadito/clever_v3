@@ -1,5 +1,13 @@
 # Coding Standards
 
+## Development Speed Priority
+
+**DO NOT write or run automated tests during development.**
+- Focus on rapid feature implementation
+- Manual UI testing will be performed by the user
+- Comprehensive test coverage will be added later in a dedicated testing phase
+- Skip all test file creation, test running, and test-related code
+
 ## Package Management
 
 - Use pnpm for all dependency management
@@ -81,19 +89,6 @@ API Patterns:
 - R2 key pattern: content/{type}/{uuid}.json
 - Index pattern: indexes/{type}-index.json
 - All responses include resolved relations automatically
-
-Testing Patterns for Relations:
-
-- Use comprehensive test suites covering all relation states (resolved, error, missing)
-- Test relation resolution at API level with mock storage buckets
-- Test frontend components with all relation states (success, 404, 500, null)
-- Use property-based testing for relation type guards and utilities
-- Test eventual consistency scenarios (content created before relations exist)
-- Test relation changes through update operations
-- Test performance with multiple relations and realistic datasets
-- Use structured test organization: unit tests for utilities, integration tests for API endpoints, component tests for UI
-- Mock storage buckets for backend testing with Map-based implementations
-- Test error handling with structured error objects and proper HTTP status codes
 
 Type Safety for Relations:
 

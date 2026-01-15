@@ -30,6 +30,7 @@
               form="content-form"
               :disabled="!isFormValidSimple || isSaving"
               class="btn-primary text-sm"
+              @click="console.log('Desktop submit button clicked, disabled:', !isFormValidSimple || isSaving)"
             >
               <svg
                 v-if="isSaving"
@@ -79,12 +80,34 @@
       </div>
     </div>
 
+    <!-- Validation errors summary -->
+    <div v-else-if="Object.keys(validationErrors).length > 0 && hasValidated" class="p-4 sm:p-6 pt-0">
+      <div class="max-w-4xl mx-auto">
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div class="flex">
+            <svg class="w-5 h-5 text-red-400 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div class="flex-1">
+              <h3 class="text-sm font-medium text-red-800 mb-2">Por favor corrija os seguintes erros:</h3>
+              <ul class="text-sm text-red-700 list-disc list-inside space-y-1">
+                <li v-for="(errorMsg, field) in validationErrors" :key="field">
+                  {{ errorMsg }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Form content -->
     <main v-else class="p-4 sm:p-6 pb-24">
       <div class="max-w-4xl mx-auto">
         <form
           id="content-form"
           @submit.prevent="handleSubmit()"
+          @submit="console.log('Form submit event fired')"
           class="space-y-6"
           novalidate
         >
@@ -292,7 +315,7 @@
 
                           <!-- Generic custom field slot -->
                           <slot
-                            v-else
+                            v-else-if="formData && field.type === 'custom'"
                             :name="`field-${field.key}`"
                             :field="field"
                             :value="formData[field.key]"
@@ -451,13 +474,17 @@ initializeFormData();
 const isFormValidSimple = computed(() => {
   // Ensure formData is available
   if (!formData.value) {
+    console.log('isFormValidSimple: formData not available');
     return false;
   }
   
   const currentFormData = formData.value;
+  console.log('isFormValidSimple: checking form validity');
+  console.log('Current form data:', JSON.stringify(currentFormData, null, 2));
   
   // Check validation errors first
   if (Object.keys(validationErrors).length > 0) {
+    console.log('isFormValidSimple: has validation errors:', JSON.stringify(validationErrors, null, 2));
     return false;
   }
   
@@ -468,13 +495,17 @@ const isFormValidSimple = computed(() => {
         const value = currentFormData[field.key];
         const isEmpty = !value || (typeof value === 'string' && value.trim() === '');
         
+        console.log(`isFormValidSimple: checking required field ${field.key}:`, value, 'isEmpty:', isEmpty);
+        
         if (isEmpty) {
+          console.log(`isFormValidSimple: field ${field.key} is empty, form invalid`);
           return false;
         }
       }
     }
   }
   
+  console.log('isFormValidSimple: form is valid');
   return true;
 });
 
@@ -612,15 +643,22 @@ const findField = (fieldKey: string): FormField | undefined => {
 
 // Event handlers
 const handleSubmit = () => {
+  console.log('ContentFormTemplate handleSubmit called');
   const currentFormData = getFormData();
+  console.log('Current form data:', JSON.stringify(currentFormData, null, 2));
   
   if (props.validateOnSubmit) {
+    console.log('Validating form...');
     const isValid = validateForm();
+    console.log('Form validation result:', isValid);
+    console.log('Validation errors:', JSON.stringify(validationErrors, null, 2));
     if (!isValid) {
+      console.log('Form validation failed, not submitting');
       return;
     }
   }
   
+  console.log('Emitting submit event with data');
   emit('submit', { ...currentFormData });
 };
 

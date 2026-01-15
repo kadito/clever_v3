@@ -152,52 +152,52 @@ This implementation plan establishes the foundational pattern for all content ty
 
 ## Phase 2: Content Type Implementation (Repeat for Each)  
 
-### Process for Each Content Type (Licenças Implementation)
+### Process for Each Content Type (Contratos Implementation)
 
-- [x] 6. Analyze legacy components for licenças
-- [x] 6.1 Analyze old_src Detail view for licenças
-  - Read old_src/views/licencas/LicencasDetail.vue
+- [x] 6. Analyze legacy components for contratos
+- [x] 6.1 Analyze old_src Detail view for contratos
+  - Read old_src/views/contratos/ContratoDetail.vue
   - Extract data structure and display fields
   - Identify conditional logic and business rules
   - Document field relationships and formatting
   - _Requirements: 7.1, 7.2_
 
-- [x] 6.2 Analyze old_src Form view for licenças
-  - Read old_src/views/licencas/LicencasForm.vue
+- [x] 6.2 Analyze old_src Form view for contratos
+  - Read old_src/views/contratos/ContratoForm.vue
   - Extract form fields and input types
   - Identify validation rules and required fields
   - Document form sections and conditional fields
   - _Requirements: 7.1, 7.2_
 
-- [x] 6.3 Create TypeScript interfaces for licenças
+- [x] 6.3 Create TypeScript interfaces for contratos
   - Extend BaseContent interface with content-specific data structure
   - Create validation schemas based on form analysis
   - Optimize data structure for new system (clean, modern design)
   - _Requirements: 7.3, 7.4, 7.5_
 
-- [ ] 7. Implement backend for licenças
-- [x] 7.1 Create licenses.ts route file
+- [-] 7. Implement backend for contratos
+- [x] 7.1 Create contracts.ts route file
   - Implement all CRUD endpoints using the generic pattern
   - Add content-specific validation logic
-  - Configure content-specific sorting (by date for licenses)
+  - Configure content-specific sorting (by date for contracts)
   - Implement search index with content-specific searchable fields
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6_
 
-- [ ]* 7.2 Write property tests for licenças API
+- [ ]* 7.2 Write property tests for contratos API
   - **Property 15: Authentication Requirement**
   - **Property 16: Audit Trail User Recording**
   - **Property 7: Index-Storage Synchronization**
   - **Validates: Requirements 8.2, 8.3, 8.4, 10.1, 10.2**
 
-- [ ] 8. Implement frontend for licenças
-- [x] 8.1 Create LicensesListView.vue component
+- [x] 8. Implement frontend for contratos
+- [ ] 8.1 Create ContractsListView.vue component
   - Implement content-specific display functions (getDisplayTitle, getDisplayMeta1, etc.)
   - Configure Portuguese labels for the content type
   - Add content-specific search and filter logic
   - Use mobile-first card layout with touch targets
   - _Requirements: 9.1, 9.2, 12.2, 12.3_
 
-- [x] 8.2 Create LicensesDetailView.vue component
+- [x] 8.2 Create ContractsDetailView.vue component
   - Use ContentDetailTemplate with enhanced audit trail display
   - Implement content-specific sections based on legacy analysis
   - Add content-specific field displays and formatting
@@ -206,7 +206,7 @@ This implementation plan establishes the foundational pattern for all content ty
   - Display user email addresses in audit trail instead of user IDs
   - _Requirements: 9.3, 12.1, 12.4_
 
-- [x] 8.3 Create LicensesCreateView.vue component
+- [x] 8.3 Create ContractsCreateView.vue component
   - Use ContentCreateTemplate wrapper with ContentFormTemplate for rendering
   - Implement content-specific form sections for creation
   - Add creation-specific validation rules using shared validation functions
@@ -214,45 +214,43 @@ This implementation plan establishes the foundational pattern for all content ty
   - Include Portuguese validation messages and labels
   - Handle form data persistence across component recreation
   - Implement multiselect dropdowns and conditional fields
-  - Add dynamic software management with custom field templates
-  - Add dynamic invoice management with custom field templates
+  - Add dynamic configuration management for contract-specific items
   - _Requirements: 9.4, 11.1, 12.1, 12.5, 17.1, 18.1, 19.1_
 
-- [x] 8.4 Create LicensesUpdateView.vue component
+- [x] 8.4 Create ContractsUpdateView.vue component
   - Use ContentFormTemplate for rendering
   - Implement content-specific form sections for editing
   - Add update-specific validation rules and disabled fields
   - Handle pre-population of existing data
   - Include Portuguese validation messages and labels
   - Support multiselect dropdowns and conditional fields
-  - Support dynamic software management in edit mode with custom field templates
-  - Support dynamic invoice management in edit mode with custom field templates
+  - Support dynamic configuration management in edit mode
   - _Requirements: 9.4, 11.1, 12.1, 12.5, 18.1, 19.1_
 
-- [ ]* 8.5 Write property tests for licenças components
+- [ ]* 8.5 Write property tests for contratos components
   - **Property 17: Error Component Display**
   - **Property 18: Authentication Redirect**
   - **Property 19: Portuguese UI Language**
   - **Property 20: Portuguese Locale Formatting**
   - **Validates: Requirements 11.2, 11.3, 12.1-12.4**
 
-- [ ] 9. Integration and routing for licenças
-- [x] 9.1 Add licenses routes to Vue Router
+- [x] 9. Integration and routing for contratos
+- [x] 9.1 Add contracts routes to Vue Router
   - Configure 5-view pattern routes (List, Detail, Create, Update)
   - Add navigation integration
   - Update dashboard tiles for content type
   - _Requirements: 5.1, 9.5_
 
-- [x] 9.2 Test end-to-end functionality for licenças
+- [x] 9.2 Test end-to-end functionality for contratos
   - Verify complete CRUD workflows
   - Test mobile responsiveness across breakpoints
   - Validate Portuguese localization
   - Test authentication and error handling
   - Test multiselect dropdowns and conditional fields
-  - Test dynamic software management
+  - Test dynamic configuration management
   - _Requirements: 11.3, 11.4, 13.5, 17.1, 18.1, 19.1_
 
-- [ ]* 9.3 Write integration tests for licenças
+- [ ]* 9.3 Write integration tests for contratos
   - Test complete user workflows
   - Verify mobile touch interactions
   - Test loading states and performance
@@ -260,14 +258,14 @@ This implementation plan establishes the foundational pattern for all content ty
   - **Property 23: Loading State Provision**
   - **Validates: Requirements 13.4, 13.5**
 
-- [x] 10. Checkpoint for licenças
-- ✅ All licenças functionality works correctly
-- ✅ All builds pass (shared, backend, frontend packages)
-- ✅ TypeScript compilation successful across all packages
-- ✅ Vue Router updated with licenses routes
-- ✅ Mobile-first responsive design implemented
-- ✅ Portuguese localization in place
-- ✅ Following established patterns from clients implementation
+- [x] 10. Checkpoint for contratos
+- Ensure all contratos functionality works correctly
+- Verify all builds pass (shared, backend, frontend packages)
+- Confirm TypeScript compilation successful across all packages
+- Validate Vue Router updated with contracts routes
+- Test mobile-first responsive design implementation
+- Verify Portuguese localization in place
+- Confirm following established patterns from previous implementations
 
 ## Implementation Order
 

@@ -4,6 +4,7 @@ import { requireAuth, getUserContext, requireUserContext, extractJwtToken, verif
 import { createContentRoutes, createStandardContentConfig, contentErrorHandler } from './content-route-template';
 import clientsRouter from './clients';
 import licensesRouter from './licenses';
+import contractsRouter from './contracts';
 import type { AppContext } from '../types/auth';
 import type {
   BaseContent,
@@ -112,18 +113,10 @@ api.route('/content/clients', clientsRouter);
 // Licenses route with date-based sorting and custom validation
 api.route('/content/licenses', licensesRouter);
 
-// Generic routes for other content types using standard configuration with relation validation
-const contractsConfig = createStandardContentConfig('contracts', 'date-desc');
-contractsConfig.validateCreate = (data: any) => {
-  const errors = validateContractCreation(data.data || data);
-  if (errors.length > 0) throw new Error(errors[0]);
-};
-contractsConfig.validateUpdate = (data: any) => {
-  const errors = validateContractUpdate(data.data || data);
-  if (errors.length > 0) throw new Error(errors[0]);
-};
-const contractsRouter = createContentRoutes<BaseContent>(contractsConfig);
+// Contracts route with date-based sorting and custom validation
 api.route('/content/contracts', contractsRouter);
+
+// Generic routes for other content types using standard configuration with relation validation
 
 const workSheetsConfig = createStandardContentConfig('work-sheets', 'date-desc');
 workSheetsConfig.validateCreate = (data: any) => {
