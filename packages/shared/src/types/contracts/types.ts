@@ -25,7 +25,6 @@ export interface ContractData {
   hasCPAContract: boolean;
   cpaContractType: 'CPA' | 'CPA_1500' | ''; // CPA (2023) or CPA_1500
   planIdCPA: string;
-  planoCPA: string; // Plan description
   distanceCPA: 'under180km' | 'over180km' | ''; // Required for CPA (2023), not for CPA_1500
   modalidadePagamentoCPA: 'MENSAL' | 'TRIMESTRAL' | 'SEMESTRAL' | 'ANUAL' | '';
   hasPOSPackage: boolean; // Optional POS assistance package for CPA_1500 PREMIUM
@@ -37,10 +36,14 @@ export interface ContractData {
   inicioContratoCPA: string; // ISO date string
   fimContratoCPA: string; // ISO date string
 
+  // CPA Service Details
+  horasAssistenciaAnualCPA: number;
+  deslocacoesPorAnoCPA: number;
+  manutencoesPorAnoCPA: number;
+
   // S&H Contract Information
   hasSHContract: boolean;
   planIdSH: string;
-  planoSH: string; // Plan description
   distanceSH: 'under180km' | 'over180km' | '';
   modalidadePagamentoSH: 'MENSAL' | 'TRIMESTRAL' | 'SEMESTRAL' | 'ANUAL' | '';
   
@@ -57,10 +60,10 @@ export interface ContractData {
   inicioContratoSH: string; // ISO date string
   fimContratoSH: string; // ISO date string
 
-  // Service Details
-  horasAssistenciaAnual: number;
-  deslocacoesPorAno: number;
-  manutencoesPorAno: number;
+  // S&H Service Details
+  horasAssistenciaAnualSH: number;
+  deslocacoesPorAnoSH: number;
+  manutencoesPorAnoSH: number;
 
   // Payment Method
   metodoPagamento: 'TRANSFERENCIA_BANCARIA' | 'DEBITO_DIRETO' | 'MULTIBANCO' | 'CHEQUE' | 'NUMERARIO' | 'MB_WAY' | '';

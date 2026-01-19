@@ -248,26 +248,64 @@
         </div>
       </div>
 
-      <!-- Service Details Section -->
-      <div class="detail-section">
+      <!-- CPA Service Details Section -->
+      <div v-if="contract?.data.hasCPAContract" class="detail-section">
         <div class="bg-white rounded-touch border border-gray-200">
           <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-            <h2 class="text-lg font-semibold text-gray-900">Detalhes do Serviço</h2>
+            <h2 class="text-lg font-semibold text-gray-900">Detalhes do Serviço CPA</h2>
           </div>
           <div class="p-4 sm:p-6">
             <div class="detail-grid">
               <div class="detail-item">
                 <label class="detail-label">Horas de Assistência Anual</label>
-                <div class="detail-value">{{ contract?.data.horasAssistenciaAnual || 0 }} horas</div>
+                <div class="detail-value">{{ contract?.data.horasAssistenciaAnualCPA || contract?.data.horasAssistenciaAnual || 0 }} horas</div>
               </div>
               <div class="detail-item">
                 <label class="detail-label">Deslocações por Ano</label>
-                <div class="detail-value">{{ contract?.data.deslocacoesPorAno || 0 }}</div>
+                <div class="detail-value">{{ contract?.data.deslocacoesPorAnoCPA || contract?.data.deslocacoesPorAno || 0 }}</div>
               </div>
               <div class="detail-item">
                 <label class="detail-label">Manutenções por Ano</label>
-                <div class="detail-value">{{ contract?.data.manutencoesPorAno || 0 }}</div>
+                <div class="detail-value">{{ contract?.data.manutencoesPorAnoCPA || contract?.data.manutencoesPorAno || 0 }}</div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S&H Service Details Section -->
+      <div v-if="contract?.data.hasSHContract" class="detail-section">
+        <div class="bg-white rounded-touch border border-gray-200">
+          <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <h2 class="text-lg font-semibold text-gray-900">Detalhes do Serviço S&H</h2>
+          </div>
+          <div class="p-4 sm:p-6">
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label class="detail-label">Horas de Assistência Anual</label>
+                <div class="detail-value">{{ contract?.data.horasAssistenciaAnualSH || contract?.data.horasAssistenciaAnual || 0 }} horas</div>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Deslocações por Ano</label>
+                <div class="detail-value">{{ contract?.data.deslocacoesPorAnoSH || contract?.data.deslocacoesPorAno || 0 }}</div>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Manutenções por Ano</label>
+                <div class="detail-value">{{ contract?.data.manutencoesPorAnoSH || contract?.data.manutencoesPorAno || 0 }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Method Section -->
+      <div class="detail-section">
+        <div class="bg-white rounded-touch border border-gray-200">
+          <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <h2 class="text-lg font-semibold text-gray-900">Método de Pagamento</h2>
+          </div>
+          <div class="p-4 sm:p-6">
+            <div class="detail-grid">
               <div v-if="contract?.data.metodoPagamento" class="detail-item">
                 <label class="detail-label">Método de Pagamento</label>
                 <div class="detail-value">{{ formatPaymentMethod(contract.data.metodoPagamento) }}</div>

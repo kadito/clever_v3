@@ -90,21 +90,22 @@ function validateContractCreate(requestData: any): void {
     hasSHContract: contractData.hasSHContract || false,
     cpaContractType: contractData.cpaContractType || '',
     planIdCPA: contractData.planIdCPA || '',
-    planoCPA: contractData.planoCPA || '',
     distanceCPA: contractData.distanceCPA || '',
     modalidadePagamentoCPA: contractData.modalidadePagamentoCPA || '',
     hasPOSPackage: contractData.hasPOSPackage || false,
     inicioContratoCPA: contractData.inicioContratoCPA || '',
     fimContratoCPA: contractData.fimContratoCPA || '',
+    horasAssistenciaAnualCPA: contractData.horasAssistenciaAnualCPA || 0,
+    deslocacoesPorAnoCPA: contractData.deslocacoesPorAnoCPA || 0,
+    manutencoesPorAnoCPA: contractData.manutencoesPorAnoCPA || 0,
     planIdSH: contractData.planIdSH || '',
-    planoSH: contractData.planoSH || '',
     distanceSH: contractData.distanceSH || '',
     modalidadePagamentoSH: contractData.modalidadePagamentoSH || '',
     inicioContratoSH: contractData.inicioContratoSH || '',
     fimContratoSH: contractData.fimContratoSH || '',
-    horasAssistenciaAnual: contractData.horasAssistenciaAnual || 0,
-    deslocacoesPorAno: contractData.deslocacoesPorAno || 0,
-    manutencoesPorAno: contractData.manutencoesPorAno || 0,
+    horasAssistenciaAnualSH: contractData.horasAssistenciaAnualSH || 0,
+    deslocacoesPorAnoSH: contractData.deslocacoesPorAnoSH || 0,
+    manutencoesPorAnoSH: contractData.manutencoesPorAnoSH || 0,
     metodoPagamento: contractData.metodoPagamento || '',
     cpaEquipments: contractData.cpaEquipments || [],
     shEquipments: contractData.shEquipments || []
@@ -141,21 +142,22 @@ function validateContractUpdateData(requestData: any, existingContent?: Contract
     hasSHContract: contractData.hasSHContract || false,
     cpaContractType: contractData.cpaContractType || '',
     planIdCPA: contractData.planIdCPA || '',
-    planoCPA: contractData.planoCPA || '',
     distanceCPA: contractData.distanceCPA || '',
     modalidadePagamentoCPA: contractData.modalidadePagamentoCPA || '',
     hasPOSPackage: contractData.hasPOSPackage || false,
     inicioContratoCPA: contractData.inicioContratoCPA || '',
     fimContratoCPA: contractData.fimContratoCPA || '',
+    horasAssistenciaAnualCPA: contractData.horasAssistenciaAnualCPA || 0,
+    deslocacoesPorAnoCPA: contractData.deslocacoesPorAnoCPA || 0,
+    manutencoesPorAnoCPA: contractData.manutencoesPorAnoCPA || 0,
     planIdSH: contractData.planIdSH || '',
-    planoSH: contractData.planoSH || '',
     distanceSH: contractData.distanceSH || '',
     modalidadePagamentoSH: contractData.modalidadePagamentoSH || '',
     inicioContratoSH: contractData.inicioContratoSH || '',
     fimContratoSH: contractData.fimContratoSH || '',
-    horasAssistenciaAnual: contractData.horasAssistenciaAnual || 0,
-    deslocacoesPorAno: contractData.deslocacoesPorAno || 0,
-    manutencoesPorAno: contractData.manutencoesPorAno || 0,
+    horasAssistenciaAnualSH: contractData.horasAssistenciaAnualSH || 0,
+    deslocacoesPorAnoSH: contractData.deslocacoesPorAnoSH || 0,
+    manutencoesPorAnoSH: contractData.manutencoesPorAnoSH || 0,
     metodoPagamento: contractData.metodoPagamento || '',
     cpaEquipments: contractData.cpaEquipments || [],
     shEquipments: contractData.shEquipments || []
@@ -185,7 +187,6 @@ function createContractSearchText(data: ContractData): string {
     searchTerms.push('cpa');
     if (data.cpaContractType) searchTerms.push(data.cpaContractType.toLowerCase());
     if (data.planIdCPA) searchTerms.push(data.planIdCPA.toLowerCase());
-    if (data.planoCPA) searchTerms.push(data.planoCPA.toLowerCase());
     if (data.modalidadePagamentoCPA) searchTerms.push(data.modalidadePagamentoCPA.toLowerCase());
     if (data.distanceCPA) searchTerms.push(data.distanceCPA.toLowerCase());
   }
@@ -193,7 +194,6 @@ function createContractSearchText(data: ContractData): string {
   if (data.hasSHContract) {
     searchTerms.push('s&h', 'sh');
     if (data.planIdSH) searchTerms.push(data.planIdSH.toLowerCase());
-    if (data.planoSH) searchTerms.push(data.planoSH.toLowerCase());
     if (data.modalidadePagamentoSH) searchTerms.push(data.modalidadePagamentoSH.toLowerCase());
     if (data.distanceSH) searchTerms.push(data.distanceSH.toLowerCase());
   }
@@ -255,7 +255,6 @@ contractConfig.extractIndexFields = (content: Contract) => {
     // CPA Contract information
     cpaContractType: data.cpaContractType || '',
     planIdCPA: data.planIdCPA || '',
-    planoCPA: data.planoCPA || '',
     modalidadePagamentoCPA: data.modalidadePagamentoCPA || '',
     distanceCPA: data.distanceCPA || '',
     inicioContratoCPA: data.inicioContratoCPA || '',
@@ -263,7 +262,6 @@ contractConfig.extractIndexFields = (content: Contract) => {
     
     // S&H Contract information
     planIdSH: data.planIdSH || '',
-    planoSH: data.planoSH || '',
     modalidadePagamentoSH: data.modalidadePagamentoSH || '',
     distanceSH: data.distanceSH || '',
     inicioContratoSH: data.inicioContratoSH || '',
@@ -276,10 +274,13 @@ contractConfig.extractIndexFields = (content: Contract) => {
     shEquipmentSerials: data.shEquipments?.map(e => e.numeroSerie).filter(Boolean) || [],
     equipmentCount: (data.cpaEquipments?.length || 0) + (data.shEquipments?.length || 0),
     
-    // Service details
-    horasAssistenciaAnual: data.horasAssistenciaAnual || 0,
-    deslocacoesPorAno: data.deslocacoesPorAno || 0,
-    manutencoesPorAno: data.manutencoesPorAno || 0,
+    // Service details - handle both old and new field names for backward compatibility
+    horasAssistenciaAnualCPA: data.horasAssistenciaAnualCPA || 0,
+    deslocacoesPorAnoCPA: data.deslocacoesPorAnoCPA || 0,
+    manutencoesPorAnoCPA: data.manutencoesPorAnoCPA || 0,
+    horasAssistenciaAnualSH: data.horasAssistenciaAnualSH || 0,
+    deslocacoesPorAnoSH: data.deslocacoesPorAnoSH || 0,
+    manutencoesPorAnoSH: data.manutencoesPorAnoSH || 0,
     
     // Payment information
     metodoPagamento: data.metodoPagamento || '',

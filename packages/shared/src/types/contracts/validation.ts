@@ -139,16 +139,32 @@ export function validateContractCreation(data: ContractCreationData): string[] {
   }
 
   // Service details validation
-  if (typeof data.horasAssistenciaAnual !== 'number' || data.horasAssistenciaAnual < 0) {
-    errors.push('As horas de assistência anual devem ser um número positivo');
+  if (data.hasCPAContract) {
+    if (typeof data.horasAssistenciaAnualCPA !== 'number' || data.horasAssistenciaAnualCPA < 0) {
+      errors.push('As horas de assistência anual CPA devem ser um número positivo');
+    }
+
+    if (typeof data.deslocacoesPorAnoCPA !== 'number' || data.deslocacoesPorAnoCPA < 0) {
+      errors.push('As deslocações por ano CPA devem ser um número positivo');
+    }
+
+    if (typeof data.manutencoesPorAnoCPA !== 'number' || data.manutencoesPorAnoCPA < 0) {
+      errors.push('As manutenções por ano CPA devem ser um número positivo');
+    }
   }
 
-  if (typeof data.deslocacoesPorAno !== 'number' || data.deslocacoesPorAno < 0) {
-    errors.push('As deslocações por ano devem ser um número positivo');
-  }
+  if (data.hasSHContract) {
+    if (typeof data.horasAssistenciaAnualSH !== 'number' || data.horasAssistenciaAnualSH < 0) {
+      errors.push('As horas de assistência anual S&H devem ser um número positivo');
+    }
 
-  if (typeof data.manutencoesPorAno !== 'number' || data.manutencoesPorAno < 0) {
-    errors.push('As manutenções por ano devem ser um número positivo');
+    if (typeof data.deslocacoesPorAnoSH !== 'number' || data.deslocacoesPorAnoSH < 0) {
+      errors.push('As deslocações por ano S&H devem ser um número positivo');
+    }
+
+    if (typeof data.manutencoesPorAnoSH !== 'number' || data.manutencoesPorAnoSH < 0) {
+      errors.push('As manutenções por ano S&H devem ser um número positivo');
+    }
   }
 
   // Payment method validation (required if any contract is configured)
@@ -266,21 +282,43 @@ export function validateContractUpdate(data: ContractUpdateData): string[] {
   }
 
   // Service details validation (if provided)
-  if (data.horasAssistenciaAnual !== undefined) {
-    if (typeof data.horasAssistenciaAnual !== 'number' || data.horasAssistenciaAnual < 0) {
-      errors.push('Horas de assistência anual deve ser um número positivo');
+  if (data.hasCPAContract) {
+    if (data.horasAssistenciaAnualCPA !== undefined) {
+      if (typeof data.horasAssistenciaAnualCPA !== 'number' || data.horasAssistenciaAnualCPA < 0) {
+        errors.push('Horas de assistência anual CPA deve ser um número positivo');
+      }
+    }
+
+    if (data.deslocacoesPorAnoCPA !== undefined) {
+      if (typeof data.deslocacoesPorAnoCPA !== 'number' || data.deslocacoesPorAnoCPA < 0) {
+        errors.push('Deslocações por ano CPA deve ser um número positivo');
+      }
+    }
+
+    if (data.manutencoesPorAnoCPA !== undefined) {
+      if (typeof data.manutencoesPorAnoCPA !== 'number' || data.manutencoesPorAnoCPA < 0) {
+        errors.push('Manutenções por ano CPA deve ser um número positivo');
+      }
     }
   }
 
-  if (data.deslocacoesPorAno !== undefined) {
-    if (typeof data.deslocacoesPorAno !== 'number' || data.deslocacoesPorAno < 0) {
-      errors.push('Deslocações por ano deve ser um número positivo');
+  if (data.hasSHContract) {
+    if (data.horasAssistenciaAnualSH !== undefined) {
+      if (typeof data.horasAssistenciaAnualSH !== 'number' || data.horasAssistenciaAnualSH < 0) {
+        errors.push('Horas de assistência anual S&H deve ser um número positivo');
+      }
     }
-  }
 
-  if (data.manutencoesPorAno !== undefined) {
-    if (typeof data.manutencoesPorAno !== 'number' || data.manutencoesPorAno < 0) {
-      errors.push('Manutenções por ano deve ser um número positivo');
+    if (data.deslocacoesPorAnoSH !== undefined) {
+      if (typeof data.deslocacoesPorAnoSH !== 'number' || data.deslocacoesPorAnoSH < 0) {
+        errors.push('Deslocações por ano S&H deve ser um número positivo');
+      }
+    }
+
+    if (data.manutencoesPorAnoSH !== undefined) {
+      if (typeof data.manutencoesPorAnoSH !== 'number' || data.manutencoesPorAnoSH < 0) {
+        errors.push('Manutenções por ano S&H deve ser um número positivo');
+      }
     }
   }
 
