@@ -448,18 +448,101 @@ const initializeSHData = () => {
 
 // Plan selection handlers with loading states
 const handleCPAPlanSelection = async (planId: string) => {
+  console.log('CPA Plan Selection Handler called with planId:', planId);
+  console.log('Current formData.value:', JSON.stringify(formData.value, null, 2));
+  
   updateFieldValue('planIdCPA', planId);
   
   if (planId && formData.value?.cpaContractType) {
+    console.log('Loading CPA plan details for:', planId, formData.value.cpaContractType);
     await loadCPAPlanDetails(planId, formData.value.cpaContractType);
+    
+    // Auto-populate service details from plan data
+    const planDetails = getPlanDetails(formData.value.cpaContractType as ContractType, planId);
+    console.log('Retrieved CPA plan details:', JSON.stringify(planDetails, null, 2));
+    
+    if (planDetails) {
+      // Set maintenance per year (CPA plans have this field)
+      if (planDetails.maintenancePerYear !== undefined) {
+        console.log('Setting manutencoesPorAnoCPA to:', planDetails.maintenancePerYear);
+        updateFieldValue('manutencoesPorAnoCPA', planDetails.maintenancePerYear);
+      }
+      
+      // Set displacements per year (try to extract number from callouts if it's a number)
+      if (planDetails.callouts !== undefined) {
+        if (typeof planDetails.callouts === 'number') {
+          console.log('Setting deslocacoesPorAnoCPA to:', planDetails.callouts);
+          updateFieldValue('deslocacoesPorAnoCPA', planDetails.callouts);
+        } else if (typeof planDetails.callouts === 'string') {
+          // Try to extract number from string like "1 deslocação" or "2 deslocações"
+          const match = planDetails.callouts.match(/(\d+)/);
+          if (match) {
+            const value = parseInt(match[1]);
+            console.log('Setting deslocacoesPorAnoCPA to (from string):', value);
+            updateFieldValue('deslocacoesPorAnoCPA', value);
+          } else {
+            // If no number found, set to 0 (unlimited or special case)
+            console.log('Setting deslocacoesPorAnoCPA to 0 (no number found in string)');
+            updateFieldValue('deslocacoesPorAnoCPA', 0);
+          }
+        }
+      }
+      
+      // CPA plans don't typically have hours, so set to 0
+      console.log('Setting horasAssistenciaAnualCPA to 0');
+      updateFieldValue('horasAssistenciaAnualCPA', 0);
+      
+      console.log('Updated formData after CPA plan selection:', JSON.stringify(formData.value, null, 2));
+    }
   }
 };
 
 const handleSHPlanSelection = async (planId: string) => {
+  console.log('S&H Plan Selection Handler called with planId:', planId);
+  console.log('Current formData.value:', JSON.stringify(formData.value, null, 2));
+  
   updateFieldValue('planIdSH', planId);
   
   if (planId) {
+    console.log('Loading S&H plan details for:', planId);
     await loadSHPlanDetails(planId);
+    
+    // Auto-populate service details from plan data
+    const planDetails = getPlanDetails('S&H', planId);
+    console.log('Retrieved S&H plan details:', JSON.stringify(planDetails, null, 2));
+    
+    if (planDetails) {
+      // Set hours per year (S&H plans have this field)
+      if (planDetails.hoursPerYear !== undefined) {
+        console.log('Setting horasAssistenciaAnualSH to:', planDetails.hoursPerYear);
+        updateFieldValue('horasAssistenciaAnualSH', planDetails.hoursPerYear);
+      }
+      
+      // Set displacements per year (S&H plans have displacementsIncluded)
+      if (planDetails.displacementsIncluded !== undefined) {
+        if (typeof planDetails.displacementsIncluded === 'number') {
+          console.log('Setting deslocacoesPorAnoSH to:', planDetails.displacementsIncluded);
+          updateFieldValue('deslocacoesPorAnoSH', planDetails.displacementsIncluded);
+        } else if (typeof planDetails.displacementsIncluded === 'string') {
+          // Try to extract number from string
+          const match = planDetails.displacementsIncluded.match(/(\d+)/);
+          if (match) {
+            const value = parseInt(match[1]);
+            console.log('Setting deslocacoesPorAnoSH to (from string):', value);
+            updateFieldValue('deslocacoesPorAnoSH', value);
+          } else {
+            console.log('Setting deslocacoesPorAnoSH to 0 (no number found in string)');
+            updateFieldValue('deslocacoesPorAnoSH', 0);
+          }
+        }
+      }
+      
+      // S&H plans don't typically have maintenance, so set to 0
+      console.log('Setting manutencoesPorAnoSH to 0');
+      updateFieldValue('manutencoesPorAnoSH', 0);
+      
+      console.log('Updated formData after S&H plan selection:', JSON.stringify(formData.value, null, 2));
+    }
   }
 };
 
@@ -814,6 +897,7 @@ const validateContractCreate = (data: Record<string, any>): Record<string, strin
 const handleCreate = async (data: Record<string, any>) => {
   console.log('ContractsCreateView handleCreate called');
   console.log('Received data:', JSON.stringify(data, null, 2));
+  console.log('Form data:', JSON.stringify(formData.value, null, 2));
   console.log('CPA Equipments:', JSON.stringify(cpaEquipments.value, null, 2));
   console.log('S&H Equipments:', JSON.stringify(shEquipments.value, null, 2));
   
@@ -821,30 +905,36 @@ const handleCreate = async (data: Record<string, any>) => {
     isSaving.value = true;
     clearError();
     
+    // Use formData.value instead of data parameter to get the most up-to-date values
+    // including those set by plan selection handlers
+    const currentFormData = formData.value || {};
+    
     // Prepare the contract data with equipment
     const contractData: ContractCreationData = {
-      clientId: data.clientId,
-      hasCPAContract: data.hasCPAContract || false,
-      hasSHContract: data.hasSHContract || false,
-      cpaContractType: data.cpaContractType || '',
-      planIdCPA: data.planIdCPA || '',
-      distanceCPA: data.distanceCPA || '',
-      modalidadePagamentoCPA: data.modalidadePagamentoCPA || '',
-      hasPOSPackage: data.hasPOSPackage || false,
-      inicioContratoCPA: data.inicioContratoCPA || '',
-      fimContratoCPA: data.fimContratoCPA || '',
-      horasAssistenciaAnualCPA: data.horasAssistenciaAnualCPA || 0,
-      deslocacoesPorAnoCPA: data.deslocacoesPorAnoCPA || 0,
-      manutencoesPorAnoCPA: data.manutencoesPorAnoCPA || 0,
-      planIdSH: data.planIdSH || '',
-      distanceSH: data.distanceSH || '',
-      modalidadePagamentoSH: data.modalidadePagamentoSH || '',
-      inicioContratoSH: data.inicioContratoSH || '',
-      fimContratoSH: data.fimContratoSH || '',
-      horasAssistenciaAnualSH: data.horasAssistenciaAnualSH || 0,
-      deslocacoesPorAnoSH: data.deslocacoesPorAnoSH || 0,
-      manutencoesPorAnoSH: data.manutencoesPorAnoSH || 0,
-      metodoPagamento: data.metodoPagamento || '',
+      clientId: currentFormData.clientId || data.clientId,
+      hasCPAContract: currentFormData.hasCPAContract || data.hasCPAContract || false,
+      hasSHContract: currentFormData.hasSHContract || data.hasSHContract || false,
+      cpaContractType: currentFormData.cpaContractType || data.cpaContractType || '',
+      planIdCPA: currentFormData.planIdCPA || data.planIdCPA || '',
+      distanceCPA: currentFormData.distanceCPA || data.distanceCPA || '',
+      modalidadePagamentoCPA: currentFormData.modalidadePagamentoCPA || data.modalidadePagamentoCPA || '',
+      hasPOSPackage: currentFormData.hasPOSPackage || data.hasPOSPackage || false,
+      inicioContratoCPA: currentFormData.inicioContratoCPA || data.inicioContratoCPA || '',
+      fimContratoCPA: currentFormData.fimContratoCPA || data.fimContratoCPA || '',
+      // Use the values from formData which should have been set by plan selection handlers
+      horasAssistenciaAnualCPA: currentFormData.horasAssistenciaAnualCPA ?? data.horasAssistenciaAnualCPA ?? 0,
+      deslocacoesPorAnoCPA: currentFormData.deslocacoesPorAnoCPA ?? data.deslocacoesPorAnoCPA ?? 0,
+      manutencoesPorAnoCPA: currentFormData.manutencoesPorAnoCPA ?? data.manutencoesPorAnoCPA ?? 0,
+      planIdSH: currentFormData.planIdSH || data.planIdSH || '',
+      distanceSH: currentFormData.distanceSH || data.distanceSH || '',
+      modalidadePagamentoSH: currentFormData.modalidadePagamentoSH || data.modalidadePagamentoSH || '',
+      inicioContratoSH: currentFormData.inicioContratoSH || data.inicioContratoSH || '',
+      fimContratoSH: currentFormData.fimContratoSH || data.fimContratoSH || '',
+      // Use the values from formData which should have been set by plan selection handlers
+      horasAssistenciaAnualSH: currentFormData.horasAssistenciaAnualSH ?? data.horasAssistenciaAnualSH ?? 0,
+      deslocacoesPorAnoSH: currentFormData.deslocacoesPorAnoSH ?? data.deslocacoesPorAnoSH ?? 0,
+      manutencoesPorAnoSH: currentFormData.manutencoesPorAnoSH ?? data.manutencoesPorAnoSH ?? 0,
+      metodoPagamento: currentFormData.metodoPagamento || data.metodoPagamento || '',
       cpaEquipments: cpaEquipments.value,
       shEquipments: shEquipments.value
     };

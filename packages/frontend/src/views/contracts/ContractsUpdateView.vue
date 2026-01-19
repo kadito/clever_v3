@@ -196,6 +196,7 @@ import { contractsFormSections } from '@/config/contracts-form-sections';
 import { useApi } from '@/composables/useApi';
 import { useErrorHandler } from '@/composables/useErrorHandler';
 import { useSharedFormData } from '@/composables/useSharedFormData';
+import { getPlanDetails, type ContractType } from '../../services/planSelection';
 
 // Router
 const route = useRoute();
@@ -435,6 +436,94 @@ const validateContractUpdate = (data: Record<string, any>): Record<string, strin
   }
   
   return errors;
+};
+
+// Plan selection handlers for auto-populating service details
+const handleCPAPlanSelection = async (planId: string, contractType: string) => {
+  console.log('CPA Plan Selection Handler called with planId:', planId, 'contractType:', contractType);
+  
+  if (planId && contractType) {
+    // Auto-populate service details from plan data
+    const planDetails = getPlanDetails(contractType as ContractType, planId);
+    console.log('Retrieved CPA plan details:', JSON.stringify(planDetails, null, 2));
+    
+    if (planDetails && formData.value) {
+      // Set maintenance per year (CPA plans have this field)
+      if (planDetails.maintenancePerYear !== undefined) {
+        console.log('Setting manutencoesPorAnoCPA to:', planDetails.maintenancePerYear);
+        formData.value.manutencoesPorAnoCPA = planDetails.maintenancePerYear;
+      }
+      
+      // Set displacements per year (try to extract number from callouts if it's a number)
+      if (planDetails.callouts !== undefined) {
+        if (typeof planDetails.callouts === 'number') {
+          console.log('Setting deslocacoesPorAnoCPA to:', planDetails.callouts);
+          formData.value.deslocacoesPorAnoCPA = planDetails.callouts;
+        } else if (typeof planDetails.callouts === 'string') {
+          // Try to extract number from string like "1 deslocação" or "2 deslocações"
+          const match = planDetails.callouts.match(/(\d+)/);
+          if (match) {
+            const value = parseInt(match[1]);
+            console.log('Setting deslocacoesPorAnoCPA to (from string):', value);
+            formData.value.deslocacoesPorAnoCPA = value;
+          } else {
+            // If no number found, set to 0 (unlimited or special case)
+            console.log('Setting deslocacoesPorAnoCPA to 0 (no number found in string)');
+            formData.value.deslocacoesPorAnoCPA = 0;
+          }
+        }
+      }
+      
+      // CPA plans don't typically have hours, so set to 0
+      console.log('Setting horasAssistenciaAnualCPA to 0');
+      formData.value.horasAssistenciaAnualCPA = 0;
+      
+      console.log('Updated formData after CPA plan selection:', JSON.stringify(formData.value, null, 2));
+    }
+  }
+};
+
+const handleSHPlanSelection = async (planId: string) => {
+  console.log('S&H Plan Selection Handler called with planId:', planId);
+  
+  if (planId) {
+    // Auto-populate service details from plan data
+    const planDetails = getPlanDetails('S&H', planId);
+    console.log('Retrieved S&H plan details:', JSON.stringify(planDetails, null, 2));
+    
+    if (planDetails && formData.value) {
+      // Set hours per year (S&H plans have this field)
+      if (planDetails.hoursPerYear !== undefined) {
+        console.log('Setting horasAssistenciaAnualSH to:', planDetails.hoursPerYear);
+        formData.value.horasAssistenciaAnualSH = planDetails.hoursPerYear;
+      }
+      
+      // Set displacements per year (S&H plans have displacementsIncluded)
+      if (planDetails.displacementsIncluded !== undefined) {
+        if (typeof planDetails.displacementsIncluded === 'number') {
+          console.log('Setting deslocacoesPorAnoSH to:', planDetails.displacementsIncluded);
+          formData.value.deslocacoesPorAnoSH = planDetails.displacementsIncluded;
+        } else if (typeof planDetails.displacementsIncluded === 'string') {
+          // Try to extract number from string
+          const match = planDetails.displacementsIncluded.match(/(\d+)/);
+          if (match) {
+            const value = parseInt(match[1]);
+            console.log('Setting deslocacoesPorAnoSH to (from string):', value);
+            formData.value.deslocacoesPorAnoSH = value;
+          } else {
+            console.log('Setting deslocacoesPorAnoSH to 0 (no number found in string)');
+            formData.value.deslocacoesPorAnoSH = 0;
+          }
+        }
+      }
+      
+      // S&H plans don't typically have maintenance, so set to 0
+      console.log('Setting manutencoesPorAnoSH to 0');
+      formData.value.manutencoesPorAnoSH = 0;
+      
+      console.log('Updated formData after S&H plan selection:', JSON.stringify(formData.value, null, 2));
+    }
+  }
 };
 
 // Event handlers
