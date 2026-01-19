@@ -46,17 +46,11 @@ const emit = defineEmits<Emits>()
 }
 
 .contract-dates-section h4 {
-  @apply text-base font-semibold text-gray-700;
+  @apply form-section-title-consistent text-base;
 }
 
 .dates-grid {
-  @apply grid grid-cols-1 gap-4;
-}
-
-@media (min-width: 640px) {
-  .dates-grid {
-    @apply grid-cols-2;
-  }
+  @apply form-grid-consistent;
 }
 
 .form-field {
@@ -64,15 +58,10 @@ const emit = defineEmits<Emits>()
 }
 
 .form-label {
-  @apply font-medium text-gray-700 text-sm;
+  @apply form-label-consistent;
 }
 
 .form-input {
-  @apply px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm transition-colors duration-200;
-  min-height: 44px; /* Touch-friendly minimum height */
-}
-
-.form-input:focus {
-  @apply outline-none border-green-500 ring-2 ring-green-200;
+  @apply form-input-consistent;
 }
 </style>

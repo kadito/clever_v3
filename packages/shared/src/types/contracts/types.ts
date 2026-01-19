@@ -19,7 +19,7 @@ export interface ContractEquipment {
 export interface ContractData {
   // Client relationship
   clientId: string;
-  clienteName: string; // For display purposes
+  clienteName?: string; // Optional - client data should be resolved through relations
 
   // CPA Contract Information
   hasCPAContract: boolean;
@@ -99,7 +99,7 @@ export interface ContractUpdateData extends Partial<ContractData> {
  */
 export interface ContractDisplayData {
   uuid: string;
-  clienteName: string;
+  clienteName?: string; // Optional - should be resolved through relations
   contractTypes: string[]; // ['CPA', 'S&H'] based on active contracts
   planNames: string[]; // Plan names for display
   paymentMethods: string[]; // Payment methods for both contract types
@@ -135,7 +135,7 @@ export interface ContractPlan {
   description: string;
   maintenancePerYear?: number;
   hoursPerYear?: number;
-  callouts?: string;
+  callouts?: string | number; // Can be either string or number based on plan type
   displacementsIncluded?: string | number;
   remoteSupport?: string;
   weekendSupport?: boolean;
@@ -173,12 +173,18 @@ export interface ContractPlan {
  */
 export interface ContractPlanConfig {
   CPA: {
+    name: string;
+    description: string;
     plans: ContractPlan[];
   };
   CPA_1500: {
+    name: string;
+    description: string;
     plans: ContractPlan[];
   };
   'S&H': {
+    name: string;
+    description: string;
     plans: ContractPlan[];
   };
 }

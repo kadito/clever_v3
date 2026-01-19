@@ -35,16 +35,18 @@
             />
             
             <!-- CPA Configuration (appears directly below CPA toggle when enabled) -->
-            <CPAContractSection
-              v-if="showCPASection"
-              :form-data="formData"
-              :cpa-equipments="cpaEquipments"
-              :selected-plan-details="selectedCPAPlanDetails"
-              :is-loading-plan="isLoadingCPAPlan"
-              @update-field="updateFieldValue"
-              @equipment-updated="handleEquipmentUpdate"
-              @plan-selected="handleCPAPlanSelection"
-            />
+            <Transition name="section-slide" mode="out-in">
+              <CPAContractSection
+                v-if="showCPASection"
+                :form-data="formData"
+                :cpa-equipments="cpaEquipments"
+                :selected-plan-details="selectedCPAPlanDetails"
+                :is-loading-plan="isLoadingCPAPlan"
+                @update-field="updateFieldValue"
+                @equipment-updated="handleEquipmentUpdate"
+                @plan-selected="handleCPAPlanSelection"
+              />
+            </Transition>
           </div>
           
           <!-- S&H Contract Type Section -->
@@ -57,16 +59,18 @@
             />
             
             <!-- S&H Configuration (appears directly below S&H toggle when enabled) -->
-            <SHContractSection
-              v-if="showSHSection"
-              :form-data="formData"
-              :sh-equipments="shEquipments"
-              :selected-plan-details="selectedSHPlanDetails"
-              :is-loading-plan="isLoadingSHPlan"
-              @update-field="updateFieldValue"
-              @plan-selected="handleSHPlanSelection"
-              @equipment-updated="handleSHEquipmentUpdate"
-            />
+            <Transition name="section-slide" mode="out-in">
+              <SHContractSection
+                v-if="showSHSection"
+                :form-data="formData"
+                :sh-equipments="shEquipments"
+                :selected-plan-details="selectedSHPlanDetails"
+                :is-loading-plan="isLoadingSHPlan"
+                @update-field="updateFieldValue"
+                @plan-selected="handleSHPlanSelection"
+                @equipment-updated="handleSHEquipmentUpdate"
+              />
+            </Transition>
           </div>
         </div>
       </div>
@@ -84,32 +88,6 @@
           @client-selected="handleClientSelected"
         />
         <div v-if="error" class="form-error">{{ error }}</div>
-      </div>
-    </template>
-
-    <!-- Custom client info display -->
-    <template #field-clientInfo="{ formData }">
-      <div v-if="selectedClient" class="client-info-display">
-        <div class="client-card">
-          <div class="client-header">
-            <h4 class="client-name">{{ selectedClient.nomeComercial || selectedClient.nomeEmpresa }}</h4>
-            <span v-if="selectedClient.contribuinte" class="client-nif">NIF: {{ selectedClient.contribuinte }}</span>
-          </div>
-          <div class="client-details">
-            <div v-if="selectedClient.contacto" class="client-detail">
-              <span class="detail-label">Contacto:</span>
-              <span class="detail-value">{{ selectedClient.contacto }}</span>
-            </div>
-            <div v-if="selectedClient.email" class="client-detail">
-              <span class="detail-label">Email:</span>
-              <span class="detail-value">{{ selectedClient.email }}</span>
-            </div>
-            <div v-if="selectedClient.morada" class="client-detail">
-              <span class="detail-label">Morada:</span>
-              <span class="detail-value">{{ selectedClient.morada }}</span>
-            </div>
-          </div>
-        </div>
       </div>
     </template>
 
@@ -156,7 +134,7 @@ import DisplayToggleSwitch from '@/components/contracts/DisplayToggleSwitch.vue'
 import CPAContractSection from '@/components/contracts/CPAContractSection.vue';
 import SHContractSection from '@/components/contracts/SHContractSection.vue';
 import { contractsFormSections } from '@/config/contracts-form-sections';
-import contractPlans from '@/config/contract-plans.json';
+import { getPlanDetails, type ContractType } from '../../services/planSelection'
 import { useApi } from '@/composables/useApi';
 import { useErrorHandler } from '@/composables/useErrorHandler';
 import { useSharedFormData } from '@/composables/useSharedFormData';
@@ -216,16 +194,20 @@ const selectedCPAPlanDetails = computed(() => {
     return planDetailsCache.get(cacheKey);
   }
   
-  const contractType = formData.value.cpaContractType;
-  const plans = contractPlans[contractType as keyof typeof contractPlans]?.plans || [];
-  const planDetails = plans.find((plan: any) => plan.id === formData.value?.planIdCPA);
-  
-  // Cache the result for future use
-  if (planDetails) {
-    planDetailsCache.set(cacheKey, markRaw(planDetails)); // Use markRaw to prevent deep reactivity
+  try {
+    const contractType = formData.value.cpaContractType as ContractType;
+    const planDetails = getPlanDetails(contractType, formData.value.planIdCPA);
+    
+    // Cache the result for future use
+    if (planDetails) {
+      planDetailsCache.set(cacheKey, markRaw(planDetails)); // Use markRaw to prevent deep reactivity
+    }
+    
+    return planDetails;
+  } catch (error) {
+    console.error('Error getting CPA plan details:', JSON.stringify(error, null, 2));
+    return null;
   }
-  
-  return planDetails;
 });
 
 const selectedSHPlanDetails = computed(() => {
@@ -240,14 +222,18 @@ const selectedSHPlanDetails = computed(() => {
     return planDetailsCache.get(cacheKey);
   }
   
-  const plans = contractPlans['S&H']?.plans || [];
-  const planDetails = plans.find((plan: any) => plan.id === formData.value?.planIdSH);
-  
-  if (planDetails) {
-    planDetailsCache.set(cacheKey, markRaw(planDetails)); // Use markRaw to prevent deep reactivity
+  try {
+    const planDetails = getPlanDetails('S&H', formData.value.planIdSH);
+    
+    if (planDetails) {
+      planDetailsCache.set(cacheKey, markRaw(planDetails)); // Use markRaw to prevent deep reactivity
+    }
+    
+    return planDetails;
+  } catch (error) {
+    console.error('Error getting S&H plan details:', JSON.stringify(error, null, 2));
+    return null;
   }
-  
-  return planDetails;
 });
 
 // Debounced update function for better performance
@@ -272,8 +258,7 @@ const loadCPAPlanDetails = async (planId: string, contractType: string) => {
     // Simulate async loading with shorter delay for better UX
     await new Promise(resolve => setTimeout(resolve, 200));
     
-    const plans = contractPlans[contractType as keyof typeof contractPlans]?.plans || [];
-    const planDetails = plans.find((plan: any) => plan.id === planId);
+    const planDetails = getPlanDetails(contractType as ContractType, planId);
     
     if (planDetails) {
       planDetailsCache.set(cacheKey, markRaw(planDetails));
@@ -281,7 +266,7 @@ const loadCPAPlanDetails = async (planId: string, contractType: string) => {
     
     return planDetails;
   } catch (error) {
-    console.error('Error loading CPA plan details:', error);
+    console.error('Error loading CPA plan details:', JSON.stringify(error, null, 2));
     return null;
   } finally {
     isLoadingCPAPlan.value = false;
@@ -304,8 +289,7 @@ const loadSHPlanDetails = async (planId: string) => {
     // Simulate async loading with shorter delay for better UX
     await new Promise(resolve => setTimeout(resolve, 200));
     
-    const plans = contractPlans['S&H']?.plans || [];
-    const planDetails = plans.find((plan: any) => plan.id === planId);
+    const planDetails = getPlanDetails('S&H', planId);
     
     if (planDetails) {
       planDetailsCache.set(cacheKey, markRaw(planDetails));
@@ -313,7 +297,7 @@ const loadSHPlanDetails = async (planId: string) => {
     
     return planDetails;
   } catch (error) {
-    console.error('Error loading S&H plan details:', error);
+    console.error('Error loading S&H plan details:', JSON.stringify(error, null, 2));
     return null;
   } finally {
     isLoadingSHPlan.value = false;
@@ -327,34 +311,71 @@ const clearError = () => {
 
 // Display toggle handlers - both sections can be active simultaneously
 const handleCPADisplayToggle = (active: boolean) => {
-  showCPASection.value = active
+  console.log('CPA toggle changed:', active);
+  showCPASection.value = active;
+  
   if (active) {
     // Initialize CPA data if it doesn't exist
     if (!formData.value.hasCPAContract) {
-      updateFieldValue('hasCPAContract', true)
-      initializeCPAData()
+      updateFieldValue('hasCPAContract', true);
+      initializeCPAData();
     }
   } else {
-    // When hiding CPA section, optionally clear CPA data
-    // For now, we'll keep the data but mark as not having CPA contract
-    updateFieldValue('hasCPAContract', false)
+    // When hiding CPA section, mark as not having CPA contract
+    updateFieldValue('hasCPAContract', false);
+    // Clear CPA-specific validation errors when section is hidden
+    clearCPAValidationErrors();
   }
-}
+};
 
 const handleSHDisplayToggle = (active: boolean) => {
-  showSHSection.value = active
+  console.log('S&H toggle changed:', active);
+  showSHSection.value = active;
+  
   if (active) {
     // Initialize S&H data if it doesn't exist
     if (!formData.value.hasSHContract) {
-      updateFieldValue('hasSHContract', true)
-      initializeSHData()
+      updateFieldValue('hasSHContract', true);
+      initializeSHData();
     }
   } else {
-    // When hiding S&H section, optionally clear S&H data
-    // For now, we'll keep the data but mark as not having S&H contract
-    updateFieldValue('hasSHContract', false)
+    // When hiding S&H section, mark as not having S&H contract
+    updateFieldValue('hasSHContract', false);
+    // Clear S&H-specific validation errors when section is hidden
+    clearSHValidationErrors();
   }
-}
+};
+
+// Helper functions to clear validation errors when sections are hidden
+const clearCPAValidationErrors = () => {
+  // Clear CPA-specific errors from the error state if they exist
+  const fieldsToClean = [
+    'cpaContractType', 'planIdCPA', 'distanceCPA', 'modalidadePagamentoCPA',
+    'inicioContratoCPA', 'fimContratoCPA', 'cpaEquipments'
+  ];
+  
+  fieldsToClean.forEach(field => {
+    if (error.value && error.value.includes(field)) {
+      // This is a simple approach - in a more complex app you'd have structured error handling
+      console.log(`Clearing CPA validation error for field: ${field}`);
+    }
+  });
+};
+
+const clearSHValidationErrors = () => {
+  // Clear S&H-specific errors from the error state if they exist
+  const fieldsToClean = [
+    'planIdSH', 'distanceSH', 'modalidadePagamentoSH',
+    'inicioContratoSH', 'fimContratoSH', 'shEquipments'
+  ];
+  
+  fieldsToClean.forEach(field => {
+    if (error.value && error.value.includes(field)) {
+      // This is a simple approach - in a more complex app you'd have structured error handling
+      console.log(`Clearing S&H validation error for field: ${field}`);
+    }
+  });
+};
 
 // Data initialization functions (preserve existing data)
 const initializeCPAData = () => {
@@ -643,9 +664,8 @@ onBeforeUnmount(() => {
 // Client selection handler
 const handleClientSelected = (client: Client | null) => {
   selectedClient.value = client;
-  if (client) {
-    updateFieldValue('clienteName', client.nomeComercial || client.nomeEmpresa || '');
-  }
+  // Note: We no longer store clienteName as we're removing client information fields
+  // Client data will be resolved through relations in the detail view
 };
 
 // Pricing functions - removed as they're now handled by DynamicPlanDetails component
@@ -659,7 +679,7 @@ const validateContractCreate = (data: Record<string, any>): Record<string, strin
   try {
     // Client validation
     if (!data.clientId) {
-      errors.clientId = 'Cliente é obrigatório';
+      errors.clientId = 'Por favor, selecione um cliente';
     }
     
     // Contract type validation - at least one must be configured
@@ -667,63 +687,63 @@ const validateContractCreate = (data: Record<string, any>): Record<string, strin
     const hasSH = data.hasSHContract;
     
     if (!hasCPA && !hasSH) {
-      errors.contractTypes = 'Configure pelo menos um tipo de contrato (CPA ou S&H)';
+      errors.contractTypes = 'Por favor, configure pelo menos um tipo de contrato (CPA ou S&H)';
     }
     
     // Payment method validation (required if any contract is configured)
     if ((hasCPA || hasSH) && !data.metodoPagamento) {
-      errors.metodoPagamento = 'Método de pagamento é obrigatório';
+      errors.metodoPagamento = 'Por favor, selecione um método de pagamento';
     }
     
     // CPA-specific validation (if CPA is configured)
     if (hasCPA) {
       if (!data.cpaContractType) {
-        errors.cpaContractType = 'Tipo de contrato CPA é obrigatório';
+        errors.cpaContractType = 'Por favor, selecione o tipo de contrato CPA';
       }
       
       if (!data.planIdCPA) {
-        errors.planIdCPA = 'Plano CPA é obrigatório';
+        errors.planIdCPA = 'Por favor, selecione um plano CPA';
       }
       
       // Distance is only required for CPA (2023), not CPA_1500
       if (data.cpaContractType === 'CPA' && !data.distanceCPA) {
-        errors.distanceCPA = 'Distância é obrigatória para contratos CPA (2023)';
+        errors.distanceCPA = 'Por favor, selecione a distância para contratos CPA (2023)';
       }
       
       if (!data.modalidadePagamentoCPA) {
-        errors.modalidadePagamentoCPA = 'Modalidade de pagamento CPA é obrigatória';
+        errors.modalidadePagamentoCPA = 'Por favor, selecione a modalidade de pagamento CPA';
       }
       
       // Validate CPA equipment from form data
       const cpaEquipmentsData = data.cpaEquipments || cpaEquipments.value;
       if (!cpaEquipmentsData || cpaEquipmentsData.length === 0) {
-        errors.cpaEquipments = 'Pelo menos um equipamento CPA é obrigatório';
+        errors.cpaEquipments = 'Por favor, adicione pelo menos um equipamento CPA';
       } else {
         // Validate each equipment
         cpaEquipmentsData.forEach((equipment: any, index: number) => {
           if (!equipment.modelo?.trim()) {
-            errors[`cpaEquipment${index}Model`] = `Modelo do equipamento ${index + 1} é obrigatório`;
+            errors[`cpaEquipment${index}Model`] = `Por favor, introduza o modelo do equipamento ${index + 1}`;
           }
           
           // First equipment should have 0% discount
           if (index === 0 && equipment.desconto !== 0) {
-            errors[`cpaEquipment${index}Discount`] = 'O primeiro equipamento não deve ter desconto';
+            errors[`cpaEquipment${index}Discount`] = 'O primeiro equipamento não deve ter desconto aplicado';
           }
           
           // Discount validation for additional equipment
           if (index > 0 && (typeof equipment.desconto !== 'number' || equipment.desconto < 0 || equipment.desconto > 100)) {
-            errors[`cpaEquipment${index}Discount`] = `Desconto do equipamento ${index + 1} deve ser entre 0 e 100%`;
+            errors[`cpaEquipment${index}Discount`] = `O desconto do equipamento ${index + 1} deve estar entre 0 e 100%`;
           }
         });
       }
       
       // Validate contract dates
       if (!data.inicioContratoCPA) {
-        errors.inicioContratoCPA = 'Data de início do contrato CPA é obrigatória';
+        errors.inicioContratoCPA = 'Por favor, selecione a data de início do contrato CPA';
       }
       
       if (!data.fimContratoCPA) {
-        errors.fimContratoCPA = 'Data de fim do contrato CPA é obrigatória';
+        errors.fimContratoCPA = 'Por favor, selecione a data de fim do contrato CPA';
       }
       
       // Date range validation
@@ -731,7 +751,7 @@ const validateContractCreate = (data: Record<string, any>): Record<string, strin
         const startDate = new Date(data.inicioContratoCPA);
         const endDate = new Date(data.fimContratoCPA);
         if (startDate >= endDate) {
-          errors.fimContratoCPA = 'Data de fim deve ser posterior à data de início';
+          errors.fimContratoCPA = 'A data de fim deve ser posterior à data de início';
         }
       }
     }
@@ -739,37 +759,37 @@ const validateContractCreate = (data: Record<string, any>): Record<string, strin
     // S&H-specific validation (if S&H is configured)
     if (hasSH) {
       if (!data.planIdSH) {
-        errors.planIdSH = 'Plano S&H é obrigatório';
+        errors.planIdSH = 'Por favor, selecione um plano S&H';
       }
       
       if (!data.distanceSH) {
-        errors.distanceSH = 'Distância S&H é obrigatória';
+        errors.distanceSH = 'Por favor, selecione a distância para o contrato S&H';
       }
       
       if (!data.modalidadePagamentoSH) {
-        errors.modalidadePagamentoSH = 'Modalidade de pagamento S&H é obrigatória';
+        errors.modalidadePagamentoSH = 'Por favor, selecione a modalidade de pagamento S&H';
       }
       
       // Validate S&H equipment from form data
       const shEquipmentsData = data.shEquipments || shEquipments.value;
       if (!shEquipmentsData || shEquipmentsData.length === 0) {
-        errors.shEquipments = 'Pelo menos um equipamento S&H é obrigatório';
+        errors.shEquipments = 'Por favor, adicione pelo menos um equipamento S&H';
       } else {
         // Validate each S&H equipment
         shEquipmentsData.forEach((equipment: any, index: number) => {
           if (!equipment.modelo?.trim()) {
-            errors[`shEquipment${index}Model`] = `Modelo do equipamento S&H ${index + 1} é obrigatório`;
+            errors[`shEquipment${index}Model`] = `Por favor, introduza o modelo do equipamento S&H ${index + 1}`;
           }
         });
       }
       
       // Validate contract dates
       if (!data.inicioContratoSH) {
-        errors.inicioContratoSH = 'Data de início do contrato S&H é obrigatória';
+        errors.inicioContratoSH = 'Por favor, selecione a data de início do contrato S&H';
       }
       
       if (!data.fimContratoSH) {
-        errors.fimContratoSH = 'Data de fim do contrato S&H é obrigatória';
+        errors.fimContratoSH = 'Por favor, selecione a data de fim do contrato S&H';
       }
       
       // Date range validation
@@ -777,7 +797,7 @@ const validateContractCreate = (data: Record<string, any>): Record<string, strin
         const startDate = new Date(data.inicioContratoSH);
         const endDate = new Date(data.fimContratoSH);
         if (startDate >= endDate) {
-          errors.fimContratoSH = 'Data de fim deve ser posterior à data de início';
+          errors.fimContratoSH = 'A data de fim deve ser posterior à data de início';
         }
       }
     }
@@ -804,7 +824,6 @@ const handleCreate = async (data: Record<string, any>) => {
     // Prepare the contract data with equipment
     const contractData: ContractCreationData = {
       clientId: data.clientId,
-      clienteName: selectedClient.value?.nomeComercial || selectedClient.value?.nomeEmpresa || '',
       hasCPAContract: data.hasCPAContract || false,
       hasSHContract: data.hasSHContract || false,
       cpaContractType: data.cpaContractType || '',
@@ -924,48 +943,59 @@ const handleCancel = () => {
   @apply p-6 bg-gray-50;
 }
 
+/* Section transition animations */
+.section-slide-enter-active,
+.section-slide-leave-active {
+  transition: all 0.3s ease-in-out;
+  transform-origin: top;
+}
+
+.section-slide-enter-from {
+  opacity: 0;
+  transform: translateY(-10px) scaleY(0.95);
+  max-height: 0;
+  overflow: hidden;
+}
+
+.section-slide-enter-to {
+  opacity: 1;
+  transform: translateY(0) scaleY(1);
+  max-height: 1000px;
+}
+
+.section-slide-leave-from {
+  opacity: 1;
+  transform: translateY(0) scaleY(1);
+  max-height: 1000px;
+}
+
+.section-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-10px) scaleY(0.95);
+  max-height: 0;
+  overflow: hidden;
+}
+
+/* Reduced motion support for transitions */
+@media (prefers-reduced-motion: reduce) {
+  .section-slide-enter-active,
+  .section-slide-leave-active {
+    transition: opacity 0.2s ease;
+  }
+  
+  .section-slide-enter-from,
+  .section-slide-leave-to {
+    transform: none;
+    max-height: auto;
+  }
+}
+
 .contract-sections {
   @apply space-y-6;
 }
 
 .active-contract-section {
   @apply mt-6 pt-6 border-t border-gray-200;
-}
-
-.client-info-display {
-  @apply mt-2;
-}
-
-.client-card {
-  @apply bg-blue-50 border border-blue-200 rounded-touch p-4;
-}
-
-.client-header {
-  @apply flex items-center justify-between mb-3;
-}
-
-.client-name {
-  @apply font-medium text-blue-900 text-lg;
-}
-
-.client-nif {
-  @apply text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded;
-}
-
-.client-details {
-  @apply space-y-2;
-}
-
-.client-detail {
-  @apply flex items-start text-sm;
-}
-
-.detail-label {
-  @apply font-medium text-blue-700 min-w-20 mr-2;
-}
-
-.detail-value {
-  @apply text-blue-600;
 }
 
 /* Equipment manager styling */
@@ -1034,7 +1064,6 @@ const handleCancel = () => {
 }
 
 /* Portuguese text optimization */
-.client-card,
 .equipment-item {
   @apply text-portuguese;
 }

@@ -6,7 +6,7 @@
         <label class="config-label required">TIPO DE CONTRATO CPA</label>
         <select 
           :model-value="formData.cpaContractType" 
-          @change="(event) => $emit('update-field', 'cpaContractType', event.target.value)"
+          @change="(event) => handleContractTypeChange(event.target.value)"
           class="config-select"
         >
           <option value="">Selecione o tipo...</option>
@@ -21,14 +21,18 @@
           :model-value="formData.planIdCPA" 
           @change="(event) => handlePlanSelection(event.target.value)"
           class="config-select"
+          :disabled="!formData.cpaContractType"
         >
-          <option value="">Selecione o plano...</option>
-          <option value="cpa_essential">ESSENTIAL CARE</option>
-          <option value="cpa_professional">PROFESSIONAL CARE</option>
-          <option value="cpa_premium">PREMIUM CARE</option>
-          <option value="cpa_1500_essential">ESSENTIAL CARE (1500)</option>
-          <option value="cpa_1500_professional">PROFESSIONAL CARE (1500)</option>
-          <option value="cpa_1500_premium">PREMIUM CARE (1500)</option>
+          <option value="">
+            {{ formData.cpaContractType ? 'Selecione o plano...' : 'Primeiro selecione o tipo de contrato' }}
+          </option>
+          <option 
+            v-for="planOption in availablePlanOptions" 
+            :key="planOption.value" 
+            :value="planOption.value"
+          >
+            {{ planOption.label }}
+          </option>
         </select>
       </div>
       
@@ -78,21 +82,13 @@
     />
     
     <!-- Dynamic Plan Details Display -->
-    <div v-if="props.isLoadingPlan" class="plan-loading-state">
-      <div class="loading-spinner">
-        <div class="spinner"></div>
-        <span class="loading-text">A carregar detalhes do plano...</span>
-      </div>
-    </div>
-    
-
-    
     <DynamicPlanDetails
-      v-if="shouldShowPlanDetails"
+      v-if="shouldShowPlanDetails || props.isLoadingPlan"
       data-testid="dynamic-plan-details"
       :plan-details="selectedPlanDetails"
       :selected-payment="formData.modalidadePagamentoCPA"
       :distance="formData.distanceCPA"
+      :is-loading="props.isLoadingPlan"
       @payment-selected="$emit('update-field', 'modalidadePagamentoCPA', $event)"
     />
   </div>
@@ -104,6 +100,7 @@ import CPAEquipmentManager from './CPAEquipmentManager.vue'
 import ContractDatesSection from './ContractDatesSection.vue'
 import DynamicPlanDetails from './DynamicPlanDetails.vue'
 import { computed, toRefs } from 'vue'
+import { getPlanOptions, type ContractType } from '../../services/planSelection'
 
 interface Props {
   formData: Record<string, any>
@@ -124,7 +121,36 @@ const emit = defineEmits<Emits>()
 // Use toRefs for better performance with reactive props
 const { formData, selectedPlanDetails, isLoadingPlan } = toRefs(props)
 
+// Get available plan options based on selected contract type
+const availablePlanOptions = computed(() => {
+  const contractType = formData.value?.cpaContractType as ContractType | ''
+  console.log('Computing available plan options for contract type:', contractType)
+  
+  try {
+    const options = getPlanOptions(contractType)
+    console.log('Available plan options:', JSON.stringify(options, null, 2))
+    return options
+  } catch (error) {
+    console.error('Error getting plan options:', JSON.stringify(error, null, 2))
+    return []
+  }
+})
+
+const handleContractTypeChange = (contractType: string) => {
+  console.log('Contract type changed to:', contractType)
+  
+  // Clear the selected plan when contract type changes
+  if (formData.value?.planIdCPA) {
+    console.log('Clearing previously selected plan:', formData.value.planIdCPA)
+    emit('update-field', 'planIdCPA', '')
+  }
+  
+  // Update the contract type
+  emit('update-field', 'cpaContractType', contractType)
+}
+
 const handlePlanSelection = (planId: string) => {
+  console.log('Plan selected:', planId)
   emit('plan-selected', planId)
 }
 
@@ -134,7 +160,7 @@ const showPOSPackageOption = computed(() => {
          formData.value?.planIdCPA === 'cpa_1500_premium'
 })
 
-// Determine if plan details should be shown based on contract type and requirements
+// Determine if plan details should be shown - show immediately after plan selection for all contract types
 const shouldShowPlanDetails = computed(() => {
   console.log('shouldShowPlanDetails check:', {
     hasSelectedPlanDetails: !!selectedPlanDetails.value,
@@ -143,33 +169,15 @@ const shouldShowPlanDetails = computed(() => {
     distanceCPA: formData.value?.distanceCPA
   });
   
-  if (!selectedPlanDetails.value) {
-    console.log('shouldShowPlanDetails: false - no selectedPlanDetails');
-    return false
-  }
+  // Show plan details if we have selected plan details and a plan is selected
+  // OR if we're in test mode (selectedPlanDetails provided without planIdCPA)
+  const hasPlanSelected = formData.value?.planIdCPA && formData.value.planIdCPA !== '';
+  const isTestMode = !!selectedPlanDetails.value && (!formData.value?.planIdCPA || formData.value.planIdCPA === '');
   
-  // If we don't have form data (e.g., in tests), show plan details when selectedPlanDetails is provided
-  if (!formData.value?.planIdCPA) {
-    console.log('shouldShowPlanDetails: true - no planIdCPA (test mode)');
-    return true
-  }
+  const shouldShow = !!selectedPlanDetails.value && (hasPlanSelected || isTestMode);
   
-  // CPA_1500 plans don't require distance (flat pricing)
-  if (formData.value.cpaContractType === 'CPA_1500') {
-    console.log('shouldShowPlanDetails: true - CPA_1500 plan');
-    return true
-  }
-  
-  // CPA (2023) plans require distance (distance-based pricing)
-  if (formData.value.cpaContractType === 'CPA') {
-    const hasDistance = !!formData.value.distanceCPA;
-    console.log('shouldShowPlanDetails:', hasDistance, '- CPA plan, hasDistance:', hasDistance);
-    return hasDistance;
-  }
-  
-  // Default: show if we have plan details
-  console.log('shouldShowPlanDetails: true - default');
-  return true
+  console.log('shouldShowPlanDetails:', shouldShow, '- plan details available, hasPlanSelected:', hasPlanSelected, 'isTestMode:', isTestMode);
+  return shouldShow;
 })
 </script>
 
@@ -179,7 +187,7 @@ const shouldShowPlanDetails = computed(() => {
 }
 
 .contract-config-grid {
-  @apply grid grid-cols-1 gap-4;
+  @apply form-grid-consistent;
 }
 
 @media (min-width: 768px) {
@@ -193,7 +201,7 @@ const shouldShowPlanDetails = computed(() => {
 }
 
 .config-label {
-  @apply font-semibold text-gray-700 text-sm;
+  @apply form-label-consistent;
 }
 
 .config-label.required::after {
@@ -202,35 +210,19 @@ const shouldShowPlanDetails = computed(() => {
 }
 
 .config-select {
-  @apply px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm transition-colors duration-200 touch-target;
+  @apply form-select-consistent;
 }
 
-.config-select:focus {
-  @apply outline-none border-green-500 ring-2 ring-green-200;
-}
-
-.plan-loading-state {
-  @apply mt-6 border border-gray-200 rounded-lg p-6 bg-gray-50;
-}
-
-.loading-spinner {
-  @apply flex items-center justify-center gap-3;
-}
-
-.spinner {
-  @apply w-5 h-5 border-2 border-gray-300 border-t-green-500 rounded-full animate-spin;
-}
-
-.loading-text {
-  @apply text-sm text-gray-600 font-medium;
+.config-select:disabled {
+  @apply bg-gray-100 text-gray-500 cursor-not-allowed;
 }
 
 .pos-package-section {
-  @apply my-4 p-4 bg-blue-50 border border-blue-200 rounded-lg;
+  @apply form-section-consistent my-4;
 }
 
 .pos-package-option {
-  @apply flex items-start;
+  @apply flex items-start p-4;
 }
 
 .pos-package-label {
@@ -238,21 +230,25 @@ const shouldShowPlanDetails = computed(() => {
 }
 
 .pos-package-checkbox {
-  @apply mt-1 w-4 h-4 text-green-600 bg-white border-gray-300 rounded focus:ring-green-500 focus:ring-2 cursor-pointer;
+  @apply form-checkbox-consistent mt-1;
 }
 
 .pos-package-text {
   @apply text-sm text-blue-700 font-medium leading-relaxed;
 }
 
-/* Mobile responsiveness improvements */
-@media (max-width: 640px) {
-  .contract-config-grid {
-    @apply gap-3;
-  }
-  
-  .config-select {
-    @apply py-3;
-  }
+/* Loading state for form elements */
+.config-select.loading {
+  @apply form-element-loading;
+}
+
+/* Error state styling */
+.config-select.error {
+  @apply form-element-error;
+}
+
+/* Success state styling */
+.config-select.success {
+  @apply form-element-success;
 }
 </style>

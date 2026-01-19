@@ -14,7 +14,7 @@ export function usePerformanceOptimizations() {
     func: T,
     wait: number = 300
   ): ((...args: Parameters<T>) => void) => {
-    let timeoutId: NodeJS.Timeout | null = null
+    let timeoutId: number | null = null
 
     const debouncedFunction = (...args: Parameters<T>) => {
       if (timeoutId) {
@@ -46,7 +46,7 @@ export function usePerformanceOptimizations() {
     wait: number = 300
   ): ((...args: Parameters<T>) => void) => {
     let lastCallTime = 0
-    let timeoutId: NodeJS.Timeout | null = null
+    let timeoutId: number | null = null
     let lastArgs: Parameters<T> | null = null
 
     const throttledFunction = (...args: Parameters<T>) => {

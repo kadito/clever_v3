@@ -16,19 +16,6 @@ export const contractsFormSections: FormSection[] = [
     ]
   },
   {
-    key: 'clientInfo',
-    title: 'Informação do Cliente',
-    description: 'Dados do cliente selecionado (apenas leitura)',
-    fields: [
-      {
-        key: 'clientInfo',
-        label: 'Informação do Cliente',
-        type: 'custom',
-        fullWidth: true
-      }
-    ]
-  },
-  {
     key: 'contractTypes',
     title: 'Tipos de Contrato',
     description: 'Configuração dos contratos CPA e S&H com sistema de alternância de visualização',

@@ -130,7 +130,6 @@ const displayedContracts = computed(() => {
   return contracts.value.filter(contract => {
     const data = contract.data;
     return (
-      data.clienteName?.toLowerCase().includes(query) ||
       data.clientId?.toLowerCase().includes(query) ||
       data.cpaContractType?.toLowerCase().includes(query) ||
       data.planIdCPA?.toLowerCase().includes(query) ||
@@ -171,8 +170,8 @@ const getContractTitle = (item: BaseContent): string => {
     }
   }
   
-  // Fallback to stored client name or default
-  return contract.data.clienteName || 'Contrato sem cliente';
+  // Fallback to default if no client data available
+  return 'Contrato sem cliente';
 };
 
 const getContractSubtitle = (item: BaseContent): string => {

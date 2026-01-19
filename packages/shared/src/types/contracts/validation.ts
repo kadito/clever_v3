@@ -44,36 +44,36 @@ export function validateContractCreation(data: ContractCreationData): string[] {
 
   // Basic validation
   if (!data.clientId?.trim()) {
-    errors.push('Cliente é obrigatório');
+    errors.push('Por favor, selecione um cliente');
   }
 
   // Must have at least one contract type
   if (!data.hasCPAContract && !data.hasSHContract) {
-    errors.push('Deve selecionar pelo menos um tipo de contrato (CPA e/ou S&H)');
+    errors.push('Por favor, selecione pelo menos um tipo de contrato (CPA e/ou S&H)');
   }
 
   // CPA Contract validation
   if (data.hasCPAContract) {
     if (!data.cpaContractType) {
-      errors.push('Tipo de contrato CPA é obrigatório');
+      errors.push('Por favor, selecione o tipo de contrato CPA');
     }
 
     if (!data.planIdCPA) {
-      errors.push('Plano CPA é obrigatório');
+      errors.push('Por favor, selecione um plano CPA');
     }
 
     if (!data.modalidadePagamentoCPA) {
-      errors.push('Modalidade de pagamento CPA é obrigatória');
+      errors.push('Por favor, selecione a modalidade de pagamento CPA');
     }
 
     // Distance is only required for CPA (2023), not CPA_1500
     if (data.cpaContractType === 'CPA' && !data.distanceCPA) {
-      errors.push('Distância é obrigatória para contratos CPA (2023)');
+      errors.push('Por favor, selecione a distância para contratos CPA (2023)');
     }
 
     // Validate CPA equipment
     if (!data.cpaEquipments || data.cpaEquipments.length === 0) {
-      errors.push('Pelo menos um equipamento CPA deve ser adicionado');
+      errors.push('Por favor, adicione pelo menos um equipamento CPA');
     } else {
       data.cpaEquipments.forEach((equipment, index) => {
         const equipmentErrors = validateContractEquipment(equipment);
@@ -81,9 +81,14 @@ export function validateContractCreation(data: ContractCreationData): string[] {
           errors.push(`Equipamento ${index + 1}: ${error}`);
         });
 
+        // Model is required for CPA equipment
+        if (!equipment.modelo?.trim()) {
+          errors.push(`Por favor, introduza o modelo do equipamento CPA ${index + 1}`);
+        }
+
         // First equipment should have 0% discount
         if (index === 0 && equipment.desconto !== 0) {
-          errors.push('O primeiro equipamento não deve ter desconto');
+          errors.push('O primeiro equipamento não deve ter desconto aplicado');
         }
       });
     }
@@ -93,7 +98,7 @@ export function validateContractCreation(data: ContractCreationData): string[] {
       const startDate = new Date(data.inicioContratoCPA);
       const endDate = new Date(data.fimContratoCPA);
       if (startDate >= endDate) {
-        errors.push('Data de fim do contrato CPA deve ser posterior à data de início');
+        errors.push('A data de fim do contrato CPA deve ser posterior à data de início');
       }
     }
   }
@@ -101,15 +106,26 @@ export function validateContractCreation(data: ContractCreationData): string[] {
   // S&H Contract validation
   if (data.hasSHContract) {
     if (!data.planIdSH) {
-      errors.push('Plano S&H é obrigatório');
+      errors.push('Por favor, selecione um plano S&H');
     }
 
     if (!data.distanceSH) {
-      errors.push('Distância S&H é obrigatória');
+      errors.push('Por favor, selecione a distância para o contrato S&H');
     }
 
     if (!data.modalidadePagamentoSH) {
-      errors.push('Modalidade de pagamento S&H é obrigatória');
+      errors.push('Por favor, selecione a modalidade de pagamento S&H');
+    }
+
+    // Validate S&H equipment
+    if (!data.shEquipments || data.shEquipments.length === 0) {
+      errors.push('Por favor, adicione pelo menos um equipamento S&H');
+    } else {
+      data.shEquipments.forEach((equipment, index) => {
+        if (!equipment.modelo?.trim()) {
+          errors.push(`Por favor, introduza o modelo do equipamento S&H ${index + 1}`);
+        }
+      });
     }
 
     // Date validation
@@ -117,22 +133,27 @@ export function validateContractCreation(data: ContractCreationData): string[] {
       const startDate = new Date(data.inicioContratoSH);
       const endDate = new Date(data.fimContratoSH);
       if (startDate >= endDate) {
-        errors.push('Data de fim do contrato S&H deve ser posterior à data de início');
+        errors.push('A data de fim do contrato S&H deve ser posterior à data de início');
       }
     }
   }
 
   // Service details validation
   if (typeof data.horasAssistenciaAnual !== 'number' || data.horasAssistenciaAnual < 0) {
-    errors.push('Horas de assistência anual deve ser um número positivo');
+    errors.push('As horas de assistência anual devem ser um número positivo');
   }
 
   if (typeof data.deslocacoesPorAno !== 'number' || data.deslocacoesPorAno < 0) {
-    errors.push('Deslocações por ano deve ser um número positivo');
+    errors.push('As deslocações por ano devem ser um número positivo');
   }
 
   if (typeof data.manutencoesPorAno !== 'number' || data.manutencoesPorAno < 0) {
-    errors.push('Manutenções por ano deve ser um número positivo');
+    errors.push('As manutenções por ano devem ser um número positivo');
+  }
+
+  // Payment method validation (required if any contract is configured)
+  if ((data.hasCPAContract || data.hasSHContract) && !data.metodoPagamento) {
+    errors.push('Por favor, selecione um método de pagamento');
   }
 
   return errors;
@@ -184,6 +205,11 @@ export function validateContractUpdate(data: ContractUpdateData): string[] {
             errors.push(`Equipamento ${index + 1}: ${error}`);
           });
 
+          // Model is required for CPA equipment
+          if (!equipment.modelo?.trim()) {
+            errors.push(`Modelo do equipamento CPA ${index + 1} é obrigatório`);
+          }
+
           // First equipment should have 0% discount
           if (index === 0 && equipment.desconto !== 0) {
             errors.push('O primeiro equipamento não deve ter desconto');
@@ -214,6 +240,19 @@ export function validateContractUpdate(data: ContractUpdateData): string[] {
 
     if (data.modalidadePagamentoSH !== undefined && !data.modalidadePagamentoSH) {
       errors.push('Modalidade de pagamento S&H é obrigatória');
+    }
+
+    // Validate S&H equipment if provided
+    if (data.shEquipments) {
+      if (data.shEquipments.length === 0) {
+        errors.push('Pelo menos um equipamento S&H deve ser mantido');
+      } else {
+        data.shEquipments.forEach((equipment, index) => {
+          if (!equipment.modelo?.trim()) {
+            errors.push(`Modelo do equipamento S&H ${index + 1} é obrigatório`);
+          }
+        });
+      }
     }
 
     // Date validation

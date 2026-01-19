@@ -1,3 +1,6 @@
+/* Import form consistency styles */
+@import '../styles/form-consistency.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

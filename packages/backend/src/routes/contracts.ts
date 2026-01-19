@@ -22,51 +22,51 @@ function validateContractCreationDirect(data: ContractCreationData): string[] {
 
   // Basic validation
   if (!data.clientId?.trim()) {
-    errors.push('Cliente é obrigatório');
+    errors.push('Por favor, selecione um cliente');
   }
 
   // Must have at least one contract type
   if (!data.hasCPAContract && !data.hasSHContract) {
-    errors.push('Deve selecionar pelo menos um tipo de contrato (CPA e/ou S&H)');
+    errors.push('Por favor, selecione pelo menos um tipo de contrato (CPA e/ou S&H)');
   }
 
   // CPA Contract validation
   if (data.hasCPAContract) {
     if (!data.cpaContractType) {
-      errors.push('Tipo de contrato CPA é obrigatório');
+      errors.push('Por favor, selecione o tipo de contrato CPA');
     }
 
     if (!data.planIdCPA) {
-      errors.push('Plano CPA é obrigatório');
+      errors.push('Por favor, selecione um plano CPA');
     }
 
     if (!data.modalidadePagamentoCPA) {
-      errors.push('Modalidade de pagamento CPA é obrigatória');
+      errors.push('Por favor, selecione a modalidade de pagamento CPA');
     }
 
     // Distance is only required for CPA (2023), not CPA_1500
     if (data.cpaContractType === 'CPA' && !data.distanceCPA) {
-      errors.push('Distância é obrigatória para contratos CPA (2023)');
+      errors.push('Por favor, selecione a distância para contratos CPA (2023)');
     }
 
     // Validate CPA equipment
     if (!data.cpaEquipments || data.cpaEquipments.length === 0) {
-      errors.push('Pelo menos um equipamento CPA deve ser adicionado');
+      errors.push('Por favor, adicione pelo menos um equipamento CPA');
     }
   }
 
   // S&H Contract validation
   if (data.hasSHContract) {
     if (!data.planIdSH) {
-      errors.push('Plano S&H é obrigatório');
+      errors.push('Por favor, selecione um plano S&H');
     }
 
     if (!data.distanceSH) {
-      errors.push('Distância S&H é obrigatória');
+      errors.push('Por favor, selecione a distância para o contrato S&H');
     }
 
     if (!data.modalidadePagamentoSH) {
-      errors.push('Modalidade de pagamento S&H é obrigatória');
+      errors.push('Por favor, selecione a modalidade de pagamento S&H');
     }
   }
 

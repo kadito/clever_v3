@@ -101,4 +101,48 @@ describe('DisplayToggleSwitch', () => {
     expect(toggleSwitch.classes()).toContain('active')
     expect(toggleSlider.exists()).toBe(true)
   })
+
+  it('handles disabled state correctly', () => {
+    const wrapper = mount(DisplayToggleSwitch, {
+      props: {
+        title: 'CPA - CASHLOGY',
+        isActive: false,
+        disabled: true
+      }
+    })
+
+    const toggleSwitch = wrapper.find('.toggle-switch')
+    
+    expect(toggleSwitch.classes()).toContain('disabled')
+    expect(toggleSwitch.attributes('disabled')).toBeDefined()
+    expect(toggleSwitch.attributes('aria-pressed')).toBe('false')
+  })
+
+  it('does not emit toggle event when disabled', async () => {
+    const wrapper = mount(DisplayToggleSwitch, {
+      props: {
+        title: 'CPA - CASHLOGY',
+        isActive: false,
+        disabled: true
+      }
+    })
+
+    await wrapper.find('.toggle-switch').trigger('click')
+
+    expect(wrapper.emitted('toggle')).toBeFalsy()
+  })
+
+  it('has proper ARIA attributes', () => {
+    const wrapper = mount(DisplayToggleSwitch, {
+      props: {
+        title: 'CPA - CASHLOGY',
+        isActive: true
+      }
+    })
+
+    const toggleSwitch = wrapper.find('.toggle-switch')
+    
+    expect(toggleSwitch.attributes('aria-pressed')).toBe('true')
+    expect(toggleSwitch.attributes('aria-label')).toBe('Desativar CPA - CASHLOGY')
+  })
 })

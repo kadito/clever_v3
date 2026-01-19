@@ -5,10 +5,13 @@
       <button
         type="button"
         class="toggle-switch"
-        :class="{ 'active': isActive }"
+        :class="{ 'active': isActive, 'disabled': disabled }"
+        :disabled="disabled"
+        :aria-pressed="isActive"
+        :aria-label="`${isActive ? 'Desativar' : 'Ativar'} ${title}`"
         @click="handleToggle"
       >
-        <span class="toggle-slider"></span>
+        <span class="toggle-slider" :class="{ 'active': isActive }"></span>
       </button>
     </div>
   </div>
@@ -18,6 +21,7 @@
 interface Props {
   title: string
   isActive: boolean
+  disabled?: boolean
 }
 
 interface Emits {
@@ -28,7 +32,9 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const handleToggle = () => {
-  emit('toggle', !props.isActive)
+  if (!props.disabled) {
+    emit('toggle', !props.isActive)
+  }
 }
 </script>
 
@@ -38,7 +44,8 @@ const handleToggle = () => {
 }
 
 .toggle-item {
-  @apply flex justify-between items-center p-4 border border-gray-200 rounded-lg bg-white transition-all duration-200;
+  @apply form-section-consistent flex justify-between items-center p-4;
+  @apply transition-all duration-300 ease-in-out;
 }
 
 .toggle-item.inactive {
@@ -50,48 +57,74 @@ const handleToggle = () => {
 }
 
 .toggle-title {
-  @apply text-base font-semibold text-gray-700 m-0;
+  @apply form-section-title-consistent text-base m-0;
 }
 
 .toggle-switch {
-  @apply relative bg-gray-300 border-none rounded-full cursor-pointer transition-colors duration-300 touch-target;
-  width: 50px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @apply toggle-switch-consistent;
+  @apply active:scale-95;
+}
+
+.toggle-switch:disabled {
+  @apply cursor-not-allowed opacity-50;
 }
 
 .toggle-switch.active {
-  @apply bg-green-500;
+  @apply bg-primary-500;
+}
+
+.toggle-switch.disabled {
+  @apply bg-gray-200 cursor-not-allowed;
 }
 
 .toggle-slider {
-  @apply absolute bg-white rounded-full transition-transform duration-300;
+  @apply absolute bg-white rounded-full transition-all duration-300 ease-in-out shadow-sm;
   top: 2px;
   left: 2px;
   width: 20px;
   height: 20px;
+  transform: translateX(0);
 }
 
-.toggle-switch.active .toggle-slider {
+.toggle-slider.active {
   transform: translateX(26px);
+}
+
+/* Enhanced hover states using consistent styling */
+.toggle-switch:hover:not(:disabled) {
+  @apply shadow-md;
+}
+
+.toggle-switch:hover:not(:disabled):not(.active) {
+  @apply bg-gray-400;
+}
+
+.toggle-switch:hover:not(:disabled).active {
+  @apply bg-primary-600;
+}
+
+/* Enhanced focus states for accessibility */
+.toggle-switch:focus {
+  @apply focus-primary;
+}
+
+.toggle-switch:focus:not(.active) {
+  @apply ring-gray-400;
 }
 
 /* Touch-friendly interactions */
 @media (hover: none) {
-  .toggle-switch:active {
+  .toggle-switch:active:not(:disabled) {
     @apply scale-95;
   }
-}
-
-/* Ensure accessibility and visual feedback */
-.toggle-switch:focus {
-  @apply outline-2 outline-green-500 outline-offset-2;
-}
-
-.toggle-switch:hover:not(:disabled) {
-  @apply opacity-90;
+  
+  .toggle-switch:active:not(:disabled):not(.active) {
+    @apply bg-gray-400;
+  }
+  
+  .toggle-switch:active:not(:disabled).active {
+    @apply bg-primary-600;
+  }
 }
 
 /* Responsive adjustments */
@@ -102,6 +135,20 @@ const handleToggle = () => {
   
   .toggle-title {
     @apply text-sm;
+  }
+  
+  .toggle-switch {
+    width: 44px;
+    height: 22px;
+  }
+  
+  .toggle-slider {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .toggle-slider.active {
+    transform: translateX(22px);
   }
 }
 </style>

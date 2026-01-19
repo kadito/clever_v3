@@ -21,7 +21,7 @@
             <button
               type="button"
               @click="handleCancel"
-              class="btn-secondary text-sm"
+              class="btn-secondary-consistent text-sm"
             >
               Cancelar
             </button>
@@ -29,7 +29,8 @@
               type="submit"
               form="content-form"
               :disabled="!isFormValidSimple || isSaving"
-              class="btn-primary text-sm"
+              class="btn-primary-consistent text-sm"
+              :class="{ 'btn-loading': isSaving }"
               @click="console.log('Desktop submit button clicked, disabled:', !isFormValidSimple || isSaving)"
             >
               <svg
@@ -73,36 +74,15 @@
       </div>
     </div>
 
-    <!-- Error state -->
-    <div v-else-if="error" class="p-4 sm:p-6">
+    <!-- Error state (only for non-validation errors) -->
+    <div v-if="error" class="p-4 sm:p-6">
       <div class="max-w-4xl mx-auto">
         <ErrorComponent :error="error" @close="clearError" />
       </div>
     </div>
 
-    <!-- Validation errors summary -->
-    <div v-else-if="Object.keys(validationErrors).length > 0 && hasValidated" class="p-4 sm:p-6 pt-0">
-      <div class="max-w-4xl mx-auto">
-        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div class="flex">
-            <svg class="w-5 h-5 text-red-400 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div class="flex-1">
-              <h3 class="text-sm font-medium text-red-800 mb-2">Por favor corrija os seguintes erros:</h3>
-              <ul class="text-sm text-red-700 list-disc list-inside space-y-1">
-                <li v-for="(errorMsg, field) in validationErrors" :key="field">
-                  {{ errorMsg }}
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Form content -->
-    <main v-else class="p-4 sm:p-6 pb-24">
+    <!-- Form content (always visible when not loading) -->
+    <main v-if="!isLoading" class="p-4 sm:p-6 pb-24">
       <div class="max-w-4xl mx-auto">
         <form
           id="content-form"
@@ -156,7 +136,7 @@
                             class="form-input"
                             :class="{ 'border-red-500': validationErrors[field.key] }"
                             @blur="validateField(field.key)"
-                            @input="(e) => updateFieldValue(field.key, (e.target as HTMLInputElement).value)"
+                            @input="(e) => { updateFieldValue(field.key, (e.target as HTMLInputElement).value); clearFieldError(field.key); }"
                           />
 
                           <!-- Number input -->
@@ -174,7 +154,7 @@
                             class="form-input"
                             :class="{ 'border-red-500': validationErrors[field.key] }"
                             @blur="validateField(field.key)"
-                            @input="(e) => updateFieldValue(field.key, Number((e.target as HTMLInputElement).value))"
+                            @input="(e) => { updateFieldValue(field.key, Number((e.target as HTMLInputElement).value)); clearFieldError(field.key); }"
                           />
 
                           <!-- Textarea -->
@@ -190,7 +170,7 @@
                             class="form-textarea"
                             :class="{ 'border-red-500': validationErrors[field.key] }"
                             @blur="validateField(field.key)"
-                            @input="(e) => updateFieldValue(field.key, (e.target as HTMLTextAreaElement).value)"
+                            @input="(e) => { updateFieldValue(field.key, (e.target as HTMLTextAreaElement).value); clearFieldError(field.key); }"
                           />
 
                           <!-- Select -->
@@ -203,7 +183,7 @@
                             class="form-select"
                             :class="{ 'border-red-500': validationErrors[field.key] }"
                             @blur="validateField(field.key)"
-                            @change="(e) => updateFieldValue(field.key, (e.target as HTMLSelectElement).value)"
+                            @change="(e) => { updateFieldValue(field.key, (e.target as HTMLSelectElement).value); clearFieldError(field.key); }"
                           >
                             <option value="" disabled>{{ field.placeholder || 'Selecionar...' }}</option>
                             <option
@@ -277,7 +257,7 @@
                               type="checkbox"
                               :disabled="field.disabled"
                               class="form-checkbox"
-                              @change="(e) => updateFieldValue(field.key, (e.target as HTMLInputElement).checked)"
+                              @change="(e) => { updateFieldValue(field.key, (e.target as HTMLInputElement).checked); clearFieldError(field.key); }"
                             />
                             <label :for="field.key" class="ml-2 text-sm text-gray-700">
                               {{ field.checkboxLabel || field.label }}
@@ -297,7 +277,7 @@
                             class="form-input"
                             :class="{ 'border-red-500': validationErrors[field.key] }"
                             @blur="validateField(field.key)"
-                            @change="(e) => updateFieldValue(field.key, (e.target as HTMLInputElement).value)"
+                            @change="(e) => { updateFieldValue(field.key, (e.target as HTMLInputElement).value); clearFieldError(field.key); }"
                           />
 
                           <!-- Custom field slot -->
@@ -308,7 +288,7 @@
                               :disabled="field.disabled"
                               :readonly="field.readonly"
                               :has-error="!!validationErrors[field.key]"
-                              @update:model-value="(value) => updateFieldValue(field.key, value)"
+                              @update:model-value="(value) => { updateFieldValue(field.key, value); clearFieldError(field.key); }"
                               @client-selected="(client) => handleClientSelected(client)"
                             />
                           </div>
@@ -347,6 +327,25 @@
           <!-- Custom form sections -->
           <slot name="customSections" :form-data="formData" :errors="validationErrors" :update-field-value="updateFieldValue" />
 
+          <!-- Validation errors summary (shown at bottom of form when there are errors) -->
+          <div v-if="Object.keys(validationErrors).length > 0 && hasValidated" class="mt-6">
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div class="flex">
+                <svg class="w-5 h-5 text-red-400 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div class="flex-1">
+                  <h3 class="text-sm font-medium text-red-800 mb-2">Por favor corrija os seguintes erros:</h3>
+                  <ul class="text-sm text-red-700 list-disc list-inside space-y-1">
+                    <li v-for="(errorMsg, field) in validationErrors" :key="field">
+                      {{ errorMsg }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Invisible overlay to close multiselect dropdowns when clicking outside -->
           <div
             v-if="hasOpenMultiselects"
@@ -363,7 +362,7 @@
         <button
           type="button"
           @click="handleCancel"
-          class="btn-secondary flex-1 justify-center"
+          class="btn-secondary-consistent flex-1 justify-center"
         >
           Cancelar
         </button>
@@ -371,7 +370,8 @@
           type="submit"
           form="content-form"
           :disabled="!isFormValidSimple || isSaving"
-          class="btn-primary flex-1 justify-center"
+          class="btn-primary-consistent flex-1 justify-center"
+          :class="{ 'btn-loading': isSaving }"
         >
           <svg
             v-if="isSaving"
@@ -571,27 +571,27 @@ const validateField = (fieldKey: string) => {
     switch (field.type) {
       case 'email':
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          validationErrors[fieldKey] = 'Email inválido';
+          validationErrors[fieldKey] = 'Por favor, introduza um endereço de email válido';
         }
         break;
       case 'tel':
         if (!/^[\d\s\-\+\(\)]+$/.test(value)) {
-          validationErrors[fieldKey] = 'Número de telefone inválido';
+          validationErrors[fieldKey] = 'Por favor, introduza um número de telefone válido';
         }
         break;
       case 'url':
         try {
           new URL(value);
         } catch {
-          validationErrors[fieldKey] = 'URL inválida';
+          validationErrors[fieldKey] = 'Por favor, introduza um URL válido (ex: https://exemplo.com)';
         }
         break;
       case 'number':
         if (field.min !== undefined && value < field.min) {
-          validationErrors[fieldKey] = `Valor mínimo é ${field.min}`;
+          validationErrors[fieldKey] = `O valor mínimo permitido é ${field.min}`;
         }
         if (field.max !== undefined && value > field.max) {
-          validationErrors[fieldKey] = `Valor máximo é ${field.max}`;
+          validationErrors[fieldKey] = `O valor máximo permitido é ${field.max}`;
         }
         break;
     }
@@ -732,6 +732,9 @@ const toggleOption = (fieldKey: string, optionValue: string) => {
   
   updateFieldValue(fieldKey, newValues);
   
+  // Clear field error when user makes a selection
+  clearFieldError(fieldKey);
+  
   // Update individual service flags for backward compatibility
   if (fieldKey === 'selectedServices') {
     const serviceFlags = {
@@ -753,6 +756,9 @@ const removeSelectedOption = (fieldKey: string, optionValue: string) => {
   const currentValues = formData.value[fieldKey] || [];
   const newValues = Array.isArray(currentValues) ? currentValues.filter(v => v !== optionValue) : [];
   updateFieldValue(fieldKey, newValues);
+  
+  // Clear field error when user makes a change
+  clearFieldError(fieldKey);
   
   // Update individual service flags for backward compatibility
   if (fieldKey === 'selectedServices') {
@@ -835,96 +841,54 @@ const getSelectedOptions = (field: FormField, selectedValues: any) => {
   border-color: rgb(239 68 68);
 }
 
-/* Responsive layout adjustments */
-@media (min-width: 768px) {
-  .content-form-container {
-    padding-bottom: 2rem;
-  }
+/* Apply consistent form styling */
+.form-input {
+  @apply form-input-consistent;
 }
 
-/* Sticky header on mobile */
-@media (max-width: 767px) {
-  header {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
+.form-textarea {
+  @apply form-textarea-consistent;
 }
 
-/* Portuguese text optimization */
-.form-input,
-.form-textarea,
 .form-select {
-  @apply text-portuguese;
-}
-
-/* Accessibility improvements */
-.form-group:focus-within {
-  @apply ring-2 ring-primary-500 ring-offset-2 rounded-touch;
-}
-
-/* Mobile input optimization */
-@media (max-width: 767px) {
-  .form-input,
-  .form-textarea,
-  .form-select {
-    font-size: 16px; /* Prevent zoom on iOS */
-  }
-}
-
-/* Touch-friendly form controls */
-.form-input,
-.form-textarea,
-.form-select {
-  @apply min-h-touch;
+  @apply form-select-consistent;
 }
 
 .form-checkbox {
-  @apply w-5 h-5; /* Larger touch target */
+  @apply form-checkbox-consistent;
 }
 
-/* Form validation animations */
+.form-label {
+  @apply form-label-consistent;
+}
+
 .form-error {
-  animation: slideDown 0.2s ease-out;
+  @apply form-error-message;
 }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.form-help {
+  @apply mt-1 text-sm text-gray-500;
 }
 
-/* Print styles */
-@media print {
-  .content-form-container {
-    background: white;
-  }
-  
-  header,
-  .mobile-actions {
-    display: none;
-  }
-  
-  .form-section {
-    break-inside: avoid;
-    margin-bottom: 1rem;
-  }
+.form-section {
+  @apply form-section-consistent;
 }
 
-/* Multiselect component styling */
+.form-grid {
+  @apply form-grid-consistent;
+}
+
+.form-group {
+  @apply mb-4;
+}
+
+/* Multiselect component styling with consistent design */
 .multiselect-container {
   @apply relative;
 }
 
 .multiselect-input {
-  @apply block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm cursor-pointer bg-white min-h-touch;
-  @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
-  @apply transition-colors duration-200;
+  @apply form-element-base cursor-pointer px-3 py-2;
 }
 
 .multiselect-input:hover {
@@ -941,13 +905,13 @@ const getSelectedOptions = (field: FormField, selectedValues: any) => {
 
 .multiselect-tag {
   @apply inline-flex items-center px-2 py-1 bg-primary-100 text-primary-800 text-xs font-medium rounded;
-  @apply max-w-full;
+  @apply max-w-full transition-colors duration-150;
 }
 
 .multiselect-tag-remove {
   @apply ml-1 text-primary-600 hover:text-primary-800 font-bold text-sm leading-none;
   @apply w-4 h-4 flex items-center justify-center rounded-full hover:bg-primary-200;
-  @apply transition-colors duration-150;
+  @apply transition-colors duration-150 touch-target;
 }
 
 .multiselect-arrow {
@@ -956,11 +920,12 @@ const getSelectedOptions = (field: FormField, selectedValues: any) => {
 
 .multiselect-dropdown {
   @apply absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto;
+  @apply animate-slide-down;
 }
 
 .multiselect-option {
   @apply flex items-center px-3 py-2 cursor-pointer hover:bg-gray-50 transition-colors duration-150;
-  @apply min-h-touch;
+  @apply touch-target;
 }
 
 .multiselect-option.selected {
@@ -968,18 +933,26 @@ const getSelectedOptions = (field: FormField, selectedValues: any) => {
 }
 
 .multiselect-checkbox {
-  @apply mr-2 rounded border-gray-300 text-primary-600 focus:ring-primary-500;
-  @apply w-4 h-4;
+  @apply form-checkbox-consistent mr-2;
 }
 
 .multiselect-overlay {
   @apply fixed inset-0 z-40;
 }
 
-/* Mobile optimizations for multiselect */
-@media (max-width: 767px) {
+/* Enhanced mobile optimizations for multiselect */
+@media (max-width: 640px) {
+  .multiselect-input {
+    @apply py-3 px-4; /* Larger touch area */
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
   .multiselect-tag {
     @apply text-xs px-1.5 py-0.5;
+  }
+  
+  .multiselect-tag-remove {
+    @apply w-5 h-5; /* Larger touch target */
   }
   
   .multiselect-dropdown {
@@ -987,7 +960,22 @@ const getSelectedOptions = (field: FormField, selectedValues: any) => {
   }
   
   .multiselect-option {
-    @apply py-3;
+    @apply py-4 px-4; /* Larger touch areas */
+  }
+  
+  .multiselect-checkbox {
+    @apply w-5 h-5; /* Larger on mobile */
+  }
+}
+
+/* Touch device specific enhancements */
+@media (hover: none) and (pointer: coarse) {
+  .multiselect-option:active {
+    @apply bg-primary-100;
+  }
+  
+  .multiselect-tag-remove:active {
+    @apply bg-primary-300 scale-95;
   }
 }
 </style>

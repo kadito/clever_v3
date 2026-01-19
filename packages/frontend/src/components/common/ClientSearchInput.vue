@@ -381,11 +381,22 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .client-search-wrapper {
-  @apply relative w-full;
+  @apply w-full;
+  /* Ensure dropdown can escape form section boundaries */
+  position: relative;
+  z-index: 1;
+}
+
+.client-search-wrapper .relative {
+  /* Create stacking context for dropdown positioning */
+  z-index: 2;
 }
 
 .search-dropdown {
-  @apply absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-touch shadow-lg z-[9999] max-h-60 overflow-y-auto;
+  @apply absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-touch shadow-xl max-h-60 overflow-y-auto;
+  z-index: 99999 !important;
+  /* Ensure dropdown is visible above all other content */
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .search-option {

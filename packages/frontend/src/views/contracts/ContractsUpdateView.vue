@@ -325,58 +325,58 @@ const validateContractUpdate = (data: Record<string, any>): Record<string, strin
     const hasSH = data.hasSHContract;
     
     if (!hasCPA && !hasSH) {
-      errors.hasCPAContract = 'Deve manter pelo menos um tipo de contrato (CPA e/ou S&H)';
-      errors.hasSHContract = 'Deve manter pelo menos um tipo de contrato (CPA e/ou S&H)';
+      errors.hasCPAContract = 'Por favor, mantenha pelo menos um tipo de contrato (CPA e/ou S&H)';
+      errors.hasSHContract = 'Por favor, mantenha pelo menos um tipo de contrato (CPA e/ou S&H)';
     }
     
     // CPA-specific validation (if CPA is configured)
     if (hasCPA) {
       if (!data.cpaContractType) {
-        errors.cpaContractType = 'Tipo de contrato CPA é obrigatório';
+        errors.cpaContractType = 'Por favor, selecione o tipo de contrato CPA';
       }
       
       if (!data.planIdCPA) {
-        errors.planIdCPA = 'Plano CPA é obrigatório';
+        errors.planIdCPA = 'Por favor, selecione um plano CPA';
       }
       
       // Distance is only required for CPA (2023), not CPA_1500
       if (data.cpaContractType === 'CPA' && !data.distanceCPA) {
-        errors.distanceCPA = 'Distância é obrigatória para contratos CPA (2023)';
+        errors.distanceCPA = 'Por favor, selecione a distância para contratos CPA (2023)';
       }
       
       if (!data.modalidadePagamentoCPA) {
-        errors.modalidadePagamentoCPA = 'Modalidade de pagamento CPA é obrigatória';
+        errors.modalidadePagamentoCPA = 'Por favor, selecione a modalidade de pagamento CPA';
       }
       
       // Validate CPA equipment
       if (!cpaEquipments.value || cpaEquipments.value.length === 0) {
-        errors.cpaEquipments = 'Pelo menos um equipamento CPA deve ser mantido';
+        errors.cpaEquipments = 'Por favor, mantenha pelo menos um equipamento CPA';
       } else {
         // Validate each equipment
         cpaEquipments.value.forEach((equipment, index) => {
           if (!equipment.modelo?.trim()) {
-            errors[`cpaEquipment${index}Model`] = `Modelo do equipamento ${index + 1} é obrigatório`;
+            errors[`cpaEquipment${index}Model`] = `Por favor, introduza o modelo do equipamento ${index + 1}`;
           }
           
           // First equipment should have 0% discount
           if (index === 0 && equipment.desconto !== 0) {
-            errors[`cpaEquipment${index}Discount`] = 'O primeiro equipamento não deve ter desconto';
+            errors[`cpaEquipment${index}Discount`] = 'O primeiro equipamento não deve ter desconto aplicado';
           }
           
           // Discount validation for additional equipment
           if (index > 0 && (typeof equipment.desconto !== 'number' || equipment.desconto < 0 || equipment.desconto > 100)) {
-            errors[`cpaEquipment${index}Discount`] = `Desconto do equipamento ${index + 1} deve ser entre 0 e 100%`;
+            errors[`cpaEquipment${index}Discount`] = `O desconto do equipamento ${index + 1} deve estar entre 0 e 100%`;
           }
         });
       }
       
       // Validate contract dates
       if (!data.inicioContratoCPA) {
-        errors.inicioContratoCPA = 'Data de início do contrato CPA é obrigatória';
+        errors.inicioContratoCPA = 'Por favor, selecione a data de início do contrato CPA';
       }
       
       if (!data.fimContratoCPA) {
-        errors.fimContratoCPA = 'Data de fim do contrato CPA é obrigatória';
+        errors.fimContratoCPA = 'Por favor, selecione a data de fim do contrato CPA';
       }
       
       // Date range validation
@@ -384,7 +384,7 @@ const validateContractUpdate = (data: Record<string, any>): Record<string, strin
         const startDate = new Date(data.inicioContratoCPA);
         const endDate = new Date(data.fimContratoCPA);
         if (startDate >= endDate) {
-          errors.fimContratoCPA = 'Data de fim deve ser posterior à data de início';
+          errors.fimContratoCPA = 'A data de fim deve ser posterior à data de início';
         }
       }
     }
@@ -392,24 +392,24 @@ const validateContractUpdate = (data: Record<string, any>): Record<string, strin
     // S&H-specific validation (if S&H is configured)
     if (hasSH) {
       if (!data.planIdSH) {
-        errors.planIdSH = 'Plano S&H é obrigatório';
+        errors.planIdSH = 'Por favor, selecione um plano S&H';
       }
       
       if (!data.distanceSH) {
-        errors.distanceSH = 'Distância S&H é obrigatória';
+        errors.distanceSH = 'Por favor, selecione a distância para o contrato S&H';
       }
       
       if (!data.modalidadePagamentoSH) {
-        errors.modalidadePagamentoSH = 'Modalidade de pagamento S&H é obrigatória';
+        errors.modalidadePagamentoSH = 'Por favor, selecione a modalidade de pagamento S&H';
       }
       
       // Validate contract dates
       if (!data.inicioContratoSH) {
-        errors.inicioContratoSH = 'Data de início do contrato S&H é obrigatória';
+        errors.inicioContratoSH = 'Por favor, selecione a data de início do contrato S&H';
       }
       
       if (!data.fimContratoSH) {
-        errors.fimContratoSH = 'Data de fim do contrato S&H é obrigatória';
+        errors.fimContratoSH = 'Por favor, selecione a data de fim do contrato S&H';
       }
       
       // Date range validation
@@ -417,7 +417,7 @@ const validateContractUpdate = (data: Record<string, any>): Record<string, strin
         const startDate = new Date(data.inicioContratoSH);
         const endDate = new Date(data.fimContratoSH);
         if (startDate >= endDate) {
-          errors.fimContratoSH = 'Data de fim deve ser posterior à data de início';
+          errors.fimContratoSH = 'A data de fim deve ser posterior à data de início';
         }
       }
     }
@@ -527,7 +527,6 @@ const loadContract = async () => {
       const data = contract.value.data;
       initialData.value = {
         clientId: data.clientId,
-        clienteName: data.clienteName,
         hasCPAContract: data.hasCPAContract,
         hasSHContract: data.hasSHContract,
         cpaContractType: data.cpaContractType,
