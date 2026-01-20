@@ -210,6 +210,74 @@ if (typeof data.deslocacoesPorAnoCPA !== 'number' ||
 4. **Validation Support**: Update validation rules to accept `-1` as a valid unlimited value
 5. **Data Integrity**: Ensure unlimited values are properly stored and retrieved from R2 storage
 
+## Dynamic Price Calculations
+
+### Overview
+
+The system implements dynamic price calculations that account for POS packages and additional equipment costs.
+
+### Pricing Formula
+
+`TOTAL_PRICE = BASE_PRICE + POS_PACKAGE(+100€) + Σ(BASE_PRICE * (1 - DISCOUNT/100))`
+
+### Pricing Components
+
+1. **Base Plan Price**: The standard plan price based on contract type, plan, and distance
+2. **POS Package**: Fixed €100/year for CPA_1500 PREMIUM when `hasPOSPackage` is enabled
+3. **Additional Equipment**: Each additional equipment (beyond the first) costs the same as the base plan price, with discount applied
+
+### Equipment Pricing Logic
+
+- **First Equipment**: Included in base plan price (no additional cost)
+- **Additional Equipment**: Each costs the same as the base plan price
+- **Discount Application**: `EQUIPMENT_COST = BASE_PRICE * (1 - DISCOUNT_PERCENTAGE/100)`
+
+### Example Calculations
+
+**CPA_1500 PREMIUM + POS Package + 2 Equipments (second with 50% discount):**
+
+**Annual Payment:**
+- Base Plan: €825
+- POS Package: +€100
+- Equipment 2 (50% discount): +€412.50 (€825 × 0.5)
+- **Total Annual**: €1,337.50
+
+**Monthly Payment:**
+- Base Plan: €75
+- POS Package: +€8.33 (€100 ÷ 12)
+- Equipment 2 (50% discount): +€37.50 (€75 × 0.5)
+- **Total Monthly**: €120.83
+- **Total Monthly × 12**: €1,449.96
+
+**Savings**: ((€1,449.96 - €1,337.50) ÷ €1,449.96) × 100 = **7.75%**
+
+**CPA Premium (Annual: €825) + 3 Equipments:**
+
+**Annual Payment:**
+- Base Plan: €825
+- Equipment 2 (25% discount): +€618.75 (€825 × 0.75)
+- Equipment 3 (0% discount): +€825.00 (€825 × 1.0)
+- **Total Annual**: €2,268.75
+
+**Monthly Payment (€75 base):**
+- Base Plan: €75
+- Equipment 2 (25% discount): +€56.25 (€75 × 0.75)
+- Equipment 3 (0% discount): +€75.00 (€75 × 1.0)
+- **Total Monthly**: €206.25
+- **Total Monthly × 12**: €2,475.00
+
+**Savings**: ((€2,475.00 - €2,268.75) ÷ €2,475.00) × 100 = **8.33%**
+
+### Implementation Details
+
+- Equipment pricing is calculated dynamically based on the base plan price **for each payment period**
+- **Monthly**: Equipment cost = Monthly base price × (1 - discount%)
+- **Annual**: Equipment cost = Annual base price × (1 - discount%)
+- POS package cost is fixed at €100/year regardless of payment frequency
+- All additional costs are calculated proportionally for each payment period
+- Price breakdown section shows composition when additional costs exist
+- Savings calculation compares total annual cost vs total monthly cost × 12
+
 ## Equipment Management
 
 ### CPA Equipment Pattern

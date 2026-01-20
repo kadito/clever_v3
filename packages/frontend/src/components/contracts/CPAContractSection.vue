@@ -89,6 +89,9 @@
       :selected-payment="formData?.modalidadePagamentoCPA || ''"
       :distance="formData?.distanceCPA || ''"
       :is-loading="props.isLoadingPlan"
+      :has-p-o-s-package="formData?.hasPOSPackage || false"
+      :equipments="cpaEquipments"
+      :contract-type="formData?.cpaContractType || ''"
       @payment-selected="$emit('update-field', 'modalidadePagamentoCPA', $event)"
     />
   </div>

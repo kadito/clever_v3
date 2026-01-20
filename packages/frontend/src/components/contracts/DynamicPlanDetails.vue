@@ -60,6 +60,25 @@
         </div>
       </div>
       
+      <!-- Price Breakdown (if has additional costs) -->
+      <div v-if="hasAdditionalCosts" class="price-breakdown-section">
+        <h4>COMPOSIÇÃO DO PREÇO:</h4>
+        <div class="price-breakdown">
+          <div class="breakdown-item">
+            <span class="breakdown-label">Plano Base:</span>
+            <span class="breakdown-value">Conforme modalidade selecionada</span>
+          </div>
+          <div v-if="hasPOSPackage" class="breakdown-item">
+            <span class="breakdown-label">Pack POS (10h assistência):</span>
+            <span class="breakdown-value">+{{ formatPrice(100) }}/ano</span>
+          </div>
+          <div v-if="equipments && equipments.length > 1" class="breakdown-item">
+            <span class="breakdown-label">Equipamentos adicionais:</span>
+            <span class="breakdown-value">{{ equipments.length - 1 }} × preço do plano (com descontos aplicados)</span>
+          </div>
+        </div>
+      </div>
+      
       <!-- Payment Options -->
       <div class="payment-selection-section">
         <h4>SELECIONE A MODALIDADE DE PAGAMENTO:</h4>
@@ -98,12 +117,23 @@
 <script setup lang="ts">
 import { computed, toRefs } from 'vue'
 
+interface ContractEquipment {
+  id: string
+  modelo: string
+  numeroSerie: string
+  desconto: number // Discount percentage (0-100)
+  observacoes: string
+}
+
 interface Props {
   planDetails: any
   selectedPayment: string
   distance?: string
   isLoading?: boolean
   errorMessage?: string
+  hasPOSPackage?: boolean
+  equipments?: ContractEquipment[]
+  contractType?: string
 }
 
 interface Emits {
@@ -114,7 +144,9 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 // Use toRefs for better performance with reactive props
-const { planDetails, selectedPayment, distance, isLoading, errorMessage } = toRefs(props)
+const { planDetails, selectedPayment, distance, isLoading, errorMessage, hasPOSPackage, equipments, contractType } = toRefs(props)
+
+// Equipment pricing: each additional equipment costs the same as the base plan price
 
 const selectPayment = (paymentId: string) => {
   emit('payment-selected', paymentId)
@@ -134,6 +166,40 @@ const requiresDistanceForPricing = computed(() => {
   return !!(prices.under180km || prices.over180km)
 })
 
+// Check if there are additional costs to display
+const hasAdditionalCosts = computed(() => {
+  return hasPOSPackage?.value || (equipments?.value && equipments.value.length > 1)
+})
+
+// Calculate additional equipment costs
+const calculateEquipmentCosts = (basePlanPrice: number): number => {
+  if (!equipments?.value || equipments.value.length <= 1) {
+    return 0
+  }
+  
+  // Skip the first equipment (included in base price), calculate for additional ones
+  // Each additional equipment costs the same as the base plan price, with discount applied
+  const additionalEquipments = equipments.value.slice(1)
+  
+  return additionalEquipments.reduce((total, equipment) => {
+    const discountMultiplier = 1 - (equipment.desconto / 100)
+    return total + (basePlanPrice * discountMultiplier)
+  }, 0)
+}
+
+// Calculate POS package cost
+const calculatePOSPackageCost = (): number => {
+  return hasPOSPackage?.value ? 100 : 0
+}
+
+// Calculate total additional costs per year
+const calculateAdditionalCosts = (basePlanPrice: number): number => {
+  const posPackageCost = calculatePOSPackageCost()
+  const equipmentCosts = calculateEquipmentCosts(basePlanPrice)
+  
+  return posPackageCost + equipmentCosts
+}
+
 // Memoized price formatter for better performance
 const formatPrice = (() => {
   const formatter = new Intl.NumberFormat('pt-PT', {
@@ -144,7 +210,8 @@ const formatPrice = (() => {
   return (price: number): string => formatter.format(price);
 })();
 
-// Compute payment options based on plan structure - enhanced with better error handling
+// Calculate savings percentage based on payment frequency (monthly is base)
+// Compute payment options based on plan structure - enhanced with dynamic pricing
 const paymentOptions = computed(() => {
   if (!planDetails.value?.prices) {
     return []
@@ -154,22 +221,61 @@ const paymentOptions = computed(() => {
   const options = []
   
   try {
+    let basePrices: any = null
+    
     // Handle distance-based pricing (CPA 2023 and S&H)
     if (requiresDistanceForPricing.value && distance?.value && prices[distance.value]) {
-      const distancePrices = prices[distance.value]
-      
-      if (distancePrices.monthly) options.push({ id: 'MENSAL', period: 'MENSAL', amount: formatPrice(distancePrices.monthly) })
-      if (distancePrices.quarterly) options.push({ id: 'TRIMESTRAL', period: 'TRIMESTRAL', amount: formatPrice(distancePrices.quarterly) })
-      if (distancePrices.semiannual) options.push({ id: 'SEMESTRAL', period: 'SEMESTRAL', amount: formatPrice(distancePrices.semiannual) })
-      if (distancePrices.annual) options.push({ id: 'ANUAL', period: 'ANUAL', amount: formatPrice(distancePrices.annual) })
+      basePrices = prices[distance.value]
     }
     // Handle flat pricing (CPA 1500)
     else if (!requiresDistanceForPricing.value && prices.monthly !== undefined) {
+      basePrices = prices
+    }
+    
+    if (basePrices) {
+      // Monthly option
+      if (basePrices.monthly) {
+        const monthlyAdditionalCosts = calculateAdditionalCosts(basePrices.monthly)
+        const totalMonthly = basePrices.monthly + monthlyAdditionalCosts
+        options.push({ 
+          id: 'MENSAL', 
+          period: 'MENSAL', 
+          amount: formatPrice(totalMonthly)
+        })
+      }
       
-      if (prices.monthly) options.push({ id: 'MENSAL', period: 'MENSAL', amount: formatPrice(prices.monthly) })
-      if (prices.quarterly) options.push({ id: 'TRIMESTRAL', period: 'TRIMESTRAL', amount: formatPrice(prices.quarterly) })
-      if (prices.semiannual) options.push({ id: 'SEMESTRAL', period: 'SEMESTRAL', amount: formatPrice(prices.semiannual) })
-      if (prices.annual) options.push({ id: 'ANUAL', period: 'ANUAL', amount: formatPrice(prices.annual) })
+      // Quarterly option
+      if (basePrices.quarterly) {
+        const quarterlyAdditionalCosts = calculateAdditionalCosts(basePrices.quarterly)
+        const totalQuarterly = basePrices.quarterly + quarterlyAdditionalCosts
+        options.push({ 
+          id: 'TRIMESTRAL', 
+          period: 'TRIMESTRAL', 
+          amount: formatPrice(totalQuarterly)
+        })
+      }
+      
+      // Semiannual option
+      if (basePrices.semiannual) {
+        const semiannualAdditionalCosts = calculateAdditionalCosts(basePrices.semiannual)
+        const totalSemiannual = basePrices.semiannual + semiannualAdditionalCosts
+        options.push({ 
+          id: 'SEMESTRAL', 
+          period: 'SEMESTRAL', 
+          amount: formatPrice(totalSemiannual)
+        })
+      }
+      
+      // Annual option
+      if (basePrices.annual) {
+        const additionalCostsPerYear = calculateAdditionalCosts(basePrices.annual)
+        const totalAnnual = basePrices.annual + additionalCostsPerYear
+        options.push({ 
+          id: 'ANUAL', 
+          period: 'ANUAL', 
+          amount: formatPrice(totalAnnual)
+        })
+      }
     }
   } catch (error) {
     console.error('Error generating payment options:', error)
@@ -249,6 +355,31 @@ const paymentOptions = computed(() => {
 
 .feature-text {
   @apply text-sm text-gray-700;
+}
+
+/* Price Breakdown Section */
+.price-breakdown-section {
+  @apply form-section-body-consistent bg-blue-50 border border-blue-200;
+}
+
+.price-breakdown-section h4 {
+  @apply text-sm font-semibold text-blue-700 mb-3 uppercase;
+}
+
+.price-breakdown {
+  @apply space-y-2;
+}
+
+.breakdown-item {
+  @apply flex justify-between items-center py-1;
+}
+
+.breakdown-label {
+  @apply text-sm text-blue-700 font-medium;
+}
+
+.breakdown-value {
+  @apply text-sm text-blue-800 font-semibold;
 }
 
 .payment-selection-section {

@@ -89,6 +89,8 @@
       :plan-details="selectedPlanDetails"
       :selected-payment="formData?.modalidadePagamentoSH || ''"
       :distance="formData?.distanceSH || ''"
+      :equipments="shEquipmentsForPricing"
+      :contract-type="'S&H'"
       @payment-selected="$emit('update-field', 'modalidadePagamentoSH', $event)"
     />
   </div>
@@ -164,6 +166,18 @@ const shouldShowPlanDetails = computed(() => {
   const shouldShow = !!(props.formData?.planIdSH && props.formData?.distanceSH);
   
   return shouldShow;
+})
+
+// Convert S&H equipments to the format expected by DynamicPlanDetails
+// S&H equipments don't have discounts, so we set discount to 0
+const shEquipmentsForPricing = computed(() => {
+  return props.shEquipments.map(equipment => ({
+    id: equipment.id,
+    modelo: equipment.modelo,
+    numeroSerie: equipment.numeroSerie,
+    desconto: 0, // S&H equipments don't have discounts
+    observacoes: equipment.observacoes
+  }))
 })
 </script>
 
