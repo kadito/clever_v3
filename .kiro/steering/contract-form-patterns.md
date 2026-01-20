@@ -118,7 +118,7 @@ const handleCPAPlanSelection = async (planId: string) => {
         updateFieldValue('manutencoesPorAnoCPA', planDetails.maintenancePerYear);
       }
       
-      // Set displacements per year
+      // Set displacements per year with unlimited value handling
       if (planDetails.callouts !== undefined) {
         if (typeof planDetails.callouts === 'number') {
           updateFieldValue('deslocacoesPorAnoCPA', planDetails.callouts);
@@ -128,7 +128,13 @@ const handleCPAPlanSelection = async (planId: string) => {
             const value = parseInt(match[1]);
             updateFieldValue('deslocacoesPorAnoCPA', value);
           } else {
-            updateFieldValue('deslocacoesPorAnoCPA', 0);
+            // If no number found, check if it's unlimited (contains "sem limite" or "unlimited")
+            if (planDetails.callouts.toLowerCase().includes('sem limite') || 
+                planDetails.callouts.toLowerCase().includes('unlimited')) {
+              updateFieldValue('deslocacoesPorAnoCPA', -1); // -1 represents unlimited
+            } else {
+              updateFieldValue('deslocacoesPorAnoCPA', 0);
+            }
           }
         }
       }
@@ -147,6 +153,62 @@ const handleCPAPlanSelection = async (planId: string) => {
 3. **Performance Optimization**: Use caching and memoization for plan details
 4. **Error Handling**: Graceful handling of missing or invalid plan data
 5. **Type Safety**: Use proper TypeScript types for plan data
+6. **Unlimited Values**: Use `-1` to represent unlimited values (displacements, hours, etc.)
+
+## Unlimited Values Handling
+
+### Convention
+
+The system uses `-1` to represent unlimited values in contract service details:
+
+- `deslocacoesPorAnoCPA: -1` = Unlimited CPA displacements per year
+- `deslocacoesPorAnoSH: -1` = Unlimited S&H displacements per year
+- `horasAssistenciaAnualCPA: -1` = Unlimited CPA hours per year (if applicable)
+- `horasAssistenciaAnualSH: -1` = Unlimited S&H hours per year (if applicable)
+
+### Detection Logic
+
+```typescript
+// Check if plan description indicates unlimited
+if (planDetails.callouts.toLowerCase().includes('sem limite') || 
+    planDetails.callouts.toLowerCase().includes('unlimited')) {
+  updateFieldValue('deslocacoesPorAnoCPA', -1); // -1 represents unlimited
+} else {
+  updateFieldValue('deslocacoesPorAnoCPA', 0);
+}
+```
+
+### Display Logic
+
+In detail views and display components, convert `-1` back to user-friendly text:
+
+```vue
+<div class="detail-value">
+  {{ (contract?.data.deslocacoesPorAnoCPA || contract?.data.deslocacoesPorAno) === -1 
+      ? 'Ilimitado' 
+      : (contract?.data.deslocacoesPorAnoCPA || contract?.data.deslocacoesPorAno || 0) }}
+</div>
+```
+
+### Validation Rules
+
+Validation functions must allow `-1` for unlimited values:
+
+```typescript
+// Allow -1 (unlimited) or positive numbers, but not 0 or other negative numbers
+if (typeof data.deslocacoesPorAnoCPA !== 'number' || 
+    (data.deslocacoesPorAnoCPA !== -1 && data.deslocacoesPorAnoCPA <= 0)) {
+  errors.push('As deslocações por ano CPA devem ser um número positivo ou -1 para ilimitado');
+}
+```
+
+### Key Principles
+
+1. **Consistent Convention**: Always use `-1` for unlimited values across the system
+2. **Detection Keywords**: Look for "sem limite", "unlimited", or similar phrases in plan descriptions
+3. **User-Friendly Display**: Convert `-1` to "Ilimitado" in Portuguese for user interfaces
+4. **Validation Support**: Update validation rules to accept `-1` as a valid unlimited value
+5. **Data Integrity**: Ensure unlimited values are properly stored and retrieved from R2 storage
 
 ## Equipment Management
 
@@ -389,6 +451,10 @@ try {
 - [ ] Client information displays correctly in read-only mode
 - [ ] All Portuguese text displays correctly
 - [ ] Mobile responsiveness works across all form sections
+- [ ] Unlimited values (-1) are properly detected from plan descriptions
+- [ ] Unlimited values display as "Ilimitado" in detail views
+- [ ] Validation accepts -1 for unlimited values
+- [ ] Plans with "sem limite" text correctly set displacement values to -1
 
 ### Common Issues to Watch For
 
@@ -397,3 +463,6 @@ try {
 3. **Equipment Array Synchronization**: Ensure equipment arrays stay in sync with form data
 4. **Validation Rule Conflicts**: Check for conflicting validation rules between contract types
 5. **Read-Only Field Submission**: Ensure read-only field values are included in form submissions
+6. **Unlimited Value Detection**: Ensure plans with "sem limite" text are properly detected and set to -1
+7. **Unlimited Value Display**: Verify that -1 values display as "Ilimitado" in all views
+8. **Validation Edge Cases**: Test that validation properly handles -1 values without errors

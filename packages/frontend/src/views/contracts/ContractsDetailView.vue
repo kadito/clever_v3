@@ -262,7 +262,11 @@
               </div>
               <div class="detail-item">
                 <label class="detail-label">Deslocações por Ano</label>
-                <div class="detail-value">{{ contract?.data.deslocacoesPorAnoCPA || contract?.data.deslocacoesPorAno || 0 }}</div>
+                <div class="detail-value">
+                  {{ (contract?.data.deslocacoesPorAnoCPA || contract?.data.deslocacoesPorAno) === -1 
+                      ? 'Ilimitado' 
+                      : (contract?.data.deslocacoesPorAnoCPA || contract?.data.deslocacoesPorAno || 0) }}
+                </div>
               </div>
               <div class="detail-item">
                 <label class="detail-label">Manutenções por Ano</label>
@@ -287,7 +291,11 @@
               </div>
               <div class="detail-item">
                 <label class="detail-label">Deslocações por Ano</label>
-                <div class="detail-value">{{ contract?.data.deslocacoesPorAnoSH || contract?.data.deslocacoesPorAno || 0 }}</div>
+                <div class="detail-value">
+                  {{ (contract?.data.deslocacoesPorAnoSH || contract?.data.deslocacoesPorAno) === -1 
+                      ? 'Ilimitado' 
+                      : (contract?.data.deslocacoesPorAnoSH || contract?.data.deslocacoesPorAno || 0) }}
+                </div>
               </div>
               <div class="detail-item">
                 <label class="detail-label">Manutenções por Ano</label>

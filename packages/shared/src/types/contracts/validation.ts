@@ -144,8 +144,8 @@ export function validateContractCreation(data: ContractCreationData): string[] {
       errors.push('As horas de assistência anual CPA devem ser um número positivo');
     }
 
-    if (typeof data.deslocacoesPorAnoCPA !== 'number' || data.deslocacoesPorAnoCPA < 0) {
-      errors.push('As deslocações por ano CPA devem ser um número positivo');
+    if (typeof data.deslocacoesPorAnoCPA !== 'number' || (data.deslocacoesPorAnoCPA !== -1 && data.deslocacoesPorAnoCPA <= 0)) {
+      errors.push('As deslocações por ano CPA devem ser um número positivo ou -1 para ilimitado');
     }
 
     if (typeof data.manutencoesPorAnoCPA !== 'number' || data.manutencoesPorAnoCPA < 0) {
@@ -158,8 +158,8 @@ export function validateContractCreation(data: ContractCreationData): string[] {
       errors.push('As horas de assistência anual S&H devem ser um número positivo');
     }
 
-    if (typeof data.deslocacoesPorAnoSH !== 'number' || data.deslocacoesPorAnoSH < 0) {
-      errors.push('As deslocações por ano S&H devem ser um número positivo');
+    if (typeof data.deslocacoesPorAnoSH !== 'number' || (data.deslocacoesPorAnoSH !== -1 && data.deslocacoesPorAnoSH <= 0)) {
+      errors.push('As deslocações por ano S&H devem ser um número positivo ou -1 para ilimitado');
     }
 
     if (typeof data.manutencoesPorAnoSH !== 'number' || data.manutencoesPorAnoSH < 0) {
@@ -290,8 +290,8 @@ export function validateContractUpdate(data: ContractUpdateData): string[] {
     }
 
     if (data.deslocacoesPorAnoCPA !== undefined) {
-      if (typeof data.deslocacoesPorAnoCPA !== 'number' || data.deslocacoesPorAnoCPA < 0) {
-        errors.push('Deslocações por ano CPA deve ser um número positivo');
+      if (typeof data.deslocacoesPorAnoCPA !== 'number' || (data.deslocacoesPorAnoCPA !== -1 && data.deslocacoesPorAnoCPA <= 0)) {
+        errors.push('Deslocações por ano CPA deve ser um número positivo ou -1 para ilimitado');
       }
     }
 
@@ -310,8 +310,8 @@ export function validateContractUpdate(data: ContractUpdateData): string[] {
     }
 
     if (data.deslocacoesPorAnoSH !== undefined) {
-      if (typeof data.deslocacoesPorAnoSH !== 'number' || data.deslocacoesPorAnoSH < 0) {
-        errors.push('Deslocações por ano S&H deve ser um número positivo');
+      if (typeof data.deslocacoesPorAnoSH !== 'number' || (data.deslocacoesPorAnoSH !== -1 && data.deslocacoesPorAnoSH <= 0)) {
+        errors.push('Deslocações por ano S&H deve ser um número positivo ou -1 para ilimitado');
       }
     }
 

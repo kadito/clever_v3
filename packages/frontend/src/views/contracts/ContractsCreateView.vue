@@ -480,9 +480,13 @@ const handleCPAPlanSelection = async (planId: string) => {
 
             updateFieldValue('deslocacoesPorAnoCPA', value);
           } else {
-            // If no number found, set to 0 (unlimited or special case)
-
-            updateFieldValue('deslocacoesPorAnoCPA', 0);
+            // If no number found, check if it's unlimited (contains "sem limite" or "unlimited")
+            if (planDetails.callouts.toLowerCase().includes('sem limite') || 
+                planDetails.callouts.toLowerCase().includes('unlimited')) {
+              updateFieldValue('deslocacoesPorAnoCPA', -1); // -1 represents unlimited
+            } else {
+              updateFieldValue('deslocacoesPorAnoCPA', 0);
+            }
           }
         }
       }
@@ -529,8 +533,13 @@ const handleSHPlanSelection = async (planId: string) => {
 
             updateFieldValue('deslocacoesPorAnoSH', value);
           } else {
-
-            updateFieldValue('deslocacoesPorAnoSH', 0);
+            // If no number found, check if it's unlimited (contains "sem limite" or "unlimited")
+            if (planDetails.displacementsIncluded.toLowerCase().includes('sem limite') || 
+                planDetails.displacementsIncluded.toLowerCase().includes('unlimited')) {
+              updateFieldValue('deslocacoesPorAnoSH', -1); // -1 represents unlimited
+            } else {
+              updateFieldValue('deslocacoesPorAnoSH', 0);
+            }
           }
         }
       }
