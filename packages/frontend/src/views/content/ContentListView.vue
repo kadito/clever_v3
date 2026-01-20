@@ -281,7 +281,7 @@ const handleSearch = (query: string) => {
 
 const handleFilter = (updatedFilters: any[]) => {
   // Filter logic will be implemented when needed
-  console.log('Filters updated:', updatedFilters);
+
 };
 
 const navigateToDetail = (id: string) => {

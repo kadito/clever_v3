@@ -311,7 +311,7 @@ const clearError = () => {
 
 // Display toggle handlers - both sections can be active simultaneously
 const handleCPADisplayToggle = (active: boolean) => {
-  console.log('CPA toggle changed:', active);
+
   showCPASection.value = active;
   
   if (active) {
@@ -329,7 +329,7 @@ const handleCPADisplayToggle = (active: boolean) => {
 };
 
 const handleSHDisplayToggle = (active: boolean) => {
-  console.log('S&H toggle changed:', active);
+
   showSHSection.value = active;
   
   if (active) {
@@ -357,7 +357,7 @@ const clearCPAValidationErrors = () => {
   fieldsToClean.forEach(field => {
     if (error.value && error.value.includes(field)) {
       // This is a simple approach - in a more complex app you'd have structured error handling
-      console.log(`Clearing CPA validation error for field: ${field}`);
+
     }
   });
 };
@@ -372,7 +372,7 @@ const clearSHValidationErrors = () => {
   fieldsToClean.forEach(field => {
     if (error.value && error.value.includes(field)) {
       // This is a simple approach - in a more complex app you'd have structured error handling
-      console.log(`Clearing S&H validation error for field: ${field}`);
+
     }
   });
 };
@@ -448,144 +448,156 @@ const initializeSHData = () => {
 
 // Plan selection handlers with loading states
 const handleCPAPlanSelection = async (planId: string) => {
-  console.log('CPA Plan Selection Handler called with planId:', planId);
-  console.log('Current formData.value:', JSON.stringify(formData.value, null, 2));
+
   
   updateFieldValue('planIdCPA', planId);
   
   if (planId && formData.value?.cpaContractType) {
-    console.log('Loading CPA plan details for:', planId, formData.value.cpaContractType);
+
     await loadCPAPlanDetails(planId, formData.value.cpaContractType);
     
     // Auto-populate service details from plan data
     const planDetails = getPlanDetails(formData.value.cpaContractType as ContractType, planId);
-    console.log('Retrieved CPA plan details:', JSON.stringify(planDetails, null, 2));
+
     
     if (planDetails) {
       // Set maintenance per year (CPA plans have this field)
       if (planDetails.maintenancePerYear !== undefined) {
-        console.log('Setting manutencoesPorAnoCPA to:', planDetails.maintenancePerYear);
+
         updateFieldValue('manutencoesPorAnoCPA', planDetails.maintenancePerYear);
       }
       
       // Set displacements per year (try to extract number from callouts if it's a number)
       if (planDetails.callouts !== undefined) {
         if (typeof planDetails.callouts === 'number') {
-          console.log('Setting deslocacoesPorAnoCPA to:', planDetails.callouts);
+
           updateFieldValue('deslocacoesPorAnoCPA', planDetails.callouts);
         } else if (typeof planDetails.callouts === 'string') {
           // Try to extract number from string like "1 deslocação" or "2 deslocações"
           const match = planDetails.callouts.match(/(\d+)/);
           if (match) {
             const value = parseInt(match[1]);
-            console.log('Setting deslocacoesPorAnoCPA to (from string):', value);
+
             updateFieldValue('deslocacoesPorAnoCPA', value);
           } else {
             // If no number found, set to 0 (unlimited or special case)
-            console.log('Setting deslocacoesPorAnoCPA to 0 (no number found in string)');
+
             updateFieldValue('deslocacoesPorAnoCPA', 0);
           }
         }
       }
       
       // CPA plans don't typically have hours, so set to 0
-      console.log('Setting horasAssistenciaAnualCPA to 0');
+
       updateFieldValue('horasAssistenciaAnualCPA', 0);
       
-      console.log('Updated formData after CPA plan selection:', JSON.stringify(formData.value, null, 2));
+
     }
   }
 };
 
 const handleSHPlanSelection = async (planId: string) => {
-  console.log('S&H Plan Selection Handler called with planId:', planId);
-  console.log('Current formData.value:', JSON.stringify(formData.value, null, 2));
+
   
   updateFieldValue('planIdSH', planId);
   
   if (planId) {
-    console.log('Loading S&H plan details for:', planId);
+
     await loadSHPlanDetails(planId);
     
     // Auto-populate service details from plan data
     const planDetails = getPlanDetails('S&H', planId);
-    console.log('Retrieved S&H plan details:', JSON.stringify(planDetails, null, 2));
+
     
     if (planDetails) {
       // Set hours per year (S&H plans have this field)
       if (planDetails.hoursPerYear !== undefined) {
-        console.log('Setting horasAssistenciaAnualSH to:', planDetails.hoursPerYear);
+
         updateFieldValue('horasAssistenciaAnualSH', planDetails.hoursPerYear);
       }
       
       // Set displacements per year (S&H plans have displacementsIncluded)
       if (planDetails.displacementsIncluded !== undefined) {
         if (typeof planDetails.displacementsIncluded === 'number') {
-          console.log('Setting deslocacoesPorAnoSH to:', planDetails.displacementsIncluded);
+
           updateFieldValue('deslocacoesPorAnoSH', planDetails.displacementsIncluded);
         } else if (typeof planDetails.displacementsIncluded === 'string') {
           // Try to extract number from string
           const match = planDetails.displacementsIncluded.match(/(\d+)/);
           if (match) {
             const value = parseInt(match[1]);
-            console.log('Setting deslocacoesPorAnoSH to (from string):', value);
+
             updateFieldValue('deslocacoesPorAnoSH', value);
           } else {
-            console.log('Setting deslocacoesPorAnoSH to 0 (no number found in string)');
+
             updateFieldValue('deslocacoesPorAnoSH', 0);
           }
         }
       }
       
       // S&H plans don't typically have maintenance, so set to 0
-      console.log('Setting manutencoesPorAnoSH to 0');
+
       updateFieldValue('manutencoesPorAnoSH', 0);
       
-      console.log('Updated formData after S&H plan selection:', JSON.stringify(formData.value, null, 2));
+
     }
   }
 };
 
 // Equipment update handler for the new system
 const handleEquipmentUpdate = (data: { action: string, index?: number, equipment?: ContractEquipment }) => {
+
+  
   switch (data.action) {
     case 'add':
       if (data.equipment) {
         cpaEquipments.value.push(data.equipment)
+
       }
       break
     case 'update':
       if (data.index !== undefined && data.equipment) {
         cpaEquipments.value[data.index] = data.equipment
+
       }
       break
     case 'remove':
       if (data.index !== undefined) {
         cpaEquipments.value.splice(data.index, 1)
+
       }
       break
   }
+  
+
 }
 
 // S&H equipment update handler
 const handleSHEquipmentUpdate = (data: { action: string, index?: number, equipment?: SHEquipment }) => {
+
+  
   switch (data.action) {
     case 'add':
       if (data.equipment) {
         shEquipments.value.push(data.equipment)
+
       }
       break
     case 'update':
       if (data.index !== undefined && data.equipment) {
         shEquipments.value[data.index] = data.equipment
+
       }
       break
     case 'remove':
       if (data.index !== undefined) {
         shEquipments.value.splice(data.index, 1)
+
       }
       break
   }
+  
+
 }
 
 // Watch for CPA contract type changes to reload plan details with debouncing
@@ -895,11 +907,7 @@ const validateContractCreate = (data: Record<string, any>): Record<string, strin
 
 // Event handlers
 const handleCreate = async (data: Record<string, any>) => {
-  console.log('ContractsCreateView handleCreate called');
-  console.log('Received data:', JSON.stringify(data, null, 2));
-  console.log('Form data:', JSON.stringify(formData.value, null, 2));
-  console.log('CPA Equipments:', JSON.stringify(cpaEquipments.value, null, 2));
-  console.log('S&H Equipments:', JSON.stringify(shEquipments.value, null, 2));
+
   
   try {
     isSaving.value = true;
@@ -935,18 +943,16 @@ const handleCreate = async (data: Record<string, any>) => {
       deslocacoesPorAnoSH: currentFormData.deslocacoesPorAnoSH ?? data.deslocacoesPorAnoSH ?? 0,
       manutencoesPorAnoSH: currentFormData.manutencoesPorAnoSH ?? data.manutencoesPorAnoSH ?? 0,
       metodoPagamento: currentFormData.metodoPagamento || data.metodoPagamento || '',
-      cpaEquipments: cpaEquipments.value,
-      shEquipments: shEquipments.value
+      // Use equipment data from form data instead of local arrays
+      cpaEquipments: currentFormData.cpaEquipments || data.cpaEquipments || [],
+      shEquipments: currentFormData.shEquipments || data.shEquipments || []
     };
     
-    console.log('Prepared contract data:', JSON.stringify(contractData, null, 2));
-    console.log('Calling API create...');
+
     
     const result = await api.create(contractData);
     
-    console.log('API create completed');
-    console.log('API result:', JSON.stringify(result, null, 2));
-    console.log('API error:', JSON.stringify(api.error.value, null, 2));
+
     
     // Check if API returned an error
     if (api.error.value) {
@@ -958,14 +964,14 @@ const handleCreate = async (data: Record<string, any>) => {
     }
     
     if (api.currentItem?.value) {
-      console.log('Navigating to contract detail:', api.currentItem.value.uuid);
+
       router.push(`/contracts/${api.currentItem.value.uuid}`);
     } else if (result) {
       // If api.currentItem is not set but we have a result, use that
-      console.log('Using result directly:', result);
+
       const uuid = result.uuid || result.data?.uuid;
       if (uuid) {
-        console.log('Navigating to contract detail from result:', uuid);
+
         router.push(`/contracts/${uuid}`);
       } else {
         throw new Error('Erro ao criar contrato - UUID não encontrado');

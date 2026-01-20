@@ -61,7 +61,6 @@ const initializeApp = async () => {
       clerkOptions.allowedRedirectOrigins = [window.location.origin];
     }
 
-    console.log('Initializing Clerk with options:', clerkOptions);
     await clerk.load(clerkOptions);
     
     // Make Clerk available globally
@@ -97,8 +96,6 @@ const initializeApp = async () => {
 
     // Listen for Clerk state changes
     clerk.addListener(updateAuthState);
-    
-    console.log('Clerk initialized successfully');
     
     // Install router and mount app
     app.use(router);

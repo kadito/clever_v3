@@ -131,7 +131,7 @@ const handleCreate = async (data: Record<string, any>) => {
     error.value = null;
     
     // Simulate API call
-    console.log('Creating example with data:', data);
+
     
     // Simulate delay
     await new Promise(resolve => setTimeout(resolve, 1000));

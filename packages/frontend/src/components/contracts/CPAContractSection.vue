@@ -124,11 +124,9 @@ const { formData, selectedPlanDetails, isLoadingPlan } = toRefs(props)
 // Get available plan options based on selected contract type
 const availablePlanOptions = computed(() => {
   const contractType = formData.value?.cpaContractType as ContractType | ''
-  console.log('Computing available plan options for contract type:', contractType)
   
   try {
     const options = getPlanOptions(contractType)
-    console.log('Available plan options:', JSON.stringify(options, null, 2))
     return options
   } catch (error) {
     console.error('Error getting plan options:', JSON.stringify(error, null, 2))
@@ -137,11 +135,9 @@ const availablePlanOptions = computed(() => {
 })
 
 const handleContractTypeChange = (contractType: string) => {
-  console.log('Contract type changed to:', contractType)
   
   // Clear the selected plan when contract type changes
   if (formData.value?.planIdCPA) {
-    console.log('Clearing previously selected plan:', formData.value.planIdCPA)
     emit('update-field', 'planIdCPA', '')
   }
   
@@ -150,7 +146,6 @@ const handleContractTypeChange = (contractType: string) => {
 }
 
 const handlePlanSelection = (planId: string) => {
-  console.log('Plan selected:', planId)
   emit('plan-selected', planId)
 }
 
@@ -162,12 +157,6 @@ const showPOSPackageOption = computed(() => {
 
 // Determine if plan details should be shown - show immediately after plan selection for all contract types
 const shouldShowPlanDetails = computed(() => {
-  console.log('shouldShowPlanDetails check:', {
-    hasSelectedPlanDetails: !!selectedPlanDetails.value,
-    planIdCPA: formData.value?.planIdCPA,
-    cpaContractType: formData.value?.cpaContractType,
-    distanceCPA: formData.value?.distanceCPA
-  });
   
   // Show plan details if we have selected plan details and a plan is selected
   // OR if we're in test mode (selectedPlanDetails provided without planIdCPA)
@@ -176,7 +165,6 @@ const shouldShowPlanDetails = computed(() => {
   
   const shouldShow = !!selectedPlanDetails.value && (hasPlanSelected || isTestMode);
   
-  console.log('shouldShowPlanDetails:', shouldShow, '- plan details available, hasPlanSelected:', hasPlanSelected, 'isTestMode:', isTestMode);
   return shouldShow;
 })
 </script>

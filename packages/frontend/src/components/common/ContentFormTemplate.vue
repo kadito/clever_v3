@@ -31,7 +31,7 @@
               :disabled="!isFormValidSimple || isSaving"
               class="btn-primary-consistent text-sm"
               :class="{ 'btn-loading': isSaving }"
-              @click="console.log('Desktop submit button clicked, disabled:', !isFormValidSimple || isSaving)"
+              @click=""
             >
               <svg
                 v-if="isSaving"
@@ -87,7 +87,6 @@
         <form
           id="content-form"
           @submit.prevent="handleSubmit()"
-          @submit="console.log('Form submit event fired')"
           class="space-y-6"
           novalidate
         >
@@ -474,17 +473,13 @@ initializeFormData();
 const isFormValidSimple = computed(() => {
   // Ensure formData is available
   if (!formData.value) {
-    console.log('isFormValidSimple: formData not available');
     return false;
   }
   
   const currentFormData = formData.value;
-  console.log('isFormValidSimple: checking form validity');
-  console.log('Current form data:', JSON.stringify(currentFormData, null, 2));
   
   // Check validation errors first
   if (Object.keys(validationErrors).length > 0) {
-    console.log('isFormValidSimple: has validation errors:', JSON.stringify(validationErrors, null, 2));
     return false;
   }
   
@@ -495,17 +490,13 @@ const isFormValidSimple = computed(() => {
         const value = currentFormData[field.key];
         const isEmpty = !value || (typeof value === 'string' && value.trim() === '');
         
-        console.log(`isFormValidSimple: checking required field ${field.key}:`, value, 'isEmpty:', isEmpty);
-        
         if (isEmpty) {
-          console.log(`isFormValidSimple: field ${field.key} is empty, form invalid`);
           return false;
         }
       }
     }
   }
   
-  console.log('isFormValidSimple: form is valid');
   return true;
 });
 
@@ -643,22 +634,15 @@ const findField = (fieldKey: string): FormField | undefined => {
 
 // Event handlers
 const handleSubmit = () => {
-  console.log('ContentFormTemplate handleSubmit called');
   const currentFormData = getFormData();
-  console.log('Current form data:', JSON.stringify(currentFormData, null, 2));
   
   if (props.validateOnSubmit) {
-    console.log('Validating form...');
     const isValid = validateForm();
-    console.log('Form validation result:', isValid);
-    console.log('Validation errors:', JSON.stringify(validationErrors, null, 2));
     if (!isValid) {
-      console.log('Form validation failed, not submitting');
       return;
     }
   }
   
-  console.log('Emitting submit event with data');
   emit('submit', { ...currentFormData });
 };
 

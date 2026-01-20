@@ -160,7 +160,6 @@ export function useErrorHandler() {
         label: 'Tentar Novamente',
         action: () => {
           // This will be implemented by the component using the error
-          console.log('Retry action triggered');
         },
         primary: true,
       });

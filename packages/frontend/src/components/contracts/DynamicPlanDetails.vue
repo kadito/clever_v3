@@ -147,7 +147,6 @@ const formatPrice = (() => {
 // Compute payment options based on plan structure - enhanced with better error handling
 const paymentOptions = computed(() => {
   if (!planDetails.value?.prices) {
-    console.log('No prices available in plan details:', JSON.stringify(planDetails.value, null, 2))
     return []
   }
   
@@ -158,7 +157,6 @@ const paymentOptions = computed(() => {
     // Handle distance-based pricing (CPA 2023 and S&H)
     if (requiresDistanceForPricing.value && distance?.value && prices[distance.value]) {
       const distancePrices = prices[distance.value]
-      console.log('Using distance-based pricing for distance:', distance.value, JSON.stringify(distancePrices, null, 2))
       
       if (distancePrices.monthly) options.push({ id: 'MENSAL', period: 'MENSAL', amount: formatPrice(distancePrices.monthly) })
       if (distancePrices.quarterly) options.push({ id: 'TRIMESTRAL', period: 'TRIMESTRAL', amount: formatPrice(distancePrices.quarterly) })
@@ -167,17 +165,14 @@ const paymentOptions = computed(() => {
     }
     // Handle flat pricing (CPA 1500)
     else if (!requiresDistanceForPricing.value && prices.monthly !== undefined) {
-      console.log('Using flat pricing:', JSON.stringify(prices, null, 2))
       
       if (prices.monthly) options.push({ id: 'MENSAL', period: 'MENSAL', amount: formatPrice(prices.monthly) })
       if (prices.quarterly) options.push({ id: 'TRIMESTRAL', period: 'TRIMESTRAL', amount: formatPrice(prices.quarterly) })
       if (prices.semiannual) options.push({ id: 'SEMESTRAL', period: 'SEMESTRAL', amount: formatPrice(prices.semiannual) })
       if (prices.annual) options.push({ id: 'ANUAL', period: 'ANUAL', amount: formatPrice(prices.annual) })
     }
-    
-    console.log('Generated payment options:', JSON.stringify(options, null, 2))
   } catch (error) {
-    console.error('Error generating payment options:', JSON.stringify(error, null, 2))
+    console.error('Error generating payment options:', error)
   }
   
   return options

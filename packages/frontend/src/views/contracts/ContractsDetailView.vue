@@ -496,7 +496,7 @@ const getClientErrorMessage = (clientRelation: any): string => {
 const retryLoadClient = async () => {
   if (!contract.value) return;
   
-  console.log('Retrying to load contract with client relation...');
+
   await loadContract();
 };
 
@@ -596,14 +596,14 @@ const loadContract = async () => {
     isLoading.value = true;
     clearError();
     
-    console.log('Loading contract with UUID:', uuid);
+
     await api.fetchById(uuid);
     
-    console.log('API currentItem after fetch:', JSON.stringify(api.currentItem.value, null, 2));
+
     
     if (api.currentItem.value) {
       contract.value = api.currentItem.value as ContentWithRelations<Contract['data']>;
-      console.log('Contract loaded successfully:', JSON.stringify(contract.value, null, 2));
+
     } else {
       throw new Error('Contrato não encontrado');
     }

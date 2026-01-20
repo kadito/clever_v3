@@ -187,8 +187,7 @@ const handleUpdate = async (data: Record<string, any>) => {
     error.value = null;
     
     // Simulate API call
-    console.log('Updating example with data:', data);
-    console.log('Original item:', props.item);
+
     
     // Simulate delay
     await new Promise(resolve => setTimeout(resolve, 1000));
