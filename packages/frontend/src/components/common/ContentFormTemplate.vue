@@ -105,7 +105,7 @@
                   <div class="p-4 sm:p-6">
                     <div class="form-grid">
                       <div
-                        v-for="field in getVisibleFields(section.fields, formData)"
+                        v-for="field in getVisibleFields(section.fields, formData || {})"
                         :key="field.key"
                         :class="field.fullWidth ? 'col-span-full' : ''"
                         class="form-group"
@@ -126,7 +126,7 @@
                           <input
                             v-if="field.type === 'text' || field.type === 'email' || field.type === 'tel' || field.type === 'url' || field.type === 'password'"
                             :id="field.key"
-                            :value="formData[field.key]"
+                            :value="formData?.[field.key] || ''"
                             :type="field.type"
                             :placeholder="field.placeholder"
                             :required="field.required"
@@ -142,7 +142,7 @@
                           <input
                             v-else-if="field.type === 'number'"
                             :id="field.key"
-                            :value="formData[field.key]"
+                            :value="formData?.[field.key] || ''"
                             type="number"
                             :placeholder="field.placeholder"
                             :required="field.required"
@@ -160,7 +160,7 @@
                           <textarea
                             v-else-if="field.type === 'textarea'"
                             :id="field.key"
-                            :value="formData[field.key]"
+                            :value="formData?.[field.key] || ''"
                             :placeholder="field.placeholder"
                             :required="field.required"
                             :disabled="field.disabled"
@@ -176,7 +176,7 @@
                           <select
                             v-else-if="field.type === 'select'"
                             :id="field.key"
-                            :value="formData[field.key]"
+                            :value="formData?.[field.key] || ''"
                             :required="field.required"
                             :disabled="field.disabled"
                             class="form-select"
@@ -201,12 +201,12 @@
                               :class="{ 'border-red-500': validationErrors[field.key] }"
                               @click="toggleMultiselect(field.key)"
                             >
-                              <div v-if="getSelectedOptions(field, formData[field.key]).length === 0" class="multiselect-placeholder">
+                              <div v-if="getSelectedOptions(field, formData?.[field.key]).length === 0" class="multiselect-placeholder">
                                 {{ field.placeholder || 'Selecionar...' }}
                               </div>
                               <div v-else class="multiselect-selected">
                                 <span
-                                  v-for="option in getSelectedOptions(field, formData[field.key])"
+                                  v-for="option in getSelectedOptions(field, formData?.[field.key])"
                                   :key="option.value"
                                   class="multiselect-tag"
                                 >
@@ -252,7 +252,7 @@
                           <div v-else-if="field.type === 'checkbox'" class="flex items-center">
                             <input
                               :id="field.key"
-                              :checked="formData[field.key]"
+                              :checked="formData?.[field.key] || false"
                               type="checkbox"
                               :disabled="field.disabled"
                               class="form-checkbox"
@@ -267,7 +267,7 @@
                           <input
                             v-else-if="field.type === 'date'"
                             :id="field.key"
-                            :value="formData[field.key]"
+                            :value="formData?.[field.key] || ''"
                             type="date"
                             :required="field.required"
                             :disabled="field.disabled"
@@ -282,7 +282,7 @@
                           <!-- Custom field slot -->
                           <div v-else-if="field.type === 'custom' && field.key === 'clientId'">
                             <ClientSearchInput
-                              :model-value="formData[field.key]"
+                              :model-value="formData?.[field.key] || ''"
                               :placeholder="field.placeholder"
                               :disabled="field.disabled"
                               :readonly="field.readonly"
@@ -297,7 +297,7 @@
                             v-else-if="formData && field.type === 'custom'"
                             :name="`field-${field.key}`"
                             :field="field"
-                            :value="formData[field.key]"
+                            :value="formData?.[field.key]"
                             :error="validationErrors[field.key]"
                             :update-value="(value: any) => updateFieldValue(field.key, value)"
                             :clear-error="() => clearFieldError(field.key)"
@@ -699,7 +699,9 @@ const hasOpenMultiselects = computed(() => {
   return Object.values(openMultiselects.value).some(isOpen => isOpen);
 });
 
-const getVisibleFields = (fields: FormField[], formData: Record<string, any>): FormField[] => {
+const getVisibleFields = (fields: FormField[], formData: Record<string, any> | null): FormField[] => {
+  if (!formData) return fields.filter(field => !field.conditional);
+  
   return fields.filter(field => {
     if (!field.conditional) return true;
     
@@ -709,12 +711,12 @@ const getVisibleFields = (fields: FormField[], formData: Record<string, any>): F
 };
 
 const isOptionSelected = (fieldKey: string, optionValue: string): boolean => {
-  const selectedValues = formData.value[fieldKey] || [];
+  const selectedValues = formData.value?.[fieldKey] || [];
   return Array.isArray(selectedValues) && selectedValues.includes(optionValue);
 };
 
 const toggleOption = (fieldKey: string, optionValue: string) => {
-  const currentValues = formData.value[fieldKey] || [];
+  const currentValues = formData.value?.[fieldKey] || [];
   const newValues = Array.isArray(currentValues) ? [...currentValues] : [];
   
   const index = newValues.indexOf(optionValue);

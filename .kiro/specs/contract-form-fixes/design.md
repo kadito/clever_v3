@@ -297,6 +297,93 @@ interface ContractPlanConfig {
 *For any* form interaction, visual feedback, animations, error states, and loading indicators should follow consistent patterns across all form components
 **Validates: Requirements 9.1, 9.2, 9.3, 9.4**
 
+### Property 18: JavaScript Error Prevention
+*For any* form data access in watchers, callbacks, or event handlers, the system should include proper null checks to prevent "formData is not defined" errors and handle component lifecycle properly
+**Validates: Requirements 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7**
+
+## Technical Implementation Details
+
+### JavaScript Error Prevention Solution
+
+The JavaScript error "formData is not defined" occurs when Vue watchers or callbacks attempt to access reactive references after component unmount or during component recreation. This is particularly problematic in complex forms with multiple watchers and dynamic sections.
+
+#### Root Cause Analysis
+1. **Duplicate Watchers**: Multiple watchers observing the same reactive arrays without proper cleanup
+2. **Missing Null Checks**: Watchers accessing `formData.value` without checking if it exists
+3. **Lifecycle Issues**: Watchers continuing to execute after component unmount
+4. **Closure Problems**: Callbacks referencing destroyed reactive references
+
+#### Solution Implementation
+
+1. **Watcher Cleanup Pattern**
+```typescript
+// Proper watcher cleanup with null checks
+const stopWatcher = watch(
+  () => formData.value?.someField,
+  (newValue) => {
+    if (formData.value && newValue) {
+      // Safe access with null checks
+      updateFieldValue('field', newValue);
+    }
+  }
+);
+
+// Add to cleanup functions
+cleanupFunctions.push(stopWatcher);
+
+// Component cleanup
+onBeforeUnmount(() => {
+  cleanupFunctions.forEach(cleanup => cleanup());
+  cleanupFunctions.length = 0;
+});
+```
+
+2. **Safe Form Data Access**
+```typescript
+// Safe initialization functions
+const initializeData = () => {
+  if (!formData.value) return; // Early return if formData not available
+  
+  // Safe field updates
+  if (!formData.value.someField) {
+    updateFieldValue('someField', defaultValue);
+  }
+};
+```
+
+3. **Display Toggle Handler Safety**
+```typescript
+// Safe toggle handlers with null checks
+const handleToggle = (active: boolean) => {
+  if (active && formData.value && !formData.value.hasContract) {
+    updateFieldValue('hasContract', true);
+    initializeData();
+  }
+};
+```
+
+4. **Equipment Watcher Deduplication**
+```typescript
+// Remove duplicate watchers - use only the cleanup-enabled versions
+// Replace multiple equipment watchers with single, properly managed watchers
+const stopEquipmentWatcher = watch(
+  equipments,
+  (newEquipments) => {
+    if (formData.value) {
+      updateFieldValue('equipments', newEquipments);
+    }
+  },
+  { deep: true }
+);
+cleanupFunctions.push(stopEquipmentWatcher);
+```
+
+#### Testing Strategy
+1. **Scenario Testing**: Create CPA-only contract, then update to add S&H section
+2. **Lifecycle Testing**: Verify proper cleanup on component unmount
+3. **Error Monitoring**: Ensure no "formData is not defined" errors in console
+4. **Form Submission**: Verify successful form submission after section additions
+
 ### Property 17: Responsive Design Consistency
 *For any* screen size or device type, all form components should maintain proper responsive design principles and functionality
 **Validates: Requirements 9.5**

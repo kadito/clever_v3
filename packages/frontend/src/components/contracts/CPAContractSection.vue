@@ -123,7 +123,7 @@ const { formData, selectedPlanDetails, isLoadingPlan } = toRefs(props)
 
 // Get available plan options based on selected contract type
 const availablePlanOptions = computed(() => {
-  const contractType = formData.value?.cpaContractType as ContractType | ''
+  const contractType = props.formData?.cpaContractType as ContractType | ''
   
   try {
     const options = getPlanOptions(contractType)
@@ -135,10 +135,8 @@ const availablePlanOptions = computed(() => {
 })
 
 const handleContractTypeChange = (contractType: string) => {
-  console.log('CPA contract type change:', JSON.stringify({ contractType, currentFormData: formData.value }, null, 2));
-  
   // Clear the selected plan when contract type changes
-  if (formData.value?.planIdCPA) {
+  if (props.formData?.planIdCPA) {
     emit('update-field', 'planIdCPA', '')
   }
   
@@ -147,14 +145,13 @@ const handleContractTypeChange = (contractType: string) => {
 }
 
 const handlePlanSelection = (planId: string) => {
-  console.log('CPA plan selection:', JSON.stringify({ planId, currentFormData: formData.value }, null, 2));
   emit('plan-selected', planId)
 }
 
 // Show POS package option only for CPA_1500 PREMIUM plan - memoized for performance
 const showPOSPackageOption = computed(() => {
-  return formData.value?.cpaContractType === 'CPA_1500' && 
-         formData.value?.planIdCPA === 'cpa_1500_premium'
+  return props.formData?.cpaContractType === 'CPA_1500' && 
+         props.formData?.planIdCPA === 'cpa_1500_premium'
 })
 
 // Determine if plan details should be shown - show immediately after plan selection for all contract types
@@ -162,8 +159,8 @@ const shouldShowPlanDetails = computed(() => {
   
   // Show plan details if we have selected plan details and a plan is selected
   // OR if we're in test mode (selectedPlanDetails provided without planIdCPA)
-  const hasPlanSelected = formData.value?.planIdCPA && formData.value.planIdCPA !== '';
-  const isTestMode = !!selectedPlanDetails.value && (!formData.value?.planIdCPA || formData.value.planIdCPA === '');
+  const hasPlanSelected = props.formData?.planIdCPA && props.formData.planIdCPA !== '';
+  const isTestMode = !!selectedPlanDetails.value && (!props.formData?.planIdCPA || props.formData.planIdCPA === '');
   
   const shouldShow = !!selectedPlanDetails.value && (hasPlanSelected || isTestMode);
   

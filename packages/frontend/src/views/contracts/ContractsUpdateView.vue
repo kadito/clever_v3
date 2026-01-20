@@ -218,21 +218,9 @@ const selectedCPAPlanDetails = computed(() => {
     return null;
   }
   
-  const cacheKey = `${formData.value.cpaContractType}-${formData.value.planIdCPA}`;
-  
-  // Check cache first for performance
-  if (planDetailsCache.has(cacheKey)) {
-    return planDetailsCache.get(cacheKey);
-  }
-  
   try {
     const contractType = formData.value.cpaContractType as ContractType;
     const planDetails = getPlanDetails(contractType, formData.value.planIdCPA);
-    
-    // Cache the result for future use
-    if (planDetails) {
-      planDetailsCache.set(cacheKey, markRaw(planDetails)); // Use markRaw to prevent deep reactivity
-    }
     
     return planDetails;
   } catch (error) {
@@ -246,19 +234,8 @@ const selectedSHPlanDetails = computed(() => {
     return null;
   }
   
-  const cacheKey = `SH-${formData.value.planIdSH}`;
-  
-  // Check cache first for performance
-  if (planDetailsCache.has(cacheKey)) {
-    return planDetailsCache.get(cacheKey);
-  }
-  
   try {
     const planDetails = getPlanDetails('S&H', formData.value.planIdSH);
-    
-    if (planDetails) {
-      planDetailsCache.set(cacheKey, markRaw(planDetails)); // Use markRaw to prevent deep reactivity
-    }
     
     return planDetails;
   } catch (error) {
@@ -352,13 +329,15 @@ const handleCPADisplayToggle = (active: boolean) => {
   
   if (active) {
     // Initialize CPA data if it doesn't exist
-    if (!formData.value.hasCPAContract) {
+    if (formData.value && !formData.value.hasCPAContract) {
       updateFieldValue('hasCPAContract', true);
       initializeCPAData();
     }
   } else {
     // When hiding CPA section, mark as not having CPA contract
-    updateFieldValue('hasCPAContract', false);
+    if (formData.value) {
+      updateFieldValue('hasCPAContract', false);
+    }
     // Clear CPA-specific validation errors when section is hidden
     clearCPAValidationErrors();
   }
@@ -369,13 +348,15 @@ const handleSHDisplayToggle = (active: boolean) => {
   
   if (active) {
     // Initialize S&H data if it doesn't exist
-    if (!formData.value.hasSHContract) {
+    if (formData.value && !formData.value.hasSHContract) {
       updateFieldValue('hasSHContract', true);
       initializeSHData();
     }
   } else {
     // When hiding S&H section, mark as not having S&H contract
-    updateFieldValue('hasSHContract', false);
+    if (formData.value) {
+      updateFieldValue('hasSHContract', false);
+    }
     // Clear S&H-specific validation errors when section is hidden
     clearSHValidationErrors();
   }
@@ -412,6 +393,9 @@ const clearSHValidationErrors = () => {
 
 // Data initialization functions (preserve existing data)
 const initializeCPAData = () => {
+  // Only initialize if formData is available
+  if (!formData.value) return;
+  
   // Initialize CPA-specific fields with default values if they don't exist
   if (!formData.value.cpaContractType) {
     updateFieldValue('cpaContractType', '')
@@ -449,6 +433,9 @@ const initializeCPAData = () => {
 }
 
 const initializeSHData = () => {
+  // Only initialize if formData is available
+  if (!formData.value) return;
+  
   // Initialize S&H-specific fields with default values if they don't exist
   if (!formData.value.planIdSH) {
     updateFieldValue('planIdSH', '')
@@ -479,29 +466,7 @@ const initializeSHData = () => {
   }
 }
 
-// Watch for CPA equipment changes and update form data
-watch(
-  cpaEquipments,
-  (newEquipments) => {
-    // Update the form data with the current equipment list
-    if (formData.value) {
-      formData.value.cpaEquipments = newEquipments;
-    }
-  },
-  { deep: true }
-);
-
-// Watch for S&H equipment changes and update form data
-watch(
-  shEquipments,
-  (newEquipments) => {
-    // Update the form data with the current equipment list
-    if (formData.value) {
-      formData.value.shEquipments = newEquipments;
-    }
-  },
-  { deep: true }
-);
+// Note: Equipment watchers are handled below with proper cleanup
 
 // Helper functions for client relation handling
 const isClientError = (clientRelation: any): boolean => {
@@ -678,7 +643,9 @@ const stopCPAEquipmentWatcher = watch(
   cpaEquipments,
   (newEquipments) => {
     // Update immediately without debouncing for form submission
-    updateFieldValue('cpaEquipments', newEquipments);
+    if (formData.value) {
+      updateFieldValue('cpaEquipments', newEquipments);
+    }
   },
   { deep: true }
 );
@@ -689,7 +656,9 @@ const stopSHEquipmentWatcher = watch(
   shEquipments,
   (newEquipments) => {
     // Update immediately without debouncing for form submission
-    updateFieldValue('shEquipments', newEquipments);
+    if (formData.value) {
+      updateFieldValue('shEquipments', newEquipments);
+    }
   },
   { deep: true }
 );
@@ -737,7 +706,9 @@ cleanupFunctions.push(stopSHInitWatcher);
 const stopCPADisplayWatcher = watch(
   showCPASection,
   (showCPA) => {
-    updateFieldValue('showCPASection', showCPA)
+    if (formData.value) {
+      updateFieldValue('showCPASection', showCPA)
+    }
   }
 );
 cleanupFunctions.push(stopCPADisplayWatcher);
@@ -745,7 +716,9 @@ cleanupFunctions.push(stopCPADisplayWatcher);
 const stopSHDisplayWatcher = watch(
   showSHSection,
   (showSH) => {
-    updateFieldValue('showSHSection', showSH)
+    if (formData.value) {
+      updateFieldValue('showSHSection', showSH)
+    }
   }
 );
 cleanupFunctions.push(stopSHDisplayWatcher);
@@ -1023,6 +996,9 @@ const loadContract = async () => {
   try {
     isLoading.value = true;
     clearError();
+    
+    // Clear plan details cache when loading a new contract
+    planDetailsCache.clear();
     
     await api.fetchById(uuid);
     

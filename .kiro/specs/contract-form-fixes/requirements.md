@@ -116,6 +116,20 @@ This specification addresses multiple critical issues with the Contracts form an
 6. THE System SHALL provide clear visual indicators that the client field is read-only in update forms
 7. THE System SHALL include the client ID in update requests to maintain data integrity
 
+### Requirement 10: JavaScript Error Prevention
+
+**User Story:** As a user updating contracts by adding new sections (like adding S&H to a CPA-only contract), I want the form to work without JavaScript errors, so that I can successfully submit my changes without technical issues.
+
+#### Acceptance Criteria
+
+1. WHEN a user updates a contract to add a new section (CPA or S&H), THE System SHALL not throw "formData is not defined" errors
+2. WHEN form watchers are active, THE System SHALL properly handle component lifecycle and cleanup to prevent memory leaks
+3. WHEN form data is accessed in watchers or callbacks, THE System SHALL include proper null checks to prevent undefined reference errors
+4. WHEN components are unmounted, THE System SHALL properly cleanup all watchers and event listeners
+5. THE System SHALL handle form data initialization and updates without duplicate watchers that could cause conflicts
+6. WHEN form sections are toggled on/off, THE System SHALL safely access form data with proper null checking
+7. THE System SHALL prevent watchers from accessing destroyed reactive references after component unmount
+
 ### Requirement 9: User Experience Consistency
 
 **User Story:** As a user working with contract forms, I want consistent behavior and visual design across all form interactions, so that I can work efficiently without learning different interaction patterns.

@@ -132,6 +132,31 @@ This implementation plan addresses critical issues in the CLEVER dashboard contr
 - [x] 11. Final checkpoint - Complete testing
   - Ensure all fixes work correctly across different scenarios, ask the user if questions arise.
 
+- [x] 12. Fix JavaScript Error Prevention
+  - [x] 12.1 Remove duplicate equipment watchers
+    - Remove the first set of equipment watchers that don't use cleanup pattern
+    - Keep only the properly managed watchers with cleanup functions
+    - Ensure no conflicting watchers for the same reactive arrays
+    - _Requirements: 10.5_
+
+  - [x] 12.2 Add null checks to all form data access
+    - Add proper null checks to all watchers accessing formData.value
+    - Update initialization functions to check formData availability
+    - Ensure display toggle handlers safely access form data
+    - _Requirements: 10.1, 10.3, 10.6_
+
+  - [x] 12.3 Improve component lifecycle management
+    - Ensure all watchers are properly added to cleanup functions
+    - Verify proper cleanup on component unmount
+    - Test component recreation scenarios
+    - _Requirements: 10.2, 10.4, 10.7_
+
+  - [x] 12.4 Test error scenarios
+    - Test creating CPA-only contract then updating to add S&H section
+    - Verify no "formData is not defined" errors occur
+    - Ensure successful form submission after section additions
+    - _Requirements: 10.1_
+
 ## Notes
 
 - Focus on rapid implementation without automated tests initially

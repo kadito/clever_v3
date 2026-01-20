@@ -125,7 +125,6 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const handlePlanSelection = (planId: string) => {
-  console.log('S&H plan selection:', JSON.stringify({ planId, currentFormData: formData.value }, null, 2));
   emit('plan-selected', planId)
 }
 
@@ -162,7 +161,9 @@ const shouldShowPlanDetails = computed(() => {
   }
   
   // S&H plans always require distance for pricing
-  return !!(props.formData?.planIdSH && props.formData?.distanceSH);
+  const shouldShow = !!(props.formData?.planIdSH && props.formData?.distanceSH);
+  
+  return shouldShow;
 })
 </script>
 
