@@ -5,8 +5,8 @@
       <div class="config-field">
         <label class="config-label required">TIPO DE CONTRATO CPA</label>
         <select 
-          :model-value="formData.cpaContractType" 
-          @change="(event) => handleContractTypeChange(event.target.value)"
+          :value="formData?.cpaContractType || ''" 
+          @change="(event) => handleContractTypeChange((event.target as HTMLSelectElement).value)"
           class="config-select"
         >
           <option value="">Selecione o tipo...</option>
@@ -18,10 +18,10 @@
       <div class="config-field">
         <label class="config-label required">PLANO CPA</label>
         <select 
-          :model-value="formData.planIdCPA" 
-          @change="(event) => handlePlanSelection(event.target.value)"
+          :value="formData?.planIdCPA || ''" 
+          @change="(event) => handlePlanSelection((event.target as HTMLSelectElement).value)"
           class="config-select"
-          :disabled="!formData.cpaContractType"
+          :disabled="!formData?.cpaContractType"
         >
           <option value="">
             {{ formData.cpaContractType ? 'Selecione o plano...' : 'Primeiro selecione o tipo de contrato' }}
@@ -39,8 +39,8 @@
       <div class="config-field">
         <label class="config-label required">DISTÂNCIA</label>
         <select 
-          :model-value="formData.distanceCPA" 
-          @change="(event) => $emit('update-field', 'distanceCPA', event.target.value)"
+          :value="formData?.distanceCPA || ''" 
+          @change="(event) => $emit('update-field', 'distanceCPA', (event.target as HTMLSelectElement).value)"
           class="config-select"
         >
           <option value="">Selecione a distância...</option>
@@ -62,8 +62,8 @@
         <label class="pos-package-label">
           <input
             type="checkbox"
-            :checked="formData.hasPOSPackage"
-            @change="$emit('update-field', 'hasPOSPackage', $event.target.checked)"
+            :checked="formData?.hasPOSPackage || false"
+            @change="$emit('update-field', 'hasPOSPackage', ($event.target as HTMLInputElement).checked)"
             class="pos-package-checkbox"
           />
           <span class="pos-package-text">
@@ -75,8 +75,8 @@
     
     <!-- Contract Dates -->
     <ContractDatesSection
-      :start-date="formData.inicioContratoCPA"
-      :end-date="formData.fimContratoCPA"
+      :start-date="formData?.inicioContratoCPA || ''"
+      :end-date="formData?.fimContratoCPA || ''"
       @update:start-date="$emit('update-field', 'inicioContratoCPA', $event)"
       @update:end-date="$emit('update-field', 'fimContratoCPA', $event)"
     />
@@ -86,8 +86,8 @@
       v-if="shouldShowPlanDetails || props.isLoadingPlan"
       data-testid="dynamic-plan-details"
       :plan-details="selectedPlanDetails"
-      :selected-payment="formData.modalidadePagamentoCPA"
-      :distance="formData.distanceCPA"
+      :selected-payment="formData?.modalidadePagamentoCPA || ''"
+      :distance="formData?.distanceCPA || ''"
       :is-loading="props.isLoadingPlan"
       @payment-selected="$emit('update-field', 'modalidadePagamentoCPA', $event)"
     />
@@ -135,6 +135,7 @@ const availablePlanOptions = computed(() => {
 })
 
 const handleContractTypeChange = (contractType: string) => {
+  console.log('CPA contract type change:', JSON.stringify({ contractType, currentFormData: formData.value }, null, 2));
   
   // Clear the selected plan when contract type changes
   if (formData.value?.planIdCPA) {
@@ -146,6 +147,7 @@ const handleContractTypeChange = (contractType: string) => {
 }
 
 const handlePlanSelection = (planId: string) => {
+  console.log('CPA plan selection:', JSON.stringify({ planId, currentFormData: formData.value }, null, 2));
   emit('plan-selected', planId)
 }
 

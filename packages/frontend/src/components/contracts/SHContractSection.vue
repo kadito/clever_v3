@@ -5,8 +5,8 @@
       <div class="config-field">
         <label class="config-label required">PLANO S&H</label>
         <select 
-          :model-value="formData.planIdSH" 
-          @change="(event) => handlePlanSelection(event.target.value)"
+          :value="formData?.planIdSH || ''" 
+          @change="(event) => handlePlanSelection((event.target as HTMLSelectElement).value)"
           class="config-select"
           data-testid="plan-select"
         >
@@ -23,8 +23,8 @@
       <div class="config-field">
         <label class="config-label required">DISTÂNCIA</label>
         <select 
-          :model-value="formData.distanceSH" 
-          @change="(event) => $emit('update-field', 'distanceSH', event.target.value)"
+          :value="formData?.distanceSH || ''" 
+          @change="(event) => $emit('update-field', 'distanceSH', (event.target as HTMLSelectElement).value)"
           class="config-select"
           data-testid="distance-select"
         >
@@ -67,8 +67,8 @@
     
     <!-- Contract Dates -->
     <ContractDatesSection
-      :start-date="formData.inicioContratoSH"
-      :end-date="formData.fimContratoSH"
+      :start-date="formData?.inicioContratoSH || ''"
+      :end-date="formData?.fimContratoSH || ''"
       @update:start-date="$emit('update-field', 'inicioContratoSH', $event)"
       @update:end-date="$emit('update-field', 'fimContratoSH', $event)"
     />
@@ -87,8 +87,8 @@
       v-if="shouldShowPlanDetails"
       data-testid="dynamic-plan-details"
       :plan-details="selectedPlanDetails"
-      :selected-payment="formData.modalidadePagamentoSH"
-      :distance="formData.distanceSH"
+      :selected-payment="formData?.modalidadePagamentoSH || ''"
+      :distance="formData?.distanceSH || ''"
       @payment-selected="$emit('update-field', 'modalidadePagamentoSH', $event)"
     />
   </div>
@@ -125,6 +125,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const handlePlanSelection = (planId: string) => {
+  console.log('S&H plan selection:', JSON.stringify({ planId, currentFormData: formData.value }, null, 2));
   emit('plan-selected', planId)
 }
 
@@ -156,12 +157,12 @@ const shouldShowPlanDetails = computed(() => {
   }
   
   // If we don't have form data (e.g., in tests), show plan details when selectedPlanDetails is provided
-  if (!props.formData.planIdSH) {
+  if (!props.formData?.planIdSH) {
     return true
   }
   
   // S&H plans always require distance for pricing
-  return !!(props.formData.planIdSH && props.formData.distanceSH);
+  return !!(props.formData?.planIdSH && props.formData?.distanceSH);
 })
 </script>
 

@@ -523,7 +523,9 @@ watch(
 watch(
   () => props.initialData,
   (newData) => {
+    console.log('🔧 ContentFormTemplate: Initial data changed:', JSON.stringify(newData, null, 2));
     Object.assign(formData.value, newData);
+    console.log('🔧 ContentFormTemplate: Form data after initial data change:', JSON.stringify(formData.value, null, 2));
   },
   { deep: true }
 );
@@ -531,9 +533,15 @@ watch(
 // Watch for form sections changes (in case they're loaded dynamically)
 watch(
   () => props.formSections,
-  (_, oldSections) => {
+  (newSections, oldSections) => {
+    console.log('🔧 ContentFormTemplate: Form sections changed:', JSON.stringify({
+      newSectionsCount: newSections?.length,
+      oldSectionsCount: oldSections?.length
+    }, null, 2));
+    
     // Only reinitialize if this is the first time sections are loaded
     if (!oldSections || oldSections.length === 0) {
+      console.log('🔧 ContentFormTemplate: Reinitializing form data due to sections change');
       initializeFormData();
     }
   },
@@ -664,7 +672,9 @@ const clearFieldError = (fieldKey: string) => {
 };
 
 const updateFieldValue = (fieldKey: string, value: any) => {
+  console.log('🔧 ContentFormTemplate: updateFieldValue called:', JSON.stringify({ fieldKey, value }, null, 2));
   updateSharedFieldValue(fieldKey, value);
+  console.log('🔧 ContentFormTemplate: Form data after update:', JSON.stringify(formData.value, null, 2));
   // Form validity is now handled by the computed property automatically
 };
 

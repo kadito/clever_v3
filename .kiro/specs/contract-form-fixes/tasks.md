@@ -103,10 +103,11 @@ This implementation plan addresses critical issues in the CLEVER dashboard contr
     - _Requirements: 8.1, 8.4_
 
   - [x] 9.2 Update contract update form
-    - Remove client information input fields
-    - Keep only client selection dropdown
-    - Ensure client data is properly resolved from relations
-    - _Requirements: 8.2, 8.3, 8.4_
+    - Implement read-only client field using form section modification
+    - Display selected client information without allowing changes
+    - Provide clear visual indicators for read-only state
+    - Ensure client ID is included in update requests
+    - _Requirements: 8.2, 8.6, 8.7_
 
   - [x] 9.3 Verify client data handling
     - Ensure client selection uses existing client data

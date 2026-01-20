@@ -191,13 +191,19 @@ interface ContractPlanConfig {
 
 ### Phase 5: Client Information Form Simplification
 
-1. **Remove Client Information Fields**
-   - Remove client information input fields from create/update forms
+1. **Remove Client Information Fields from Create Form**
+   - Remove client information input fields from create form
    - Keep only the client selection dropdown
    - Ensure client data is properly resolved from relations
 
-2. **Form Layout Optimization**
-   - Reorganize form sections after client field removal
+2. **Implement Read-Only Client Field in Update Form**
+   - Make client field read-only in update forms using form section modification
+   - Display selected client information without allowing changes
+   - Provide clear visual indicators for read-only state
+   - Ensure client ID is included in update requests
+
+3. **Form Layout Optimization**
+   - Reorganize form sections after client field changes
    - Maintain proper form flow and validation
    - Update form styling for improved layout
 
@@ -276,17 +282,21 @@ interface ContractPlanConfig {
 **Validates: Requirements 7.5**
 
 ### Property 13: Client Form Simplification
-*For any* contract create or update form, only the client selection dropdown should be present without additional client information input fields
-**Validates: Requirements 8.1, 8.2, 8.4**
+*For any* contract create form, only the client selection dropdown should be present without additional client information input fields
+**Validates: Requirements 8.1, 8.4**
 
-### Property 14: Client Data Usage
+### Property 14: Client Field Read-Only Behavior
+*For any* contract update form, the client field should be displayed as read-only with clear visual indicators and should not allow modifications while still including the client ID in update requests
+**Validates: Requirements 8.2, 8.6, 8.7**
+
+### Property 15: Client Data Usage
 *For any* client selection in contract forms, the system should use existing client data from the selection and maintain client information display in detail views through resolved relations
 **Validates: Requirements 8.3, 8.5**
 
-### Property 15: UI Consistency
+### Property 16: UI Consistency
 *For any* form interaction, visual feedback, animations, error states, and loading indicators should follow consistent patterns across all form components
 **Validates: Requirements 9.1, 9.2, 9.3, 9.4**
 
-### Property 16: Responsive Design Consistency
+### Property 17: Responsive Design Consistency
 *For any* screen size or device type, all form components should maintain proper responsive design principles and functionality
 **Validates: Requirements 9.5**

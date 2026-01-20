@@ -109,10 +109,12 @@ This specification addresses multiple critical issues with the Contracts form an
 #### Acceptance Criteria
 
 1. WHEN creating a new contract, THE System SHALL only display the client selection dropdown without additional client information fields
-2. WHEN editing an existing contract, THE System SHALL only display the client selection dropdown without additional client information fields
-3. WHEN a client is selected, THE System SHALL use the existing client data from the client selection
-4. THE System SHALL remove all client information input fields from the contract create and update forms
+2. WHEN editing an existing contract, THE System SHALL display the client selection as read-only to prevent accidental changes
+3. WHEN a client is selected during creation, THE System SHALL use the existing client data from the client selection
+4. THE System SHALL remove all client information input fields from the contract create form
 5. THE System SHALL maintain client information display in the contract detail view using resolved relations
+6. THE System SHALL provide clear visual indicators that the client field is read-only in update forms
+7. THE System SHALL include the client ID in update requests to maintain data integrity
 
 ### Requirement 9: User Experience Consistency
 

@@ -13,8 +13,8 @@ export function useSharedFormData(formKey: string) {
     Object.assign(newFormData, initialData);
     
     // Ensure all form fields have keys
-    for (const section of formSections) {
-      for (const field of section.fields) {
+    for (const section of formSections || []) {
+      for (const field of section.fields || []) {
         if (!(field.key in newFormData)) {
           // Set default values based on field type
           switch (field.type) {
@@ -37,8 +37,7 @@ export function useSharedFormData(formKey: string) {
 
   const updateFieldValue = (fieldKey: string, value: any) => {
     if (!globalFormData.value) {
-      console.warn('❌ Global form data not initialized');
-      return;
+      globalFormData.value = {};
     }
     
     globalFormData.value[fieldKey] = value;
