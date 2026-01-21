@@ -123,3 +123,6 @@ Delete Functionality Patterns:
 - Ensure 44px minimum touch targets for all delete buttons and confirmation dialog buttons
 - Implement soft delete through existing backend functionality
 - Prevent double-deletion through proper state management
+- Generate dynamic confirmation messages with item identification
+- Use comprehensive error handling with structured logging (JSON.stringify for objects)
+- Follow established ConfirmationDialog component patterns for consistency

@@ -145,9 +145,9 @@
         </template>
 
         <!-- Pricing display section (only shown when displacement is enabled) -->
-        <template #after-section-displacement>
+        <template #after-section-displacement="{ formData: slotFormData }">
           <div
-            v-if="currentFormData?.hasDisplacement"
+            v-if="slotFormData?.hasDisplacement"
             class="pricing-section"
           >
             <h3>Cálculo de Preços <span class="vat-note">(sem IVA)</span></h3>
@@ -480,28 +480,32 @@ const handleUpdate = async (formData: Record<string, any>) => {
 
 // Pricing calculation methods (based on legacy logic)
 const getDisplacementRate = (): number => {
-  if (!currentFormData.value?.hasDisplacement) return 0;
-  const totalKms = currentFormData.value?.totalKms || 0;
+  const formDataValue = currentFormData.value;
+  if (!formDataValue?.hasDisplacement) return 0;
+  const totalKms = formDataValue?.totalKms || 0;
   return totalKms > 180 ? 50 : 35;
 };
 
 const getHourlyRate = (): number => {
-  if (!currentFormData.value?.hasDisplacement) return 0;
-  return currentFormData.value?.weekendHoliday ? 60 : 45;
+  const formDataValue = currentFormData.value;
+  if (!formDataValue?.hasDisplacement) return 0;
+  return formDataValue?.weekendHoliday ? 60 : 45;
 };
 
 const getKmsPrice = (): number => {
-  if (!currentFormData.value?.hasDisplacement) return 0;
+  const formDataValue = currentFormData.value;
+  if (!formDataValue?.hasDisplacement) return 0;
   const pricePerKm = 0.4;
-  const totalKms = currentFormData.value?.totalKms || 0;
+  const totalKms = formDataValue?.totalKms || 0;
   return Math.round(pricePerKm * totalKms * 100) / 100;
 };
 
 const getLaborPrice = (): number => {
-  if (!currentFormData.value?.hasDisplacement) return 0;
+  const formDataValue = currentFormData.value;
+  if (!formDataValue?.hasDisplacement) return 0;
   
-  const arrivalTime = currentFormData.value?.arrivalTime;
-  const departureTime = currentFormData.value?.departureTime;
+  const arrivalTime = formDataValue?.arrivalTime;
+  const departureTime = formDataValue?.departureTime;
   
   if (!arrivalTime || !departureTime) return 0;
   
@@ -528,7 +532,8 @@ const getLaborPrice = (): number => {
 };
 
 const getTotalPrice = (): number => {
-  if (!currentFormData.value?.hasDisplacement) return 0;
+  const formDataValue = currentFormData.value;
+  if (!formDataValue?.hasDisplacement) return 0;
   
   const displacementRate = getDisplacementRate();
   const kmsPrice = getKmsPrice();

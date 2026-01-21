@@ -346,6 +346,9 @@
                     </div>
                   </div>
                 </div>
+                
+                <!-- After-section slot for additional content -->
+                <slot :name="`after-section-${section.key}`" :form-data="formData" :errors="validationErrors" :update-field-value="updateFieldValue" />
               </div>
             </slot>
           </div>
