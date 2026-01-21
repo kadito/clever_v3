@@ -5,13 +5,18 @@
     :error="error"
     back-route="/work-sheets"
     :show-edit-button="true"
+    :show-delete-button="true"
     :show-meta-bar="true"
     :show-audit-trail="true"
     :show-mobile-actions="true"
     :get-title="getWorkSheetTitle"
     :get-subtitle="getWorkSheetSubtitle"
     :get-status="getWorkSheetStatus"
+    delete-button-text="Eliminar"
+    confirm-delete-title="Confirmar Eliminação"
+    confirm-delete-message="Tem a certeza que pretende eliminar esta folha de obra?"
     @edit="handleEdit"
+    @delete="handleDelete"
     @back="handleBack"
     @clear-error="clearError"
   >
@@ -292,6 +297,19 @@
       </div>
     </template>
   </ContentDetailTemplate>
+
+  <!-- Delete Confirmation Dialog -->
+  <ConfirmationDialog
+    :is-open="showDeleteConfirm"
+    :title="confirmDeleteTitle"
+    :message="confirmDeleteMessage"
+    :is-loading="isDeleting"
+    confirm-text="Confirmar"
+    cancel-text="Cancelar"
+    @confirm="confirmDelete"
+    @cancel="cancelDelete"
+    @close="cancelDelete"
+  />
 </template>
 
 <script setup lang="ts">
@@ -300,16 +318,23 @@ import { useRoute, useRouter } from 'vue-router';
 import type { WorkSheet, ContentWithRelations, WorkSheetData, BaseContent } from '@clever/shared';
 import ContentDetailTemplate from '@/components/common/ContentDetailTemplate.vue';
 import ClientInfoSection from '@/components/common/ClientInfoSection.vue';
+import ConfirmationDialog from '@/components/common/ConfirmationDialog.vue';
 import { useApi } from '@/composables/useApi';
 
 const route = useRoute();
 const router = useRouter();
-const { fetchById, currentItem, loading: apiLoading, error: apiError } = useApi<ContentWithRelations<WorkSheetData>>('work-sheets');
+const { fetchById, currentItem, loading: apiLoading, error: apiError, remove } = useApi<ContentWithRelations<WorkSheetData>>('work-sheets');
 
 // State
 const workSheet = ref<ContentWithRelations<WorkSheetData> | null>(null);
 const isLoading = computed(() => apiLoading.loading.value);
 const error = computed(() => apiError.value?.message || null);
+
+// Delete state
+const isDeleting = ref(false);
+const showDeleteConfirm = ref(false);
+const confirmDeleteTitle = ref('Confirmar Eliminação');
+const confirmDeleteMessage = ref('');
 
 // Display helper functions for ContentDetailTemplate
 const getWorkSheetTitle = (item: BaseContent | null): string => {
@@ -358,6 +383,75 @@ const handleEdit = () => {
 
 const handleBack = () => {
   router.push('/work-sheets');
+};
+
+// Delete handlers
+const getDeleteConfirmationMessage = (): string => {
+  if (!workSheet.value) return 'Tem a certeza que pretende eliminar esta folha de obra?';
+  
+  const clientName = workSheet.value.relations?.client && typeof workSheet.value.relations.client === 'object' && 'nomeEmpresa' in workSheet.value.relations.client
+    ? workSheet.value.relations.client.nomeComercial || workSheet.value.relations.client.nomeEmpresa
+    : 'Cliente não especificado';
+  
+  const serviceType = workSheet.value.data.otherData?.serviceType || 'Folha de Obra';
+  const assistanceDate = workSheet.value.data.request?.assistanceDate 
+    ? formatDate(workSheet.value.data.request.assistanceDate)
+    : '';
+  
+  const identifier = assistanceDate 
+    ? `${serviceType} - ${clientName} (${assistanceDate})`
+    : `${serviceType} - ${clientName}`;
+  
+  return `Tem a certeza que pretende eliminar "${identifier}"?`;
+};
+
+const handleDelete = () => {
+  if (!workSheet.value) return;
+  
+  confirmDeleteMessage.value = getDeleteConfirmationMessage();
+  showDeleteConfirm.value = true;
+};
+
+const confirmDelete = async () => {
+  if (!workSheet.value) return;
+  
+  try {
+    isDeleting.value = true;
+    
+    console.log('Attempting to delete work sheet:', JSON.stringify({
+      uuid: workSheet.value.uuid,
+      serviceType: workSheet.value.data.otherData?.serviceType,
+      assistanceDate: workSheet.value.data.request?.assistanceDate
+    }, null, 2));
+    
+    const success = await remove(workSheet.value.uuid);
+    
+    if (apiError.value) {
+      console.error('Delete operation failed with API error:', JSON.stringify(apiError.value, null, 2));
+      // Error is handled by the useApi composable and displayed in the template
+      showDeleteConfirm.value = false;
+      return;
+    }
+    
+    if (success) {
+      console.log('Work sheet deleted successfully, navigating to /work-sheets');
+      router.push('/work-sheets');
+    } else {
+      console.error('Delete operation failed - useApi returned false');
+      // Error will be displayed in the template via the error computed property
+      showDeleteConfirm.value = false;
+    }
+  } catch (err) {
+    console.error('Delete operation error:', JSON.stringify(err, null, 2));
+    // Error will be displayed in the template via the error computed property
+    showDeleteConfirm.value = false;
+  } finally {
+    isDeleting.value = false;
+  }
+};
+
+const cancelDelete = () => {
+  showDeleteConfirm.value = false;
 };
 
 // Data loading

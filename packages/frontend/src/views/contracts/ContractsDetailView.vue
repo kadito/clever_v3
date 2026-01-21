@@ -5,13 +5,18 @@
     :error="error"
     back-route="/contracts"
     :show-edit-button="true"
+    :show-delete-button="true"
     :show-meta-bar="true"
     :show-audit-trail="true"
     :show-mobile-actions="true"
     :get-title="getContractTitle"
     :get-subtitle="getContractSubtitle"
     :get-status="getContractStatus"
+    delete-button-text="Eliminar"
+    confirm-delete-title="Confirmar Eliminação"
+    confirm-delete-message="Tem a certeza que pretende eliminar este contrato?"
     @edit="handleEdit"
+    @delete="handleDelete"
     @back="handleBack"
     @clear-error="clearError"
   >
@@ -362,6 +367,19 @@
       </div>
     </template>
   </ContentDetailTemplate>
+
+  <!-- Delete Confirmation Dialog -->
+  <ConfirmationDialog
+    :is-open="showDeleteConfirm"
+    :title="confirmDeleteTitle"
+    :message="confirmDeleteMessage"
+    :is-loading="isDeleting"
+    confirm-text="Confirmar"
+    cancel-text="Cancelar"
+    @confirm="confirmDelete"
+    @cancel="cancelDelete"
+    @close="cancelDelete"
+  />
 </template>
 
 <script setup lang="ts">
@@ -370,6 +388,7 @@ import { useRoute, useRouter } from 'vue-router';
 import type { Contract, BaseContent, ContentWithRelations } from '@clever/shared';
 import { hasActiveContract, getContractSummary } from '@clever/shared';
 import ContentDetailTemplate from '@/components/common/ContentDetailTemplate.vue';
+import ConfirmationDialog from '@/components/common/ConfirmationDialog.vue';
 import { useApi } from '@/composables/useApi';
 import { useErrorHandler } from '@/composables/useErrorHandler';
 
@@ -385,6 +404,12 @@ const errorHandler = useErrorHandler();
 const contract = ref<ContentWithRelations<Contract['data']> | null>(null);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
+
+// Delete state
+const isDeleting = ref(false);
+const showDeleteConfirm = ref(false);
+const confirmDeleteTitle = ref('Confirmar Eliminação');
+const confirmDeleteMessage = ref('');
 
 // Clear error function
 const clearError = () => {
@@ -590,6 +615,81 @@ const handleEdit = (item: BaseContent) => {
 
 const handleBack = () => {
   router.push('/contracts');
+};
+
+// Delete functionality
+const getDeleteConfirmationMessage = (): string => {
+  if (!contract.value) return 'Tem a certeza que pretende eliminar este contrato?';
+  
+  // Try to get client name from resolved relations first
+  let clientName = 'Cliente desconhecido';
+  if (contract.value.relations?.client) {
+    const clientRelation = contract.value.relations.client;
+    
+    // Check if it's a resolved relation with client data
+    if (clientRelation && typeof clientRelation === 'object' && 'nomeEmpresa' in clientRelation) {
+      clientName = clientRelation.nomeComercial || clientRelation.nomeEmpresa || 'Cliente desconhecido';
+    }
+  }
+  
+  // Fallback to stored client name
+  if (clientName === 'Cliente desconhecido' && contract.value.data.clienteName) {
+    clientName = contract.value.data.clienteName;
+  }
+  
+  return `Tem a certeza que pretende eliminar o contrato de "${clientName}"? Esta ação não pode ser desfeita.`;
+};
+
+const handleDelete = () => {
+  if (!contract.value) return;
+  
+  confirmDeleteMessage.value = getDeleteConfirmationMessage();
+  showDeleteConfirm.value = true;
+};
+
+const confirmDelete = async () => {
+  if (!contract.value) return;
+  
+  try {
+    isDeleting.value = true;
+    
+    console.log('Attempting to delete contract:', JSON.stringify({
+      uuid: contract.value.uuid,
+      clientName: contract.value.data.clienteName || 'Unknown'
+    }, null, 2));
+    
+    const success = await api.remove(contract.value.uuid);
+    
+    // Check if API returned an error
+    if (api.error.value) {
+      console.error('API returned error:', JSON.stringify(api.error.value, null, 2));
+      error.value = typeof api.error.value === 'string' 
+        ? api.error.value 
+        : api.error.value.message || 'Erro ao eliminar contrato';
+      showDeleteConfirm.value = false;
+      return;
+    }
+    
+    if (success) {
+      console.log('Contract deleted successfully, navigating to /contracts');
+      // Navigate to contracts list after successful deletion
+      router.push('/contracts');
+    } else {
+      console.error('Delete operation failed - useApi returned false');
+      error.value = 'Não foi possível eliminar este contrato.';
+      showDeleteConfirm.value = false;
+    }
+  } catch (err) {
+    console.error('Delete operation error:', JSON.stringify(err, null, 2));
+    error.value = err instanceof Error ? err.message : 'Erro ao eliminar contrato';
+    showDeleteConfirm.value = false;
+  } finally {
+    isDeleting.value = false;
+  }
+};
+
+const cancelDelete = () => {
+  showDeleteConfirm.value = false;
 };
 
 // Data loading

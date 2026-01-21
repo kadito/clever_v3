@@ -5,13 +5,18 @@
     :error="error"
     back-route="/licenses"
     :show-edit-button="true"
+    :show-delete-button="true"
     :show-meta-bar="true"
     :show-audit-trail="true"
     :show-mobile-actions="true"
     :get-title="getLicenseTitle"
     :get-subtitle="getLicenseSubtitle"
     :get-status="getLicenseStatus"
+    delete-button-text="Eliminar"
+    confirm-delete-title="Confirmar Eliminação"
+    confirm-delete-message="Tem a certeza que pretende eliminar esta licença?"
     @edit="handleEdit"
+    @delete="handleDelete"
     @back="handleBack"
     @clear-error="clearError"
   >
@@ -19,7 +24,7 @@
     <template #content="{ item }">
       <div v-if="item && item.data" class="space-y-6">
         <!-- Client Information Section (First Priority) -->
-        <ClientInfoSection :client-relation="license.relations?.client" />
+        <ClientInfoSection :client-relation="(license as ContentWithRelations<License['data']>)?.relations?.client" />
 
         <!-- Basic Information Section -->
         <div class="detail-section">
@@ -211,6 +216,19 @@
       </div>
     </template>
   </ContentDetailTemplate>
+
+  <!-- Delete Confirmation Dialog -->
+  <ConfirmationDialog
+    :is-open="showDeleteConfirm"
+    :title="confirmDeleteTitle"
+    :message="confirmDeleteMessage"
+    :is-loading="isDeleting"
+    confirm-text="Confirmar"
+    cancel-text="Cancelar"
+    @confirm="confirmDelete"
+    @cancel="cancelDelete"
+    @close="cancelDelete"
+  />
 </template>
 
 <script setup lang="ts">
@@ -220,6 +238,7 @@ import type { License, BaseContent, Client, ContentWithRelations } from '@clever
 import ContentDetailTemplate from '@/components/common/ContentDetailTemplate.vue';
 import RelationInfoDisplay from '@/components/common/RelationInfoDisplay.vue';
 import ClientInfoSection from '@/components/common/ClientInfoSection.vue';
+import ConfirmationDialog from '@/components/common/ConfirmationDialog.vue';
 import { useApi } from '@/composables/useApi';
 import { useErrorHandler } from '@/composables/useErrorHandler';
 
@@ -235,6 +254,12 @@ const errorHandler = useErrorHandler();
 const license = ref<ContentWithRelations<License['data']> | null>(null);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
+
+// Delete state
+const isDeleting = ref(false);
+const showDeleteConfirm = ref(false);
+const confirmDeleteTitle = ref('Confirmar Eliminação');
+const confirmDeleteMessage = ref('');
 
 // Clear error function
 const clearError = () => {
@@ -346,6 +371,69 @@ const handleEdit = (item: BaseContent | null) => {
 
 const handleBack = () => {
   router.push('/licenses');
+};
+
+// Delete handlers
+const getDeleteConfirmationMessage = (): string => {
+  if (!license.value) return 'Tem a certeza que pretende eliminar esta licença?';
+  
+  const softwareNames = license.value.data.software?.name || [];
+  const licenseIdentifier = softwareNames.length > 0 
+    ? softwareNames.join(', ') 
+    : `Licença ${license.value.data.versao || ''}`.trim();
+  
+  return `Tem a certeza que pretende eliminar "${licenseIdentifier}"?`;
+};
+
+const handleDelete = () => {
+  if (!license.value) return;
+  
+  confirmDeleteMessage.value = getDeleteConfirmationMessage();
+  showDeleteConfirm.value = true;
+};
+
+const confirmDelete = async () => {
+  if (!license.value) return;
+  
+  try {
+    isDeleting.value = true;
+    
+    console.log('Attempting to delete license:', JSON.stringify({
+      uuid: license.value.uuid,
+      software: license.value.data.software?.name,
+      version: license.value.data.versao
+    }, null, 2));
+    
+    const success = await api.remove(license.value.uuid);
+    
+    if (api.error.value) {
+      console.error('Delete operation failed with API error:', JSON.stringify(api.error.value, null, 2));
+      error.value = typeof api.error.value === 'string' 
+        ? api.error.value 
+        : api.error.value.message || 'Erro ao eliminar licença';
+      showDeleteConfirm.value = false;
+      return;
+    }
+    
+    if (success) {
+      console.log('License deleted successfully, navigating to /licenses');
+      router.push('/licenses');
+    } else {
+      console.error('Delete operation failed - useApi returned false');
+      error.value = 'Não foi possível eliminar esta licença.';
+      showDeleteConfirm.value = false;
+    }
+  } catch (err) {
+    console.error('Delete operation error:', JSON.stringify(err, null, 2));
+    error.value = err instanceof Error ? err.message : 'Erro ao eliminar licença';
+    showDeleteConfirm.value = false;
+  } finally {
+    isDeleting.value = false;
+  }
+};
+
+const cancelDelete = () => {
+  showDeleteConfirm.value = false;
 };
 
 // Data loading

@@ -5,13 +5,18 @@
     :error="error"
     back-route="/clients"
     :show-edit-button="true"
+    :show-delete-button="true"
     :show-meta-bar="true"
     :show-audit-trail="true"
     :show-mobile-actions="true"
     :get-title="getClientTitle"
     :get-subtitle="getClientSubtitle"
     :get-status="getClientStatus"
+    delete-button-text="Eliminar"
+    confirm-delete-title="Confirmar Eliminação"
+    confirm-delete-message="Tem a certeza que pretende eliminar este cliente?"
     @edit="handleEdit"
+    @delete="handleDelete"
     @back="handleBack"
     @clear-error="clearError"
   >
@@ -351,6 +356,19 @@
       </div>
     </template>
   </ContentDetailTemplate>
+
+  <!-- Delete Confirmation Dialog -->
+  <ConfirmationDialog
+    :is-open="showDeleteConfirm"
+    :title="confirmDeleteTitle"
+    :message="confirmDeleteMessage"
+    :is-loading="isDeleting"
+    confirm-text="Confirmar"
+    cancel-text="Cancelar"
+    @confirm="confirmDelete"
+    @cancel="cancelDelete"
+    @close="cancelDelete"
+  />
 </template>
 
 <script setup lang="ts">
@@ -358,6 +376,7 @@ import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { Client, BaseContent } from '@clever/shared';
 import ContentDetailTemplate from '@/components/common/ContentDetailTemplate.vue';
+import ConfirmationDialog from '@/components/common/ConfirmationDialog.vue';
 import { useApi } from '@/composables/useApi';
 import { useErrorHandler } from '@/composables/useErrorHandler';
 
@@ -373,6 +392,12 @@ const errorHandler = useErrorHandler();
 const client = ref<Client | null>(null);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
+
+// Delete state
+const isDeleting = ref(false);
+const showDeleteConfirm = ref(false);
+const confirmDeleteTitle = ref('Confirmar Eliminação');
+const confirmDeleteMessage = ref('');
 
 // Clear error function
 const clearError = () => {
@@ -434,6 +459,66 @@ const handleEdit = (item: BaseContent | null) => {
 
 const handleBack = () => {
   router.push('/clients');
+};
+
+// Delete functionality
+const getDeleteConfirmationMessage = (): string => {
+  if (!client.value) return 'Tem a certeza que pretende eliminar este cliente?';
+  
+  const clientName = client.value.data.nomeComercial || client.value.data.nomeEmpresa || 'este cliente';
+  return `Tem a certeza que pretende eliminar "${clientName}"? Esta ação não pode ser desfeita.`;
+};
+
+const handleDelete = () => {
+  if (!client.value) return;
+  
+  confirmDeleteMessage.value = getDeleteConfirmationMessage();
+  showDeleteConfirm.value = true;
+};
+
+const confirmDelete = async () => {
+  if (!client.value) return;
+  
+  try {
+    isDeleting.value = true;
+    
+    console.log('Attempting to delete client:', JSON.stringify({
+      uuid: client.value.uuid,
+      name: client.value.data.nomeComercial || client.value.data.nomeEmpresa
+    }, null, 2));
+    
+    const success = await api.remove(client.value.uuid);
+    
+    // Check if API returned an error
+    if (api.error.value) {
+      console.error('API returned error:', JSON.stringify(api.error.value, null, 2));
+      error.value = typeof api.error.value === 'string' 
+        ? api.error.value 
+        : api.error.value.message || 'Erro ao eliminar cliente';
+      showDeleteConfirm.value = false;
+      return;
+    }
+    
+    if (success) {
+      console.log('Client deleted successfully, navigating to /clients');
+      // Navigate to clients list after successful deletion
+      router.push('/clients');
+    } else {
+      console.error('Delete operation failed - useApi returned false');
+      error.value = 'Não foi possível eliminar este cliente.';
+      showDeleteConfirm.value = false;
+    }
+  } catch (err) {
+    console.error('Delete operation error:', JSON.stringify(err, null, 2));
+    error.value = err instanceof Error ? err.message : 'Erro ao eliminar cliente';
+    showDeleteConfirm.value = false;
+  } finally {
+    isDeleting.value = false;
+  }
+};
+
+const cancelDelete = () => {
+  showDeleteConfirm.value = false;
 };
 
 // Data loading

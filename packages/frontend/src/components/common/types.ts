@@ -67,6 +67,10 @@ export interface ContentDetailProps {
   error?: string | null;
   backRoute?: string;
   showEditButton?: boolean;
+  showDeleteButton?: boolean;
+  deleteButtonText?: string;
+  confirmDeleteTitle?: string;
+  confirmDeleteMessage?: string;
 }
 
 export interface ContentFormProps {
@@ -109,4 +113,20 @@ export interface RelationDisplayConfig {
   displayName: string;
   icon: string;
   fields: RelationFieldConfig[];
+}
+
+// Confirmation dialog props
+export interface ConfirmationDialogProps {
+  isOpen: boolean;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  isLoading?: boolean;
+}
+
+export interface ConfirmationDialogEmits {
+  confirm: [];
+  cancel: [];
+  close: [];
 }

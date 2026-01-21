@@ -23,6 +23,26 @@
           <!-- Actions -->
           <div class="flex items-center space-x-2 ml-3">
             <slot name="headerActions" :item="item">
+              <!-- Delete button slot for customization -->
+              <slot name="deleteButton" :item="item" :handleDelete="handleDelete">
+                <!-- Delete button - visible on desktop, hidden on mobile -->
+                <button
+                  v-if="showDeleteButton"
+                  @click="handleDelete"
+                  class="hidden sm:inline-flex btn-danger text-sm"
+                >
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                  {{ deleteButtonText }}
+                </button>
+              </slot>
+              
               <!-- Edit button - visible on desktop, hidden on mobile -->
               <button
                 v-if="showEditButton"
@@ -175,6 +195,22 @@
       <div class="flex space-x-3">
         <slot name="mobileActions" :item="item">
           <button
+            v-if="showDeleteButton"
+            @click="handleDelete"
+            class="btn-danger flex-1 justify-center"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              />
+            </svg>
+            {{ deleteButtonText }}
+          </button>
+          
+          <button
             v-if="showEditButton"
             @click="handleEdit"
             class="btn-primary flex-1 justify-center"
@@ -223,9 +259,15 @@ interface Props {
   
   // Display configuration
   showEditButton?: boolean;
+  showDeleteButton?: boolean;
   showMetaBar?: boolean;
   showAuditTrail?: boolean;
   showMobileActions?: boolean;
+  
+  // Delete configuration
+  deleteButtonText?: string;
+  confirmDeleteTitle?: string;
+  confirmDeleteMessage?: string;
   
   // Content display functions
   getTitle?: (item: BaseContent) => string;
@@ -239,9 +281,13 @@ const props = withDefaults(defineProps<Props>(), {
   error: null,
   backRoute: '../',
   showEditButton: true,
+  showDeleteButton: false,
   showMetaBar: true,
   showAuditTrail: true,
   showMobileActions: true,
+  deleteButtonText: 'Eliminar',
+  confirmDeleteTitle: 'Confirmar Eliminação',
+  confirmDeleteMessage: 'Tem a certeza que pretende eliminar este item?',
   getTitle: (item: BaseContent) => item.data.name || item.data.title || `Item #${item.uuid.slice(0, 8)}`,
   getSubtitle: (item: BaseContent) => item.data.subtitle || item.data.description || '',
   getStatus: (item: BaseContent) => item.data.status || '',
@@ -250,6 +296,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   edit: [item: BaseContent];
+  delete: [item: BaseContent];
   back: [];
   clearError: [];
 }>();
@@ -342,6 +389,12 @@ const formatDateTime = (dateString: string): string => {
 const handleEdit = () => {
   if (props.item) {
     emit('edit', props.item);
+  }
+};
+
+const handleDelete = () => {
+  if (props.item) {
+    emit('delete', props.item);
   }
 };
 

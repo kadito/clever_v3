@@ -9,6 +9,7 @@ export { default as UserProfile } from './UserProfile.vue';
 export { default as ErrorNotification } from './ErrorNotification.vue';
 export { default as ClientSearchInput } from './ClientSearchInput.vue';
 export { default as RelationInfoDisplay } from './RelationInfoDisplay.vue';
+export { default as ConfirmationDialog } from './ConfirmationDialog.vue';
 
 // Template components
 export { default as ContentListTemplate } from './ContentListTemplate.vue';
@@ -28,5 +29,7 @@ export type {
   ContentFormProps,
   RelationInfoDisplayProps,
   RelationFieldConfig,
-  RelationDisplayConfig
+  RelationDisplayConfig,
+  ConfirmationDialogProps,
+  ConfirmationDialogEmits
 } from './types';
