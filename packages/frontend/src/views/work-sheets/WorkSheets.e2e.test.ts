@@ -31,13 +31,6 @@ const mockWorkSheets: WorkSheet[] = [
     isDeleted: false,
     data: {
       clientId: 'client-1',
-      client: {
-        commercialName: 'Empresa ABC Lda',
-        socialName: 'Empresa ABC Lda',
-        taxNumber: '123456789',
-        address: 'Rua Principal, 123',
-        location: 'Lisboa'
-      },
       request: {
         date: '2024-01-15',
         receivedBy: 'João Silva',
@@ -87,13 +80,6 @@ const mockWorkSheets: WorkSheet[] = [
     isDeleted: false,
     data: {
       clientId: 'client-2',
-      client: {
-        commercialName: 'Loja XYZ',
-        socialName: 'Loja XYZ Unipessoal Lda',
-        taxNumber: '987654321',
-        address: 'Avenida Central, 456',
-        location: 'Porto'
-      },
       request: {
         date: '2024-01-14',
         receivedBy: 'Maria Costa',
@@ -189,7 +175,6 @@ vi.mock('@/composables/useAuth', () => ({
 const mockFormData = {
   value: {
     clientId: 'client-1',
-    clientCommercialName: 'Empresa ABC Lda',
     assistanceDate: '2024-01-15',
     technician: 'Pedro Santos',
     serviceType: 'ASSISTÊNCIA PRESENCIAL',
@@ -465,8 +450,8 @@ describe('Work Sheets End-to-End Tests', () => {
         await clientSearch.vm.$emit('client-selected', mockClient);
         await wrapper.vm.$nextTick();
 
-        // Should auto-populate client fields
-        expect(mockFormData.value.clientCommercialName).toBe('Empresa ABC Lda');
+        // Client data is now handled through relations
+        expect(mockFormData.value.clientId).toBe('client-1');
       });
 
       it('should display multiselect payment method options', async () => {

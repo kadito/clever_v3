@@ -18,10 +18,6 @@ export function validateWorkSheetCreation(data: WorkSheetCreationData): string[]
     errors.push('Cliente é obrigatório');
   }
 
-  if (!data.client?.commercialName?.trim()) {
-    errors.push('Designação comercial é obrigatória');
-  }
-
   if (!data.request?.assistanceDate?.trim()) {
     errors.push('Data da assistência é obrigatória');
   }
@@ -103,10 +99,6 @@ export function validateWorkSheetUpdate(data: WorkSheetUpdateData): string[] {
   const errors: string[] = [];
 
   // Only validate fields that are present
-  if (data.client?.commercialName !== undefined && !data.client.commercialName.trim()) {
-    errors.push('Designação comercial não pode estar vazia');
-  }
-
   if (data.request?.assistanceDate !== undefined) {
     if (!data.request.assistanceDate.trim()) {
       errors.push('Data da assistência não pode estar vazia');
@@ -151,7 +143,7 @@ export function validateWorkSheetForDisplay(workSheet: WorkSheet): WorkSheetDisp
   try {
     return {
       uuid: workSheet.uuid,
-      clientName: workSheet.data.client?.commercialName || 'Cliente não especificado',
+      clientName: 'Cliente não especificado', // Will be resolved from relations
       serviceType: workSheet.data.otherData?.serviceType || 'Não especificado',
       technician: workSheet.data.otherData?.technician || 'Não especificado',
       assistanceDate: workSheet.data.request?.assistanceDate || '',
@@ -256,7 +248,7 @@ export function calculateWorkSheetTotals(data: WorkSheetData): {
  */
 export function getWorkSheetSummary(workSheet: WorkSheet): string {
   const data = workSheet.data;
-  const clientName = data.client?.commercialName || 'Cliente não especificado';
+  const clientName = 'Cliente não especificado'; // Will be resolved from relations
   const serviceType = data.otherData?.serviceType || 'Serviço';
   const date = data.request?.assistanceDate || '';
   

@@ -320,8 +320,6 @@ const getWorkSheetTitle = (item: BaseContent | null): string => {
   let clientName = 'Cliente não especificado';
   if (workSheetItem.relations?.client && typeof workSheetItem.relations.client === 'object' && 'nomeEmpresa' in workSheetItem.relations.client) {
     clientName = workSheetItem.relations.client.nomeComercial || workSheetItem.relations.client.nomeEmpresa || clientName;
-  } else if (workSheetItem.data.client?.commercialName) {
-    clientName = workSheetItem.data.client.commercialName;
   }
   
   const serviceType = workSheetItem.data.otherData?.serviceType || 'Folha de Obra';

@@ -9,7 +9,6 @@
 
 // Export all types
 export type {
-  WorkSheetClientData,
   WorkSheetRequestData,
   WorkSheetDisplacementData,
   WorkSheetOtherData,

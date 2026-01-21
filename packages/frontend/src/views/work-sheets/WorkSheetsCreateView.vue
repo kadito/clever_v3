@@ -258,13 +258,6 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
     // Transform form data to WorkSheetCreationData format
     const workSheetData: WorkSheetCreationData = {
       clientId: data.clientId || '',
-      client: {
-        commercialName: '', // Will be populated on backend
-        socialName: '',
-        taxNumber: '',
-        address: '',
-        location: ''
-      },
       request: {
         date: data.requestDate || '',
         receivedBy: data.receivedBy || '',
@@ -366,13 +359,6 @@ const handleCreateSuccess = async (formData: Record<string, any>) => {
     // Transform form data to WorkSheetCreationData format
     const workSheetData: WorkSheetCreationData = {
       clientId: formData.clientId || '',
-      client: {
-        commercialName: '', // Will be populated on backend
-        socialName: '',
-        taxNumber: '',
-        address: '',
-        location: ''
-      },
       request: {
         date: formData.requestDate || '',
         receivedBy: formData.receivedBy || '',

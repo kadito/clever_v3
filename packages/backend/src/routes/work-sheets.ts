@@ -26,13 +26,6 @@ function validateWorkSheetCreate(requestData: any): void {
   // Create a proper WorkSheetCreationData object with defaults
   const workSheetCreationData: WorkSheetCreationData = {
     clientId: workSheetData.clientId || '',
-    client: {
-      commercialName: workSheetData.client?.commercialName || '',
-      socialName: workSheetData.client?.socialName || '',
-      taxNumber: workSheetData.client?.taxNumber || '',
-      address: workSheetData.client?.address || '',
-      location: workSheetData.client?.location || ''
-    },
     request: {
       date: workSheetData.request?.date || '',
       receivedBy: workSheetData.request?.receivedBy || '',
@@ -107,12 +100,8 @@ function validateWorkSheetUpdateData(requestData: any, existingContent?: WorkShe
 function createWorkSheetSearchText(data: WorkSheetData): string {
   const searchTerms: string[] = [];
   
-  // Client information
+  // Client information (only clientId, client data comes from relations)
   if (data.clientId) searchTerms.push(data.clientId.toLowerCase());
-  if (data.client?.commercialName) searchTerms.push(data.client.commercialName.toLowerCase());
-  if (data.client?.socialName) searchTerms.push(data.client.socialName.toLowerCase());
-  if (data.client?.taxNumber) searchTerms.push(data.client.taxNumber.toLowerCase());
-  if (data.client?.location) searchTerms.push(data.client.location.toLowerCase());
   
   // Request information
   if (data.request?.receivedBy) searchTerms.push(data.request.receivedBy.toLowerCase());
@@ -170,10 +159,7 @@ workSheetConfig.extractIndexFields = (content: WorkSheet) => {
   return {
     // Basic information for search and display
     clientId: data.clientId || '',
-    clientName: data.client?.commercialName || '',
-    clientSocialName: data.client?.socialName || '',
-    clientTaxNumber: data.client?.taxNumber || '',
-    clientLocation: data.client?.location || '',
+    // Client data now comes from relations
     
     // Request information
     assistanceDate: data.request?.assistanceDate || '',

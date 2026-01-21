@@ -122,15 +122,12 @@ const displayedWorkSheets = computed(() => {
   return workSheets.value.filter(workSheet => {
     const data = workSheet.data;
     return (
-      data.client?.commercialName?.toLowerCase().includes(query) ||
-      data.client?.socialName?.toLowerCase().includes(query) ||
-      data.client?.location?.toLowerCase().includes(query) ||
       data.otherData?.technician?.toLowerCase().includes(query) ||
       data.otherData?.serviceType?.toLowerCase().includes(query) ||
       data.request?.reason?.toLowerCase().includes(query) ||
       data.displacement?.paymentMethod?.toLowerCase().includes(query)
     );
-  });
+  });;
 });
 
 // Display functions for ContentListTemplate
@@ -152,8 +149,8 @@ const getWorkSheetTitle = (item: BaseContent): string => {
     }
   }
   
-  // Fallback to stored client name or default
-  return workSheet.data.client?.commercialName || workSheet.data.client?.socialName || 'Folha de obra sem cliente';
+  // Fallback to default
+  return 'Folha de obra sem cliente';
 };
 
 const getWorkSheetSubtitle = (item: BaseContent): string => {
@@ -198,8 +195,6 @@ const getWorkSheetInitials = (item: BaseContent): string => {
     if (clientRelation && typeof clientRelation === 'object' && 'nomeEmpresa' in clientRelation) {
       name = clientRelation.nomeComercial || clientRelation.nomeEmpresa || 'F';
     }
-  } else if (workSheet.data.client?.commercialName || workSheet.data.client?.socialName) {
-    name = workSheet.data.client.commercialName || workSheet.data.client.socialName || 'F';
   }
   
   return name

@@ -224,11 +224,6 @@ const initialFormData = computed(() => {
   return {
     // Client information
     clientId: data.clientId || '',
-    clientCommercialName: data.client?.commercialName || '',
-    clientSocialName: data.client?.socialName || '',
-    clientTaxNumber: data.client?.taxNumber || '',
-    clientAddress: data.client?.address || '',
-    clientLocation: data.client?.location || '',
     
     // Request information
     requestDate: data.request?.date || '',
@@ -339,14 +334,7 @@ const clearError = () => {
 const handleClientSelected = (client: Client | null) => {
   selectedClient.value = client;
   
-  if (client) {
-    // Auto-populate client fields
-    updateFieldValue('clientCommercialName', client.data?.nomeEmpresa || '');
-    updateFieldValue('clientSocialName', client.data?.nomeEmpresa || '');
-    updateFieldValue('clientTaxNumber', client.data?.contribuinte || '');
-    updateFieldValue('clientAddress', client.data?.morada || '');
-    updateFieldValue('clientLocation', client.data?.localidade || '');
-  }
+  // Client data is now handled through relations, no need to auto-populate
 };
 
 const validateUpdateForm = (data: Record<string, any>): Record<string, string> => {
@@ -445,13 +433,6 @@ const handleUpdate = async (formData: Record<string, any>) => {
   // Transform form data to API format
   const updateData = {
     clientId: formData.clientId,
-    client: {
-      commercialName: formData.clientCommercialName || '',
-      socialName: formData.clientSocialName || '',
-      taxNumber: formData.clientTaxNumber || '',
-      address: formData.clientAddress || '',
-      location: formData.clientLocation || ''
-    },
     request: {
       date: formData.requestDate || '',
       receivedBy: formData.receivedBy || '',

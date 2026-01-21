@@ -1,16 +1,6 @@
 import type { BaseContent } from '../base';
 
-/**
- * Work Sheet Client Data Interface
- * Client information section from the legacy form
- */
-export interface WorkSheetClientData {
-  commercialName: string; // DESIGNAÇÃO COMERCIAL
-  socialName: string; // DESIGNAÇÃO SOCIAL
-  taxNumber: string; // CONTRIBUINTE
-  address: string; // MORADA
-  location: string; // LOCALIDADE
-}
+// Client information is now handled through relations (clientId -> resolved client data)
 
 /**
  * Work Sheet Request Data Interface
@@ -82,7 +72,6 @@ export interface WorkSheetData {
   clientId: string;
 
   // Main data sections
-  client: WorkSheetClientData;
   request: WorkSheetRequestData;
   displacement: WorkSheetDisplacementData;
   otherData: WorkSheetOtherData;
