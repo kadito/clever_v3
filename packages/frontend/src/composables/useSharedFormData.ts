@@ -19,7 +19,8 @@ export function useSharedFormData(formKey: string) {
           // Set default values based on field type
           switch (field.type) {
             case 'checkbox':
-              newFormData[field.key] = false;
+            case 'switch':
+              newFormData[field.key] = field.defaultValue ?? false;
               break;
             case 'number':
               newFormData[field.key] = field.defaultValue ?? null;

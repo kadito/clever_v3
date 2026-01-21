@@ -263,6 +263,33 @@
                             </label>
                           </div>
 
+                          <!-- Switch -->
+                          <div v-else-if="field.type === 'switch'" class="flex items-center justify-between">
+                            <label :for="field.key" class="text-sm font-medium text-gray-700">
+                              {{ field.switchLabel || field.label }}
+                            </label>
+                            <div class="relative inline-flex items-center">
+                              <input
+                                :id="field.key"
+                                :checked="formData?.[field.key] || false"
+                                type="checkbox"
+                                :disabled="field.disabled"
+                                class="sr-only"
+                                @change="(e) => { updateFieldValue(field.key, (e.target as HTMLInputElement).checked); clearFieldError(field.key); }"
+                              />
+                              <div
+                                class="switch-track"
+                                :class="{ 'switch-track-active': formData?.[field.key] || false, 'switch-track-disabled': field.disabled }"
+                                @click="!field.disabled && updateFieldValue(field.key, !(formData?.[field.key] || false))"
+                              >
+                                <div
+                                  class="switch-thumb"
+                                  :class="{ 'switch-thumb-active': formData?.[field.key] || false }"
+                                ></div>
+                              </div>
+                            </div>
+                          </div>
+
                           <!-- Date input -->
                           <input
                             v-else-if="field.type === 'date'"
@@ -469,6 +496,18 @@ const initializeFormData = () => {
 // Initialize form data when component mounts
 initializeFormData();
 
+// Helper function to get visible fields based on conditional logic
+const getVisibleFields = (fields: FormField[], formData: Record<string, any> | null): FormField[] => {
+  if (!formData) return fields.filter(field => !field.conditional);
+  
+  return fields.filter(field => {
+    if (!field.conditional) return true;
+    
+    const dependentValue = formData[field.conditional.dependsOn];
+    return field.conditional.showWhen(dependentValue);
+  });
+};
+
 // Computed property for form validity (after formData is initialized)
 const isFormValidSimple = computed(() => {
   // Ensure formData is available
@@ -483,9 +522,10 @@ const isFormValidSimple = computed(() => {
     return false;
   }
   
-  // Check required fields
+  // Check required fields (only for visible fields)
   for (const section of props.formSections) {
-    for (const field of section.fields) {
+    const visibleFields = getVisibleFields(section.fields, currentFormData);
+    for (const field of visibleFields) {
       if (field.required) {
         const value = currentFormData[field.key];
         const isEmpty = !value || (typeof value === 'string' && value.trim() === '');
@@ -559,7 +599,18 @@ const validateField = (fieldKey: string) => {
   // Clear existing error
   delete validationErrors[fieldKey];
   
-  // Required validation
+  // Check if field should be visible based on conditional logic
+  if (field.conditional) {
+    const dependentValue = currentFormData[field.conditional.dependsOn];
+    const shouldShow = field.conditional.showWhen(dependentValue);
+    
+    // If field is not visible, don't validate it
+    if (!shouldShow) {
+      return;
+    }
+  }
+  
+  // Required validation (only for visible fields)
   if (field.required && (!value || (typeof value === 'string' && value.trim() === ''))) {
     validationErrors[fieldKey] = `${field.label} é obrigatório`;
     return;
@@ -613,17 +664,38 @@ const validateForm = () => {
     delete validationErrors[key];
   });
   
-  // Validate all fields
+  // Get current form data for conditional checks
+  const currentFormData = getFormData();
+  
+  // Validate all fields, but skip conditional fields that shouldn't be visible
   for (const section of props.formSections) {
     for (const field of section.fields) {
+      // Check if field should be visible based on conditional logic
+      if (field.conditional) {
+        const dependentValue = currentFormData[field.conditional.dependsOn];
+        const shouldShow = field.conditional.showWhen(dependentValue);
+        
+        // If field is not visible, skip validation entirely
+        if (!shouldShow) {
+          continue;
+        }
+      }
+      
       validateField(field.key);
     }
   }
   
   // Custom form validation
   if (props.customValidator) {
-    const currentFormData = getFormData();
     const customErrors = props.customValidator(currentFormData);
+    
+    // COMPLETELY REPLACE field validation errors with custom validation results
+    // Clear all existing errors first
+    Object.keys(validationErrors).forEach(key => {
+      delete validationErrors[key];
+    });
+    
+    // Then assign custom validation errors
     Object.assign(validationErrors, customErrors);
   }
   
@@ -672,9 +744,7 @@ const clearFieldError = (fieldKey: string) => {
 };
 
 const updateFieldValue = (fieldKey: string, value: any) => {
-  console.log('🔧 ContentFormTemplate: updateFieldValue called:', JSON.stringify({ fieldKey, value }, null, 2));
   updateSharedFieldValue(fieldKey, value);
-  console.log('🔧 ContentFormTemplate: Form data after update:', JSON.stringify(formData.value, null, 2));
   // Form validity is now handled by the computed property automatically
 };
 
@@ -698,17 +768,6 @@ const closeAllMultiselects = () => {
 const hasOpenMultiselects = computed(() => {
   return Object.values(openMultiselects.value).some(isOpen => isOpen);
 });
-
-const getVisibleFields = (fields: FormField[], formData: Record<string, any> | null): FormField[] => {
-  if (!formData) return fields.filter(field => !field.conditional);
-  
-  return fields.filter(field => {
-    if (!field.conditional) return true;
-    
-    const dependentValue = formData[field.conditional.dependsOn];
-    return field.conditional.showWhen(dependentValue);
-  });
-};
 
 const isOptionSelected = (fieldKey: string, optionValue: string): boolean => {
   const selectedValues = formData.value?.[fieldKey] || [];
@@ -972,6 +1031,43 @@ const getSelectedOptions = (field: FormField, selectedValues: any) => {
   
   .multiselect-tag-remove:active {
     @apply bg-primary-300 scale-95;
+  }
+}
+
+/* Switch component styling */
+.switch-track {
+  @apply w-11 h-6 bg-gray-200 rounded-full cursor-pointer transition-colors duration-200 ease-in-out relative;
+  @apply touch-target; /* Ensure 44px minimum touch target */
+}
+
+.switch-track-active {
+  @apply bg-primary-600;
+}
+
+.switch-track-disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.switch-thumb {
+  @apply absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out;
+}
+
+.switch-thumb-active {
+  @apply translate-x-5;
+}
+
+/* Mobile optimizations for switches */
+@media (max-width: 640px) {
+  .switch-track {
+    @apply w-12 h-7; /* Slightly larger on mobile */
+  }
+  
+  .switch-thumb {
+    @apply w-6 h-6 top-0.5 left-0.5;
+  }
+  
+  .switch-thumb-active {
+    @apply translate-x-5;
   }
 }
 </style>

@@ -1,0 +1,515 @@
+<template>
+  <ContentDetailTemplate
+    :item="workSheet"
+    :is-loading="isLoading"
+    :error="error"
+    back-route="/work-sheets"
+    :show-edit-button="true"
+    :show-meta-bar="true"
+    :show-audit-trail="true"
+    :show-mobile-actions="true"
+    :get-title="getWorkSheetTitle"
+    :get-subtitle="getWorkSheetSubtitle"
+    :get-status="getWorkSheetStatus"
+    @edit="handleEdit"
+    @back="handleBack"
+    @clear-error="clearError"
+  >
+    <!-- Custom content sections -->
+    <template #content="{ item }">
+      <div v-if="item && item.data" class="space-y-6">
+        <!-- Client Information Section (First Priority) -->
+        <ClientInfoSection :client-relation="workSheet?.relations?.client" />
+
+        <!-- Request Information Section -->
+        <div class="detail-section">
+          <div class="bg-white rounded-touch border border-gray-200">
+            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+              <h2 class="text-lg font-semibold text-gray-900">Informação do Pedido</h2>
+            </div>
+            <div class="p-4 sm:p-6">
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <label class="detail-label">Data do Pedido</label>
+                  <div class="detail-value">{{ formatDate(item.data.request?.date) }}</div>
+                </div>
+                <div class="detail-item">
+                  <label class="detail-label">Receção do Pedido</label>
+                  <div class="detail-value">{{ item.data.request?.receivedBy || '-' }}</div>
+                </div>
+                <div class="detail-item">
+                  <label class="detail-label">Data da Assistência</label>
+                  <div class="detail-value">{{ formatDate(item.data.request?.assistanceDate) }}</div>
+                </div>
+                <div class="detail-item">
+                  <label class="detail-label">Motivo do Pedido</label>
+                  <div class="detail-value">{{ item.data.request?.reason || '-' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Time Tracking Section -->
+        <div class="detail-section">
+          <div class="bg-white rounded-touch border border-gray-200">
+            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+              <h2 class="text-lg font-semibold text-gray-900">Controlo de Tempo</h2>
+            </div>
+            <div class="p-4 sm:p-6">
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <label class="detail-label">Hora Chegada</label>
+                  <div class="detail-value">{{ item.data.request?.arrivalTime || '-' }}</div>
+                </div>
+                <div class="detail-item">
+                  <label class="detail-label">Hora Saída</label>
+                  <div class="detail-value">{{ item.data.request?.departureTime || '-' }}</div>
+                </div>
+                <div class="detail-item">
+                  <label class="detail-label">Total Horas</label>
+                  <div class="detail-value">{{ item.data.request?.totalHours || '-' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service Information Section -->
+        <div class="detail-section">
+          <div class="bg-white rounded-touch border border-gray-200">
+            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+              <h2 class="text-lg font-semibold text-gray-900">Informação do Serviço</h2>
+            </div>
+            <div class="p-4 sm:p-6">
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <label class="detail-label">Tipo de Serviço</label>
+                  <div class="detail-value">{{ item.data.otherData?.serviceType || '-' }}</div>
+                </div>
+                <div class="detail-item">
+                  <label class="detail-label">Técnico Responsável</label>
+                  <div class="detail-value">{{ item.data.otherData?.technician || '-' }}</div>
+                </div>
+                <div v-if="item.data.otherData?.serviceObservations" class="detail-item col-span-full">
+                  <label class="detail-label">Observações do Serviço</label>
+                  <div class="detail-value">{{ item.data.otherData.serviceObservations }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Displacement Section -->
+        <div class="detail-section">
+          <div class="bg-white rounded-touch border border-gray-200">
+            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+              <h2 class="text-lg font-semibold text-gray-900">Deslocação</h2>
+            </div>
+            <div class="p-4 sm:p-6">
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <label class="detail-label">Deslocação</label>
+                  <div class="detail-value">{{ item.data.displacement?.hasDisplacement ? 'Sim' : 'Não' }}</div>
+                </div>
+                <div class="detail-item">
+                  <label class="detail-label">Final Semana - Feriado</label>
+                  <div class="detail-value">{{ item.data.displacement?.weekendHoliday ? 'Sim' : 'Não' }}</div>
+                </div>
+                <div v-if="item.data.displacement?.hasDisplacement" class="detail-item">
+                  <label class="detail-label">KMs (Ida)</label>
+                  <div class="detail-value">{{ item.data.displacement.oneWayKms || 0 }} km</div>
+                </div>
+                <div v-if="item.data.displacement?.hasDisplacement" class="detail-item">
+                  <label class="detail-label">Total KMs (Ida e Volta)</label>
+                  <div class="detail-value">{{ item.data.displacement.totalKms || 0 }} km</div>
+                </div>
+                <div class="detail-item">
+                  <label class="detail-label">Método de Pagamento</label>
+                  <div class="detail-value">{{ item.data.displacement?.paymentMethod || 'PENDENTE' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pricing Section (only if displacement is enabled) -->
+        <div v-if="item.data.displacement?.hasDisplacement" class="detail-section">
+          <div class="bg-white rounded-touch border border-gray-200">
+            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+              <h2 class="text-lg font-semibold text-gray-900">Cálculo de Preços <span class="text-sm font-normal text-gray-600">(sem IVA)</span></h2>
+            </div>
+            <div class="p-4 sm:p-6">
+              <div class="pricing-table bg-gray-50 rounded-lg p-4 border-l-4 border-primary-500">
+                <div class="pricing-row">
+                  <span class="pricing-label">Taxa Deslocação:</span>
+                  <span class="pricing-value">{{ getDisplacementRate() }}€ <span class="text-xs text-red-600">sem IVA</span></span>
+                </div>
+                <div class="pricing-row">
+                  <span class="pricing-label">Preço KMs:</span>
+                  <span class="pricing-value">{{ getKmsPrice() }}€ <span class="text-xs text-red-600">sem IVA</span></span>
+                </div>
+                <div class="pricing-row">
+                  <span class="pricing-label">Valor Hora:</span>
+                  <span class="pricing-value">{{ getHourlyRate() }}€ <span class="text-xs text-red-600">sem IVA</span></span>
+                </div>
+                <div class="pricing-row">
+                  <span class="pricing-label">Preço Mão Obra:</span>
+                  <span class="pricing-value">{{ getLaborPrice() }}€ <span class="text-xs text-red-600">sem IVA</span></span>
+                </div>
+                <div class="pricing-row total bg-primary-600 text-white -mx-4 -mb-4 px-4 py-3 rounded-b-lg font-bold">
+                  <span class="pricing-label text-white">PREÇO TOTAL:</span>
+                  <span class="pricing-value text-white text-lg">{{ getTotalPrice() }}€ <span class="text-xs opacity-90">sem IVA</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contract Information Section (only if payment method is CONTRATO) -->
+        <div v-if="item.data.displacement?.paymentMethod === 'CONTRATO'" class="detail-section">
+          <div class="bg-white rounded-touch border border-gray-200">
+            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+              <h2 class="text-lg font-semibold text-gray-900">Garantia e Contrato</h2>
+            </div>
+            <div class="p-4 sm:p-6">
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <label class="detail-label">Garantia</label>
+                  <div class="detail-value">{{ item.data.otherData?.warranty ? 'Sim' : 'Não' }}</div>
+                </div>
+                <div class="detail-item">
+                  <label class="detail-label">Contrato</label>
+                  <div class="detail-value">{{ item.data.otherData?.contract ? 'Sim' : 'Não' }}</div>
+                </div>
+                <div class="detail-item">
+                  <label class="detail-label">Ano de Contrato</label>
+                  <div class="detail-value">{{ item.data.otherData?.contractYear || '-' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Material and Equipment Section -->
+        <div class="detail-section">
+          <div class="bg-white rounded-touch border border-gray-200">
+            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+              <h2 class="text-lg font-semibold text-gray-900">Material e Equipamentos</h2>
+            </div>
+            <div class="p-4 sm:p-6">
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <label class="detail-label">Material Utilizado</label>
+                  <div class="detail-value">{{ item.data.otherData?.materialUsed ? 'Sim' : 'Não' }}</div>
+                </div>
+                <div class="detail-item">
+                  <label class="detail-label">Equipamentos</label>
+                  <div class="detail-value">{{ item.data.otherData?.equipment ? 'Sim' : 'Não' }}</div>
+                </div>
+                <div v-if="item.data.otherData?.materialUsed && item.data.otherData?.materialDetails" class="detail-item col-span-full">
+                  <label class="detail-label">Descrição do Material Utilizado</label>
+                  <div class="detail-value">{{ item.data.otherData.materialDetails }}</div>
+                </div>
+                <div v-if="item.data.otherData?.equipment && item.data.otherData?.equipmentDetails" class="detail-item col-span-full">
+                  <label class="detail-label">Descrição dos Equipamentos</label>
+                  <div class="detail-value">{{ item.data.otherData.equipmentDetails }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service Status and Technical Operations Section -->
+        <div class="detail-section">
+          <div class="bg-white rounded-touch border border-gray-200">
+            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+              <h2 class="text-lg font-semibold text-gray-900">Estado do Serviço e Operações Técnicas</h2>
+            </div>
+            <div class="p-4 sm:p-6">
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <label class="detail-label">Totalmente Resolvido</label>
+                  <div class="detail-value">{{ item.data.otherData?.totallyResolved ? 'Sim' : 'Não' }}</div>
+                </div>
+                <div class="detail-item">
+                  <label class="detail-label">Leitura de Dump</label>
+                  <div class="detail-value">{{ item.data.otherData?.dumpReading ? 'Sim' : 'Não' }}</div>
+                </div>
+                <div class="detail-item">
+                  <label class="detail-label">Cópia de Segurança</label>
+                  <div class="detail-value">{{ item.data.otherData?.backup ? 'Sim' : 'Não' }}</div>
+                </div>
+                <div class="detail-item">
+                  <label class="detail-label">Verificação do Acesso Remoto</label>
+                  <div class="detail-value">{{ item.data.otherData?.remoteAccessCheck ? 'Sim' : 'Não' }}</div>
+                </div>
+                <div class="detail-item">
+                  <label class="detail-label">AnyDesk</label>
+                  <div class="detail-value">{{ item.data.otherData?.anydesk ? 'Sim' : 'Não' }}</div>
+                </div>
+                <div v-if="!item.data.otherData?.totallyResolved && item.data.otherData?.resolutionIssues" class="detail-item col-span-full">
+                  <label class="detail-label">Observações sobre Problemas Não Resolvidos</label>
+                  <div class="detail-value">{{ item.data.otherData.resolutionIssues }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service Report Section -->
+        <div class="detail-section">
+          <div class="bg-white rounded-touch border border-gray-200">
+            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+              <h2 class="text-lg font-semibold text-gray-900">Relatório de Serviço</h2>
+            </div>
+            <div class="p-4 sm:p-6">
+              <div class="detail-item">
+                <label class="detail-label">Descrição Detalhada do Serviço</label>
+                <div class="detail-value">{{ item.data.otherData?.serviceReport || '-' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Client Signature Section -->
+        <div v-if="item.data.otherData?.clientSignature" class="detail-section">
+          <div class="bg-white rounded-touch border border-gray-200">
+            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+              <h2 class="text-lg font-semibold text-gray-900">Assinatura do Cliente</h2>
+            </div>
+            <div class="p-4 sm:p-6">
+              <div class="flex justify-center">
+                <img
+                  :src="item.data.otherData.clientSignature"
+                  alt="Assinatura do Cliente"
+                  class="max-w-full max-h-48 border-2 border-gray-200 rounded bg-white"
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+  </ContentDetailTemplate>
+</template>
+
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import type { WorkSheet, ContentWithRelations, WorkSheetData, BaseContent } from '@clever/shared';
+import ContentDetailTemplate from '@/components/common/ContentDetailTemplate.vue';
+import ClientInfoSection from '@/components/common/ClientInfoSection.vue';
+import { useApi } from '@/composables/useApi';
+
+const route = useRoute();
+const router = useRouter();
+const { fetchById, currentItem, loading: apiLoading, error: apiError } = useApi<ContentWithRelations<WorkSheetData>>('work-sheets');
+
+// State
+const workSheet = ref<ContentWithRelations<WorkSheetData> | null>(null);
+const isLoading = computed(() => apiLoading.loading.value);
+const error = computed(() => apiError.value?.message || null);
+
+// Display helper functions for ContentDetailTemplate
+const getWorkSheetTitle = (item: BaseContent | null): string => {
+  if (!item?.data) return 'Folha de Obra';
+  const workSheetItem = item as ContentWithRelations<WorkSheetData>;
+  
+  // Try to get client name from relations first, then fallback to data
+  let clientName = 'Cliente não especificado';
+  if (workSheetItem.relations?.client && typeof workSheetItem.relations.client === 'object' && 'nomeEmpresa' in workSheetItem.relations.client) {
+    clientName = workSheetItem.relations.client.nomeComercial || workSheetItem.relations.client.nomeEmpresa || clientName;
+  } else if (workSheetItem.data.client?.commercialName) {
+    clientName = workSheetItem.data.client.commercialName;
+  }
+  
+  const serviceType = workSheetItem.data.otherData?.serviceType || 'Folha de Obra';
+  return `${serviceType} - ${clientName}`;
+};
+
+const getWorkSheetSubtitle = (item: BaseContent | null): string => {
+  if (!item?.data) return '';
+  const workSheetItem = item as ContentWithRelations<WorkSheetData>;
+  const assistanceDate = workSheetItem.data.request?.assistanceDate;
+  if (assistanceDate) {
+    return formatDate(assistanceDate);
+  }
+  return '';
+};
+
+const getWorkSheetStatus = (item: BaseContent | null): string => {
+  if (!item?.data) return 'Carregando...';
+  const workSheetItem = item as ContentWithRelations<WorkSheetData>;
+  if (workSheetItem.data.otherData?.totallyResolved) {
+    return 'Resolvido';
+  }
+  return 'Pendente';
+};
+
+// Clear error function
+const clearError = () => {
+  // Error is managed by the API composable
+};
+
+// Event handlers for ContentDetailTemplate
+const handleEdit = () => {
+  if (!workSheet.value) return;
+  router.push(`/work-sheets/${workSheet.value.uuid}/editar`);
+};
+
+const handleBack = () => {
+  router.push('/work-sheets');
+};
+
+// Data loading
+const loadWorkSheet = async () => {
+  const uuid = route.params.uuid as string;
+  if (!uuid) {
+    return;
+  }
+
+  // Validate UUID format to prevent trying to fetch invalid UUIDs like "create"
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(uuid)) {
+    console.error('Invalid UUID format:', uuid);
+    router.push('/work-sheets');
+    return;
+  }
+
+  await fetchById(uuid);
+  
+  if (currentItem.value) {
+    workSheet.value = currentItem.value as ContentWithRelations<WorkSheetData>;
+  }
+};
+
+// Utility functions
+const formatDate = (dateString: string | undefined): string => {
+  if (!dateString) return '-';
+  try {
+    return new Date(dateString).toLocaleDateString('pt-PT');
+  } catch {
+    return 'Data inválida';
+  }
+};
+
+// Pricing calculation methods (based on legacy logic)
+const getDisplacementRate = (): number => {
+  if (!workSheet.value?.data?.displacement?.hasDisplacement) return 0;
+  const totalKms = workSheet.value.data.displacement.totalKms || 0;
+  return totalKms > 180 ? 50 : 35;
+};
+
+const getHourlyRate = (): number => {
+  if (!workSheet.value?.data?.displacement?.hasDisplacement) return 0;
+  return workSheet.value.data.displacement.weekendHoliday ? 60 : 45;
+};
+
+const getKmsPrice = (): number => {
+  if (!workSheet.value?.data?.displacement?.hasDisplacement) return 0;
+  const pricePerKm = 0.4;
+  const totalKms = workSheet.value.data.displacement.totalKms || 0;
+  return Math.round(pricePerKm * totalKms * 100) / 100;
+};
+
+const getLaborPrice = (): number => {
+  if (!workSheet.value?.data?.displacement?.hasDisplacement) return 0;
+  
+  const arrivalTime = workSheet.value.data.request?.arrivalTime;
+  const departureTime = workSheet.value.data.request?.departureTime;
+  
+  if (!arrivalTime || !departureTime) return 0;
+  
+  try {
+    const [arrivalHours, arrivalMinutes] = arrivalTime.split(':').map(Number);
+    const [departureHours, departureMinutes] = departureTime.split(':').map(Number);
+    
+    const arrivalTotalMinutes = arrivalHours * 60 + arrivalMinutes;
+    const departureTotalMinutes = departureHours * 60 + departureMinutes;
+    
+    let diffMinutes = departureTotalMinutes - arrivalTotalMinutes;
+    if (diffMinutes < 0) {
+      diffMinutes += 24 * 60; // Handle next day
+    }
+    
+    const totalHours = diffMinutes / 60;
+    const chargeableHours = totalHours < 1 ? 1 : totalHours; // Minimum 1 hour
+    const hourlyRate = getHourlyRate();
+    
+    return Math.round(chargeableHours * hourlyRate * 100) / 100;
+  } catch {
+    return 0;
+  }
+};
+
+const getTotalPrice = (): number => {
+  if (!workSheet.value?.data?.displacement?.hasDisplacement) return 0;
+  
+  const displacementRate = getDisplacementRate();
+  const kmsPrice = getKmsPrice();
+  const laborPrice = getLaborPrice();
+  
+  return Math.round((displacementRate + kmsPrice + laborPrice) * 100) / 100;
+};
+
+// Lifecycle
+onMounted(() => {
+  loadWorkSheet();
+});
+</script>
+
+<style scoped>
+/* Pricing table specific styles */
+.pricing-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pricing-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.pricing-row:last-child:not(.total) {
+  border-bottom: none;
+}
+
+.pricing-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.pricing-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.pricing-row.total .pricing-label {
+  color: white;
+}
+
+.pricing-row.total .pricing-value {
+  color: white;
+  font-size: 1.125rem;
+}
+
+/* Mobile responsiveness for pricing */
+@media (max-width: 640px) {
+  .pricing-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .pricing-value {
+    width: 100%;
+  }
+}
+</style>

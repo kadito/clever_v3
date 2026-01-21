@@ -169,6 +169,7 @@ export {
 export * from './types/clients';
 export * from './types/licenses';
 export * from './types/contracts';
+export * from './types/work-sheets';
 
 // Re-export generic content validation utilities
 export {

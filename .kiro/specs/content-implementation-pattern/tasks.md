@@ -267,6 +267,121 @@ This implementation plan establishes the foundational pattern for all content ty
 - Verify Portuguese localization in place
 - Confirm following established patterns from previous implementations
 
+### Process for Each Content Type (Folhas de Obra Implementation)
+
+- [x] 11. Analyze legacy components for folhas-obra
+- [x] 11.1 Analyze old_src Detail view for folhas-obra
+  - Read old_src/views/folhas-obra/FolhasObraDetail.vue
+  - Extract data structure and display fields
+  - Identify conditional logic and business rules
+  - Document field relationships and formatting
+  - _Requirements: 7.1, 7.2_
+
+- [x] 11.2 Analyze old_src Form view for folhas-obra
+  - Read old_src/views/folhas-obra/FolhaObraForm.vue
+  - Extract form fields and input types
+  - Identify validation rules and required fields
+  - Document form sections and conditional fields
+  - _Requirements: 7.1, 7.2_
+
+- [x] 11.3 Create TypeScript interfaces for work-sheets
+  - Extend BaseContent interface with content-specific data structure
+  - Create validation schemas based on form analysis
+  - Optimize data structure for new system (clean, modern design)
+  - _Requirements: 7.3, 7.4, 7.5_
+
+- [x] 12. Implement backend for work-sheets
+- [x] 12.1 Create work-sheets.ts route file
+  - Implement all CRUD endpoints using the generic pattern
+  - Add content-specific validation logic
+  - Configure content-specific sorting (by date for work-sheets)
+  - Implement search index with content-specific searchable fields
+  - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6_
+
+- [ ]* 12.2 Write property tests for work-sheets API
+  - **Property 15: Authentication Requirement**
+  - **Property 16: Audit Trail User Recording**
+  - **Property 7: Index-Storage Synchronization**
+  - **Validates: Requirements 8.2, 8.3, 8.4, 10.1, 10.2**
+
+- [x] 13. Implement frontend for work-sheets
+- [x] 13.1 Create WorkSheetsListView.vue component
+  - Implement content-specific display functions (getDisplayTitle, getDisplayMeta1, etc.)
+  - Configure Portuguese labels for the content type
+  - Add content-specific search and filter logic
+  - Use mobile-first card layout with touch targets
+  - _Requirements: 9.1, 9.2, 12.2, 12.3_
+
+- [x] 13.2 Create WorkSheetsDetailView.vue component
+  - Use ContentDetailTemplate with enhanced audit trail display
+  - Implement content-specific sections based on legacy analysis
+  - Add content-specific field displays and formatting
+  - Configure mobile-friendly responsive layouts
+  - Include Portuguese labels and locale formatting
+  - Display user email addresses in audit trail instead of user IDs
+  - _Requirements: 9.3, 12.1, 12.4_
+
+- [x] 13.3 Create WorkSheetsCreateView.vue component
+  - Use ContentCreateTemplate wrapper with ContentFormTemplate for rendering
+  - Implement content-specific form sections for creation
+  - Add creation-specific validation rules using shared validation functions
+  - Configure appropriate mobile input types and form field definitions
+  - Include Portuguese validation messages and labels
+  - Handle form data persistence across component recreation
+  - Implement multiselect dropdowns and conditional fields
+  - Add dynamic configuration management for work-sheet-specific items
+  - _Requirements: 9.4, 11.1, 12.1, 12.5, 17.1, 18.1, 19.1_
+
+- [x] 13.4 Create WorkSheetsUpdateView.vue component
+  - Use ContentFormTemplate for rendering
+  - Implement content-specific form sections for editing
+  - Add update-specific validation rules and disabled fields
+  - Handle pre-population of existing data
+  - Include Portuguese validation messages and labels
+  - Support multiselect dropdowns and conditional fields
+  - Support dynamic configuration management in edit mode
+  - _Requirements: 9.4, 11.1, 12.1, 12.5, 18.1, 19.1_
+
+- [ ]* 13.5 Write property tests for work-sheets components
+  - **Property 17: Error Component Display**
+  - **Property 18: Authentication Redirect**
+  - **Property 19: Portuguese UI Language**
+  - **Property 20: Portuguese Locale Formatting**
+  - **Validates: Requirements 11.2, 11.3, 12.1-12.4**
+
+- [-] 14. Integration and routing for work-sheets
+- [x] 14.1 Add work-sheets routes to Vue Router
+  - Configure 5-view pattern routes (List, Detail, Create, Update)
+  - Add navigation integration
+  - Update dashboard tiles for content type
+  - _Requirements: 5.1, 9.5_
+
+- [x] 14.2 Test end-to-end functionality for work-sheets
+  - Verify complete CRUD workflows
+  - Test mobile responsiveness across breakpoints
+  - Validate Portuguese localization
+  - Test authentication and error handling
+  - Test multiselect dropdowns and conditional fields
+  - Test dynamic configuration management
+  - _Requirements: 11.3, 11.4, 13.5, 17.1, 18.1, 19.1_
+
+- [ ]* 14.3 Write integration tests for work-sheets
+  - Test complete user workflows
+  - Verify mobile touch interactions
+  - Test loading states and performance
+  - **Property 21: Search Input Debouncing**
+  - **Property 23: Loading State Provision**
+  - **Validates: Requirements 13.4, 13.5**
+
+- [x] 15. Checkpoint for work-sheets
+- Ensure all work-sheets functionality works correctly
+- Verify all builds pass (shared, backend, frontend packages)
+- Confirm TypeScript compilation successful across all packages
+- Validate Vue Router updated with work-sheets routes
+- Test mobile-first responsive design implementation
+- Verify Portuguese localization in place
+- Confirm following established patterns from previous implementations
+
 ## Implementation Order
 
 1. **Complete Phase 1** (Base Infrastructure) - Do this once

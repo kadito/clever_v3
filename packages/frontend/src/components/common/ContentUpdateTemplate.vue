@@ -114,20 +114,35 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
   const errors: Record<string, string> = {};
   
   // Default update validation - more lenient than create
-  // Only validate required fields that are not disabled/readonly
+  // Only validate required fields that are not disabled/readonly AND are visible based on conditional logic
   for (const section of formSections.value) {
     for (const field of section.fields) {
       if (field.required && !field.disabled && !field.readonly) {
-        if (!data[field.key] || (typeof data[field.key] === 'string' && data[field.key].trim() === '')) {
-          errors[field.key] = `${field.label} é obrigatório`;
+        // Check if field should be visible based on conditional logic
+        let shouldValidate = true;
+        if (field.conditional) {
+          const dependentValue = data[field.conditional.dependsOn];
+          shouldValidate = field.conditional.showWhen(dependentValue);
+        }
+        
+        // Only validate if field should be visible
+        if (shouldValidate) {
+          if (!data[field.key] || (typeof data[field.key] === 'string' && data[field.key].trim() === '')) {
+            errors[field.key] = `${field.label} é obrigatório`;
+          }
         }
       }
     }
   }
   
-  // Apply custom validation if provided
+  // Apply custom validation if provided - this should override default validation
   if (props.customValidator) {
     const customErrors = props.customValidator(data);
+    
+    // Custom validator has complete control - clear default errors and use custom ones
+    Object.keys(errors).forEach(key => {
+      delete errors[key];
+    });
     Object.assign(errors, customErrors);
   }
   

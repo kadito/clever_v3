@@ -1,0 +1,344 @@
+import type { FormSection } from '@/components/common/types';
+
+export const workSheetsFormSections: FormSection[] = [
+  {
+    key: 'basic',
+    title: 'Dados do Cliente',
+    description: 'Informação básica do cliente para a folha de obra',
+    fields: [
+      {
+        key: 'clientId',
+        label: 'Cliente',
+        type: 'custom',
+        required: true,
+        placeholder: 'Pesquisar cliente...'
+      }
+    ]
+  },
+  {
+    key: 'request',
+    title: 'Informação do Pedido',
+    description: 'Detalhes sobre o pedido de assistência',
+    fields: [
+      {
+        key: 'requestDate',
+        label: 'Data do Pedido',
+        type: 'date',
+        fullWidth: false,
+        defaultValue: new Date().toISOString().split('T')[0]
+      },
+      {
+        key: 'receivedBy',
+        label: 'Receção do Pedido',
+        type: 'text',
+        fullWidth: false,
+        placeholder: 'Nome do colaborador'
+      },
+      {
+        key: 'assistanceDate',
+        label: 'Data da Assistência',
+        type: 'date',
+        required: true,
+        fullWidth: false,
+        defaultValue: new Date().toISOString().split('T')[0]
+      },
+      {
+        key: 'reason',
+        label: 'Motivo do Pedido',
+        type: 'textarea',
+        fullWidth: true,
+        rows: 3,
+        placeholder: 'Descreva o motivo do pedido...'
+      }
+    ]
+  },
+  {
+    key: 'timeTracking',
+    title: 'Controlo de Tempo',
+    description: 'Horários de chegada e saída para cálculo automático',
+    fields: [
+      {
+        key: 'arrivalTime',
+        label: 'Hora Chegada',
+        type: 'custom',
+        fullWidth: false,
+        placeholder: '10:00'
+      },
+      {
+        key: 'departureTime',
+        label: 'Hora Saída',
+        type: 'custom',
+        fullWidth: false,
+        placeholder: '18:00'
+      },
+      {
+        key: 'totalHours',
+        label: 'Total Horas',
+        type: 'text',
+        fullWidth: false,
+        disabled: true,
+        placeholder: 'Calculado automaticamente'
+      }
+    ]
+  },
+  {
+    key: 'service',
+    title: 'Tipo de Serviço',
+    description: 'Informação sobre o tipo de serviço',
+    fields: [
+      {
+        key: 'serviceType',
+        label: 'Tipo de Serviço',
+        type: 'select',
+        fullWidth: false,
+        options: [
+          { value: '', label: '--' },
+          { value: 'ASSISTÊNCIA PRESENCIAL', label: 'ASSISTÊNCIA PRESENCIAL' },
+          { value: 'MANUTENÇÃO', label: 'MANUTENÇÃO' },
+          { value: 'INSTALAÇÃO', label: 'INSTALAÇÃO' }
+        ]
+      },
+      {
+        key: 'serviceObservations',
+        label: 'Observações do Serviço',
+        type: 'textarea',
+        fullWidth: true,
+        rows: 3,
+        placeholder: 'Observações adicionais sobre o serviço...'
+      }
+    ]
+  },
+  {
+    key: 'displacement',
+    title: 'Deslocação',
+    description: 'Configuração de deslocação e cálculo de preços',
+    fields: [
+      {
+        key: 'hasDisplacement',
+        label: 'Deslocação',
+        type: 'custom',
+        fullWidth: false,
+        defaultValue: false
+      },
+      {
+        key: 'weekendHoliday',
+        label: 'Final Semana - Feriado',
+        type: 'switch',
+        fullWidth: false,
+        switchLabel: 'Serviço em fim-de-semana ou feriado',
+        defaultValue: false
+      },
+      {
+        key: 'oneWayKms',
+        label: 'KMs (Ida)',
+        type: 'number',
+        fullWidth: false,
+        min: 0,
+        step: 1,
+        placeholder: 'Quilómetros de ida',
+        conditional: {
+          dependsOn: 'hasDisplacement',
+          showWhen: (value: any) => value === true
+        }
+      },
+      {
+        key: 'totalKms',
+        label: 'Total KMs (Ida e Volta)',
+        type: 'number',
+        fullWidth: false,
+        disabled: true,
+        placeholder: 'Total automático',
+        conditional: {
+          dependsOn: 'hasDisplacement',
+          showWhen: (value: any) => value === true
+        }
+      }
+    ]
+  },
+  {
+    key: 'payment',
+    title: 'Método de Pagamento',
+    description: 'Forma de pagamento do serviço',
+    fields: [
+      {
+        key: 'paymentMethod',
+        label: 'Método de Pagamento',
+        type: 'custom',
+        required: true,
+        fullWidth: true
+      }
+    ]
+  },
+  {
+    key: 'contract',
+    title: 'Garantia e Contrato',
+    description: 'Informação sobre garantia e contrato (apenas para pagamento por contrato)',
+    fields: [
+      {
+        key: 'warranty',
+        label: 'Garantia',
+        type: 'switch',
+        fullWidth: false,
+        switchLabel: 'Serviço coberto por garantia',
+        defaultValue: false,
+        conditional: {
+          dependsOn: 'paymentMethod',
+          showWhen: (value: any) => value === 'CONTRATO'
+        }
+      },
+      {
+        key: 'contract',
+        label: 'Contrato',
+        type: 'switch',
+        fullWidth: false,
+        switchLabel: 'Serviço coberto por contrato',
+        defaultValue: false,
+        conditional: {
+          dependsOn: 'paymentMethod',
+          showWhen: (value: any) => value === 'CONTRATO'
+        }
+      },
+      {
+        key: 'contractYear',
+        label: 'Ano de Contrato',
+        type: 'select',
+        fullWidth: false,
+        options: [
+          { value: '2023', label: '2023' },
+          { value: '2024', label: '2024' },
+          { value: '2025', label: '2025' },
+          { value: '2026', label: '2026' }
+        ],
+        defaultValue: new Date().getFullYear().toString(),
+        conditional: {
+          dependsOn: 'paymentMethod',
+          showWhen: (value: any) => value === 'CONTRATO'
+        }
+      }
+    ]
+  },
+  {
+    key: 'materials',
+    title: 'Material e Equipamentos',
+    description: 'Informação sobre material e equipamentos utilizados',
+    fields: [
+      {
+        key: 'materialUsed',
+        label: 'Material Utilizado',
+        type: 'switch',
+        fullWidth: false,
+        switchLabel: 'Foi utilizado material',
+        defaultValue: false
+      },
+      {
+        key: 'equipment',
+        label: 'Equipamentos',
+        type: 'switch',
+        fullWidth: false,
+        switchLabel: 'Foram utilizados equipamentos',
+        defaultValue: false
+      },
+      {
+        key: 'materialDetails',
+        label: 'Descrição do Material Utilizado',
+        type: 'textarea',
+        fullWidth: true,
+        rows: 3,
+        required: true,
+        placeholder: 'Descreva o material utilizado...',
+        conditional: {
+          dependsOn: 'materialUsed',
+          showWhen: (value: any) => value === true
+        }
+      },
+      {
+        key: 'equipmentDetails',
+        label: 'Descrição dos Equipamentos',
+        type: 'textarea',
+        fullWidth: true,
+        rows: 3,
+        required: true,
+        placeholder: 'Descreva os equipamentos utilizados...',
+        conditional: {
+          dependsOn: 'equipment',
+          showWhen: (value: any) => value === true
+        }
+      }
+    ]
+  },
+  {
+    key: 'serviceStatus',
+    title: 'Estado do Serviço e Operações Técnicas',
+    description: 'Estado de resolução e operações técnicas realizadas',
+    fields: [
+      {
+        key: 'totallyResolved',
+        label: 'Totalmente Resolvido',
+        type: 'switch',
+        fullWidth: false,
+        switchLabel: 'O problema foi totalmente resolvido',
+        defaultValue: true
+      },
+      {
+        key: 'dumpReading',
+        label: 'Leitura de Dump',
+        type: 'switch',
+        fullWidth: false,
+        switchLabel: 'Foi realizada leitura de dump',
+        defaultValue: false
+      },
+      {
+        key: 'backup',
+        label: 'Cópia de Segurança',
+        type: 'switch',
+        fullWidth: false,
+        switchLabel: 'Foi realizada cópia de segurança',
+        defaultValue: false
+      },
+      {
+        key: 'remoteAccessCheck',
+        label: 'Verificação do Acesso Remoto',
+        type: 'switch',
+        fullWidth: false,
+        switchLabel: 'Foi verificado o acesso remoto',
+        defaultValue: false
+      },
+      {
+        key: 'anydesk',
+        label: 'AnyDesk',
+        type: 'switch',
+        fullWidth: false,
+        switchLabel: 'Foi utilizado AnyDesk',
+        defaultValue: false
+      },
+      {
+        key: 'resolutionIssues',
+        label: 'Observações sobre Problemas Não Resolvidos',
+        type: 'textarea',
+        fullWidth: true,
+        rows: 4,
+        required: true,
+        placeholder: 'Descreva os problemas que não foram totalmente resolvidos...',
+        conditional: {
+          dependsOn: 'totallyResolved',
+          showWhen: (value: any) => value === false
+        }
+      }
+    ]
+  },
+  {
+    key: 'observations',
+    title: 'Relatório de Serviço',
+    description: 'Descrição detalhada do serviço realizado',
+    fields: [
+      {
+        key: 'serviceReport',
+        label: 'Descrição Detalhada do Serviço',
+        type: 'textarea',
+        fullWidth: true,
+        rows: 5,
+        placeholder: 'Descrição detalhada do serviço realizado...'
+      }
+    ]
+  }
+];

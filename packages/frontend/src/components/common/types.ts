@@ -3,7 +3,7 @@
 export interface FormField {
   key: string;
   label: string;
-  type: 'text' | 'email' | 'tel' | 'url' | 'password' | 'number' | 'textarea' | 'select' | 'multiselect' | 'checkbox' | 'date' | 'custom';
+  type: 'text' | 'email' | 'tel' | 'url' | 'password' | 'number' | 'textarea' | 'select' | 'multiselect' | 'checkbox' | 'switch' | 'date' | 'custom';
   placeholder?: string;
   help?: string;
   required?: boolean;
@@ -26,6 +26,9 @@ export interface FormField {
   
   // Checkbox specific
   checkboxLabel?: string;
+  
+  // Switch specific
+  switchLabel?: string;
   
   // Conditional field support
   conditional?: {

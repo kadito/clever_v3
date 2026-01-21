@@ -5,6 +5,7 @@ import { createContentRoutes, createStandardContentConfig, contentErrorHandler }
 import clientsRouter from './clients';
 import licensesRouter from './licenses';
 import contractsRouter from './contracts';
+import workSheetsRouter from './work-sheets';
 import type { AppContext } from '../types/auth';
 import type {
   BaseContent,
@@ -116,19 +117,10 @@ api.route('/content/licenses', licensesRouter);
 // Contracts route with date-based sorting and custom validation
 api.route('/content/contracts', contractsRouter);
 
-// Generic routes for other content types using standard configuration with relation validation
-
-const workSheetsConfig = createStandardContentConfig('work-sheets', 'date-desc');
-workSheetsConfig.validateCreate = (data: any) => {
-  const errors = validateWorkSheetCreation(data.data || data);
-  if (errors.length > 0) throw new Error(errors[0]);
-};
-workSheetsConfig.validateUpdate = (data: any) => {
-  const errors = validateWorkSheetUpdate(data.data || data);
-  if (errors.length > 0) throw new Error(errors[0]);
-};
-const workSheetsRouter = createContentRoutes<BaseContent>(workSheetsConfig);
+// Work Sheets route with date-based sorting and custom validation
 api.route('/content/work-sheets', workSheetsRouter);
+
+// Generic routes for other content types using standard configuration with relation validation
 
 const dailyRecordsConfig = createStandardContentConfig('daily-records', 'date-desc');
 dailyRecordsConfig.validateCreate = (data: any) => {

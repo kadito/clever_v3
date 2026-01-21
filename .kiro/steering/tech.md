@@ -39,20 +39,36 @@
 - **Prettier** for code formatting
 - **TypeScript** strict mode for type checking
 
-## Common Commands
+## Development Environment
 
-### Development
+### Local Development Setup
+
+**IMPORTANT: The development server is ALWAYS RUNNING.**
+
+**Access URLs:**
+- **Application**: http://localhost:8787/
+- **API Endpoints**: http://localhost:8787/api/*
+- **Vue SPA**: All non-API routes served by Vue Router
+
+**Development Server Assumptions:**
+- **DO NOT run `pnpm dev`** - the server is already running
+- **DO NOT start any development servers** - they are already active
+- If server doesn't respond, inform the user to restart it manually
+- Single Wrangler dev server serves both frontend and backend
+- Vue static files served from KV binding in development
+- API routes handled by Hono, all other routes serve Vue SPA
+
+### Alternative Development Commands
 
 ```bash
-# Start development (uses wrangler for full-stack)
-pnpm dev
-
-# Start frontend only
+# Start frontend only (for isolated frontend development)
 pnpm --filter @clever/frontend dev
 
-# Start backend only
+# Start backend only (for isolated backend development)
 pnpm --filter @clever/backend dev
 ```
+
+**Note:** Use `pnpm dev` from root for normal development as it provides the complete integrated experience.
 
 ### Building
 
