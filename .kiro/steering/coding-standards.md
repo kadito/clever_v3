@@ -109,3 +109,17 @@ Frontend Component Patterns for Relations:
 - Handle relation prop passing with optional chaining: `license.relations?.client`
 - Maintain consistent Portuguese labels across all relation displays
 - Use mobile-first responsive design for all relation components
+
+Delete Functionality Patterns:
+
+- Delete buttons only appear in detail views, never in list views
+- Always use confirmation dialogs before executing delete operations
+- Leverage existing `ContentDetailTemplate` component for consistent delete UI
+- Use `useApi` composable's `remove()` method for all delete operations
+- Show loading states during delete operations with proper user feedback
+- Navigate to list view after successful deletion
+- Display error messages in detail view (not in dialogs) using existing `ErrorComponent`
+- Use Portuguese labels for all delete-related UI ("Eliminar", "Confirmar", "Cancelar")
+- Ensure 44px minimum touch targets for all delete buttons and confirmation dialog buttons
+- Implement soft delete through existing backend functionality
+- Prevent double-deletion through proper state management
