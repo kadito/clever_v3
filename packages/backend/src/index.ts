@@ -10,12 +10,20 @@ const app = new Hono();
 app.onError(errorHandler);
 
 // CORS middleware - apply only to API routes
-app.use('/api/*', cors({
-  origin: ['http://localhost:3000', 'http://localhost:8787', 'https://*.clerk.accounts.dev', 'https://clerk.accounts.dev'],
-  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  credentials: true,
-}));
+app.use(
+  '/api/*',
+  cors({
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:8787',
+      'https://*.clerk.accounts.dev',
+      'https://clerk.accounts.dev',
+    ],
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    credentials: true,
+  })
+);
 
 // API routes
 app.route('/api', api);
@@ -39,12 +47,12 @@ app.use('*', async c => {
 
   // Try to fetch the requested asset
   const response = await assets.fetch(c.req.raw);
-  
+
   // If asset exists, return it
   if (response.status === 200) {
     return response;
   }
-  
+
   // If asset doesn't exist and it's not an API route, serve index.html for SPA routing
   const url = new URL(c.req.url);
   if (!url.pathname.startsWith('/api/')) {
@@ -55,7 +63,7 @@ app.use('*', async c => {
     });
     return assets.fetch(indexRequest);
   }
-  
+
   // For API routes that don't exist, return 404
   return c.text('Not Found', 404);
 });

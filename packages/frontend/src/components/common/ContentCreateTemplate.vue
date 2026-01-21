@@ -16,7 +16,12 @@
   >
     <!-- Custom form sections for creation-specific fields -->
     <template #customSections="{ formData, errors, updateFieldValue }">
-      <slot name="createSections" :form-data="formData" :errors="errors" :update-field-value="updateFieldValue" />
+      <slot
+        name="createSections"
+        :form-data="formData"
+        :errors="errors"
+        :update-field-value="updateFieldValue"
+      />
     </template>
 
     <!-- Custom field overrides -->
@@ -36,15 +41,15 @@ interface Props {
   createTitle?: string;
   subtitle?: string;
   cancelRoute?: string;
-  
+
   // Form configuration
   formSections: FormSection[];
-  
+
   // State
   isLoading?: boolean;
   isSaving?: boolean;
   error?: string | null;
-  
+
   // Validation
   customValidator?: (data: Record<string, any>) => Record<string, string>;
 }
@@ -70,33 +75,33 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
   if (props.customValidator) {
     return props.customValidator(data);
   }
-  
+
   // Default create validation - all required fields must be present
   const errors: Record<string, string> = {};
   for (const section of props.formSections) {
     for (const field of section.fields) {
-      if (field.required && (!data[field.key] || (typeof data[field.key] === 'string' && data[field.key].trim() === ''))) {
+      if (
+        field.required &&
+        (!data[field.key] || (typeof data[field.key] === 'string' && data[field.key].trim() === ''))
+      ) {
         errors[field.key] = `${field.label} é obrigatório`;
       }
     }
   }
-  
+
   return errors;
 };
 
 // Event handlers
 const handleCreate = (data: Record<string, any>) => {
-
   emit('create', data);
 };
 
 const handleCancel = () => {
-
   emit('cancel');
 };
 
 const clearError = () => {
-
   emit('clearError');
 };
 </script>

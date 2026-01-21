@@ -4,9 +4,9 @@
     <div class="contract-config-grid">
       <div class="config-field">
         <label class="config-label required">TIPO DE CONTRATO CPA</label>
-        <select 
-          :value="formData?.cpaContractType || ''" 
-          @change="(event) => handleContractTypeChange((event.target as HTMLSelectElement).value)"
+        <select
+          :value="formData?.cpaContractType || ''"
+          @change="event => handleContractTypeChange((event.target as HTMLSelectElement).value)"
           class="config-select"
         >
           <option value="">Selecione o tipo...</option>
@@ -14,33 +14,39 @@
           <option value="CPA_1500">CPA - Cashlogy (1500)</option>
         </select>
       </div>
-      
+
       <div class="config-field">
         <label class="config-label required">PLANO CPA</label>
-        <select 
-          :value="formData?.planIdCPA || ''" 
-          @change="(event) => handlePlanSelection((event.target as HTMLSelectElement).value)"
+        <select
+          :value="formData?.planIdCPA || ''"
+          @change="event => handlePlanSelection((event.target as HTMLSelectElement).value)"
           class="config-select"
           :disabled="!formData?.cpaContractType"
         >
           <option value="">
-            {{ formData.cpaContractType ? 'Selecione o plano...' : 'Primeiro selecione o tipo de contrato' }}
+            {{
+              formData.cpaContractType
+                ? 'Selecione o plano...'
+                : 'Primeiro selecione o tipo de contrato'
+            }}
           </option>
-          <option 
-            v-for="planOption in availablePlanOptions" 
-            :key="planOption.value" 
+          <option
+            v-for="planOption in availablePlanOptions"
+            :key="planOption.value"
             :value="planOption.value"
           >
             {{ planOption.label }}
           </option>
         </select>
       </div>
-      
+
       <div class="config-field">
         <label class="config-label required">DISTÂNCIA</label>
-        <select 
-          :value="formData?.distanceCPA || ''" 
-          @change="(event) => $emit('update-field', 'distanceCPA', (event.target as HTMLSelectElement).value)"
+        <select
+          :value="formData?.distanceCPA || ''"
+          @change="
+            event => $emit('update-field', 'distanceCPA', (event.target as HTMLSelectElement).value)
+          "
           class="config-select"
         >
           <option value="">Selecione a distância...</option>
@@ -49,13 +55,13 @@
         </select>
       </div>
     </div>
-    
+
     <!-- Equipment Management -->
     <CPAEquipmentManager
       :equipments="cpaEquipments"
       @equipment-updated="$emit('equipment-updated', $event)"
     />
-    
+
     <!-- POS Package Option (only for CPA_1500 PREMIUM) -->
     <div v-if="showPOSPackageOption" class="pos-package-section">
       <div class="pos-package-option">
@@ -63,7 +69,9 @@
           <input
             type="checkbox"
             :checked="formData?.hasPOSPackage || false"
-            @change="$emit('update-field', 'hasPOSPackage', ($event.target as HTMLInputElement).checked)"
+            @change="
+              $emit('update-field', 'hasPOSPackage', ($event.target as HTMLInputElement).checked)
+            "
             class="pos-package-checkbox"
           />
           <span class="pos-package-text">
@@ -72,7 +80,7 @@
         </label>
       </div>
     </div>
-    
+
     <!-- Contract Dates -->
     <ContractDatesSection
       :start-date="formData?.inicioContratoCPA || ''"
@@ -80,7 +88,7 @@
       @update:start-date="$emit('update-field', 'inicioContratoCPA', $event)"
       @update:end-date="$emit('update-field', 'fimContratoCPA', $event)"
     />
-    
+
     <!-- Dynamic Plan Details Display -->
     <DynamicPlanDetails
       v-if="shouldShowPlanDetails || props.isLoadingPlan"
@@ -98,77 +106,79 @@
 </template>
 
 <script setup lang="ts">
-import type { ContractEquipment } from '@clever/shared'
-import CPAEquipmentManager from './CPAEquipmentManager.vue'
-import ContractDatesSection from './ContractDatesSection.vue'
-import DynamicPlanDetails from './DynamicPlanDetails.vue'
-import { computed, toRefs } from 'vue'
-import { getPlanOptions, type ContractType } from '../../services/planSelection'
+import type { ContractEquipment } from '@clever/shared';
+import CPAEquipmentManager from './CPAEquipmentManager.vue';
+import ContractDatesSection from './ContractDatesSection.vue';
+import DynamicPlanDetails from './DynamicPlanDetails.vue';
+import { computed, toRefs } from 'vue';
+import { getPlanOptions, type ContractType } from '../../services/planSelection';
 
 interface Props {
-  formData: Record<string, any>
-  cpaEquipments: ContractEquipment[]
-  selectedPlanDetails: any
-  isLoadingPlan?: boolean
+  formData: Record<string, any>;
+  cpaEquipments: ContractEquipment[];
+  selectedPlanDetails: any;
+  isLoadingPlan?: boolean;
 }
 
 interface Emits {
-  (e: 'update-field', field: string, value: any): void
-  (e: 'equipment-updated', equipment: any): void
-  (e: 'plan-selected', planId: string): void
+  (e: 'update-field', field: string, value: any): void;
+  (e: 'equipment-updated', equipment: any): void;
+  (e: 'plan-selected', planId: string): void;
 }
 
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
 
 // Use toRefs for better performance with reactive props
-const { formData, selectedPlanDetails, isLoadingPlan } = toRefs(props)
+const { formData, selectedPlanDetails, isLoadingPlan } = toRefs(props);
 
 // Get available plan options based on selected contract type
 const availablePlanOptions = computed(() => {
-  const contractType = props.formData?.cpaContractType as ContractType | ''
-  
+  const contractType = props.formData?.cpaContractType as ContractType | '';
+
   try {
-    const options = getPlanOptions(contractType)
-    return options
+    const options = getPlanOptions(contractType);
+    return options;
   } catch (error) {
-    console.error('Error getting plan options:', JSON.stringify(error, null, 2))
-    return []
+    console.error('Error getting plan options:', JSON.stringify(error, null, 2));
+    return [];
   }
-})
+});
 
 const handleContractTypeChange = (contractType: string) => {
   // Clear the selected plan when contract type changes
   if (props.formData?.planIdCPA) {
-    emit('update-field', 'planIdCPA', '')
+    emit('update-field', 'planIdCPA', '');
   }
-  
+
   // Update the contract type
-  emit('update-field', 'cpaContractType', contractType)
-}
+  emit('update-field', 'cpaContractType', contractType);
+};
 
 const handlePlanSelection = (planId: string) => {
-  emit('plan-selected', planId)
-}
+  emit('plan-selected', planId);
+};
 
 // Show POS package option only for CPA_1500 PREMIUM plan - memoized for performance
 const showPOSPackageOption = computed(() => {
-  return props.formData?.cpaContractType === 'CPA_1500' && 
-         props.formData?.planIdCPA === 'cpa_1500_premium'
-})
+  return (
+    props.formData?.cpaContractType === 'CPA_1500' &&
+    props.formData?.planIdCPA === 'cpa_1500_premium'
+  );
+});
 
 // Determine if plan details should be shown - show immediately after plan selection for all contract types
 const shouldShowPlanDetails = computed(() => {
-  
   // Show plan details if we have selected plan details and a plan is selected
   // OR if we're in test mode (selectedPlanDetails provided without planIdCPA)
   const hasPlanSelected = props.formData?.planIdCPA && props.formData.planIdCPA !== '';
-  const isTestMode = !!selectedPlanDetails.value && (!props.formData?.planIdCPA || props.formData.planIdCPA === '');
-  
+  const isTestMode =
+    !!selectedPlanDetails.value && (!props.formData?.planIdCPA || props.formData.planIdCPA === '');
+
   const shouldShow = !!selectedPlanDetails.value && (hasPlanSelected || isTestMode);
-  
+
   return shouldShow;
-})
+});
 </script>
 
 <style scoped>

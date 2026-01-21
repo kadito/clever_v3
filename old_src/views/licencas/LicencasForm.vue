@@ -55,14 +55,17 @@
       <!-- Software Section -->
       <section class="form-section">
         <h2>SOFTWARE</h2>
-        
+
         <div class="form-grid">
           <div class="form-group full-width">
             <label for="software-name">SOFTWARE *</label>
             <div class="multiselect-wrapper">
-              <div 
+              <div
                 class="multiselect-trigger"
-                :class="{ 'is-open': showSoftwareDropdown, 'has-selection': formData.software.name.length > 0 }"
+                :class="{
+                  'is-open': showSoftwareDropdown,
+                  'has-selection': formData.software.name.length > 0,
+                }"
                 @click="toggleSoftwareDropdown"
               >
                 <span v-if="formData.software.name.length === 0" class="placeholder">
@@ -73,62 +76,51 @@
                 </span>
                 <span class="dropdown-arrow" :class="{ 'is-open': showSoftwareDropdown }">▼</span>
               </div>
-              
+
               <div v-if="showSoftwareDropdown" class="multiselect-dropdown" @click.stop>
                 <div class="multiselect-options">
-                  <label 
-                    v-for="option in softwareOptions" 
+                  <label
+                    v-for="option in softwareOptions"
                     :key="option.value"
                     class="multiselect-option"
                   >
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       :value="option.value"
                       v-model="formData.software.name"
                       @change="onSoftwareChange"
-                    >
+                    />
                     <span>{{ option.label }}</span>
                   </label>
                 </div>
               </div>
             </div>
-            
+
             <div v-if="formData.software.name.length > 0" class="selected-software">
               <span class="selected-label">Selecionado:</span>
               <span class="selected-items">
-                <span 
-                  v-for="(item, index) in formData.software.name" 
+                <span
+                  v-for="(item, index) in formData.software.name"
                   :key="index"
                   class="software-tag"
                 >
                   {{ item }}
-                  <button 
-                    type="button"
-                    @click="removeSoftware(item)"
-                    class="tag-remove"
-                  >
-                    ×
-                  </button>
+                  <button type="button" @click="removeSoftware(item)" class="tag-remove">×</button>
                 </span>
               </span>
             </div>
           </div>
         </div>
-        
+
         <!-- Grouped Software-Specific Fields -->
         <div v-if="formData.software.name.length > 0" class="software-specific-fields">
-          
           <!-- Vectron Group -->
           <div v-if="formData.software.name.includes('Vectron')" class="software-group">
             <h3 class="software-group-title">Vectron</h3>
             <div class="form-grid">
               <div class="form-group">
                 <label for="vectron-model">MODELO</label>
-                <select 
-                  id="vectron-model" 
-                  v-model="formData.software.model" 
-                  class="form-control"
-                >
+                <select id="vectron-model" v-model="formData.software.model" class="form-control">
                   <option value="">Selecione o modelo...</option>
                   <option value="Vectron Wide 14">Vectron Wide 14"</option>
                   <option value="Vectron Pos 7">Vectron Pos 7</option>
@@ -140,40 +132,40 @@
                   <option value="Vectron Mobil Pro IV">Vectron Mobil Pro IV</option>
                 </select>
               </div>
-              
+
               <div class="form-group">
                 <label for="n-equipamento">Nº EQUIPAMENTO</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   id="n-equipamento"
-                  v-model="formData.software.nEquipamento" 
+                  v-model="formData.software.nEquipamento"
                   class="form-control"
                   placeholder="Nº do equipamento"
-                >
+                />
               </div>
-              
+
               <div class="form-group">
                 <label for="versao-vectron">VERSÃO DO SOFTWARE</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   id="versao-vectron"
-                  v-model="formData.versao" 
+                  v-model="formData.versao"
                   class="form-control"
                   placeholder="Ex: 1.2.3"
-                >
+                />
               </div>
             </div>
           </div>
-          
+
           <!-- Pix Group -->
           <div v-if="formData.software.name.includes('Pix')" class="software-group">
             <h3 class="software-group-title">Pix</h3>
             <div class="form-grid">
               <div class="form-group">
                 <label for="pix-product">PRODUTO</label>
-                <select 
-                  id="pix-product" 
-                  v-model="formData.software.product" 
+                <select
+                  id="pix-product"
+                  v-model="formData.software.product"
                   class="form-control"
                   @change="onPixProductChange"
                 >
@@ -188,41 +180,45 @@
                   <option value="Pix RestFest">Pix RestFest</option>
                 </select>
               </div>
-              
+
               <!-- Pix Modules (for products that have modules) -->
               <div class="form-group full-width" v-if="pixHasModules(formData.software.product)">
                 <label>MÓDULOS</label>
                 <div class="modules-checkboxes">
                   <label class="module-checkbox">
-                    <input type="checkbox" value="Modulo 1" v-model="formData.software.modules">
+                    <input type="checkbox" value="Modulo 1" v-model="formData.software.modules" />
                     Módulo 1
                   </label>
                   <label class="module-checkbox">
-                    <input type="checkbox" value="Modulo 2" v-model="formData.software.modules">
+                    <input type="checkbox" value="Modulo 2" v-model="formData.software.modules" />
                     Módulo 2
                   </label>
                   <label class="module-checkbox">
-                    <input type="checkbox" value="Modulo 3" v-model="formData.software.modules">
+                    <input type="checkbox" value="Modulo 3" v-model="formData.software.modules" />
                     Módulo 3
                   </label>
                   <label class="module-checkbox">
-                    <input type="checkbox" value="Posto adicional" v-model="formData.software.modules">
+                    <input
+                      type="checkbox"
+                      value="Posto adicional"
+                      v-model="formData.software.modules"
+                    />
                     Posto adicional
                   </label>
                 </div>
               </div>
             </div>
           </div>
-          
+
           <!-- Zon Soft Group -->
           <div v-if="formData.software.name.includes('Zon Soft')" class="software-group">
             <h3 class="software-group-title">Zon Soft</h3>
             <div class="form-grid">
               <div class="form-group">
                 <label for="zonsoft-product">PRODUTO</label>
-                <select 
-                  id="zonsoft-product" 
-                  v-model="formData.software.product" 
+                <select
+                  id="zonsoft-product"
+                  v-model="formData.software.product"
                   class="form-control"
                 >
                   <option value="">Selecione o produto...</option>
@@ -233,12 +229,15 @@
                   <option value="ZSREST">ZSREST</option>
                 </select>
               </div>
-              
-              <div class="form-group" v-if="formData.software.product && formData.software.product !== 'ZSFACT'">
+
+              <div
+                class="form-group"
+                v-if="formData.software.product && formData.software.product !== 'ZSFACT'"
+              >
                 <label for="zonsoft-version">VERSÃO</label>
-                <select 
-                  id="zonsoft-version" 
-                  v-model="formData.software.version" 
+                <select
+                  id="zonsoft-version"
+                  v-model="formData.software.version"
                   class="form-control"
                 >
                   <option value="">Selecione a versão...</option>
@@ -249,16 +248,16 @@
               </div>
             </div>
           </div>
-          
+
           <!-- Pt CERT Group -->
           <div v-if="formData.software.name.includes('Pt CERT')" class="software-group">
             <h3 class="software-group-title">Pt CERT</h3>
             <div class="form-grid">
               <div class="form-group">
                 <label for="ptcert-license">TIPO DE LICENÇA</label>
-                <select 
-                  id="ptcert-license" 
-                  v-model="formData.software.licenseType" 
+                <select
+                  id="ptcert-license"
+                  v-model="formData.software.licenseType"
                   class="form-control"
                 >
                   <option value="">Selecione o tipo...</option>
@@ -268,45 +267,42 @@
               </div>
             </div>
           </div>
-          
+
           <!-- Common Fields (for other software types) -->
-          <div 
-            v-if="hasOtherSoftware" 
-            class="software-group"
-          >
+          <div v-if="hasOtherSoftware" class="software-group">
             <h3 class="software-group-title">Outros</h3>
             <div class="form-grid">
               <div class="form-group">
                 <label for="numero-serie">NÚMERO SÉRIE</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   id="numero-serie"
-                  v-model="formData.numeroSerie" 
+                  v-model="formData.numeroSerie"
                   class="form-control"
                   placeholder="Nº de série"
-                >
+                />
               </div>
-              
+
               <div class="form-group">
                 <label for="versao-software">VERSÃO SOFTWARE</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   id="versao-software"
-                  v-model="formData.versao" 
+                  v-model="formData.versao"
                   class="form-control"
                   placeholder="Ex: 1.2.3"
-                >
+                />
               </div>
-              
+
               <div class="form-group">
                 <label for="versao-licenca">VERSÃO LICENÇA</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   id="versao-licenca"
-                  v-model="formData.software.versaoLicenca" 
+                  v-model="formData.software.versaoLicenca"
                   class="form-control"
                   placeholder="Versão da licença"
-                >
+                />
               </div>
             </div>
           </div>
@@ -319,31 +315,22 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="dataInicio">DATA DE INÍCIO</label>
-            <input 
-              type="date" 
-              id="dataInicio" 
-              v-model="formData.dataInicio" 
-              class="form-control"
-            >
+            <input type="date" id="dataInicio" v-model="formData.dataInicio" class="form-control" />
           </div>
-          
+
           <div class="form-group">
             <label for="dataVencimento">DATA DE VENCIMENTO</label>
-            <input 
-              type="date" 
-              id="dataVencimento" 
-              v-model="formData.dataVencimento" 
+            <input
+              type="date"
+              id="dataVencimento"
+              v-model="formData.dataVencimento"
               class="form-control"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="modalidade">MODALIDADE</label>
-            <select 
-              id="modalidade" 
-              v-model="formData.modalidade" 
-              class="form-control"
-            >
+            <select id="modalidade" v-model="formData.modalidade" class="form-control">
               <option value="">--</option>
               <option value="ANUAL">ANUAL</option>
               <option value="SEMESTRAL">SEMESTRAL</option>
@@ -351,16 +338,16 @@
               <option value="MENSAL">MENSAL</option>
             </select>
           </div>
-          
+
           <div class="form-group">
             <label for="duracaoContrato">DURAÇÃO DO CONTRATO</label>
-            <input 
-              type="text" 
-              id="duracaoContrato" 
-              v-model="formData.duracaoContrato" 
+            <input
+              type="text"
+              id="duracaoContrato"
+              v-model="formData.duracaoContrato"
               class="form-control"
               placeholder="Ex: 12 meses"
-            >
+            />
           </div>
         </div>
       </section>
@@ -368,72 +355,64 @@
       <!-- Invoice Information Section -->
       <section class="form-section">
         <h2>INFORMAÇÕES DE FATURA</h2>
-        
+
         <!-- Dynamic invoice items -->
-        <div 
-          v-for="(invoice, index) in formData.invoices" 
-          :key="invoice.id"
-          class="activity-card"
-        >
+        <div v-for="(invoice, index) in formData.invoices" :key="invoice.id" class="activity-card">
           <div class="activity-header">
             <h3>Fatura {{ index + 1 }}</h3>
-            <button 
-              type="button" 
-              @click="removeInvoice(index)" 
-              class="btn btn-remove-activity"
-            >
+            <button type="button" @click="removeInvoice(index)" class="btn btn-remove-activity">
               ❌
             </button>
           </div>
-          
+
           <div class="form-grid">
             <div class="form-group">
               <label :for="`ano-${invoice.id}`">ANO</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 :id="`ano-${invoice.id}`"
-                v-model="invoice.ano" 
+                v-model="invoice.ano"
                 class="form-control"
                 placeholder="Ex: 2024"
-              >
+              />
             </div>
-            
+
             <div class="form-group">
               <label :for="`numeroFatura-${invoice.id}`">NÚMERO DA FATURA</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 :id="`numeroFatura-${invoice.id}`"
-                v-model="invoice.numeroFatura" 
+                v-model="invoice.numeroFatura"
                 class="form-control"
                 placeholder="Número da fatura"
-              >
+              />
             </div>
-            
+
             <div class="form-group">
               <label :for="`dataFatura-${invoice.id}`">DATA DA FATURA</label>
-              <input 
-                type="date" 
+              <input
+                type="date"
                 :id="`dataFatura-${invoice.id}`"
-                v-model="invoice.dataFatura" 
+                v-model="invoice.dataFatura"
                 class="form-control"
-              >
+              />
             </div>
-            
+
             <div class="form-group">
               <label :for="`dataAviso-${invoice.id}`">DATA DE AVISO</label>
-              <input 
-                type="date" 
+              <input
+                type="date"
                 :id="`dataAviso-${invoice.id}`"
-                v-model="invoice.dataAviso" 
+                v-model="invoice.dataAviso"
                 class="form-control"
-              >
+              />
             </div>
           </div>
         </div>
-        
+
         <!-- Clickable empty state / add button -->
-        <div 
-          v-if="formData.invoices.length === 0" 
+        <div
+          v-if="formData.invoices.length === 0"
           @click="addInvoice"
           class="clickable-add-message"
         >
@@ -443,19 +422,10 @@
 
       <!-- Action buttons -->
       <div class="form-actions">
-        <button 
-          type="button" 
-          @click="handleCancel" 
-          class="btn btn-cancel"
-          :disabled="loading"
-        >
+        <button type="button" @click="handleCancel" class="btn btn-cancel" :disabled="loading">
           Cancelar
         </button>
-        <button 
-          type="submit" 
-          class="btn btn-primary"
-          :disabled="loading || !isFormValid"
-        >
+        <button type="submit" class="btn btn-primary" :disabled="loading || !isFormValid">
           <span v-if="loading" class="btn-spinner"></span>
           {{ isEditing ? 'Atualizar' : 'Criar' }} Licença
         </button>
@@ -465,39 +435,33 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
-import ClienteSearchSelect from '@/components/ClienteSearchSelect.vue'
-import { useLicencasStore } from '@/stores/licencas.js'
-import { useClientesStore } from '@/stores/clientes.js'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
+import ClienteSearchSelect from '@/components/ClienteSearchSelect.vue';
+import { useLicencasStore } from '@/stores/licencas.js';
+import { useClientesStore } from '@/stores/clientes.js';
 
 // Router
-const router = useRouter()
-const route = useRoute()
+const router = useRouter();
+const route = useRoute();
 
 // Store
-const store = useLicencasStore()
-const { loading, error } = storeToRefs(store)
-const { 
-  createLicenca, 
-  updateLicenca, 
-  fetchLicencaById, 
-  clearError,
-  getYearFromDate 
-} = store
+const store = useLicencasStore();
+const { loading, error } = storeToRefs(store);
+const { createLicenca, updateLicenca, fetchLicencaById, clearError, getYearFromDate } = store;
 
 // Clients store
-const clientesStore = useClientesStore()
-const { clientes } = storeToRefs(clientesStore)
-const { fetchClientes } = clientesStore
+const clientesStore = useClientesStore();
+const { clientes } = storeToRefs(clientesStore);
+const { fetchClientes } = clientesStore;
 
 // Form state
-const isEditing = ref(false)
-const licencaYear = ref(null)
-const licencaId = ref(null)
-const showSoftwareDropdown = ref(false)
+const isEditing = ref(false);
+const licencaYear = ref(null);
+const licencaId = ref(null);
+const showSoftwareDropdown = ref(false);
 
 // Software options
 const softwareOptions = [
@@ -510,8 +474,8 @@ const softwareOptions = [
   { value: 'Publicidade', label: 'Publicidade' },
   { value: 'Software XD', label: 'Software XD' },
   { value: 'AIR Menu', label: 'AIR Menu' },
-  { value: 'Cashlogy', label: 'Cashlogy' }
-]
+  { value: 'Cashlogy', label: 'Cashlogy' },
+];
 
 // Form data
 const formData = ref({
@@ -531,76 +495,76 @@ const formData = ref({
     licenseType: '',
     modules: [],
     nEquipamento: '',
-    versaoLicenca: ''
-  }
-})
+    versaoLicenca: '',
+  },
+});
 
 // Computed
 const isFormValid = computed(() => {
-  return formData.value.cliente.trim() && formData.value.software.name.length > 0
-})
+  return formData.value.cliente.trim() && formData.value.software.name.length > 0;
+});
 
 // Check if there are other software types selected (not Vectron, Pix, Zon Soft, or Pt CERT)
 const hasOtherSoftware = computed(() => {
-  const softwareWithSpecificFields = ['Vectron', 'Pix', 'Zon Soft', 'Pt CERT']
-  return formData.value.software.name.some(name => !softwareWithSpecificFields.includes(name))
-})
+  const softwareWithSpecificFields = ['Vectron', 'Pix', 'Zon Soft', 'Pt CERT'];
+  return formData.value.software.name.some(name => !softwareWithSpecificFields.includes(name));
+});
 
 // Helper methods
-const pixHasModules = (product) => {
+const pixHasModules = product => {
   // These Pix products have module options
-  const productsWithModules = ['Pix rest', 'Pix Gest', 'Pix POS', 'Pix AutoVenda']
-  return productsWithModules.includes(product)
-}
+  const productsWithModules = ['Pix rest', 'Pix Gest', 'Pix POS', 'Pix AutoVenda'];
+  return productsWithModules.includes(product);
+};
 
 const onSoftwareChange = () => {
   // Clear dependent fields when software changes (only if Vectron/Pix/Zon Soft are removed)
   if (!formData.value.software.name.includes('Vectron')) {
-    formData.value.software.model = ''
-    formData.value.software.nEquipamento = ''
+    formData.value.software.model = '';
+    formData.value.software.nEquipamento = '';
   }
   if (!formData.value.software.name.includes('Pix')) {
-    formData.value.software.product = ''
-    formData.value.software.modules = []
+    formData.value.software.product = '';
+    formData.value.software.modules = [];
   }
   if (!formData.value.software.name.includes('Zon Soft')) {
-    formData.value.software.product = ''
-    formData.value.software.version = ''
+    formData.value.software.product = '';
+    formData.value.software.version = '';
   }
   if (!formData.value.software.name.includes('Pt CERT')) {
-    formData.value.software.licenseType = ''
+    formData.value.software.licenseType = '';
   }
-}
+};
 
 const onPixProductChange = () => {
   // Clear modules when Pix product changes
   if (!pixHasModules(formData.value.software.product)) {
-    formData.value.software.modules = []
+    formData.value.software.modules = [];
   }
-}
+};
 
 const toggleSoftwareDropdown = () => {
-  showSoftwareDropdown.value = !showSoftwareDropdown.value
-}
+  showSoftwareDropdown.value = !showSoftwareDropdown.value;
+};
 
-const removeSoftware = (softwareName) => {
-  const index = formData.value.software.name.indexOf(softwareName)
+const removeSoftware = softwareName => {
+  const index = formData.value.software.name.indexOf(softwareName);
   if (index > -1) {
-    formData.value.software.name.splice(index, 1)
-    onSoftwareChange()
+    formData.value.software.name.splice(index, 1);
+    onSoftwareChange();
   }
-}
+};
 
 const cancelRoute = computed(() => {
-  const from = route.query.from
+  const from = route.query.from;
   if (from === 'detail' && licencaYear.value && licencaId.value) {
-    return `/licencas/${licencaYear.value}/${licencaId.value}`
+    return `/licencas/${licencaYear.value}/${licencaId.value}`;
   } else if (from === 'list') {
-    return '/licencas/list'
+    return '/licencas/list';
   } else {
-    return '/licencas'
+    return '/licencas';
   }
-})
+});
 
 // Methods
 const addInvoice = () => {
@@ -609,82 +573,82 @@ const addInvoice = () => {
     ano: '',
     numeroFatura: '',
     dataFatura: '',
-    dataAviso: ''
-  })
-}
+    dataAviso: '',
+  });
+};
 
-const removeInvoice = (index) => {
-  formData.value.invoices.splice(index, 1)
-}
+const removeInvoice = index => {
+  formData.value.invoices.splice(index, 1);
+};
 
 const handleSubmit = async () => {
-  if (!isFormValid.value) return
+  if (!isFormValid.value) return;
 
   try {
-    let year = licencaYear.value
-    
+    let year = licencaYear.value;
+
     // If creating new, determine year from start date or use current year
     if (!isEditing.value) {
       if (formData.value.dataInicio) {
-        year = getYearFromDate(formData.value.dataInicio)
+        year = getYearFromDate(formData.value.dataInicio);
       } else {
-        year = new Date().getFullYear().toString()
+        year = new Date().getFullYear().toString();
       }
     }
-    
+
     // Prepare data with tipoSoftware as array (for backward compatibility, also store as string)
-    const softwareNames = formData.value.software?.name || []
+    const softwareNames = formData.value.software?.name || [];
     const payload = {
       ...formData.value,
       tipoSoftware: Array.isArray(softwareNames) ? softwareNames : [softwareNames],
       // Keep software.name as array for new format
       software: {
         ...formData.value.software,
-        name: Array.isArray(softwareNames) ? softwareNames : [softwareNames]
-      }
-    }
-    
+        name: Array.isArray(softwareNames) ? softwareNames : [softwareNames],
+      },
+    };
+
     if (isEditing.value) {
-      await updateLicenca(licencaYear.value, licencaId.value, payload)
-      router.push(`/licencas/${licencaYear.value}/${licencaId.value}`)
+      await updateLicenca(licencaYear.value, licencaId.value, payload);
+      router.push(`/licencas/${licencaYear.value}/${licencaId.value}`);
     } else {
-      const newLicenca = await createLicenca(year, payload)
-      router.push(`/licencas/${year}/${newLicenca.id}`)
+      const newLicenca = await createLicenca(year, payload);
+      router.push(`/licencas/${year}/${newLicenca.id}`);
     }
   } catch (err) {
-    console.error('Error saving licenca:', err)
+    console.error('Error saving licenca:', err);
   }
-}
+};
 
 const handleCancel = () => {
-  router.push(cancelRoute.value)
-}
+  router.push(cancelRoute.value);
+};
 
 const loadLicencaForEditing = async () => {
   if (licencaYear.value && licencaId.value) {
     try {
-      const licenca = await fetchLicencaById(licencaYear.value, licencaId.value)
+      const licenca = await fetchLicencaById(licencaYear.value, licencaId.value);
       if (licenca) {
         // Convert old format (tipoSoftware) to new format (software object)
         // Handle both string (legacy) and array (new) formats
-        let softwareNames = []
-        
+        let softwareNames = [];
+
         if (licenca.tipoSoftware) {
           if (Array.isArray(licenca.tipoSoftware)) {
             // Already an array
-            softwareNames = licenca.tipoSoftware
+            softwareNames = licenca.tipoSoftware;
           } else {
             // Legacy string format - convert to array
-            softwareNames = [licenca.tipoSoftware]
+            softwareNames = [licenca.tipoSoftware];
           }
         } else if (licenca.software?.name) {
           if (Array.isArray(licenca.software.name)) {
-            softwareNames = licenca.software.name
+            softwareNames = licenca.software.name;
           } else {
-            softwareNames = [licenca.software.name]
+            softwareNames = [licenca.software.name];
           }
         }
-        
+
         formData.value = {
           ...licenca,
           software: {
@@ -695,55 +659,58 @@ const loadLicencaForEditing = async () => {
             licenseType: licenca.software?.licenseType || licenca.licenseType || '',
             modules: licenca.software?.modules || licenca.modules || [],
             nEquipamento: licenca.software?.nEquipamento || licenca.nEquipamento || '',
-            versaoLicenca: licenca.software?.versaoLicenca || licenca.versaoLicenca || ''
-          }
-        }
+            versaoLicenca: licenca.software?.versaoLicenca || licenca.versaoLicenca || '',
+          },
+        };
       }
     } catch (err) {
-      console.error('Error loading licenca:', err)
+      console.error('Error loading licenca:', err);
     }
   }
-}
-
+};
 
 // Watch for software name changes to clear dependent fields
-watch(() => formData.value.software.name, () => {
-  onSoftwareChange()
-}, { deep: true })
+watch(
+  () => formData.value.software.name,
+  () => {
+    onSoftwareChange();
+  },
+  { deep: true }
+);
 
 // Lifecycle
-let handleClickOutside = null
+let handleClickOutside = null;
 
 onMounted(async () => {
   // Close dropdown when clicking outside
-  handleClickOutside = (event) => {
+  handleClickOutside = event => {
     if (!event.target.closest('.multiselect-wrapper')) {
-      showSoftwareDropdown.value = false
+      showSoftwareDropdown.value = false;
     }
-  }
-  document.addEventListener('click', handleClickOutside)
-  
+  };
+  document.addEventListener('click', handleClickOutside);
+
   // Fetch clients for dropdown
   try {
-    await fetchClientes()
+    await fetchClientes();
   } catch (error) {
-    console.error('Error fetching clients:', error)
+    console.error('Error fetching clients:', error);
   }
-  
+
   // Check if we're editing
   if (route.params.year && route.params.id) {
-    isEditing.value = true
-    licencaYear.value = route.params.year
-    licencaId.value = route.params.id
-    await loadLicencaForEditing()
+    isEditing.value = true;
+    licencaYear.value = route.params.year;
+    licencaId.value = route.params.id;
+    await loadLicencaForEditing();
   }
-})
+});
 
 onBeforeUnmount(() => {
   if (handleClickOutside) {
-    document.removeEventListener('click', handleClickOutside)
+    document.removeEventListener('click', handleClickOutside);
   }
-})
+});
 </script>
 
 <style scoped>
@@ -945,8 +912,12 @@ onBeforeUnmount(() => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Dynamic invoice sections */
@@ -1017,50 +988,50 @@ onBeforeUnmount(() => {
   .licencas-form-container {
     padding: 0.5rem;
   }
-  
+
   .form-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .form-header h1 {
     font-size: 1.3rem;
   }
-  
+
   .form-section {
     padding: 1rem;
     margin-bottom: 1rem;
   }
-  
+
   .form-section h2 {
     font-size: 1rem;
     margin-bottom: 0.75rem;
   }
-  
+
   .form-grid {
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
-  
+
   .form-group {
     min-height: auto;
   }
-  
+
   .form-group label {
     font-size: 0.85rem;
   }
-  
+
   .form-control {
     padding: 0.65rem;
     font-size: 0.9rem;
   }
-  
+
   .form-actions {
     flex-direction: column;
     gap: 0.75rem;
   }
-  
+
   .btn {
     width: 100%;
     padding: 0.75rem;
@@ -1071,38 +1042,38 @@ onBeforeUnmount(() => {
   .licencas-form-container {
     padding: 0.25rem;
   }
-  
+
   .form-section {
     padding: 0.75rem;
   }
-  
+
   .form-section h2 {
     font-size: 0.9rem;
   }
-  
+
   .form-group label {
     font-size: 0.8rem;
   }
-  
+
   .form-control {
     padding: 0.6rem;
     font-size: 0.85rem;
   }
-  
+
   .form-header h1 {
     font-size: 1.2rem;
   }
-  
+
   .btn-remove-activity {
     width: auto; /* Override general mobile button width */
   }
-  
+
   .activity-header {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
   }
-  
+
   .activity-header h3 {
     font-size: 0.9rem;
     margin: 0;
@@ -1131,7 +1102,7 @@ onBeforeUnmount(() => {
   text-transform: none;
 }
 
-.module-checkbox input[type="checkbox"] {
+.module-checkbox input[type='checkbox'] {
   width: 18px;
   height: 18px;
   cursor: pointer;
@@ -1229,7 +1200,7 @@ onBeforeUnmount(() => {
   background: #f8f9fa;
 }
 
-.multiselect-option input[type="checkbox"] {
+.multiselect-option input[type='checkbox'] {
   width: 18px;
   height: 18px;
   cursor: pointer;

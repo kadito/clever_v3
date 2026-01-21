@@ -3,12 +3,16 @@
 ## Core Form Components
 
 ### Component Architecture
-- **ContentFormTemplate.vue**: Core form rendering with shared form data handling
-- **ContentCreateTemplate.vue**: Wrapper for creation-specific logic and validation
+
+- **ContentFormTemplate.vue**: Core form rendering with shared form data
+  handling
+- **ContentCreateTemplate.vue**: Wrapper for creation-specific logic and
+  validation
 - **ContentUpdateTemplate.vue**: Uses ContentFormTemplate directly for editing
 - **useSharedFormData**: Composable to handle Vue component recreation issues
 
 ### Data Persistence
+
 - Form data persists across component recreation during navigation
 - Handles Vue Router navigation without losing form state
 - Prevents data loss when components are recreated
@@ -16,6 +20,7 @@
 ## Form Field Patterns
 
 ### Input Types
+
 - Use proper HTML5 input types for mobile keyboards:
   - `tel` for phone numbers
   - `email` for email addresses
@@ -25,18 +30,21 @@
   - `checkbox` for boolean values
 
 ### Multiselect Dropdowns
+
 - Replace individual checkboxes with touch-friendly multiselect dropdowns
 - Visual tags show selected items with individual removal capability
 - Click-outside closing with proper dropdown behavior and overlay handling
 - Mobile-optimized with proper touch targets and responsive design
 
 ### Conditional Fields
+
 - Dynamic field visibility based on other field values
 - Dependency tracking with proper reactive updates when dependent values change
 - All conditional logic defined in JSON configuration within form sections
 - No hardcoded conditional logic in templates
 
 ### Dynamic Configuration Management
+
 - Add/remove functionality for configuration items (e.g., software, invoices)
 - Individual item editing with save/cancel functionality
 - Touch-friendly card interface for configuration management
@@ -45,7 +53,9 @@
 ## Form Section Standards
 
 ### Section Ordering
+
 Consistent order across all content types:
+
 1. **Basic** - Core identification fields
 2. **Contact** - Contact information
 3. **Address** - Address details
@@ -55,6 +65,7 @@ Consistent order across all content types:
 7. **Observations** - Always last section
 
 ### Cross-View Consistency
+
 - Same section ordering in Create, Update, and Detail views
 - Consistent field grouping and labeling
 - Uniform responsive behavior across breakpoints
@@ -62,11 +73,13 @@ Consistent order across all content types:
 ## Validation Patterns
 
 ### Shared Validation
+
 - Validation functions in shared package for consistency
 - Content-specific validation can override default validation
 - Portuguese validation messages with proper field mapping
 
 ### Create vs Update Validation
+
 - Different validation rules between Create and Update components
 - Create: Full validation for new content
 - Update: May have disabled fields or different business rules
@@ -75,11 +88,13 @@ Consistent order across all content types:
 ## Mobile-First Form Design
 
 ### Touch Targets
+
 - All interactive elements meet 44px minimum requirement
 - Form sections adapt from mobile to desktop layouts
 - Touch-friendly controls and spacing
 
 ### Responsive Forms
+
 - Mobile-first responsive design with proper breakpoints
 - Form sections stack on mobile, may use columns on desktop
 - Consistent behavior across all screen sizes
@@ -87,6 +102,7 @@ Consistent order across all content types:
 ## Implementation Guidelines
 
 ### Form Section Configuration
+
 ```typescript
 interface FormSection {
   title: string;
@@ -97,7 +113,16 @@ interface FormSection {
 
 interface FormField {
   name: string;
-  type: 'text' | 'email' | 'tel' | 'url' | 'textarea' | 'select' | 'multiselect' | 'checkbox' | 'dynamic';
+  type:
+    | 'text'
+    | 'email'
+    | 'tel'
+    | 'url'
+    | 'textarea'
+    | 'select'
+    | 'multiselect'
+    | 'checkbox'
+    | 'dynamic';
   label: string;
   required?: boolean;
   validation?: ValidationRule[];
@@ -108,6 +133,7 @@ interface FormField {
 ```
 
 ### Shared Form Data Usage
+
 ```typescript
 // In Create/Update components
 const { formData, updateFormData, resetFormData } = useSharedFormData();
@@ -117,6 +143,7 @@ const { formData, updateFormData, resetFormData } = useSharedFormData();
 ```
 
 ### Conditional Field Configuration
+
 ```typescript
 interface ConditionalRule {
   dependsOn: string; // field name

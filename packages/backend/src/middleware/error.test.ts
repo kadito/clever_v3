@@ -40,7 +40,7 @@ describe('Error Handling Middleware', () => {
 
       const callArgs = (mockContext.json as any).mock.calls[0];
       const response = callArgs[0] as ApiResponse;
-      
+
       // Verify timestamp is a valid ISO string
       expect(() => new Date(response.timestamp)).not.toThrow();
       expect(response.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
@@ -76,7 +76,7 @@ describe('Error Handling Middleware', () => {
 
       const callArgs = (mockContext.json as any).mock.calls[0];
       const response = callArgs[0] as ApiResponse;
-      
+
       // Verify timestamp is a valid ISO string
       expect(() => new Date(response.timestamp)).not.toThrow();
       expect(response.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
@@ -86,21 +86,21 @@ describe('Error Handling Middleware', () => {
   describe('Integration with Hono app', () => {
     it('should handle errors thrown in route handlers', async () => {
       const app = new Hono();
-      
+
       // Add error handler
       app.onError(errorHandler);
-      
+
       // Add route that throws an error
       app.get('/test-error', () => {
         throw new Error('Test route error');
       });
 
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      
+
       const res = await app.request('/test-error');
-      
+
       expect(res.status).toBe(500);
-      
+
       const body: ApiResponse = await res.json();
       expect(body.success).toBe(false);
       expect(body.error).toBe('Internal server error');

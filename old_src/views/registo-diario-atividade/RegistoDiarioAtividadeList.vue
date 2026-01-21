@@ -9,29 +9,23 @@
       <div class="controls-left">
         <h2>Registos {{ selectedYear }} ({{ displayedRegistros.length }})</h2>
       </div>
-      
+
       <div class="controls-right">
-        <YearSelector 
-          v-model="selectedYear" 
-          :years="availableYears"
-          @change="handleYearChange"
-        />
-        
-        <button @click="fetchData" :disabled="loading" class="btn btn-refresh">
-          🔄 Atualizar
-        </button>
+        <YearSelector v-model="selectedYear" :years="availableYears" @change="handleYearChange" />
+
+        <button @click="fetchData" :disabled="loading" class="btn btn-refresh">🔄 Atualizar</button>
       </div>
     </div>
 
     <!-- Search -->
     <div class="search-container">
-      <input 
-        type="text" 
-        v-model="searchQuery" 
+      <input
+        type="text"
+        v-model="searchQuery"
         @input="handleSearch"
-        placeholder="Pesquisar registos..." 
+        placeholder="Pesquisar registos..."
         class="search-input"
-      >
+      />
       <span class="search-icon">🔍</span>
     </div>
 
@@ -48,8 +42,8 @@
 
     <!-- Registos List -->
     <div v-else-if="displayedRegistros.length > 0" class="registos-list">
-      <div 
-        v-for="registro in displayedRegistros" 
+      <div
+        v-for="registro in displayedRegistros"
         :key="`${registro.year || selectedYear}-${registro.id}`"
         class="registro-item"
         @click="navigateToDetail(registro)"
@@ -57,54 +51,59 @@
         <div class="registro-main">
           <div class="registro-header">
             <h3>{{ registro.cliente }}</h3>
-            <span 
-              class="registro-type-badge" 
-              :class="{ 
-                'interno': registro.internoOuExterno === 'INTERNO', 
-                'externo': registro.internoOuExterno === 'EXTERNO' 
+            <span
+              class="registro-type-badge"
+              :class="{
+                interno: registro.internoOuExterno === 'INTERNO',
+                externo: registro.internoOuExterno === 'EXTERNO',
               }"
             >
               {{ registro.internoOuExterno || 'N/A' }}
             </span>
           </div>
-          
+
           <div class="registro-info-grid">
             <div class="registro-info-item">
               <span class="info-icon">📅</span>
               <span class="info-label">Data:</span>
               <span class="info-value">{{ formatDateTime(registro.dataRegistro) }}</span>
             </div>
-            
+
             <div v-if="registro.assunto" class="registro-info-item">
               <span class="info-icon">📋</span>
               <span class="info-label">Assunto:</span>
               <span class="info-value">{{ registro.assunto }}</span>
             </div>
-            
-            <div v-if="registro.totalHorasCalculado || registro.totalHoras" class="registro-info-item highlight">
+
+            <div
+              v-if="registro.totalHorasCalculado || registro.totalHoras"
+              class="registro-info-item highlight"
+            >
               <span class="info-icon">⏱️</span>
               <span class="info-label">Horas:</span>
-              <span class="info-value">{{ registro.totalHorasCalculado || registro.totalHoras }}</span>
+              <span class="info-value">{{
+                registro.totalHorasCalculado || registro.totalHoras
+              }}</span>
             </div>
-            
+
             <div v-if="registro.respRegisto" class="registro-info-item">
               <span class="info-icon">👤</span>
               <span class="info-label">Responsável:</span>
               <span class="info-value">{{ registro.respRegisto }}</span>
             </div>
           </div>
-          
+
           <div v-if="getTotalClientsForRegistro(registro) > 1" class="registro-additional-info">
             <span class="additional-badge">
               +{{ getTotalClientsForRegistro(registro) - 1 }} cliente(s) adicional(is)
             </span>
           </div>
-          
+
           <div v-if="searchResults && registro.year" class="registro-year-badge">
             Ano: {{ registro.year }}
           </div>
         </div>
-        
+
         <div class="registro-actions">
           <button class="action-btn" @click.stop="showActions(registro)" aria-label="Mais ações">
             <span>⋮</span>
@@ -116,12 +115,8 @@
     <!-- Empty State -->
     <div v-else class="empty-state">
       <h3>Nenhum registo encontrado</h3>
-      <p v-if="searchQuery">
-        Não foram encontrados registos com o termo "{{ searchQuery }}".
-      </p>
-      <p v-else>
-        Não há registos para o ano {{ selectedYear }}.
-      </p>
+      <p v-if="searchQuery">Não foram encontrados registos com o termo "{{ searchQuery }}".</p>
+      <p v-else>Não há registos para o ano {{ selectedYear }}.</p>
     </div>
 
     <!-- Search Results Info -->
@@ -132,25 +127,21 @@
       </p>
     </div>
 
-
-
-
     <!-- Pagination -->
     <div v-if="totalPages > 1" class="pagination">
-      <button 
+      <button
         @click="goToPage(currentPage - 1)"
         :disabled="currentPage === 1"
         class="pagination-btn"
       >
         ← Anterior
       </button>
-      
+
       <div class="pagination-info">
-        Página {{ currentPage }} de {{ totalPages }} 
-        ({{ displayedRegistros.length }} registos)
+        Página {{ currentPage }} de {{ totalPages }} ({{ displayedRegistros.length }} registos)
       </div>
-      
-      <button 
+
+      <button
         @click="goToPage(currentPage + 1)"
         :disabled="currentPage === totalPages"
         class="pagination-btn"
@@ -170,7 +161,13 @@
           <button @click="editRegistro(selectedRegistroForActions)" class="modal-btn edit-btn">
             ✏️ Editar
           </button>
-          <button @click="confirmDelete(selectedRegistroForActions); closeActions()" class="modal-btn delete-btn">
+          <button
+            @click="
+              confirmDelete(selectedRegistroForActions);
+              closeActions();
+            "
+            class="modal-btn delete-btn"
+          >
             🗑️ Eliminar
           </button>
         </div>
@@ -182,43 +179,37 @@
       <div class="modal-content" @click.stop>
         <h3>Confirmar Eliminação</h3>
         <p>
-          Tem a certeza que pretende eliminar o registo de 
-          <strong>{{ registroToDelete?.cliente }}</strong>?
+          Tem a certeza que pretende eliminar o registo de
+          <strong>{{ registroToDelete?.cliente }}</strong
+          >?
         </p>
-        <p class="warning-text">
-          Esta ação não pode ser desfeita.
-        </p>
+        <p class="warning-text">Esta ação não pode ser desfeita.</p>
         <div class="modal-actions">
-          <button @click="cancelDelete" class="btn btn-secondary">
-            Cancelar
-          </button>
+          <button @click="cancelDelete" class="btn btn-secondary">Cancelar</button>
           <button @click="deleteRegistroAction" class="btn btn-danger" :disabled="loading">
             {{ loading ? 'A eliminar...' : 'Eliminar' }}
           </button>
         </div>
       </div>
     </div>
-    
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import { useRegistoDiarioAtividadeStore } from '@/stores/registo-diario-atividade'
-import BackButton from '@/components/BackButton.vue'
-import YearSelector from '@/components/YearSelector.vue'
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import { useRegistoDiarioAtividadeStore } from '@/stores/registo-diario-atividade';
+import BackButton from '@/components/BackButton.vue';
+import YearSelector from '@/components/YearSelector.vue';
 
 // Router
-const router = useRouter()
+const router = useRouter();
 // Store
-const store = useRegistoDiarioAtividadeStore()
+const store = useRegistoDiarioAtividadeStore();
 
 // Reactive references from store
-const { 
-  registros, availableYears, currentYear, loading, error
-} = storeToRefs(store)
+const { registros, availableYears, currentYear, loading, error } = storeToRefs(store);
 const {
   fetchRegistrosForYear,
   fetchAvailableYears,
@@ -229,256 +220,263 @@ const {
   formatDate,
   getTotalClientsForRegistro,
   getTotalHoursForRegistro,
-  deleteRegistro
-} = store
+  deleteRegistro,
+} = store;
 
 // Local state
-const searchQuery = ref('')
-const searchResults = ref(null)
-const selectedYear = ref(currentYear.value)
-const sortField = ref('dataRegistro')
-const sortDirection = ref('desc')
-const showActionsModal = ref(false)
-const selectedRegistroForActions = ref(null)
-const currentPage = ref(1)
-const itemsPerPage = ref(10)
-const showDeleteModal = ref(false)
-const registroToDelete = ref(null)
+const searchQuery = ref('');
+const searchResults = ref(null);
+const selectedYear = ref(currentYear.value);
+const sortField = ref('dataRegistro');
+const sortDirection = ref('desc');
+const showActionsModal = ref(false);
+const selectedRegistroForActions = ref(null);
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
+const showDeleteModal = ref(false);
+const registroToDelete = ref(null);
 
 // Computed properties for display
 const displayedRegistros = computed(() => {
   if (searchResults.value) {
-    return searchResults.value.results || []
+    return searchResults.value.results || [];
   }
-  return sortedRegistros.value
-})
+  return sortedRegistros.value;
+});
 
 const sortedRegistros = computed(() => {
   const sorted = [...registros.value].sort((a, b) => {
-    let aValue = a[sortField.value]
-    let bValue = b[sortField.value]
-    
+    let aValue = a[sortField.value];
+    let bValue = b[sortField.value];
+
     // Handle dates
     if (sortField.value === 'dataRegistro') {
-      aValue = new Date(aValue)
-      bValue = new Date(bValue)
+      aValue = new Date(aValue);
+      bValue = new Date(bValue);
     }
-    
+
     // Handle strings
     if (typeof aValue === 'string') {
-      aValue = aValue.toLowerCase()
+      aValue = aValue.toLowerCase();
     }
     if (typeof bValue === 'string') {
-      bValue = bValue.toLowerCase()
+      bValue = bValue.toLowerCase();
     }
-    
+
     if (aValue < bValue) {
-      return sortDirection.value === 'asc' ? -1 : 1
+      return sortDirection.value === 'asc' ? -1 : 1;
     }
     if (aValue > bValue) {
-      return sortDirection.value === 'asc' ? 1 : -1
+      return sortDirection.value === 'asc' ? 1 : -1;
     }
-    return 0
-  })
-  
-  return sorted
-})
+    return 0;
+  });
+
+  return sorted;
+});
 
 const totalPages = computed(() => {
-  return Math.ceil(displayedRegistros.value.length / itemsPerPage.value)
-})
+  return Math.ceil(displayedRegistros.value.length / itemsPerPage.value);
+});
 
 const paginatedRegistros = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  const end = start + itemsPerPage.value
-  return displayedRegistros.value.slice(start, end)
-})
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  const end = start + itemsPerPage.value;
+  return displayedRegistros.value.slice(start, end);
+});
 
-const filteredInternosCount = computed(() => 
-  displayedRegistros.value.filter(r => 
-    r.internoOuExterno === 'INTERNO' || 
-    r.interOuExter2 === 'INTERNO' || 
-    r.interOuExter3 === 'INTERNO' ||
-    r.interOuExter4 === 'INTERNO' ||
-    r.interOuExter5 === 'INTERNO' ||
-    r.interOuExter6 === 'INTERNO'
-  ).length
-)
+const filteredInternosCount = computed(
+  () =>
+    displayedRegistros.value.filter(
+      r =>
+        r.internoOuExterno === 'INTERNO' ||
+        r.interOuExter2 === 'INTERNO' ||
+        r.interOuExter3 === 'INTERNO' ||
+        r.interOuExter4 === 'INTERNO' ||
+        r.interOuExter5 === 'INTERNO' ||
+        r.interOuExter6 === 'INTERNO'
+    ).length
+);
 
-const filteredExternosCount = computed(() => 
-  displayedRegistros.value.filter(r => 
-    r.internoOuExterno === 'EXTERNO' || 
-    r.interOuExter2 === 'EXTERNO' || 
-    r.interOuExter3 === 'EXTERNO' ||
-    r.interOuExter4 === 'EXTERNO' ||
-    r.interOuExter5 === 'EXTERNO' ||
-    r.interOuExter6 === 'EXTERNO'
-  ).length
-)
+const filteredExternosCount = computed(
+  () =>
+    displayedRegistros.value.filter(
+      r =>
+        r.internoOuExterno === 'EXTERNO' ||
+        r.interOuExter2 === 'EXTERNO' ||
+        r.interOuExter3 === 'EXTERNO' ||
+        r.interOuExter4 === 'EXTERNO' ||
+        r.interOuExter5 === 'EXTERNO' ||
+        r.interOuExter6 === 'EXTERNO'
+    ).length
+);
 
 const filteredTotalHours = computed(() => {
-  let totalMinutes = 0
-  
+  let totalMinutes = 0;
+
   displayedRegistros.value.forEach(registro => {
     const hoursFields = [
-      registro.totalHoras, registro.totalHoras2, registro.totalHoras3,
-      registro.totalHoras4, registro.totalHoras5, registro.totalHoras6
-    ]
-    
+      registro.totalHoras,
+      registro.totalHoras2,
+      registro.totalHoras3,
+      registro.totalHoras4,
+      registro.totalHoras5,
+      registro.totalHoras6,
+    ];
+
     hoursFields.forEach(hours => {
       if (hours && typeof hours === 'string') {
-        const timeParts = hours.split(':')
+        const timeParts = hours.split(':');
         if (timeParts.length >= 2) {
-          const h = parseInt(timeParts[0]) || 0
-          const m = parseInt(timeParts[1]) || 0
-          totalMinutes += (h * 60) + m
+          const h = parseInt(timeParts[0]) || 0;
+          const m = parseInt(timeParts[1]) || 0;
+          totalMinutes += h * 60 + m;
         }
       }
-    })
-  })
-  
-  const hours = Math.floor(totalMinutes / 60)
-  const minutes = totalMinutes % 60
-  return `${hours}:${minutes.toString().padStart(2, '0')}`
-})
+    });
+  });
+
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${hours}:${minutes.toString().padStart(2, '0')}`;
+});
 
 // Methods
-const handleYearChange = async (year) => {
-  selectedYear.value = year
-  setCurrentYear(year)
-  clearSearch()
-  currentPage.value = 1
-  await fetchData()
-}
+const handleYearChange = async year => {
+  selectedYear.value = year;
+  setCurrentYear(year);
+  clearSearch();
+  currentPage.value = 1;
+  await fetchData();
+};
 
 const handleSearch = async () => {
   if (!searchQuery.value.trim()) {
-    clearSearch()
-    return
+    clearSearch();
+    return;
   }
-  
+
   try {
-    currentPage.value = 1
-    const results = await searchRegistros(
-      searchQuery.value.trim(), 
-      selectedYear.value
-    )
-    searchResults.value = results
+    currentPage.value = 1;
+    const results = await searchRegistros(searchQuery.value.trim(), selectedYear.value);
+    searchResults.value = results;
   } catch (error) {
-    console.error('Search failed:', error)
+    console.error('Search failed:', error);
   }
-}
+};
 
 const clearSearch = () => {
-  searchQuery.value = ''
-  searchResults.value = null
-  currentPage.value = 1
-}
+  searchQuery.value = '';
+  searchResults.value = null;
+  currentPage.value = 1;
+};
 
-const showActions = (registro) => {
-  selectedRegistroForActions.value = registro
-  showActionsModal.value = true
-}
+const showActions = registro => {
+  selectedRegistroForActions.value = registro;
+  showActionsModal.value = true;
+};
 
 const closeActions = () => {
-  showActionsModal.value = false
-  selectedRegistroForActions.value = null
-}
+  showActionsModal.value = false;
+  selectedRegistroForActions.value = null;
+};
 
-const viewRegistro = (registro) => {
-  navigateToDetail(registro)
-  closeActions()
-}
+const viewRegistro = registro => {
+  navigateToDetail(registro);
+  closeActions();
+};
 
-const editRegistro = (registro) => {
-  const year = registro.year || selectedYear.value
-  router.push(`/registo-diario-atividade/${year}/${registro.id}/edit?from=list`)
-  closeActions()
-}
+const editRegistro = registro => {
+  const year = registro.year || selectedYear.value;
+  router.push(`/registo-diario-atividade/${year}/${registro.id}/edit?from=list`);
+  closeActions();
+};
 
-const navigateToDetail = (registro) => {
-  const year = registro.year || selectedYear.value
-  router.push(`/registo-diario-atividade/${year}/${registro.id}`)
-}
+const navigateToDetail = registro => {
+  const year = registro.year || selectedYear.value;
+  router.push(`/registo-diario-atividade/${year}/${registro.id}`);
+};
 
-
-const sortBy = (field) => {
+const sortBy = field => {
   if (sortField.value === field) {
-    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
   } else {
-    sortField.value = field
-    sortDirection.value = 'asc'
+    sortField.value = field;
+    sortDirection.value = 'asc';
   }
-  currentPage.value = 1
-}
+  currentPage.value = 1;
+};
 
-const goToPage = (page) => {
+const goToPage = page => {
   if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page
+    currentPage.value = page;
   }
-}
+};
 
-const confirmDelete = (registro) => {
-  registroToDelete.value = registro
-  showDeleteModal.value = true
-}
+const confirmDelete = registro => {
+  registroToDelete.value = registro;
+  showDeleteModal.value = true;
+};
 
 const cancelDelete = () => {
-  registroToDelete.value = null
-  showDeleteModal.value = false
-}
+  registroToDelete.value = null;
+  showDeleteModal.value = false;
+};
 
 const deleteRegistroAction = async () => {
-  if (!registroToDelete.value) return
-  
+  if (!registroToDelete.value) return;
+
   try {
-    await deleteRegistro(selectedYear.value, registroToDelete.value.id)
-    cancelDelete()
-    
+    await deleteRegistro(selectedYear.value, registroToDelete.value.id);
+    cancelDelete();
+
     // Refresh data
-    await fetchData()
-    
+    await fetchData();
+
     // Go to previous page if this page becomes empty
     if (paginatedRegistros.value.length === 0 && currentPage.value > 1) {
-      currentPage.value -= 1
+      currentPage.value -= 1;
     }
   } catch (error) {
-    console.error('Delete failed:', error)
+    console.error('Delete failed:', error);
   }
-}
+};
 
 const truncateText = (text, maxLength) => {
-  if (!text || text.length <= maxLength) return text
-  return text.substring(0, maxLength) + '...'
-}
+  if (!text || text.length <= maxLength) return text;
+  return text.substring(0, maxLength) + '...';
+};
 
 const fetchData = async () => {
   try {
-    await Promise.all([
-      fetchRegistrosForYear(selectedYear.value),
-      fetchAvailableYears()
-    ])
+    await Promise.all([fetchRegistrosForYear(selectedYear.value), fetchAvailableYears()]);
   } catch (error) {
-    console.error('Failed to fetch data:', error)
+    console.error('Failed to fetch data:', error);
   }
-}
+};
 
 // Watchers
-watch(() => currentYear.value, (newYear) => {
-  selectedYear.value = newYear
-})
-
-watch(() => displayedRegistros.value.length, () => {
-  // Reset to first page if current page becomes invalid
-  if (currentPage.value > totalPages.value && totalPages.value > 0) {
-    currentPage.value = 1
+watch(
+  () => currentYear.value,
+  newYear => {
+    selectedYear.value = newYear;
   }
-})
+);
+
+watch(
+  () => displayedRegistros.value.length,
+  () => {
+    // Reset to first page if current page becomes invalid
+    if (currentPage.value > totalPages.value && totalPages.value > 0) {
+      currentPage.value = 1;
+    }
+  }
+);
 
 // Lifecycle
 onMounted(async () => {
-  await fetchData()
-})
+  await fetchData();
+});
 </script>
 
 <style scoped>
@@ -577,7 +575,8 @@ onMounted(async () => {
   border-color: var(--color-primary);
 }
 
-.search-button, .clear-search-button {
+.search-button,
+.clear-search-button {
   padding: 0.75rem 1rem;
   background: var(--color-primary);
   color: white;
@@ -588,7 +587,8 @@ onMounted(async () => {
   transition: background-color 0.2s ease;
 }
 
-.search-button:hover, .clear-search-button:hover {
+.search-button:hover,
+.clear-search-button:hover {
   background: var(--color-primary-dark);
 }
 
@@ -1213,8 +1213,12 @@ onMounted(async () => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .error-message {
@@ -1304,56 +1308,56 @@ onMounted(async () => {
   .registo-container {
     padding: 0.5rem;
   }
-  
+
   .list-controls {
     flex-direction: column;
     gap: 1rem;
     align-items: stretch;
   }
-  
+
   .controls-left {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .controls-left h2 {
     font-size: 1.1rem;
   }
-  
+
   .registro-item {
     flex-direction: column;
     padding: 1rem;
   }
-  
+
   .registro-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .registro-info-grid {
     grid-template-columns: 1fr;
     gap: 0.5rem;
   }
-  
+
   .registro-info-item {
     flex-wrap: wrap;
   }
-  
+
   .registro-actions {
     align-self: flex-end;
   }
-  
+
   .search-container {
     width: 100%;
     max-width: none;
   }
-  
+
   .pagination {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .actions-modal {
     padding: 1rem;
     min-width: 260px;

@@ -12,10 +12,10 @@ describe('ConfirmationDialog', () => {
       props: {
         isOpen: true,
         title: 'Test Title',
-        message: 'Test message'
-      }
+        message: 'Test message',
+      },
     });
-    
+
     expect(wrapper.props('isOpen')).toBe(true);
     expect(wrapper.props('title')).toBe('Test Title');
     expect(wrapper.props('message')).toBe('Test message');
@@ -26,10 +26,10 @@ describe('ConfirmationDialog', () => {
       props: {
         isOpen: true,
         title: 'Test Title',
-        message: 'Test message'
-      }
+        message: 'Test message',
+      },
     });
-    
+
     expect(wrapper.props('confirmText')).toBe('Confirmar');
     expect(wrapper.props('cancelText')).toBe('Cancelar');
     expect(wrapper.props('isLoading')).toBe(false);
@@ -42,10 +42,10 @@ describe('ConfirmationDialog', () => {
         title: 'Test Title',
         message: 'Test message',
         confirmText: 'Custom Confirm',
-        cancelText: 'Custom Cancel'
-      }
+        cancelText: 'Custom Cancel',
+      },
     });
-    
+
     expect(wrapper.props('confirmText')).toBe('Custom Confirm');
     expect(wrapper.props('cancelText')).toBe('Custom Cancel');
   });
@@ -56,10 +56,10 @@ describe('ConfirmationDialog', () => {
         isOpen: true,
         title: 'Test Title',
         message: 'Test message',
-        isLoading: true
-      }
+        isLoading: true,
+      },
     });
-    
+
     expect(wrapper.props('isLoading')).toBe(true);
   });
 
@@ -68,10 +68,10 @@ describe('ConfirmationDialog', () => {
       props: {
         isOpen: true,
         title: 'Test Title',
-        message: 'Test message'
-      }
+        message: 'Test message',
+      },
     });
-    
+
     // Component should be a Vue component
     expect(wrapper.vm).toBeDefined();
     expect(wrapper.exists()).toBe(true);
@@ -82,23 +82,23 @@ describe('ConfirmationDialog', () => {
       props: {
         isOpen: true,
         title: 'Test Title 1',
-        message: 'Test message 1'
-      }
+        message: 'Test message 1',
+      },
     });
-    
+
     const wrapper2 = mount(ConfirmationDialog, {
       props: {
         isOpen: true,
         title: 'Test Title 2',
-        message: 'Test message 2'
-      }
+        message: 'Test message 2',
+      },
     });
-    
+
     // Each instance should have unique IDs
     expect(wrapper1.vm.titleId).toBeDefined();
     expect(wrapper2.vm.titleId).toBeDefined();
     expect(wrapper1.vm.titleId).not.toBe(wrapper2.vm.titleId);
-    
+
     expect(wrapper1.vm.messageId).toBeDefined();
     expect(wrapper2.vm.messageId).toBeDefined();
     expect(wrapper1.vm.messageId).not.toBe(wrapper2.vm.messageId);
@@ -109,10 +109,10 @@ describe('ConfirmationDialog', () => {
       props: {
         isOpen: true,
         title: 'Test Title',
-        message: 'Test message'
-      }
+        message: 'Test message',
+      },
     });
-    
+
     // Check that event handler methods exist
     expect(typeof wrapper.vm.handleConfirm).toBe('function');
     expect(typeof wrapper.vm.handleCancel).toBe('function');
@@ -124,14 +124,14 @@ describe('ConfirmationDialog', () => {
       props: {
         isOpen: true,
         title: 'Confirmar Eliminação',
-        message: 'Tem a certeza que pretende eliminar este item?'
-      }
+        message: 'Tem a certeza que pretende eliminar este item?',
+      },
     });
-    
+
     // Default button text should be in Portuguese
     expect(wrapper.props('confirmText')).toBe('Confirmar');
     expect(wrapper.props('cancelText')).toBe('Cancelar');
-    
+
     // Props should accept Portuguese text
     expect(wrapper.props('title')).toBe('Confirmar Eliminação');
     expect(wrapper.props('message')).toBe('Tem a certeza que pretende eliminar este item?');
@@ -142,10 +142,10 @@ describe('ConfirmationDialog', () => {
       props: {
         isOpen: true,
         title: 'Test Title',
-        message: 'Test message'
-      }
+        message: 'Test message',
+      },
     });
-    
+
     // Component should be designed for mobile-first
     // This is verified by the CSS classes and structure in the template
     expect(wrapper.vm).toBeDefined();
@@ -156,13 +156,13 @@ describe('ConfirmationDialog', () => {
       props: {
         isOpen: false,
         title: 'Test Title',
-        message: 'Test message'
-      }
+        message: 'Test message',
+      },
     });
-    
+
     // Component should mount without errors
     expect(wrapper.vm).toBeDefined();
-    
+
     // Component should unmount without errors
     expect(() => wrapper.unmount()).not.toThrow();
   });

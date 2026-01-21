@@ -21,7 +21,7 @@ describe('useAuth', () => {
     // Import after setting up Pinia
     const { useAuth } = await import('./useAuth');
     const auth = useAuth();
-    
+
     expect(auth.isLoaded.value).toBe(true);
     expect(auth.isSignedIn.value).toBe(false);
     expect(auth.user.value).toBe(null);
@@ -34,9 +34,9 @@ describe('useAuth', () => {
     // Import after setting up Pinia
     const { useAuth } = await import('./useAuth');
     const auth = useAuth();
-    
+
     expect(typeof auth.signOut).toBe('function');
-    
+
     // Test sign out functionality
     await auth.signOut();
     expect(window.Clerk.signOut).toHaveBeenCalled();

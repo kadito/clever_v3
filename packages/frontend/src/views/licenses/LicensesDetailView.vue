@@ -24,12 +24,16 @@
     <template #content="{ item }">
       <div v-if="item && item.data" class="space-y-6">
         <!-- Client Information Section (First Priority) -->
-        <ClientInfoSection :client-relation="(license as ContentWithRelations<License['data']>)?.relations?.client" />
+        <ClientInfoSection
+          :client-relation="(license as ContentWithRelations<License['data']>)?.relations?.client"
+        />
 
         <!-- Basic Information Section -->
         <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Informação Básica</h2>
             </div>
             <div class="p-4 sm:p-6">
@@ -58,7 +62,9 @@
         <!-- License Period Section -->
         <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Período da Licença</h2>
             </div>
             <div class="p-4 sm:p-6">
@@ -89,15 +95,20 @@
         </div>
 
         <!-- Software Section -->
-        <div v-if="item.data.software && item.data.software.name && item.data.software.name.length > 0" class="detail-section">
+        <div
+          v-if="item.data.software && item.data.software.name && item.data.software.name.length > 0"
+          class="detail-section"
+        >
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Software</h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="software-list">
-                <div 
-                  v-for="(softwareName, index) in item.data.software.name" 
+                <div
+                  v-for="(softwareName, index) in item.data.software.name"
                   :key="index"
                   class="software-card"
                 >
@@ -105,7 +116,7 @@
                     <h3 class="text-base font-semibold text-gray-900">{{ softwareName }}</h3>
                     <span class="software-badge">{{ Number(index) + 1 }}</span>
                   </div>
-                  
+
                   <div class="detail-grid">
                     <!-- Show software-specific fields based on the software type -->
                     <template v-if="softwareName === 'Vectron'">
@@ -118,18 +129,21 @@
                         <div class="detail-value">{{ item.data.software.nEquipamento }}</div>
                       </div>
                     </template>
-                    
+
                     <template v-else-if="softwareName === 'Pix'">
                       <div v-if="item.data.software.product" class="detail-item">
                         <label class="detail-label">Produto</label>
                         <div class="detail-value">{{ item.data.software.product }}</div>
                       </div>
-                      <div v-if="item.data.software.modules && item.data.software.modules.length > 0" class="detail-item col-span-full">
+                      <div
+                        v-if="item.data.software.modules && item.data.software.modules.length > 0"
+                        class="detail-item col-span-full"
+                      >
                         <label class="detail-label">Módulos</label>
                         <div class="detail-value">
                           <div class="flex flex-wrap gap-1">
-                            <span 
-                              v-for="module in item.data.software.modules" 
+                            <span
+                              v-for="module in item.data.software.modules"
                               :key="module"
                               class="module-badge"
                             >
@@ -139,21 +153,21 @@
                         </div>
                       </div>
                     </template>
-                    
+
                     <template v-else-if="softwareName === 'Zon Soft'">
                       <div v-if="item.data.software.version" class="detail-item">
                         <label class="detail-label">Versão</label>
                         <div class="detail-value">{{ item.data.software.version }}</div>
                       </div>
                     </template>
-                    
+
                     <template v-else-if="softwareName === 'Pt CERT'">
                       <div v-if="item.data.software.licenseType" class="detail-item">
                         <label class="detail-label">Tipo de Licença</label>
                         <div class="detail-value">{{ item.data.software.licenseType }}</div>
                       </div>
                     </template>
-                    
+
                     <!-- Common fields for all software types -->
                     <div v-if="item.data.software.numeroSerie" class="detail-item">
                       <label class="detail-label">Número Série</label>
@@ -177,23 +191,21 @@
         <!-- Invoices Section -->
         <div v-if="item.data.invoices && item.data.invoices.length > 0" class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Faturas</h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="space-y-4">
-                <div 
-                  v-for="invoice in item.data.invoices" 
-                  :key="invoice.id"
-                  class="invoice-card"
-                >
+                <div v-for="invoice in item.data.invoices" :key="invoice.id" class="invoice-card">
                   <div class="flex items-start justify-between mb-3">
                     <h3 class="text-base font-semibold text-gray-900">
                       Fatura {{ invoice.numeroFatura || invoice.id }}
                     </h3>
                     <span class="invoice-badge">{{ invoice.ano || 'N/A' }}</span>
                   </div>
-                  
+
                   <div class="detail-grid">
                     <div v-if="invoice.numeroFatura" class="detail-item">
                       <label class="detail-label">Número</label>
@@ -278,32 +290,34 @@ const getLicenseSubtitle = (item: BaseContent | null): string => {
   if (!item || !item.data) return '';
   const license = item as License;
   const parts = [];
-  
+
   if (license.data.clientName) {
     parts.push(license.data.clientName);
   }
-  
+
   if (license.data.versao) {
     parts.push(`v${license.data.versao}`);
   }
-  
+
   if (license.data.modalidade) {
     parts.push(license.data.modalidade);
   }
-  
+
   return parts.join(' • ');
 };
 
 const getLicenseStatus = (item: BaseContent | null): string => {
   if (!item || !item.data) return 'Licença';
   const license = item as License;
-  
+
   // Determine status based on expiration
   if (license.data.dataVencimento) {
     const expirationDate = new Date(license.data.dataVencimento);
     const now = new Date();
-    const daysUntilExpiration = Math.ceil((expirationDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    
+    const daysUntilExpiration = Math.ceil(
+      (expirationDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
     if (daysUntilExpiration < 0) {
       return 'Expirada';
     } else if (daysUntilExpiration <= 30) {
@@ -312,7 +326,7 @@ const getLicenseStatus = (item: BaseContent | null): string => {
       return 'Ativa';
     }
   }
-  
+
   return 'Ativa';
 };
 
@@ -337,11 +351,13 @@ const getStatusClass = (status: string): string => {
 
 const getExpirationClass = (dateString?: string): string => {
   if (!dateString) return '';
-  
+
   const expirationDate = new Date(dateString);
   const now = new Date();
-  const daysUntilExpiration = Math.ceil((expirationDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-  
+  const daysUntilExpiration = Math.ceil(
+    (expirationDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+  );
+
   if (daysUntilExpiration < 0) {
     return 'text-red-600 font-semibold';
   } else if (daysUntilExpiration <= 30) {
@@ -353,7 +369,7 @@ const getExpirationClass = (dateString?: string): string => {
 
 const formatDate = (dateString?: string): string => {
   if (!dateString) return '-';
-  
+
   const date = new Date(dateString);
   return date.toLocaleDateString('pt-PT', {
     year: 'numeric',
@@ -376,45 +392,57 @@ const handleBack = () => {
 // Delete handlers
 const getDeleteConfirmationMessage = (): string => {
   if (!license.value) return 'Tem a certeza que pretende eliminar esta licença?';
-  
+
   const softwareNames = license.value.data.software?.name || [];
-  const licenseIdentifier = softwareNames.length > 0 
-    ? softwareNames.join(', ') 
-    : `Licença ${license.value.data.versao || ''}`.trim();
-  
+  const licenseIdentifier =
+    softwareNames.length > 0
+      ? softwareNames.join(', ')
+      : `Licença ${license.value.data.versao || ''}`.trim();
+
   return `Tem a certeza que pretende eliminar "${licenseIdentifier}"?`;
 };
 
 const handleDelete = () => {
   if (!license.value) return;
-  
+
   confirmDeleteMessage.value = getDeleteConfirmationMessage();
   showDeleteConfirm.value = true;
 };
 
 const confirmDelete = async () => {
   if (!license.value) return;
-  
+
   try {
     isDeleting.value = true;
-    
-    console.log('Attempting to delete license:', JSON.stringify({
-      uuid: license.value.uuid,
-      software: license.value.data.software?.name,
-      version: license.value.data.versao
-    }, null, 2));
-    
+
+    console.log(
+      'Attempting to delete license:',
+      JSON.stringify(
+        {
+          uuid: license.value.uuid,
+          software: license.value.data.software?.name,
+          version: license.value.data.versao,
+        },
+        null,
+        2
+      )
+    );
+
     const success = await api.remove(license.value.uuid);
-    
+
     if (api.error.value) {
-      console.error('Delete operation failed with API error:', JSON.stringify(api.error.value, null, 2));
-      error.value = typeof api.error.value === 'string' 
-        ? api.error.value 
-        : api.error.value.message || 'Erro ao eliminar licença';
+      console.error(
+        'Delete operation failed with API error:',
+        JSON.stringify(api.error.value, null, 2)
+      );
+      error.value =
+        typeof api.error.value === 'string'
+          ? api.error.value
+          : api.error.value.message || 'Erro ao eliminar licença';
       showDeleteConfirm.value = false;
       return;
     }
-    
+
     if (success) {
       console.log('License deleted successfully, navigating to /licenses');
       router.push('/licenses');
@@ -439,18 +467,18 @@ const cancelDelete = () => {
 // Data loading
 const loadLicense = async () => {
   const licenseId = route.params.uuid as string;
-  
+
   if (!licenseId) {
     error.value = 'ID da licença não fornecido';
     return;
   }
-  
+
   try {
     isLoading.value = true;
     clearError();
-    
+
     await api.fetchById(licenseId);
-    
+
     if (api.currentItem.value) {
       license.value = api.currentItem.value as ContentWithRelations<License['data']>;
     } else {
@@ -598,7 +626,7 @@ onMounted(() => {
   .contact-link {
     @apply text-black no-underline;
   }
-  
+
   .status-badge {
     @apply border border-gray-300 bg-white text-black;
   }

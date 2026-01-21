@@ -11,21 +11,21 @@ export const licensesFormSections: FormSection[] = [
         label: 'Cliente',
         type: 'custom',
         required: true,
-        placeholder: 'Pesquisar cliente...'
+        placeholder: 'Pesquisar cliente...',
       },
       {
         key: 'versao',
         label: 'Versão',
         type: 'text',
-        placeholder: 'Ex: 2024.1'
+        placeholder: 'Ex: 2024.1',
       },
       {
         key: 'numeroSerie',
         label: 'Número de Série',
         type: 'text',
-        placeholder: 'Número de série da licença'
-      }
-    ]
+        placeholder: 'Número de série da licença',
+      },
+    ],
   },
   {
     key: 'period',
@@ -35,12 +35,12 @@ export const licensesFormSections: FormSection[] = [
       {
         key: 'dataInicio',
         label: 'Data de Início',
-        type: 'date'
+        type: 'date',
       },
       {
         key: 'dataVencimento',
         label: 'Data de Vencimento',
-        type: 'date'
+        type: 'date',
       },
       {
         key: 'modalidade',
@@ -50,17 +50,17 @@ export const licensesFormSections: FormSection[] = [
           { value: 'ANUAL', label: 'Anual' },
           { value: 'SEMESTRAL', label: 'Semestral' },
           { value: 'TRIMESTRAL', label: 'Trimestral' },
-          { value: 'MENSAL', label: 'Mensal' }
+          { value: 'MENSAL', label: 'Mensal' },
         ],
-        placeholder: 'Selecione a modalidade...'
+        placeholder: 'Selecione a modalidade...',
       },
       {
         key: 'duracaoContrato',
         label: 'Duração do Contrato',
         type: 'text',
-        placeholder: 'Ex: 12 meses'
-      }
-    ]
+        placeholder: 'Ex: 12 meses',
+      },
+    ],
   },
   {
     key: 'software',
@@ -71,9 +71,9 @@ export const licensesFormSections: FormSection[] = [
         key: 'software',
         label: 'Software',
         type: 'custom',
-        fullWidth: true
-      }
-    ]
+        fullWidth: true,
+      },
+    ],
   },
   {
     key: 'invoices',
@@ -84,8 +84,8 @@ export const licensesFormSections: FormSection[] = [
         key: 'invoices',
         label: 'Faturas',
         type: 'custom',
-        fullWidth: true
-      }
-    ]
-  }
+        fullWidth: true,
+      },
+    ],
+  },
 ];

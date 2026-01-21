@@ -9,17 +9,13 @@
       <div class="controls-header">
         <h2>Folhas de Obra {{ selectedYear }} ({{ displayedFolhas.length }})</h2>
       </div>
-      
+
       <div class="controls-actions">
         <!-- Year selector -->
         <div class="year-selector-container">
-          <YearSelector 
-            v-model="selectedYear" 
-            :years="availableYears"
-            @change="onYearChange"
-          />
+          <YearSelector v-model="selectedYear" :years="availableYears" @change="onYearChange" />
         </div>
-        
+
         <button @click="refreshData" :disabled="loading" class="btn btn-refresh">
           🔄 Atualizar
         </button>
@@ -28,13 +24,13 @@
 
     <!-- Search -->
     <div class="search-container">
-      <input 
-        type="text" 
-        v-model="searchQuery" 
+      <input
+        type="text"
+        v-model="searchQuery"
         @input="onSearchInput"
-        placeholder="Pesquisar por cliente, número..." 
+        placeholder="Pesquisar por cliente, número..."
         class="search-input"
-      >
+      />
       <span class="search-icon">🔍</span>
     </div>
 
@@ -51,8 +47,8 @@
 
     <!-- Folhas de Obra List -->
     <div v-if="!loading && displayedFolhas.length > 0" class="folhas-obra-list">
-      <div 
-        v-for="folha in displayedFolhas" 
+      <div
+        v-for="folha in displayedFolhas"
         :key="`${folha.year || selectedYear}-${folha.id}`"
         class="folha-item"
         @click="viewFolhaDetail(folha)"
@@ -64,17 +60,19 @@
             <span class="folha-date">{{ formatDate(folha.date) }}</span>
           </div>
           <div class="folha-details" v-if="folha.request?.reason || folha.otherData?.technician">
-            <span v-if="folha.request?.reason" class="folha-reason">{{ folha.request.reason }}</span>
-            <span v-if="folha.otherData?.technician" class="folha-technician">👨‍🔧 {{ folha.otherData.technician }}</span>
+            <span v-if="folha.request?.reason" class="folha-reason">{{
+              folha.request.reason
+            }}</span>
+            <span v-if="folha.otherData?.technician" class="folha-technician"
+              >👨‍🔧 {{ folha.otherData.technician }}</span
+            >
           </div>
           <div v-if="isSearching && folha.year" class="folha-year">
             <span>Ano: {{ folha.year }}</span>
           </div>
         </div>
         <div class="folha-actions">
-          <button class="action-btn" @click.stop="showActions(folha)">
-            ⋮
-          </button>
+          <button class="action-btn" @click.stop="showActions(folha)">⋮</button>
         </div>
       </div>
     </div>
@@ -85,9 +83,7 @@
       <p v-if="searchQuery">
         Não foram encontradas folhas de obra com o termo "{{ searchQuery }}".
       </p>
-      <p v-else>
-        Não há folhas de obra para o ano {{ selectedYear }}.
-      </p>
+      <p v-else>Não há folhas de obra para o ano {{ selectedYear }}.</p>
     </div>
 
     <!-- Search Results Info -->
@@ -103,46 +99,30 @@
       <div class="actions-modal" @click.stop>
         <h3>{{ selectedFolhaForActions?.clientName }}</h3>
         <div class="modal-actions">
-          <button @click="viewFolha" class="modal-btn view-btn">
-            📋 Ver Detalhes
-          </button>
-          <button @click="editFolha" class="modal-btn edit-btn">
-            ✏️ Editar
-          </button>
-          <button @click="deleteFolhaAction" class="modal-btn delete-btn">
-            🗑️ Eliminar
-          </button>
+          <button @click="viewFolha" class="modal-btn view-btn">📋 Ver Detalhes</button>
+          <button @click="editFolha" class="modal-btn edit-btn">✏️ Editar</button>
+          <button @click="deleteFolhaAction" class="modal-btn delete-btn">🗑️ Eliminar</button>
         </div>
-        <button @click="closeActions" class="modal-btn cancel-btn">
-          Cancelar
-        </button>
+        <button @click="closeActions" class="modal-btn cancel-btn">Cancelar</button>
       </div>
     </div>
-
-
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
-import YearSelector from '@/components/YearSelector.vue'
-import { useFolhasObraStore } from '@/stores/folhas-obra.js'
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
+import YearSelector from '@/components/YearSelector.vue';
+import { useFolhasObraStore } from '@/stores/folhas-obra.js';
 
 // Router
-const router = useRouter()
+const router = useRouter();
 
 // Store
-const store = useFolhasObraStore()
-const { 
-  folhas, 
-  currentYear, 
-  availableYears, 
-  loading, 
-  error 
-} = storeToRefs(store)
+const store = useFolhasObraStore();
+const { folhas, currentYear, availableYears, loading, error } = storeToRefs(store);
 
 const {
   fetchFolhasForYear,
@@ -150,151 +130,155 @@ const {
   searchFolhas,
   clearError,
   setCurrentYear,
-  getYearFromDate
-} = store
+  getYearFromDate,
+} = store;
 
 // Local reactive state
-const selectedYear = ref(currentYear.value)
-const searchQuery = ref('')
-const searchResults = ref([])
-const isSearching = ref(false)
-const searchTimeout = ref(null)
-const showActionsModal = ref(false)
-const selectedFolhaForActions = ref(null)
+const selectedYear = ref(currentYear.value);
+const searchQuery = ref('');
+const searchResults = ref([]);
+const isSearching = ref(false);
+const searchTimeout = ref(null);
+const showActionsModal = ref(false);
+const selectedFolhaForActions = ref(null);
 
 // Computed
 const displayedFolhas = computed(() => {
-  return isSearching.value ? searchResults.value : folhas.value
-})
+  return isSearching.value ? searchResults.value : folhas.value;
+});
 
 // Methods
-const viewFolhaDetail = (folha) => {
-  const year = folha.year || selectedYear.value
-  router.push(`/folhas-obra/${folha.id}?year=${year}`)
-}
+const viewFolhaDetail = folha => {
+  const year = folha.year || selectedYear.value;
+  router.push(`/folhas-obra/${folha.id}?year=${year}`);
+};
 
-const formatDate = (dateString) => {
-  const date = new Date(dateString)
+const formatDate = dateString => {
+  const date = new Date(dateString);
   return date.toLocaleDateString('pt-PT', {
     day: '2-digit',
     month: '2-digit',
-    year: 'numeric'
-  })
-}
+    year: 'numeric',
+  });
+};
 
-const showActions = (folha) => {
-  selectedFolhaForActions.value = folha
-  showActionsModal.value = true
-}
+const showActions = folha => {
+  selectedFolhaForActions.value = folha;
+  showActionsModal.value = true;
+};
 
 const closeActions = () => {
-  showActionsModal.value = false
-  selectedFolhaForActions.value = null
-}
+  showActionsModal.value = false;
+  selectedFolhaForActions.value = null;
+};
 
 const viewFolha = () => {
   if (selectedFolhaForActions.value) {
-    viewFolhaDetail(selectedFolhaForActions.value)
+    viewFolhaDetail(selectedFolhaForActions.value);
   }
-  closeActions()
-}
+  closeActions();
+};
 
 const editFolha = () => {
   if (selectedFolhaForActions.value) {
-    const year = selectedFolhaForActions.value.year || selectedYear.value
-    router.push(`/folhas-obra/${selectedFolhaForActions.value.id}/edit?year=${year}`)
+    const year = selectedFolhaForActions.value.year || selectedYear.value;
+    router.push(`/folhas-obra/${selectedFolhaForActions.value.id}/edit?year=${year}`);
   }
-  closeActions()
-}
+  closeActions();
+};
 
 const deleteFolhaAction = async () => {
-  if (!selectedFolhaForActions.value) return
-  
-  const confirmed = confirm(`Tem a certeza que deseja eliminar a folha de obra "${selectedFolhaForActions.value.number}"?`)
-  
+  if (!selectedFolhaForActions.value) return;
+
+  const confirmed = confirm(
+    `Tem a certeza que deseja eliminar a folha de obra "${selectedFolhaForActions.value.number}"?`
+  );
+
   if (confirmed) {
     try {
-      const year = selectedFolhaForActions.value.year || selectedYear.value
-      await store.deleteFolha(year, selectedFolhaForActions.value.id)
-      closeActions()
+      const year = selectedFolhaForActions.value.year || selectedYear.value;
+      await store.deleteFolha(year, selectedFolhaForActions.value.id);
+      closeActions();
     } catch (err) {
-      console.error('Error deleting folha:', err)
+      console.error('Error deleting folha:', err);
     }
   }
-}
-
+};
 
 const onYearChange = () => {
   if (searchQuery.value) {
-    clearSearch()
+    clearSearch();
   }
-  setCurrentYear(selectedYear.value)
-  fetchFolhasForYear(selectedYear.value)
-}
+  setCurrentYear(selectedYear.value);
+  fetchFolhasForYear(selectedYear.value);
+};
 
 const refreshData = () => {
   if (isSearching.value) {
-    performSearch()
+    performSearch();
   } else {
-    fetchFolhasForYear(selectedYear.value)
+    fetchFolhasForYear(selectedYear.value);
   }
-}
+};
 
 const onSearchInput = () => {
   if (searchTimeout.value) {
-    clearTimeout(searchTimeout.value)
+    clearTimeout(searchTimeout.value);
   }
-  
+
   if (searchQuery.value.trim()) {
     searchTimeout.value = setTimeout(() => {
-      performSearch()
-    }, 300) // Debounce search
+      performSearch();
+    }, 300); // Debounce search
   } else {
-    clearSearch()
+    clearSearch();
   }
-}
+};
 
 const performSearch = async () => {
-  if (!searchQuery.value.trim()) return
-  
-  isSearching.value = true
+  if (!searchQuery.value.trim()) return;
+
+  isSearching.value = true;
   try {
-    const result = await searchFolhas(searchQuery.value.trim())
-    searchResults.value = result.results || []
+    const result = await searchFolhas(searchQuery.value.trim());
+    searchResults.value = result.results || [];
   } catch (err) {
-    console.error('Search failed:', err)
-    searchResults.value = []
+    console.error('Search failed:', err);
+    searchResults.value = [];
   }
-}
+};
 
 const clearSearch = () => {
-  searchQuery.value = ''
-  searchResults.value = []
-  isSearching.value = false
+  searchQuery.value = '';
+  searchResults.value = [];
+  isSearching.value = false;
   if (searchTimeout.value) {
-    clearTimeout(searchTimeout.value)
+    clearTimeout(searchTimeout.value);
   }
-}
+};
 
 // Lifecycle
 onMounted(async () => {
   // Fetch available years first
-  await fetchAvailableYears()
-  
+  await fetchAvailableYears();
+
   // If current year is not in available years, use the latest year
-  if (availableYears.value.length > 0 && !availableYears.value.includes(selectedYear.value.toString())) {
-    selectedYear.value = parseInt(availableYears.value[availableYears.value.length - 1])
-    setCurrentYear(selectedYear.value)
+  if (
+    availableYears.value.length > 0 &&
+    !availableYears.value.includes(selectedYear.value.toString())
+  ) {
+    selectedYear.value = parseInt(availableYears.value[availableYears.value.length - 1]);
+    setCurrentYear(selectedYear.value);
   }
-  
+
   // Fetch folhas for selected year
-  await fetchFolhasForYear(selectedYear.value)
-})
+  await fetchFolhasForYear(selectedYear.value);
+});
 
 // Watchers
-watch(currentYear, (newYear) => {
-  selectedYear.value = newYear
-})
+watch(currentYear, newYear => {
+  selectedYear.value = newYear;
+});
 </script>
 
 <style scoped>
@@ -373,8 +357,6 @@ watch(currentYear, (newYear) => {
   font-size: 1.1rem;
 }
 
-
-
 .btn {
   padding: 0.75rem 1.5rem;
   border: none;
@@ -404,8 +386,6 @@ watch(currentYear, (newYear) => {
   cursor: not-allowed;
   transform: none;
 }
-
-
 
 .loading-state {
   background: white;
@@ -614,52 +594,52 @@ watch(currentYear, (newYear) => {
   .folhas-obra-container {
     padding: 0.5rem;
   }
-  
+
   .list-controls {
     padding: 1rem;
     margin-bottom: 1rem;
   }
-  
+
   .controls-header h2 {
     font-size: 1.25rem;
     margin-bottom: 0.75rem;
   }
-  
+
   .controls-actions {
     flex-direction: column;
     align-items: stretch;
     gap: 0.75rem;
     margin-bottom: 0.75rem;
   }
-  
+
   .year-selector-container {
     width: 100%;
     display: flex;
     justify-content: flex-start;
   }
-  
+
   .btn.btn-refresh {
     width: 100%;
     justify-content: center;
   }
-  
+
   .search-input {
     padding: 0.65rem 2.25rem 0.65rem 0.875rem;
     font-size: 0.85rem;
   }
-  
+
   .search-icon {
     right: 0.75rem;
   }
-  
+
   .folha-item {
     padding: 1rem;
   }
-  
+
   .folha-main h3 {
     font-size: 0.95rem;
   }
-  
+
   .folha-meta span {
     font-size: 0.8rem;
   }
@@ -669,44 +649,44 @@ watch(currentYear, (newYear) => {
   .folhas-obra-container {
     padding: 0.25rem;
   }
-  
+
   .list-controls {
     padding: 0.75rem;
   }
-  
+
   .controls-header h2 {
     font-size: 1.1rem;
   }
-  
+
   .controls-actions {
     gap: 0.5rem;
     margin-bottom: 0.5rem;
   }
-  
+
   .search-input {
     padding: 0.6rem 2rem 0.6rem 0.75rem;
     font-size: 0.8rem;
   }
-  
+
   .search-icon {
     right: 0.65rem;
   }
-  
+
   .folha-item {
     padding: 0.75rem;
   }
-  
+
   .folha-main h3 {
     font-size: 0.9rem;
   }
-  
+
   .folha-meta span {
     font-size: 0.75rem;
   }
-  
+
   .btn.btn-refresh {
     padding: 0.65rem;
     font-size: 0.85rem;
   }
 }
-</style> 
+</style>

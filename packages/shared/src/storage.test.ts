@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { ContentStorageService, ContentNotFoundError, ContentValidationError, createContentStorageService } from './storage.js';
+import {
+  ContentStorageService,
+  ContentNotFoundError,
+  ContentValidationError,
+  createContentStorageService,
+} from './storage.js';
 import type { BaseContent } from './types.js';
 
 // Mock R2Bucket interface
@@ -62,7 +67,7 @@ describe('ContentStorageService', () => {
       expect(mockR2Bucket.get).toHaveBeenCalledWith('content/test-content/test-uuid-123.json');
       expect(result).toEqual({
         ...mockContent,
-        relations: {}
+        relations: {},
       });
     });
 
@@ -149,16 +154,16 @@ describe('ContentStorageService', () => {
         updatedBy: 'user-123',
         version: 1,
         isDeleted: false,
-        data: createData
+        data: createData,
       };
-      
+
       expect(mockR2Bucket.put).toHaveBeenCalledWith(
         `content/test-content/${mockUUID}.json`,
         JSON.stringify(expectedSavedContent, null, 2),
         expect.objectContaining({
           httpMetadata: expect.objectContaining({
-            contentType: 'application/json'
-          })
+            contentType: 'application/json',
+          }),
         })
       );
 
@@ -168,8 +173,8 @@ describe('ContentStorageService', () => {
         expect.stringContaining(mockUUID),
         expect.objectContaining({
           httpMetadata: expect.objectContaining({
-            contentType: 'application/json'
-          })
+            contentType: 'application/json',
+          }),
         })
       );
     });
@@ -315,16 +320,16 @@ describe('ContentStorageService', () => {
           description: 'This will be deleted',
         },
         deletedAt: mockDate,
-        deletedBy: 'user-123'
+        deletedBy: 'user-123',
       };
-      
+
       expect(mockR2Bucket.put).toHaveBeenCalledWith(
         'content/test-content/test-uuid-123.json',
         JSON.stringify(expectedDeletedContent, null, 2),
         expect.objectContaining({
           httpMetadata: expect.objectContaining({
-            contentType: 'application/json'
-          })
+            contentType: 'application/json',
+          }),
         })
       );
 
@@ -339,9 +344,9 @@ describe('ContentStorageService', () => {
     it('should throw error when content not found', async () => {
       (mockR2Bucket.get as any).mockResolvedValue(null);
 
-      await expect(
-        storageService.delete('non-existent-uuid', mockUserContext)
-      ).rejects.toThrow('Content not found');
+      await expect(storageService.delete('non-existent-uuid', mockUserContext)).rejects.toThrow(
+        'Content not found'
+      );
     });
   });
 

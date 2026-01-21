@@ -1,25 +1,15 @@
 <template>
   <div class="work-sheet-update-container">
     <!-- Loading state -->
-    <div
-      v-if="loading"
-      class="loading-state"
-    >
+    <div v-if="loading" class="loading-state">
       <p>A carregar folha de obra...</p>
     </div>
 
     <!-- Error state -->
-    <ErrorComponent
-      v-if="error"
-      :error="error"
-      @close="clearError"
-    />
+    <ErrorComponent v-if="error" :error="error" @close="clearError" />
 
     <!-- Content -->
-    <div
-      v-if="!loading && workSheet"
-      class="update-content"
-    >
+    <div v-if="!loading && workSheet" class="update-content">
       <!-- Form -->
       <ContentUpdateTemplate
         content-type="work-sheets"
@@ -43,13 +33,10 @@
             maxlength="5"
             class="form-input"
             :class="{ 'border-red-500': !!error }"
-            @input="(e) => handleTimeInput(e, 'arrivalTime', updateFieldValue)"
-            @blur="(e) => handleTimeBlur(e, 'arrivalTime', updateFieldValue)"
+            @input="e => handleTimeInput(e, 'arrivalTime', updateFieldValue)"
+            @blur="e => handleTimeBlur(e, 'arrivalTime', updateFieldValue)"
           />
-          <p
-            v-if="error"
-            class="form-error text-red-600 text-sm mt-1"
-          >
+          <p v-if="error" class="form-error text-red-600 text-sm mt-1">
             {{ error }}
           </p>
         </template>
@@ -62,13 +49,10 @@
             maxlength="5"
             class="form-input"
             :class="{ 'border-red-500': !!error }"
-            @input="(e) => handleTimeInput(e, 'departureTime', updateFieldValue)"
-            @blur="(e) => handleTimeBlur(e, 'departureTime', updateFieldValue)"
+            @input="e => handleTimeInput(e, 'departureTime', updateFieldValue)"
+            @blur="e => handleTimeBlur(e, 'departureTime', updateFieldValue)"
           />
-          <p
-            v-if="error"
-            class="form-error text-red-600 text-sm mt-1"
-          >
+          <p v-if="error" class="form-error text-red-600 text-sm mt-1">
             {{ error }}
           </p>
         </template>
@@ -79,13 +63,10 @@
             :model-value="formData?.clientId || ''"
             :selected-client="selectedClient"
             :has-error="!!error"
-            @update:model-value="(value) => updateFieldValue('clientId', value)"
+            @update:model-value="value => updateFieldValue('clientId', value)"
             @client-selected="handleClientSelected"
           />
-          <p
-            v-if="error"
-            class="form-error text-red-600 text-sm mt-1"
-          >
+          <p v-if="error" class="form-error text-red-600 text-sm mt-1">
             {{ error }}
           </p>
         </template>
@@ -95,21 +76,23 @@
             <label class="displacement-label">Deslocação</label>
             <div class="radio-group">
               <label :class="['radio-label', formData?.hasDisplacement === true ? 'selected' : '']">
-                <input 
-                  type="radio" 
+                <input
+                  type="radio"
                   :checked="formData?.hasDisplacement === true"
                   name="displacement"
                   @change="updateFieldValue('hasDisplacement', true)"
-                >
+                />
                 <span>SIM</span>
               </label>
-              <label :class="['radio-label', formData?.hasDisplacement === false ? 'selected' : '']">
-                <input 
-                  type="radio" 
+              <label
+                :class="['radio-label', formData?.hasDisplacement === false ? 'selected' : '']"
+              >
+                <input
+                  type="radio"
                   :checked="formData?.hasDisplacement === false"
                   name="displacement"
                   @change="updateFieldValue('hasDisplacement', false)"
-                >
+                />
                 <span>NÃO</span>
               </label>
             </div>
@@ -120,25 +103,25 @@
           <div class="payment-method-selector">
             <label class="payment-label">Método de Pagamento</label>
             <div class="payment-options">
-              <label 
-                v-for="method in paymentMethods" 
+              <label
+                v-for="method in paymentMethods"
                 :key="method.value"
-                :class="['payment-option', formData?.paymentMethod === method.value ? 'selected' : '']"
+                :class="[
+                  'payment-option',
+                  formData?.paymentMethod === method.value ? 'selected' : '',
+                ]"
               >
-                <input 
-                  type="radio" 
+                <input
+                  type="radio"
                   :value="method.value"
                   :checked="formData?.paymentMethod === method.value"
                   name="paymentMethod"
                   @change="updateFieldValue('paymentMethod', method.value)"
-                >
+                />
                 <span>{{ method.label }}</span>
               </label>
             </div>
-            <p
-              v-if="error"
-              class="form-error text-red-600 text-sm mt-1"
-            >
+            <p v-if="error" class="form-error text-red-600 text-sm mt-1">
               {{ error }}
             </p>
           </div>
@@ -146,31 +129,38 @@
 
         <!-- Pricing display section (only shown when displacement is enabled) -->
         <template #after-section-displacement="{ formData: slotFormData }">
-          <div
-            v-if="slotFormData?.hasDisplacement"
-            class="pricing-section"
-          >
+          <div v-if="slotFormData?.hasDisplacement" class="pricing-section">
             <h3>Cálculo de Preços <span class="vat-note">(sem IVA)</span></h3>
             <div class="pricing-table">
               <div class="pricing-row">
                 <span class="pricing-label">Taxa Deslocação:</span>
-                <span class="pricing-value">{{ getDisplacementRate() }}€ <span class="vat-indicator">sem IVA</span></span>
+                <span class="pricing-value"
+                  >{{ getDisplacementRate() }}€ <span class="vat-indicator">sem IVA</span></span
+                >
               </div>
               <div class="pricing-row">
                 <span class="pricing-label">Preço KMs:</span>
-                <span class="pricing-value">{{ getKmsPrice() }}€ <span class="vat-indicator">sem IVA</span></span>
+                <span class="pricing-value"
+                  >{{ getKmsPrice() }}€ <span class="vat-indicator">sem IVA</span></span
+                >
               </div>
               <div class="pricing-row">
                 <span class="pricing-label">Valor Hora:</span>
-                <span class="pricing-value">{{ getHourlyRate() }}€ <span class="vat-indicator">sem IVA</span></span>
+                <span class="pricing-value"
+                  >{{ getHourlyRate() }}€ <span class="vat-indicator">sem IVA</span></span
+                >
               </div>
               <div class="pricing-row">
                 <span class="pricing-label">Preço Mão Obra:</span>
-                <span class="pricing-value">{{ getLaborPrice() }}€ <span class="vat-indicator">sem IVA</span></span>
+                <span class="pricing-value"
+                  >{{ getLaborPrice() }}€ <span class="vat-indicator">sem IVA</span></span
+                >
               </div>
               <div class="pricing-row total">
                 <span class="pricing-label">PREÇO TOTAL:</span>
-                <span class="pricing-value">{{ getTotalPrice() }}€ <span class="vat-indicator">sem IVA</span></span>
+                <span class="pricing-value"
+                  >{{ getTotalPrice() }}€ <span class="vat-indicator">sem IVA</span></span
+                >
               </div>
             </div>
           </div>
@@ -194,7 +184,13 @@ import { useSharedFormData } from '@/composables/useSharedFormData';
 
 const route = useRoute();
 const router = useRouter();
-const { fetchById, update, currentItem, loading: apiLoading, error: apiError } = useApi<WorkSheet>('work-sheets');
+const {
+  fetchById,
+  update,
+  currentItem,
+  loading: apiLoading,
+  error: apiError,
+} = useApi<WorkSheet>('work-sheets');
 
 // Form data management
 const { formData: currentFormData, updateFieldValue } = useSharedFormData('work-sheet-update');
@@ -213,63 +209,64 @@ const paymentMethods = [
   { value: 'CARTÃO MB', label: 'CARTÃO MB' },
   { value: 'DINHEIRO', label: 'DINHEIRO' },
   { value: 'TRANSFERÊNCIA BANCÁRIA', label: 'TRANSFERÊNCIA BANCÁRIA' },
-  { value: 'CONTRATO', label: 'CONTRATO' }
+  { value: 'CONTRATO', label: 'CONTRATO' },
 ];
 
 // Computed
 const initialFormData = computed(() => {
   if (!workSheet.value) return {};
-  
+
   const data = workSheet.value.data;
   return {
     // Client information
     clientId: data.clientId || '',
-    
+
     // Request information
     requestDate: data.request?.date || '',
     receivedBy: data.request?.receivedBy || '',
     assistanceDate: data.request?.assistanceDate || '',
     reason: data.request?.reason || '',
-    
+
     // Time tracking
     arrivalTime: data.request?.arrivalTime || '',
     departureTime: data.request?.departureTime || '',
     totalHours: data.request?.totalHours || '',
-    
+
     // Service information
     serviceType: data.otherData?.serviceType || '',
     technician: data.otherData?.technician || '',
     serviceObservations: data.otherData?.serviceObservations || '',
-    
+
     // Displacement
     hasDisplacement: data.displacement?.hasDisplacement || false,
     weekendHoliday: data.displacement?.weekendHoliday || false,
     oneWayKms: data.displacement?.oneWayKms || 0,
     totalKms: data.displacement?.totalKms || 0,
     paymentMethod: data.displacement?.paymentMethod || 'PENDENTE',
-    
+
     // Contract information
     warranty: data.otherData?.warranty || false,
     contract: data.otherData?.contract || false,
     contractYear: data.otherData?.contractYear || new Date().getFullYear().toString(),
-    
+
     // Materials and equipment
     materialUsed: data.otherData?.materialUsed || false,
     materialDetails: data.otherData?.materialDetails || '',
     equipment: data.otherData?.equipment || false,
     equipmentDetails: data.otherData?.equipmentDetails || '',
-    
+
     // Service status
-    totallyResolved: data.otherData?.totallyResolved !== undefined ? data.otherData.totallyResolved : true,
+    totallyResolved:
+      data.otherData?.totallyResolved !== undefined ? data.otherData.totallyResolved : true,
     resolutionIssues: data.otherData?.resolutionIssues || '',
     dumpReading: data.otherData?.dumpReading || false,
     backup: data.otherData?.backup || false,
     remoteAccessCheck: data.otherData?.remoteAccessCheck || false,
     anydesk: data.otherData?.anydesk || false,
-    
+
     // Service report
     serviceReport: data.otherData?.serviceReport || '',
-    clientSignature: data.otherData?.clientSignature || ''
+    clientSignature: data.otherData?.clientSignature || '',
   };
 });
 
@@ -281,7 +278,7 @@ const loadWorkSheet = async () => {
   }
 
   await fetchById(uuid);
-  
+
   if (currentItem.value) {
     // Work sheet loaded successfully
   }
@@ -291,28 +288,36 @@ const loadWorkSheet = async () => {
 const formatTimeInput = (value: string): string => {
   // Remove all non-digits
   const digits = value.replace(/\D/g, '');
-  
+
   if (digits.length === 0) return '';
   if (digits.length <= 2) return digits;
   if (digits.length <= 4) {
     return `${digits.slice(0, 2)}:${digits.slice(2)}`;
   }
-  
+
   // Limit to 4 digits (HHMM)
   return `${digits.slice(0, 2)}:${digits.slice(2, 4)}`;
 };
 
-const handleTimeInput = (event: Event, fieldKey: string, updateFieldValue: (key: string, value: any) => void) => {
+const handleTimeInput = (
+  event: Event,
+  fieldKey: string,
+  updateFieldValue: (key: string, value: any) => void
+) => {
   const target = event.target as HTMLInputElement;
   const formatted = formatTimeInput(target.value);
   target.value = formatted;
   updateFieldValue(fieldKey, formatted);
 };
 
-const handleTimeBlur = (event: Event, fieldKey: string, updateFieldValue: (key: string, value: any) => void) => {
+const handleTimeBlur = (
+  event: Event,
+  fieldKey: string,
+  updateFieldValue: (key: string, value: any) => void
+) => {
   const target = event.target as HTMLInputElement;
   const value = target.value;
-  
+
   // Validate time format on blur
   if (value && !/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(value)) {
     // If invalid format, try to fix common issues
@@ -333,23 +338,23 @@ const clearError = () => {
 
 const handleClientSelected = (client: Client | null) => {
   selectedClient.value = client;
-  
+
   // Client data is now handled through relations, no need to auto-populate
 };
 
 const validateUpdateForm = (data: Record<string, any>): Record<string, string> => {
   const fieldErrors: Record<string, string> = {};
-  
+
   try {
     // Basic required field validation
     if (!data.clientId?.trim()) {
       fieldErrors.clientId = 'Cliente é obrigatório';
     }
-    
+
     if (!data.assistanceDate?.trim()) {
       fieldErrors.assistanceDate = 'Data da assistência é obrigatória';
     }
-    
+
     // Date validation
     if (data.assistanceDate) {
       const assistanceDate = new Date(data.assistanceDate);
@@ -357,63 +362,66 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
         fieldErrors.assistanceDate = 'Data da assistência deve ser uma data válida';
       }
     }
-    
+
     if (data.requestDate) {
       const requestDate = new Date(data.requestDate);
       if (isNaN(requestDate.getTime())) {
         fieldErrors.requestDate = 'Data do pedido deve ser uma data válida';
       }
     }
-    
+
     // Time format validation
     if (data.arrivalTime && !isValidTimeFormat(data.arrivalTime)) {
       fieldErrors.arrivalTime = 'Hora de chegada deve estar no formato HH:MM';
     }
-    
+
     if (data.departureTime && !isValidTimeFormat(data.departureTime)) {
       fieldErrors.departureTime = 'Hora de saída deve estar no formato HH:MM';
     }
-    
+
     // Displacement validation
     if (data.hasDisplacement && typeof data.oneWayKms === 'number' && data.oneWayKms < 0) {
       fieldErrors.oneWayKms = 'Quilómetros de ida deve ser um número positivo';
     }
-    
+
     // CONDITIONAL FIELD VALIDATION - Only validate when conditions are met
-    
+
     // Material details only required when materialUsed is true
     if (data.materialUsed === true && !data.materialDetails?.trim()) {
-      fieldErrors.materialDetails = 'Descrição do material é obrigatória quando material utilizado está marcado';
+      fieldErrors.materialDetails =
+        'Descrição do material é obrigatória quando material utilizado está marcado';
     }
-    
+
     // Equipment details only required when equipment is true
     if (data.equipment === true && !data.equipmentDetails?.trim()) {
-      fieldErrors.equipmentDetails = 'Descrição dos equipamentos é obrigatória quando equipamentos está marcado';
+      fieldErrors.equipmentDetails =
+        'Descrição dos equipamentos é obrigatória quando equipamentos está marcado';
     }
-    
+
     // Resolution issues only required when totallyResolved is false
     if (data.totallyResolved === false && !data.resolutionIssues?.trim()) {
-      fieldErrors.resolutionIssues = 'Observações sobre problemas não resolvidos são obrigatórias quando o serviço não está totalmente resolvido';
+      fieldErrors.resolutionIssues =
+        'Observações sobre problemas não resolvidos são obrigatórias quando o serviço não está totalmente resolvido';
     }
-    
+
     // EXPLICITLY CLEAR ERRORS FOR CONDITIONAL FIELDS THAT SHOULDN'T BE VALIDATED
     // This ensures that any previous validation errors for these fields are removed
-    
+
     // Clear materialDetails error if materialUsed is false
     if (data.materialUsed !== true) {
       delete fieldErrors.materialDetails;
     }
-    
+
     // Clear equipmentDetails error if equipment is false
     if (data.equipment !== true) {
       delete fieldErrors.equipmentDetails;
     }
-    
+
     // Clear resolutionIssues error if totallyResolved is true
     if (data.totallyResolved !== false) {
       delete fieldErrors.resolutionIssues;
     }
-    
+
     return fieldErrors;
   } catch (err) {
     console.error('Error in work sheet update validation:', JSON.stringify(err, null, 2));
@@ -429,7 +437,7 @@ const isValidTimeFormat = (time: string): boolean => {
 
 const handleUpdate = async (formData: Record<string, any>) => {
   if (!workSheet.value) return;
-  
+
   // Transform form data to API format
   const updateData = {
     clientId: formData.clientId,
@@ -440,14 +448,14 @@ const handleUpdate = async (formData: Record<string, any>) => {
       reason: formData.reason || '',
       arrivalTime: formData.arrivalTime || '',
       departureTime: formData.departureTime || '',
-      totalHours: formData.totalHours || ''
+      totalHours: formData.totalHours || '',
     },
     displacement: {
       hasDisplacement: formData.hasDisplacement || false,
       weekendHoliday: formData.weekendHoliday || false,
       oneWayKms: formData.oneWayKms || 0,
       totalKms: formData.totalKms || 0,
-      paymentMethod: formData.paymentMethod || 'PENDENTE'
+      paymentMethod: formData.paymentMethod || 'PENDENTE',
     },
     otherData: {
       serviceType: formData.serviceType || '',
@@ -467,12 +475,14 @@ const handleUpdate = async (formData: Record<string, any>) => {
       remoteAccessCheck: formData.remoteAccessCheck || false,
       anydesk: formData.anydesk || false,
       serviceReport: formData.serviceReport || '',
-      clientSignature: formData.clientSignature || ''
-    }
+      clientSignature: formData.clientSignature || '',
+    },
   };
-  
-  const updatedWorkSheet = await update(workSheet.value.uuid, { data: updateData } as Partial<WorkSheet>);
-  
+
+  const updatedWorkSheet = await update(workSheet.value.uuid, {
+    data: updateData,
+  } as Partial<WorkSheet>);
+
   if (updatedWorkSheet) {
     router.push(`/work-sheets/${workSheet.value.uuid}`);
   }
@@ -503,28 +513,28 @@ const getKmsPrice = (): number => {
 const getLaborPrice = (): number => {
   const formDataValue = currentFormData.value;
   if (!formDataValue?.hasDisplacement) return 0;
-  
+
   const arrivalTime = formDataValue?.arrivalTime;
   const departureTime = formDataValue?.departureTime;
-  
+
   if (!arrivalTime || !departureTime) return 0;
-  
+
   try {
     const [arrivalHours, arrivalMinutes] = arrivalTime.split(':').map(Number);
     const [departureHours, departureMinutes] = departureTime.split(':').map(Number);
-    
+
     const arrivalTotalMinutes = arrivalHours * 60 + arrivalMinutes;
     const departureTotalMinutes = departureHours * 60 + departureMinutes;
-    
+
     let diffMinutes = departureTotalMinutes - arrivalTotalMinutes;
     if (diffMinutes < 0) {
       diffMinutes += 24 * 60; // Handle next day
     }
-    
+
     const totalHours = diffMinutes / 60;
     const chargeableHours = totalHours < 1 ? 1 : totalHours; // Minimum 1 hour
     const hourlyRate = getHourlyRate();
-    
+
     return Math.round(chargeableHours * hourlyRate * 100) / 100;
   } catch {
     return 0;
@@ -534,83 +544,108 @@ const getLaborPrice = (): number => {
 const getTotalPrice = (): number => {
   const formDataValue = currentFormData.value;
   if (!formDataValue?.hasDisplacement) return 0;
-  
+
   const displacementRate = getDisplacementRate();
   const kmsPrice = getKmsPrice();
   const laborPrice = getLaborPrice();
-  
+
   return Math.round((displacementRate + kmsPrice + laborPrice) * 100) / 100;
 };
 
 // Watchers for automatic calculations
-watch(() => currentFormData.value?.oneWayKms, (newValue) => {
-  if (newValue !== undefined && newValue !== null && currentFormData.value?.hasDisplacement) {
-    const totalKms = newValue * 2;
-    updateFieldValue('totalKms', totalKms);
-  }
-});
-
-watch(() => [currentFormData.value?.arrivalTime, currentFormData.value?.departureTime], ([arrivalTime, departureTime]) => {
-  if (arrivalTime && departureTime) {
-    try {
-      const arrivalMatch = arrivalTime.match(/^(\d{1,2}):(\d{1,2})$/);
-      const departureMatch = departureTime.match(/^(\d{1,2}):(\d{1,2})$/);
-      
-      if (arrivalMatch && departureMatch) {
-        const arrivalHours = parseInt(arrivalMatch[1]);
-        const arrivalMinutes = parseInt(arrivalMatch[2]);
-        const departureHours = parseInt(departureMatch[1]);
-        const departureMinutes = parseInt(departureMatch[2]);
-        
-        const arrival = new Date(2000, 0, 1, arrivalHours, arrivalMinutes);
-        const departure = new Date(2000, 0, 1, departureHours, departureMinutes);
-        
-        if (departure >= arrival) {
-          const diff = departure.getTime() - arrival.getTime();
-          const hours = Math.floor(diff / 3600000).toString().padStart(2, '0');
-          const minutes = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-          updateFieldValue('totalHours', `${hours}:${minutes}`);
-        }
-      }
-    } catch (error) {
-      console.error('Error calculating total hours:', error);
+watch(
+  () => currentFormData.value?.oneWayKms,
+  newValue => {
+    if (newValue !== undefined && newValue !== null && currentFormData.value?.hasDisplacement) {
+      const totalKms = newValue * 2;
+      updateFieldValue('totalKms', totalKms);
     }
   }
-});
+);
+
+watch(
+  () => [currentFormData.value?.arrivalTime, currentFormData.value?.departureTime],
+  ([arrivalTime, departureTime]) => {
+    if (arrivalTime && departureTime) {
+      try {
+        const arrivalMatch = arrivalTime.match(/^(\d{1,2}):(\d{1,2})$/);
+        const departureMatch = departureTime.match(/^(\d{1,2}):(\d{1,2})$/);
+
+        if (arrivalMatch && departureMatch) {
+          const arrivalHours = parseInt(arrivalMatch[1]);
+          const arrivalMinutes = parseInt(arrivalMatch[2]);
+          const departureHours = parseInt(departureMatch[1]);
+          const departureMinutes = parseInt(departureMatch[2]);
+
+          const arrival = new Date(2000, 0, 1, arrivalHours, arrivalMinutes);
+          const departure = new Date(2000, 0, 1, departureHours, departureMinutes);
+
+          if (departure >= arrival) {
+            const diff = departure.getTime() - arrival.getTime();
+            const hours = Math.floor(diff / 3600000)
+              .toString()
+              .padStart(2, '0');
+            const minutes = Math.floor((diff % 3600000) / 60000)
+              .toString()
+              .padStart(2, '0');
+            updateFieldValue('totalHours', `${hours}:${minutes}`);
+          }
+        }
+      } catch (error) {
+        console.error('Error calculating total hours:', error);
+      }
+    }
+  }
+);
 
 // Clear conditional fields when dependencies change
-watch(() => currentFormData.value?.paymentMethod, (newValue) => {
-  if (newValue !== 'CONTRATO') {
-    updateFieldValue('warranty', false);
-    updateFieldValue('contract', false);
-    updateFieldValue('contractYear', new Date().getFullYear().toString());
+watch(
+  () => currentFormData.value?.paymentMethod,
+  newValue => {
+    if (newValue !== 'CONTRATO') {
+      updateFieldValue('warranty', false);
+      updateFieldValue('contract', false);
+      updateFieldValue('contractYear', new Date().getFullYear().toString());
+    }
   }
-});
+);
 
-watch(() => currentFormData.value?.materialUsed, (newValue) => {
-  if (!newValue) {
-    updateFieldValue('materialDetails', '');
+watch(
+  () => currentFormData.value?.materialUsed,
+  newValue => {
+    if (!newValue) {
+      updateFieldValue('materialDetails', '');
+    }
   }
-});
+);
 
-watch(() => currentFormData.value?.equipment, (newValue) => {
-  if (!newValue) {
-    updateFieldValue('equipmentDetails', '');
+watch(
+  () => currentFormData.value?.equipment,
+  newValue => {
+    if (!newValue) {
+      updateFieldValue('equipmentDetails', '');
+    }
   }
-});
+);
 
-watch(() => currentFormData.value?.totallyResolved, (newValue) => {
-  if (newValue) {
-    updateFieldValue('resolutionIssues', '');
+watch(
+  () => currentFormData.value?.totallyResolved,
+  newValue => {
+    if (newValue) {
+      updateFieldValue('resolutionIssues', '');
+    }
   }
-});
+);
 
-watch(() => currentFormData.value?.hasDisplacement, (newValue) => {
-  if (!newValue) {
-    updateFieldValue('oneWayKms', 0);
-    updateFieldValue('totalKms', 0);
+watch(
+  () => currentFormData.value?.hasDisplacement,
+  newValue => {
+    if (!newValue) {
+      updateFieldValue('oneWayKms', 0);
+      updateFieldValue('totalKms', 0);
+    }
   }
-});
+);
 
 // Lifecycle
 onMounted(() => {
@@ -687,19 +722,19 @@ onMounted(() => {
   border-right: 1px solid #ddd;
 }
 
-.radio-label input[type="radio"] {
+.radio-label input[type='radio'] {
   position: absolute;
   opacity: 0;
 }
 
-.radio-label input[type="radio"]:checked + span {
+.radio-label input[type='radio']:checked + span {
   color: #333;
   font-weight: 600;
 }
 
 .radio-label.selected {
   background-color: #fff;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Payment method styling */
@@ -738,19 +773,19 @@ onMounted(() => {
   justify-content: center;
 }
 
-.payment-option input[type="radio"] {
+.payment-option input[type='radio'] {
   position: absolute;
   opacity: 0;
 }
 
 .payment-option:hover {
-  border-color: #75AE93;
+  border-color: #75ae93;
   background-color: rgba(117, 174, 147, 0.05);
 }
 
 .payment-option.selected {
-  border-color: #75AE93;
-  background-color: #75AE93;
+  border-color: #75ae93;
+  background-color: #75ae93;
   color: white;
   font-weight: 600;
 }
@@ -766,7 +801,7 @@ onMounted(() => {
   padding: 1rem;
   background: #f8f9fa;
   border-radius: 8px;
-  border-left: 4px solid #75AE93;
+  border-left: 4px solid #75ae93;
 }
 
 .pricing-section h3 {
@@ -802,7 +837,7 @@ onMounted(() => {
 }
 
 .pricing-row.total {
-  background: #75AE93;
+  background: #75ae93;
   color: white;
   margin: 0.5rem -1rem -1rem -1rem;
   padding: 1rem;
@@ -848,29 +883,29 @@ onMounted(() => {
   .work-sheet-update-container {
     padding: 0.5rem;
   }
-  
+
   .payment-options {
     flex-direction: column;
   }
-  
+
   .payment-option {
     min-width: auto;
   }
-  
+
   .pricing-section {
     padding: 0.75rem;
   }
-  
+
   .pricing-section h3 {
     font-size: 0.9rem;
   }
-  
+
   .pricing-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.25rem;
   }
-  
+
   .pricing-value {
     width: 100%;
   }

@@ -26,7 +26,9 @@
         <!-- Basic Information Section -->
         <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Informação Básica</h2>
             </div>
             <div class="p-4 sm:p-6">
@@ -55,7 +57,9 @@
         <!-- Contact Information Section -->
         <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Contactos</h2>
             </div>
             <div class="p-4 sm:p-6">
@@ -63,9 +67,9 @@
                 <div class="detail-item">
                   <label class="detail-label">Telefone</label>
                   <div class="detail-value">
-                    <a 
-                      v-if="item.data.telefone" 
-                      :href="`tel:${item.data.telefone}`" 
+                    <a
+                      v-if="item.data.telefone"
+                      :href="`tel:${item.data.telefone}`"
                       class="contact-link"
                     >
                       {{ item.data.telefone }}
@@ -76,9 +80,9 @@
                 <div class="detail-item">
                   <label class="detail-label">Telefone do Contacto</label>
                   <div class="detail-value">
-                    <a 
-                      v-if="item.data.telefoneContato" 
-                      :href="`tel:${item.data.telefoneContato}`" 
+                    <a
+                      v-if="item.data.telefoneContato"
+                      :href="`tel:${item.data.telefoneContato}`"
                       class="contact-link"
                     >
                       {{ item.data.telefoneContato }}
@@ -89,9 +93,9 @@
                 <div class="detail-item">
                   <label class="detail-label">E-mail</label>
                   <div class="detail-value">
-                    <a 
-                      v-if="item.data.email" 
-                      :href="`mailto:${item.data.email}`" 
+                    <a
+                      v-if="item.data.email"
+                      :href="`mailto:${item.data.email}`"
                       class="contact-link"
                     >
                       {{ item.data.email }}
@@ -102,9 +106,9 @@
                 <div class="detail-item">
                   <label class="detail-label">E-mail do Contacto</label>
                   <div class="detail-value">
-                    <a 
-                      v-if="item.data.emailContato" 
-                      :href="`mailto:${item.data.emailContato}`" 
+                    <a
+                      v-if="item.data.emailContato"
+                      :href="`mailto:${item.data.emailContato}`"
                       class="contact-link"
                     >
                       {{ item.data.emailContato }}
@@ -120,7 +124,9 @@
         <!-- Address Information Section -->
         <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Morada</h2>
             </div>
             <div class="p-4 sm:p-6">
@@ -145,7 +151,9 @@
         <!-- Financial Information Section -->
         <div v-if="item.data.iban" class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Informação Financeira</h2>
             </div>
             <div class="p-4 sm:p-6">
@@ -162,7 +170,9 @@
         <!-- Services Section -->
         <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Serviços</h2>
             </div>
             <div class="p-4 sm:p-6">
@@ -206,11 +216,17 @@
               </div>
 
               <!-- Conditional service fields -->
-              <div v-if="hasConditionalFields(item.data)" class="mt-6 pt-6 border-t border-gray-200">
+              <div
+                v-if="hasConditionalFields(item.data)"
+                class="mt-6 pt-6 border-t border-gray-200"
+              >
                 <h3 class="text-sm font-semibold text-gray-900 mb-4">Configurações Adicionais</h3>
                 <div class="detail-grid">
                   <!-- DUMPS Link -->
-                  <div v-if="item.data.dumps && item.data.dumpsLink" class="detail-item col-span-full">
+                  <div
+                    v-if="item.data.dumps && item.data.dumpsLink"
+                    class="detail-item col-span-full"
+                  >
                     <label class="detail-label">Link Google Drive</label>
                     <div class="detail-value">
                       <a :href="item.data.dumpsLink" target="_blank" class="contact-link">
@@ -236,7 +252,10 @@
                   </template>
 
                   <!-- Vectron Connect Address -->
-                  <div v-if="item.data.vectronConnect && item.data.vectronAddress" class="detail-item col-span-full">
+                  <div
+                    v-if="item.data.vectronConnect && item.data.vectronAddress"
+                    class="detail-item col-span-full"
+                  >
                     <label class="detail-label">Vectron Address</label>
                     <div class="detail-value font-mono">{{ item.data.vectronAddress }}</div>
                   </div>
@@ -249,13 +268,15 @@
         <!-- Software Section -->
         <div v-if="item.data.softwares && item.data.softwares.length > 0" class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Software</h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="space-y-4">
-                <div 
-                  v-for="(software, index) in item.data.softwares" 
+                <div
+                  v-for="(software, index) in item.data.softwares"
                   :key="software.id"
                   class="software-card"
                 >
@@ -268,7 +289,7 @@
                     </h3>
                     <span class="software-badge">{{ Number(index) + 1 }}</span>
                   </div>
-                  
+
                   <div class="detail-grid">
                     <!-- Vectron-specific fields -->
                     <template v-if="software.name === 'Vectron'">
@@ -285,15 +306,18 @@
                         <div class="detail-value">{{ software.versaoSoftware }}</div>
                       </div>
                     </template>
-                    
+
                     <!-- Pix-specific fields -->
                     <template v-else-if="software.name === 'Pix'">
-                      <div v-if="software.modules && software.modules.length > 0" class="detail-item col-span-full">
+                      <div
+                        v-if="software.modules && software.modules.length > 0"
+                        class="detail-item col-span-full"
+                      >
                         <label class="detail-label">Módulos</label>
                         <div class="detail-value">
                           <div class="flex flex-wrap gap-1">
-                            <span 
-                              v-for="module in software.modules" 
+                            <span
+                              v-for="module in software.modules"
                               :key="module"
                               class="module-badge"
                             >
@@ -303,7 +327,7 @@
                         </div>
                       </div>
                     </template>
-                    
+
                     <!-- Zon Soft-specific fields -->
                     <template v-else-if="software.name === 'Zon Soft'">
                       <div v-if="software.version" class="detail-item">
@@ -311,7 +335,7 @@
                         <div class="detail-value">{{ software.version }}</div>
                       </div>
                     </template>
-                    
+
                     <!-- Pt CERT-specific fields -->
                     <template v-else-if="software.name === 'Pt CERT'">
                       <div v-if="software.licenseType" class="detail-item">
@@ -319,7 +343,7 @@
                         <div class="detail-value">{{ software.licenseType }}</div>
                       </div>
                     </template>
-                    
+
                     <!-- Common fields (for all except Vectron) -->
                     <template v-if="software.name !== 'Vectron'">
                       <div v-if="software.numeroSerie" class="detail-item">
@@ -345,7 +369,9 @@
         <!-- Observations Section -->
         <div v-if="item.data.observacoes" class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Observações</h2>
             </div>
             <div class="p-4 sm:p-6">
@@ -415,15 +441,15 @@ const getClientSubtitle = (item: BaseContent | null): string => {
   if (!item || !item.data) return '';
   const client = item as Client;
   const parts = [];
-  
+
   if (client.data.contribuinte) {
     parts.push(`NIF: ${client.data.contribuinte}`);
   }
-  
+
   if (client.data.localidade) {
     parts.push(client.data.localidade);
   }
-  
+
   return parts.join(' • ');
 };
 
@@ -431,13 +457,13 @@ const getClientStatus = (item: BaseContent | null): string => {
   if (!item || !item.data) return 'Cliente';
   const client = item as Client;
   const services = [];
-  
+
   if (client.data.manutencao24) services.push('Manutenção 24h');
   else if (client.data.manutencao) services.push('Manutenção');
-  
+
   if (client.data.temAnydesk) services.push('AnyDesk');
   if (client.data.atcud) services.push('ATCUD');
-  
+
   return services.join(', ') || 'Cliente Ativo';
 };
 
@@ -464,41 +490,50 @@ const handleBack = () => {
 // Delete functionality
 const getDeleteConfirmationMessage = (): string => {
   if (!client.value) return 'Tem a certeza que pretende eliminar este cliente?';
-  
-  const clientName = client.value.data.nomeComercial || client.value.data.nomeEmpresa || 'este cliente';
+
+  const clientName =
+    client.value.data.nomeComercial || client.value.data.nomeEmpresa || 'este cliente';
   return `Tem a certeza que pretende eliminar "${clientName}"? Esta ação não pode ser desfeita.`;
 };
 
 const handleDelete = () => {
   if (!client.value) return;
-  
+
   confirmDeleteMessage.value = getDeleteConfirmationMessage();
   showDeleteConfirm.value = true;
 };
 
 const confirmDelete = async () => {
   if (!client.value) return;
-  
+
   try {
     isDeleting.value = true;
-    
-    console.log('Attempting to delete client:', JSON.stringify({
-      uuid: client.value.uuid,
-      name: client.value.data.nomeComercial || client.value.data.nomeEmpresa
-    }, null, 2));
-    
+
+    console.log(
+      'Attempting to delete client:',
+      JSON.stringify(
+        {
+          uuid: client.value.uuid,
+          name: client.value.data.nomeComercial || client.value.data.nomeEmpresa,
+        },
+        null,
+        2
+      )
+    );
+
     const success = await api.remove(client.value.uuid);
-    
+
     // Check if API returned an error
     if (api.error.value) {
       console.error('API returned error:', JSON.stringify(api.error.value, null, 2));
-      error.value = typeof api.error.value === 'string' 
-        ? api.error.value 
-        : api.error.value.message || 'Erro ao eliminar cliente';
+      error.value =
+        typeof api.error.value === 'string'
+          ? api.error.value
+          : api.error.value.message || 'Erro ao eliminar cliente';
       showDeleteConfirm.value = false;
       return;
     }
-    
+
     if (success) {
       console.log('Client deleted successfully, navigating to /clients');
       // Navigate to clients list after successful deletion
@@ -524,18 +559,18 @@ const cancelDelete = () => {
 // Data loading
 const loadClient = async () => {
   const clientId = route.params.uuid as string;
-  
+
   if (!clientId) {
     error.value = 'ID do cliente não fornecido';
     return;
   }
-  
+
   try {
     isLoading.value = true;
     clearError();
-    
+
     await api.fetchById(clientId);
-    
+
     if (api.currentItem.value) {
       client.value = api.currentItem.value;
     } else {
@@ -639,7 +674,7 @@ onMounted(() => {
   .services-grid {
     @apply grid-cols-1;
   }
-  
+
   .software-card {
     @apply p-3;
   }
@@ -650,7 +685,7 @@ onMounted(() => {
   .software-card {
     @apply border border-gray-300 bg-white;
   }
-  
+
   .contact-link {
     @apply text-black no-underline;
   }

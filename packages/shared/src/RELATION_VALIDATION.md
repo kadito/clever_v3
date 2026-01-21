@@ -1,16 +1,21 @@
 # Content Relations Validation System
 
-This document describes the relation validation system implemented for the CLEVER dashboard content management system.
+This document describes the relation validation system implemented for the
+CLEVER dashboard content management system.
 
 ## Overview
 
-The relation validation system allows content to reference other content through relation IDs (like `clientId`) without requiring the referenced content to exist at creation/update time. This design enables flexible content management, bulk imports, and eventual consistency patterns.
+The relation validation system allows content to reference other content through
+relation IDs (like `clientId`) without requiring the referenced content to exist
+at creation/update time. This design enables flexible content management, bulk
+imports, and eventual consistency patterns.
 
 ## Key Principles
 
 ### 1. No Referential Integrity Validation at Storage Time
 
-**Requirement 1.1, 1.3**: Allow creation/update of content with relation IDs without validating referenced content exists.
+**Requirement 1.1, 1.3**: Allow creation/update of content with relation IDs
+without validating referenced content exists.
 
 - Content can be created with any relation ID value (valid UUID format)
 - No database-style foreign key constraints
@@ -22,7 +27,7 @@ The relation validation system allows content to reference other content through
 const license = {
   clientId: '123e4567-e89b-12d3-a456-426614174000', // May or may not exist
   versao: '2024',
-  numeroSerie: 'ABC123'
+  numeroSerie: 'ABC123',
 };
 ```
 
@@ -44,7 +49,8 @@ const license4 = { clientId: undefined, versao: '2024' }; // Undefined clientId
 
 ### 3. Format Validation Only
 
-The system validates the format of relation IDs (UUID format) but not their existence:
+The system validates the format of relation IDs (UUID format) but not their
+existence:
 
 ```typescript
 // Valid - proper UUID format
@@ -97,16 +103,16 @@ export const CONTENT_RELATION_CONFIGS: Record<string, RelationFieldConfig[]> = {
       fieldName: 'clientId',
       targetType: 'clients',
       required: false, // Optional relation
-      displayName: 'Cliente'
-    }
+      displayName: 'Cliente',
+    },
   ],
   contracts: [
     {
       fieldName: 'clientId',
       targetType: 'clients',
       required: false,
-      displayName: 'Cliente'
-    }
+      displayName: 'Cliente',
+    },
   ],
   // ... other content types
 };
@@ -121,13 +127,13 @@ Validates relation field formats without checking referential integrity:
 ```typescript
 const errors = validateRelationFields('licenses', {
   clientId: '123e4567-e89b-12d3-a456-426614174000', // Valid UUID
-  versao: '2024'
+  versao: '2024',
 });
 // Returns: [] (no errors)
 
 const errors2 = validateRelationFields('licenses', {
   clientId: 'invalid-format', // Invalid UUID
-  versao: '2024'
+  versao: '2024',
 });
 // Returns: ['Cliente deve ter um formato válido de identificador']
 ```
@@ -139,13 +145,13 @@ Cleans and normalizes relation field values:
 ```typescript
 const sanitized = sanitizeRelationFields('licenses', {
   clientId: '  123e4567-e89b-12d3-a456-426614174000  ', // Whitespace
-  versao: '2024'
+  versao: '2024',
 });
 // Returns: { clientId: '123e4567-e89b-12d3-a456-426614174000', versao: '2024' }
 
 const sanitized2 = sanitizeRelationFields('licenses', {
   clientId: '   ', // Empty after trim
-  versao: '2024'
+  versao: '2024',
 });
 // Returns: { clientId: undefined, versao: '2024' }
 ```
@@ -155,7 +161,8 @@ const sanitized2 = sanitizeRelationFields('licenses', {
 Tracks changes to relation fields for audit purposes:
 
 ```typescript
-const changes = extractRelationChanges('licenses', 
+const changes = extractRelationChanges(
+  'licenses',
   { clientId: 'old-uuid', versao: '2024' },
   { clientId: 'new-uuid', versao: '2024' }
 );
@@ -257,13 +264,13 @@ If the client doesn't exist:
 
 Currently supported relations:
 
-| Content Type | Relation Field | Target Type | Required |
-|--------------|----------------|-------------|----------|
-| licenses | clientId | clients | No |
-| contracts | clientId | clients | No |
-| work-sheets | clientId | clients | No |
-| remote-assistance | clientId | clients | No |
-| daily-records | clientId | clients | No |
+| Content Type      | Relation Field | Target Type | Required |
+| ----------------- | -------------- | ----------- | -------- |
+| licenses          | clientId       | clients     | No       |
+| contracts         | clientId       | clients     | No       |
+| work-sheets       | clientId       | clients     | No       |
+| remote-assistance | clientId       | clients     | No       |
+| daily-records     | clientId       | clients     | No       |
 
 ## Benefits
 
@@ -301,8 +308,10 @@ pnpm --filter @clever/backend test relation-validation-integration.test.ts
 
 Potential future improvements:
 
-1. **Relation Validation Rules**: More sophisticated validation rules per relation type
+1. **Relation Validation Rules**: More sophisticated validation rules per
+   relation type
 2. **Cascade Operations**: Optional cascade delete/update operations
 3. **Relation Indexing**: Specialized indexes for relation queries
 4. **Relation Analytics**: Metrics on relation usage and health
-5. **Relation Constraints**: Optional referential integrity constraints for specific use cases
+5. **Relation Constraints**: Optional referential integrity constraints for
+   specific use cases

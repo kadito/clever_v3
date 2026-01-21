@@ -24,13 +24,13 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="dataRegistro">DATA DO REGISTO</label>
-            <input 
-              type="datetime-local" 
-              id="dataRegistro" 
-              v-model="formData.dataRegistro" 
+            <input
+              type="datetime-local"
+              id="dataRegistro"
+              v-model="formData.dataRegistro"
               class="form-control"
               required
-            >
+            />
           </div>
         </div>
       </section>
@@ -51,104 +51,102 @@
               store-name
             />
           </div>
-          
+
           <div class="form-group">
             <label for="internoOuExterno">TIPO DE ATIVIDADE</label>
-            <select 
-              id="internoOuExterno" 
-              v-model="formData.internoOuExterno" 
-              class="form-control"
-            >
+            <select id="internoOuExterno" v-model="formData.internoOuExterno" class="form-control">
               <option value="">--</option>
               <option value="INTERNO">INTERNO</option>
               <option value="EXTERNO">EXTERNO</option>
             </select>
           </div>
-          
+
           <div class="form-group">
             <label for="assunto">ASSUNTO</label>
-            <input 
-              type="text" 
-              id="assunto" 
-              v-model="formData.assunto" 
+            <input
+              type="text"
+              id="assunto"
+              v-model="formData.assunto"
               class="form-control"
               placeholder="Assunto da atividade"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="horaInicio">HORA INÍCIO</label>
-            <input 
-              type="text" 
-              id="horaInicio" 
-              v-model="formData.horaInicio" 
+            <input
+              type="text"
+              id="horaInicio"
+              v-model="formData.horaInicio"
               class="form-control time-input"
               :class="{ 'is-invalid': validationErrors.horaInicio }"
               placeholder="HH:MM (ex: 09:30)"
               maxlength="5"
               @input="formatTimeInput($event, 'horaInicio')"
               @blur="validateTimeInput('horaInicio')"
-            >
+            />
             <div v-if="validationErrors.horaInicio" class="invalid-feedback">
               {{ validationErrors.horaInicio }}
             </div>
           </div>
-          
+
           <div class="form-group">
             <label for="horaFim">HORA FIM</label>
-            <input 
-              type="text" 
-              id="horaFim" 
-              v-model="formData.horaFim" 
+            <input
+              type="text"
+              id="horaFim"
+              v-model="formData.horaFim"
               class="form-control time-input"
               :class="{ 'is-invalid': validationErrors.horaFim }"
               placeholder="HH:MM (ex: 17:45)"
               maxlength="5"
               @input="formatTimeInput($event, 'horaFim')"
               @blur="validateTimeInput('horaFim')"
-            >
+            />
             <div v-if="validationErrors.horaFim" class="invalid-feedback">
               {{ validationErrors.horaFim }}
             </div>
           </div>
-          
+
           <div class="form-group">
             <label for="tempoPausa">TEMPO PAUSA (MINUTOS)</label>
-            <input 
-              type="number" 
-              id="tempoPausa" 
-              v-model.number="formData.tempoPausa" 
+            <input
+              type="number"
+              id="tempoPausa"
+              v-model.number="formData.tempoPausa"
               class="form-control"
               placeholder="0"
               min="0"
               step="1"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="totalHorasCalculado">TOTAL HORAS</label>
-            <input 
-              type="text" 
-              id="totalHorasCalculado" 
-              v-model="formData.totalHorasCalculado" 
+            <input
+              type="text"
+              id="totalHorasCalculado"
+              v-model="formData.totalHorasCalculado"
               class="form-control"
               placeholder="00:00:00"
               readonly
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="respRegisto">RESPONSÁVEL PELO REGISTO</label>
-            <select 
-              id="respRegisto" 
-              v-model="formData.respRegisto" 
+            <select
+              id="respRegisto"
+              v-model="formData.respRegisto"
               class="form-control"
               :disabled="equipaStore.loading"
             >
-              <option value="">{{ equipaStore.loading ? 'A carregar colaboradores...' : '--' }}</option>
-              <option 
-                v-for="collaborator in collaborators" 
-                :key="collaborator.id" 
+              <option value="">
+                {{ equipaStore.loading ? 'A carregar colaboradores...' : '--' }}
+              </option>
+              <option
+                v-for="collaborator in collaborators"
+                :key="collaborator.id"
                 :value="collaborator.name"
               >
                 {{ collaborator.name }}
@@ -156,13 +154,13 @@
             </select>
           </div>
         </div>
-        
+
         <!-- Descrição field - full width below all other inputs -->
         <div class="form-group form-group-full">
           <label for="descricao">DESCRIÇÃO</label>
-          <textarea 
-            id="descricao" 
-            v-model="formData.descricao" 
+          <textarea
+            id="descricao"
+            v-model="formData.descricao"
             class="form-control"
             rows="3"
             placeholder="Descrição detalhada da atividade"
@@ -176,119 +174,117 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="cliente2">CLIENTE 2</label>
-            <input 
-              type="text" 
-              id="cliente2" 
-              v-model="formData.cliente2" 
+            <input
+              type="text"
+              id="cliente2"
+              v-model="formData.cliente2"
               class="form-control"
               placeholder="Nome do segundo cliente"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="interOuExter2">TIPO DE ATIVIDADE</label>
-            <select 
-              id="interOuExter2" 
-              v-model="formData.interOuExter2" 
-              class="form-control"
-            >
+            <select id="interOuExter2" v-model="formData.interOuExter2" class="form-control">
               <option value="">--</option>
               <option value="INTERNO">INTERNO</option>
               <option value="EXTERNO">EXTERNO</option>
             </select>
           </div>
-          
+
           <div class="form-group">
             <label for="assunto2">ASSUNTO</label>
-            <input 
-              type="text" 
-              id="assunto2" 
-              v-model="formData.assunto2" 
+            <input
+              type="text"
+              id="assunto2"
+              v-model="formData.assunto2"
               class="form-control"
               placeholder="Assunto da atividade"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="totalHoras2">TOTAL DE HORAS</label>
-            <input 
-              type="text" 
-              id="totalHoras2" 
-              v-model="formData.totalHoras2" 
+            <input
+              type="text"
+              id="totalHoras2"
+              v-model="formData.totalHoras2"
               class="form-control"
               placeholder="00:00:00"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="respRegisto2">RESPONSÁVEL PELO REGISTO</label>
-            <select 
-              id="respRegisto2" 
-              v-model="formData.respRegisto2" 
+            <select
+              id="respRegisto2"
+              v-model="formData.respRegisto2"
               class="form-control"
               :disabled="equipaStore.loading"
             >
-              <option value="">{{ equipaStore.loading ? 'A carregar colaboradores...' : '--' }}</option>
-              <option 
-                v-for="collaborator in collaborators" 
-                :key="collaborator.id" 
+              <option value="">
+                {{ equipaStore.loading ? 'A carregar colaboradores...' : '--' }}
+              </option>
+              <option
+                v-for="collaborator in collaborators"
+                :key="collaborator.id"
                 :value="collaborator.name"
               >
                 {{ collaborator.name }}
               </option>
             </select>
           </div>
-          
+
           <div class="form-group">
             <label for="descricao2">DESCRIÇÃO</label>
-            <textarea 
-              id="descricao2" 
-              v-model="formData.descricao2" 
+            <textarea
+              id="descricao2"
+              v-model="formData.descricao2"
               class="form-control"
               rows="3"
               placeholder="Descrição detalhada da atividade"
             ></textarea>
           </div>
-          
+
           <div class="form-group">
             <label>TEVE CLIENTE 2</label>
             <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                id="teveCliente2" 
+              <input
+                type="checkbox"
+                id="teveCliente2"
                 v-model="formData.teveCliente2"
                 class="toggle-input"
-              >
+              />
               <label for="teveCliente2" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
             </div>
           </div>
-          
+
           <div class="form-group">
             <label>FOLHA DE OBRA</label>
             <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                id="folhaObra2" 
+              <input
+                type="checkbox"
+                id="folhaObra2"
                 v-model="formData.folhaObra2"
                 class="toggle-input"
-              >
+              />
               <label for="folhaObra2" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
             </div>
           </div>
-          
+
           <div class="form-group">
             <label>ASSISTÊNCIA REMOTA</label>
             <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                id="assistRemota2" 
+              <input
+                type="checkbox"
+                id="assistRemota2"
                 v-model="formData.assistRemota2"
                 class="toggle-input"
-              >
+              />
               <label for="assistRemota2" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
@@ -303,67 +299,67 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="kmsSaidaSede">KMS SAÍDA SEDE</label>
-            <input 
-              type="number" 
-              id="kmsSaidaSede" 
-              v-model.number="formData.kmsSaidaSede" 
+            <input
+              type="number"
+              id="kmsSaidaSede"
+              v-model.number="formData.kmsSaidaSede"
               class="form-control"
               min="0"
               step="0.1"
               placeholder="0.0"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="kmsChegadaSede">KMS CHEGADA SEDE</label>
-            <input 
-              type="number" 
-              id="kmsChegadaSede" 
-              v-model.number="formData.kmsChegadaSede" 
+            <input
+              type="number"
+              id="kmsChegadaSede"
+              v-model.number="formData.kmsChegadaSede"
               class="form-control"
               min="0"
               step="0.1"
               placeholder="0.0"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="horaSaida">HORA SAÍDA</label>
-            <input 
-              type="text" 
-              id="horaSaida" 
-              v-model="formData.horaSaida" 
+            <input
+              type="text"
+              id="horaSaida"
+              v-model="formData.horaSaida"
               class="form-control time-input"
               placeholder="HH:MM"
               maxlength="5"
               @input="formatTimeInput($event, 'horaSaida')"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="horaChegada">HORA CHEGADA</label>
-            <input 
-              type="text" 
-              id="horaChegada" 
-              v-model="formData.horaChegada" 
+            <input
+              type="text"
+              id="horaChegada"
+              v-model="formData.horaChegada"
               class="form-control time-input"
               placeholder="HH:MM"
               maxlength="5"
               @input="formatTimeInput($event, 'horaChegada')"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="kmsAbastecimento">KMS ABASTECIMENTO</label>
-            <input 
-              type="number" 
-              id="kmsAbastecimento" 
-              v-model.number="formData.kmsAbastecimento" 
+            <input
+              type="number"
+              id="kmsAbastecimento"
+              v-model.number="formData.kmsAbastecimento"
               class="form-control"
               min="0"
               step="0.1"
               placeholder="0.0"
-            >
+            />
           </div>
         </div>
       </section>
@@ -371,88 +367,94 @@
       <!-- Additional Activities Section -->
       <section class="form-section">
         <h2>ATIVIDADES ADICIONAIS</h2>
-        
+
         <div class="add-activity-buttons">
-          <button 
-            type="button" 
-            @click="addAtividadeAdicional('FOLHA DE OBRA')" 
+          <button
+            type="button"
+            @click="addAtividadeAdicional('FOLHA DE OBRA')"
             class="btn btn-add-activity btn-folha-obra"
           >
             Folha de Obra
           </button>
           <div class="button-divider">+</div>
-          <button 
-            type="button" 
-            @click="addAtividadeAdicional('ASSISTENCIA REMOTA')" 
+          <button
+            type="button"
+            @click="addAtividadeAdicional('ASSISTENCIA REMOTA')"
             class="btn btn-add-activity btn-assistencia-remota"
           >
             Assistencia remota
           </button>
         </div>
-        
+
         <div v-if="formData.atividadesAdicionais.length === 0" class="no-activities-message">
           <p>Nenhuma atividade adicional adicionada</p>
         </div>
-        
-        <div 
-          v-for="(atividade, index) in formData.atividadesAdicionais" 
+
+        <div
+          v-for="(atividade, index) in formData.atividadesAdicionais"
           :key="atividade.id"
           class="activity-card"
         >
           <div class="activity-header">
             <h3>{{ atividade.tipo }} {{ index + 1 }}</h3>
-            <button 
-              type="button" 
-              @click="removeAtividadeAdicional(index)" 
+            <button
+              type="button"
+              @click="removeAtividadeAdicional(index)"
               class="btn btn-remove-activity"
               title="Remover atividade"
             >
               ❌
             </button>
           </div>
-          
+
           <div class="form-grid">
             <!-- Reference Field - First input -->
             <div class="form-group">
               <label :for="`referencia-${atividade.id}`">
-                {{ atividade.tipo === 'FOLHA DE OBRA' ? 'REFERÊNCIA FOLHA DE OBRA' : 'REFERÊNCIA ASSISTÊNCIA REMOTA' }}
+                {{
+                  atividade.tipo === 'FOLHA DE OBRA'
+                    ? 'REFERÊNCIA FOLHA DE OBRA'
+                    : 'REFERÊNCIA ASSISTÊNCIA REMOTA'
+                }}
               </label>
-              <input 
+              <input
                 :id="`referencia-${atividade.id}`"
-                type="text" 
-                v-model="atividade.referencia" 
+                type="text"
+                v-model="atividade.referencia"
                 class="form-control"
-                :placeholder="atividade.tipo === 'FOLHA DE OBRA' ? 'Ex: FO-2024-001' : 'Ex: AR-2024-001'"
+                :placeholder="
+                  atividade.tipo === 'FOLHA DE OBRA' ? 'Ex: FO-2024-001' : 'Ex: AR-2024-001'
+                "
                 required
-              >
+              />
             </div>
-            
+
             <!-- Cliente -->
             <div class="form-group">
               <label :for="`cliente-${atividade.id}`">CLIENTE</label>
-              <select 
+              <select
                 :id="`cliente-${atividade.id}`"
-                v-model="atividade.cliente" 
+                v-model="atividade.cliente"
                 class="form-control"
                 required
               >
                 <option value="">--</option>
-                <option 
-                  v-for="cliente in clientes" 
-                  :key="cliente.id" 
+                <option
+                  v-for="cliente in clientes"
+                  :key="cliente.id"
                   :value="cliente.nomeComercial"
                 >
                   {{ cliente.nomeComercial }}
                 </option>
               </select>
             </div>
-            
+
             <!-- Tipo de Atividade -->
             <div class="form-group">
               <label :for="`tipoAtividade-${atividade.id}`">TIPO DE ATIVIDADE</label>
-              <select 
+              <select
                 :id="`tipoAtividade-${atividade.id}`"
-                v-model="atividade.tipoAtividade" 
+                v-model="atividade.tipoAtividade"
                 class="form-control"
               >
                 <option value="">--</option>
@@ -460,100 +462,102 @@
                 <option value="EXTERNO">EXTERNO</option>
               </select>
             </div>
-            
+
             <!-- Assunto -->
             <div class="form-group">
               <label :for="`assunto-${atividade.id}`">ASSUNTO</label>
-              <input 
+              <input
                 :id="`assunto-${atividade.id}`"
-                type="text" 
-                v-model="atividade.assunto" 
+                type="text"
+                v-model="atividade.assunto"
                 class="form-control"
                 placeholder="Assunto da atividade"
-              >
+              />
             </div>
-            
+
             <!-- Hora Início -->
             <div class="form-group">
               <label :for="`horaInicio-${atividade.id}`">HORA INÍCIO</label>
-              <input 
+              <input
                 :id="`horaInicio-${atividade.id}`"
-                type="text" 
-                v-model="atividade.horaInicio" 
+                type="text"
+                v-model="atividade.horaInicio"
                 class="form-control time-input"
                 placeholder="HH:MM"
                 maxlength="5"
                 @input="formatTimeInputForActivity($event, atividade, 'horaInicio')"
-              >
+              />
             </div>
-            
+
             <!-- Hora Fim -->
             <div class="form-group">
               <label :for="`horaFim-${atividade.id}`">HORA FIM</label>
-              <input 
+              <input
                 :id="`horaFim-${atividade.id}`"
-                type="text" 
-                v-model="atividade.horaFim" 
+                type="text"
+                v-model="atividade.horaFim"
                 class="form-control time-input"
                 placeholder="HH:MM"
                 maxlength="5"
                 @input="formatTimeInputForActivity($event, atividade, 'horaFim')"
-              >
+              />
             </div>
-            
+
             <!-- Tempo Pausa -->
             <div class="form-group">
               <label :for="`tempoPausa-${atividade.id}`">TEMPO PAUSA (MINUTOS)</label>
-              <input 
+              <input
                 :id="`tempoPausa-${atividade.id}`"
-                type="number" 
-                v-model.number="atividade.tempoPausa" 
+                type="number"
+                v-model.number="atividade.tempoPausa"
                 class="form-control"
                 placeholder="0"
                 min="0"
                 step="1"
-              >
+              />
             </div>
-            
+
             <!-- Total Horas -->
             <div class="form-group">
               <label :for="`totalHoras-${atividade.id}`">TOTAL HORAS</label>
-              <input 
+              <input
                 :id="`totalHoras-${atividade.id}`"
-                type="text" 
-                v-model="atividade.totalHoras" 
+                type="text"
+                v-model="atividade.totalHoras"
                 class="form-control"
                 placeholder="00:00:00"
                 readonly
-              >
+              />
             </div>
-            
+
             <!-- Responsável pelo Registo -->
             <div class="form-group">
               <label :for="`responsavel-${atividade.id}`">RESPONSÁVEL PELO REGISTO</label>
-              <select 
+              <select
                 :id="`responsavel-${atividade.id}`"
-                v-model="atividade.responsavel" 
+                v-model="atividade.responsavel"
                 class="form-control"
                 :disabled="equipaStore.loading"
               >
-                <option value="">{{ equipaStore.loading ? 'A carregar colaboradores...' : '--' }}</option>
-                <option 
-                  v-for="collaborator in collaborators" 
-                  :key="collaborator.id" 
+                <option value="">
+                  {{ equipaStore.loading ? 'A carregar colaboradores...' : '--' }}
+                </option>
+                <option
+                  v-for="collaborator in collaborators"
+                  :key="collaborator.id"
                   :value="collaborator.name"
                 >
                   {{ collaborator.name }}
                 </option>
               </select>
             </div>
-            
+
             <!-- Descrição -->
             <div class="form-group form-group-full">
               <label :for="`descricao-${atividade.id}`">DESCRIÇÃO</label>
-              <textarea 
+              <textarea
                 :id="`descricao-${atividade.id}`"
-                v-model="atividade.descricao" 
+                v-model="atividade.descricao"
                 class="form-control"
                 rows="3"
                 placeholder="Descrição detalhada da atividade"
@@ -565,128 +569,112 @@
 
       <!-- Action buttons -->
       <div class="form-actions">
-        <button 
-          type="button" 
-          @click="handleCancel" 
-          class="btn btn-cancel"
-          :disabled="loading"
-        >
+        <button type="button" @click="handleCancel" class="btn btn-cancel" :disabled="loading">
           Cancelar
         </button>
-        <button 
-          type="submit" 
-          class="btn btn-primary"
-          :disabled="loading || !isFormValid"
-        >
+        <button type="submit" class="btn btn-primary" :disabled="loading || !isFormValid">
           <span v-if="loading" class="btn-spinner"></span>
           {{ isEditing ? 'Atualizar' : 'Criar' }} Registo
         </button>
       </div>
-    
     </form>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
-import ClienteSearchSelect from '@/components/ClienteSearchSelect.vue'
-import { useRegistoDiarioAtividadeStore } from '@/stores/registo-diario-atividade.js'
-import { useClientesStore } from '@/stores/clientes.js'
-import { useEquipaStore } from '@/stores/equipa.js'
+import { ref, reactive, computed, onMounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
+import ClienteSearchSelect from '@/components/ClienteSearchSelect.vue';
+import { useRegistoDiarioAtividadeStore } from '@/stores/registo-diario-atividade.js';
+import { useClientesStore } from '@/stores/clientes.js';
+import { useEquipaStore } from '@/stores/equipa.js';
 
 // Router
-const router = useRouter()
-const route = useRoute()
+const router = useRouter();
+const route = useRoute();
 
 // Stores
-const store = useRegistoDiarioAtividadeStore()
-const clientesStore = useClientesStore()
-const equipaStore = useEquipaStore()
+const store = useRegistoDiarioAtividadeStore();
+const clientesStore = useClientesStore();
+const equipaStore = useEquipaStore();
 
-const { loading, error } = storeToRefs(store)
-const { clientes } = storeToRefs(clientesStore)
-const { collaborators } = storeToRefs(equipaStore)
+const { loading, error } = storeToRefs(store);
+const { clientes } = storeToRefs(clientesStore);
+const { collaborators } = storeToRefs(equipaStore);
 
-const { 
-  createRegistro, 
-  updateRegistro, 
-  fetchRegistroById, 
-  clearError,
-  getYearFromDate 
-} = store
+const { createRegistro, updateRegistro, fetchRegistroById, clearError, getYearFromDate } = store;
 
-const { fetchClientes } = clientesStore
-const { fetchCollaborators } = equipaStore
+const { fetchClientes } = clientesStore;
+const { fetchCollaborators } = equipaStore;
 
 // Form state
-const isEditing = ref(false)
-const registroYear = ref(null)
-const registroId = ref(null)
-const showSecondaryActivity = ref(false)
-const validationErrors = reactive({})
+const isEditing = ref(false);
+const registroYear = ref(null);
+const registroId = ref(null);
+const showSecondaryActivity = ref(false);
+const validationErrors = reactive({});
 
 // Constants
-const VALID_MINUTES = [0, 15, 30, 45]
+const VALID_MINUTES = [0, 15, 30, 45];
 
 // Round minutes to nearest valid value (00, 15, 30, 45) - always round UP
-const roundMinutes = (minutes) => {
+const roundMinutes = minutes => {
   // Always round UP to the next valid minute
-  if (minutes === 0) return 0
-  
-  if (minutes <= 15) return 15
-  if (minutes <= 30) return 30
-  if (minutes <= 45) return 45
-  
+  if (minutes === 0) return 0;
+
+  if (minutes <= 15) return 15;
+  if (minutes <= 30) return 30;
+  if (minutes <= 45) return 45;
+
   // If minutes > 45, round to 00 of next hour (which means we need to handle hour increment)
   // But for simplicity, we'll just return 45 as the max valid minute
   // The hour increment will be handled separately if needed
-  return 45
-}
+  return 45;
+};
 
 // Validate time input format and values
-const validateTimeInput = (field) => {
-  const value = formData.value[field]
-  
+const validateTimeInput = field => {
+  const value = formData.value[field];
+
   if (!value) {
     // Clear error if field is empty (optional field)
     if (validationErrors[field]) {
-      delete validationErrors[field]
+      delete validationErrors[field];
     }
-    return
+    return;
   }
-  
+
   // Check format HH:MM
-  const timeRegex = /^([01]?[0-9]|2[0-4]):([0-5][0-9])$/
+  const timeRegex = /^([01]?[0-9]|2[0-4]):([0-5][0-9])$/;
   if (!timeRegex.test(value)) {
-    validationErrors[field] = 'Formato inválido. Use HH:MM (ex: 09:30)'
-    return
+    validationErrors[field] = 'Formato inválido. Use HH:MM (ex: 09:30)';
+    return;
   }
-  
-  const [hours, minutes] = value.split(':').map(Number)
-  
+
+  const [hours, minutes] = value.split(':').map(Number);
+
   // Validate hours (0-24)
   if (hours < 0 || hours > 24) {
-    validationErrors[field] = 'Horas devem estar entre 0 e 24'
-    return
+    validationErrors[field] = 'Horas devem estar entre 0 e 24';
+    return;
   }
-  
+
   // Validate minutes (0-59) - allow any minute value
   if (minutes < 0 || minutes > 59) {
-    validationErrors[field] = 'Minutos devem estar entre 0 e 59'
-    return
+    validationErrors[field] = 'Minutos devem estar entre 0 e 59';
+    return;
   }
-  
+
   // Clear error if validation passes
   if (validationErrors[field]) {
-    delete validationErrors[field]
+    delete validationErrors[field];
   }
-  
+
   // Recalculate total hours
-  calculateTotalHours()
-}
+  calculateTotalHours();
+};
 
 // Form data
 const formData = ref({
@@ -742,103 +730,102 @@ const formData = ref({
   kmsChegadaSede: 0,
   horaSaida: '',
   horaChegada: '',
-})
+});
 
 // Computed
 const isFormValid = computed(() => {
-  return formData.value.dataRegistro && formData.value.cliente.trim()
-})
+  return formData.value.dataRegistro && formData.value.cliente.trim();
+});
 
 const cancelRoute = computed(() => {
-  const from = route.query.from
+  const from = route.query.from;
   if (from === 'detail' && registroYear.value && registroId.value) {
-    return `/registo-diario-atividade/${registroYear.value}/${registroId.value}`
+    return `/registo-diario-atividade/${registroYear.value}/${registroId.value}`;
   } else if (from === 'list') {
-    return '/registo-diario-atividade/list'
+    return '/registo-diario-atividade/list';
   } else {
-    return '/registo-diario-atividade'
+    return '/registo-diario-atividade';
   }
-})
+});
 
 // Methods
 const toggleSecondaryActivity = () => {
-  showSecondaryActivity.value = !showSecondaryActivity.value
-}
+  showSecondaryActivity.value = !showSecondaryActivity.value;
+};
 
 const calculateTotalHours = () => {
   if (!formData.value.horaInicio || !formData.value.horaFim) {
-    formData.value.totalHorasCalculado = ''
-    return
+    formData.value.totalHorasCalculado = '';
+    return;
   }
 
   try {
     // Parse times (assuming HH:MM format)
-    const [startHour, startMin] = formData.value.horaInicio.split(':').map(Number)
-    const [endHour, endMin] = formData.value.horaFim.split(':').map(Number)
-    
+    const [startHour, startMin] = formData.value.horaInicio.split(':').map(Number);
+    const [endHour, endMin] = formData.value.horaFim.split(':').map(Number);
+
     // Create date objects for calculation
-    const startTime = new Date(2000, 0, 1, startHour, startMin)
-    const endTime = new Date(2000, 0, 1, endHour, endMin)
-    
+    const startTime = new Date(2000, 0, 1, startHour, startMin);
+    const endTime = new Date(2000, 0, 1, endHour, endMin);
+
     // Handle case where end time is next day
     if (endTime < startTime) {
-      endTime.setDate(endTime.getDate() + 1)
+      endTime.setDate(endTime.getDate() + 1);
     }
-    
+
     // Calculate difference in minutes
-    const diffMinutes = (endTime - startTime) / (1000 * 60)
-    
+    const diffMinutes = (endTime - startTime) / (1000 * 60);
+
     // Subtract pause time
-    const totalMinutes = diffMinutes - (formData.value.tempoPausa || 0)
-    
+    const totalMinutes = diffMinutes - (formData.value.tempoPausa || 0);
+
     if (totalMinutes <= 0) {
-      formData.value.totalHorasCalculado = '00:00:00'
-      return
+      formData.value.totalHorasCalculado = '00:00:00';
+      return;
     }
-    
+
     // Convert to HH:MM:SS format
-    const hours = Math.floor(totalMinutes / 60)
-    const minutes = Math.floor(totalMinutes % 60)
-    const seconds = Math.floor((totalMinutes % 1) * 60)
-    
-    formData.value.totalHorasCalculado = 
-      `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = Math.floor(totalMinutes % 60);
+    const seconds = Math.floor((totalMinutes % 1) * 60);
+
+    formData.value.totalHorasCalculado = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   } catch (error) {
-    console.error('Error calculating total hours:', error)
-    formData.value.totalHorasCalculado = ''
+    console.error('Error calculating total hours:', error);
+    formData.value.totalHorasCalculado = '';
   }
-}
+};
 
 const formatTimeInput = (event, field) => {
   // Get the input value and remove non-digit characters
-  let value = event.target.value.replace(/[^\d]/g, '')
-  
+  let value = event.target.value.replace(/[^\d]/g, '');
+
   // Limit to 4 digits
   if (value.length > 4) {
-    value = value.slice(0, 4)
+    value = value.slice(0, 4);
   }
-  
+
   // Format as HH:MM
   if (value.length > 2) {
-    value = value.slice(0, 2) + ':' + value.slice(2, 4)
+    value = value.slice(0, 2) + ':' + value.slice(2, 4);
   }
-  
+
   // Update the form field
-  formData.value[field] = value
-  
+  formData.value[field] = value;
+
   // Update the input value
-  event.target.value = value
-  
+  event.target.value = value;
+
   // Clear validation errors when user is typing
   if (validationErrors[field]) {
-    delete validationErrors[field]
+    delete validationErrors[field];
   }
-  
-  // Recalculate total hours
-  calculateTotalHours()
-}
 
-const addAtividadeAdicional = (tipo) => {
+  // Recalculate total hours
+  calculateTotalHours();
+};
+
+const addAtividadeAdicional = tipo => {
   formData.value.atividadesAdicionais.push({
     id: Date.now(), // Simple ID for tracking
     tipo: tipo, // FOLHA DE OBRA or ASSISTENCIA REMOTA
@@ -851,165 +838,177 @@ const addAtividadeAdicional = (tipo) => {
     tempoPausa: 0,
     totalHoras: '',
     responsavel: '',
-    descricao: ''
-  })
-}
+    descricao: '',
+  });
+};
 
-const removeAtividadeAdicional = (index) => {
-  formData.value.atividadesAdicionais.splice(index, 1)
-}
+const removeAtividadeAdicional = index => {
+  formData.value.atividadesAdicionais.splice(index, 1);
+};
 
 const formatTimeInputForActivity = (event, atividade, field) => {
   // Get the input value and remove non-digit characters
-  let value = event.target.value.replace(/[^\d]/g, '')
-  
+  let value = event.target.value.replace(/[^\d]/g, '');
+
   // Format as HH:MM
   if (value.length > 2) {
-    value = value.slice(0, 2) + ':' + value.slice(2, 4)
+    value = value.slice(0, 2) + ':' + value.slice(2, 4);
   }
-  
-  // Update the activity field
-  atividade[field] = value
-  
-  // Update the input value
-  event.target.value = value
-  
-  // Calculate total hours for this activity
-  calculateTotalHoursForActivity(atividade)
-}
 
-const calculateTotalHoursForActivity = (atividade) => {
+  // Update the activity field
+  atividade[field] = value;
+
+  // Update the input value
+  event.target.value = value;
+
+  // Calculate total hours for this activity
+  calculateTotalHoursForActivity(atividade);
+};
+
+const calculateTotalHoursForActivity = atividade => {
   if (!atividade.horaInicio || !atividade.horaFim) {
-    atividade.totalHoras = ''
-    return
+    atividade.totalHoras = '';
+    return;
   }
 
   try {
     // Parse times (assuming HH:MM format)
-    const [startHour, startMin] = atividade.horaInicio.split(':').map(Number)
-    const [endHour, endMin] = atividade.horaFim.split(':').map(Number)
-    
+    const [startHour, startMin] = atividade.horaInicio.split(':').map(Number);
+    const [endHour, endMin] = atividade.horaFim.split(':').map(Number);
+
     // Create date objects for calculation
-    const startTime = new Date(2000, 0, 1, startHour, startMin)
-    const endTime = new Date(2000, 0, 1, endHour, endMin)
-    
+    const startTime = new Date(2000, 0, 1, startHour, startMin);
+    const endTime = new Date(2000, 0, 1, endHour, endMin);
+
     // Handle case where end time is next day
     if (endTime < startTime) {
-      endTime.setDate(endTime.getDate() + 1)
+      endTime.setDate(endTime.getDate() + 1);
     }
-    
+
     // Calculate difference in minutes
-    const diffMinutes = (endTime - startTime) / (1000 * 60)
-    
+    const diffMinutes = (endTime - startTime) / (1000 * 60);
+
     // Subtract pause time
-    const totalMinutes = diffMinutes - (atividade.tempoPausa || 0)
-    
+    const totalMinutes = diffMinutes - (atividade.tempoPausa || 0);
+
     if (totalMinutes <= 0) {
-      atividade.totalHoras = '00:00:00'
-      return
+      atividade.totalHoras = '00:00:00';
+      return;
     }
-    
+
     // Convert to HH:MM:SS format
-    const hours = Math.floor(totalMinutes / 60)
-    const minutes = Math.floor(totalMinutes % 60)
-    const seconds = Math.floor((totalMinutes % 1) * 60)
-    
-    atividade.totalHoras = 
-      `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = Math.floor(totalMinutes % 60);
+    const seconds = Math.floor((totalMinutes % 1) * 60);
+
+    atividade.totalHoras = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   } catch (error) {
-    console.error('Error calculating total hours for activity:', error)
-    atividade.totalHoras = ''
+    console.error('Error calculating total hours for activity:', error);
+    atividade.totalHoras = '';
   }
-}
+};
 
 const handleSubmit = async () => {
-  if (!isFormValid.value) return
+  if (!isFormValid.value) return;
 
   try {
-    const year = getYearFromDate(formData.value.dataRegistro)
-    
+    const year = getYearFromDate(formData.value.dataRegistro);
+
     if (isEditing.value) {
-      await updateRegistro(registroYear.value, registroId.value, formData.value)
-      router.push(`/registo-diario-atividade/${registroYear.value}/${registroId.value}`)
+      await updateRegistro(registroYear.value, registroId.value, formData.value);
+      router.push(`/registo-diario-atividade/${registroYear.value}/${registroId.value}`);
     } else {
-      const newRegistro = await createRegistro(year, formData.value)
-      router.push(`/registo-diario-atividade/${year}/${newRegistro.id}`)
+      const newRegistro = await createRegistro(year, formData.value);
+      router.push(`/registo-diario-atividade/${year}/${newRegistro.id}`);
     }
   } catch (err) {
-    console.error('Error saving registro:', err)
+    console.error('Error saving registro:', err);
   }
-}
+};
 
 const handleCancel = () => {
-  router.push(cancelRoute.value)
-}
+  router.push(cancelRoute.value);
+};
 
 const loadRegistroForEditing = async () => {
   if (registroYear.value && registroId.value) {
     try {
-      const registro = await fetchRegistroById(registroYear.value, registroId.value)
+      const registro = await fetchRegistroById(registroYear.value, registroId.value);
       if (registro) {
-        formData.value = { ...registro }
+        formData.value = { ...registro };
         // Show secondary activity if there's data for it
         if (registro.cliente2 || registro.assunto2 || registro.descricao2) {
-          showSecondaryActivity.value = true
+          showSecondaryActivity.value = true;
         }
         // Recalculate total hours after loading data
-        calculateTotalHours()
+        calculateTotalHours();
       }
     } catch (err) {
-      console.error('Error loading registro:', err)
+      console.error('Error loading registro:', err);
     }
   }
-}
+};
 
 // Watchers
-watch(() => formData.value.tempoPausa, () => {
-  calculateTotalHours()
-})
+watch(
+  () => formData.value.tempoPausa,
+  () => {
+    calculateTotalHours();
+  }
+);
 
-watch(() => formData.value.horaInicio, () => {
-  calculateTotalHours()
-})
+watch(
+  () => formData.value.horaInicio,
+  () => {
+    calculateTotalHours();
+  }
+);
 
-watch(() => formData.value.horaFim, () => {
-  calculateTotalHours()
-})
+watch(
+  () => formData.value.horaFim,
+  () => {
+    calculateTotalHours();
+  }
+);
 
 // Watch additional activities for changes in pause time
-watch(() => formData.value.atividadesAdicionais, (newActivities) => {
-  newActivities.forEach(atividade => {
-    // Recalculate total hours when pause time changes
-    if (atividade.horaInicio && atividade.horaFim) {
-      calculateTotalHoursForActivity(atividade)
-    }
-  })
-}, { deep: true })
+watch(
+  () => formData.value.atividadesAdicionais,
+  newActivities => {
+    newActivities.forEach(atividade => {
+      // Recalculate total hours when pause time changes
+      if (atividade.horaInicio && atividade.horaFim) {
+        calculateTotalHoursForActivity(atividade);
+      }
+    });
+  },
+  { deep: true }
+);
 
 // Lifecycle
 onMounted(async () => {
   // Fetch clients data for the dropdown
   try {
-    await fetchClientes()
+    await fetchClientes();
   } catch (error) {
-    console.error('Error loading clients:', error)
+    console.error('Error loading clients:', error);
   }
-  
+
   // Fetch collaborators data for the dropdown
   try {
-    await fetchCollaborators()
+    await fetchCollaborators();
   } catch (error) {
-    console.error('Error loading collaborators:', error)
+    console.error('Error loading collaborators:', error);
   }
-  
+
   // Check if we're editing
   if (route.params.year && route.params.id) {
-    isEditing.value = true
-    registroYear.value = route.params.year
-    registroId.value = route.params.id
-    await loadRegistroForEditing()
+    isEditing.value = true;
+    registroYear.value = route.params.year;
+    registroId.value = route.params.id;
+    await loadRegistroForEditing();
   }
-})
+});
 </script>
 
 <style scoped>
@@ -1406,8 +1405,12 @@ onMounted(async () => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Mobile responsiveness */
@@ -1415,69 +1418,69 @@ onMounted(async () => {
   .registo-form-container {
     padding: 0.5rem;
   }
-  
+
   .form-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .form-header h1 {
     font-size: 1.3rem;
   }
-  
+
   .form-section {
     padding: 1rem;
     margin-bottom: 1rem;
   }
-  
+
   .form-section h2 {
     font-size: 1rem;
     margin-bottom: 0.75rem;
   }
-  
+
   .form-grid {
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
-  
+
   .form-group {
     min-height: auto;
   }
-  
+
   .form-group label {
     font-size: 0.85rem;
   }
-  
+
   .form-control {
     padding: 0.65rem;
     font-size: 0.9rem;
   }
-  
+
   .form-actions {
     flex-direction: column;
     gap: 0.75rem;
   }
-  
+
   .btn {
     width: 100%;
     padding: 0.75rem;
   }
-  
+
   .btn-remove-activity {
     width: auto;
   }
-  
+
   .add-activity-buttons {
     flex-direction: column;
     gap: 0.75rem;
   }
-  
+
   .btn-add-activity {
     width: 100%;
     min-width: auto;
   }
-  
+
   .button-divider {
     display: none;
   }
@@ -1487,24 +1490,24 @@ onMounted(async () => {
   .registo-form-container {
     padding: 0.25rem;
   }
-  
+
   .form-section {
     padding: 0.75rem;
   }
-  
+
   .form-section h2 {
     font-size: 0.9rem;
   }
-  
+
   .form-group label {
     font-size: 0.8rem;
   }
-  
+
   .form-control {
     padding: 0.6rem;
     font-size: 0.85rem;
   }
-  
+
   .form-header h1 {
     font-size: 1.2rem;
   }

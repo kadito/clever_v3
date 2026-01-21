@@ -36,10 +36,10 @@ export function useAuth() {
     isLoaded: computed(() => authStore.isLoaded),
     isSignedIn: computed(() => authStore.isSignedIn),
     user: computed(() => authStore.user),
-    
+
     // Authentication actions
     signOut: handleSignOut,
-    
+
     // Computed helpers from store
     isAuthenticated: computed(() => authStore.isAuthenticated),
     userType: computed(() => authStore.userType),

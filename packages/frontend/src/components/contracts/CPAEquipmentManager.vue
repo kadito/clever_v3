@@ -2,20 +2,19 @@
   <div class="equipment-section">
     <div class="equipment-header">
       <h4>EQUIPAMENTOS CPA</h4>
-      <button
-        type="button"
-        class="add-equipment-btn"
-        @click="addEquipment"
-      >
+      <button type="button" class="add-equipment-btn" @click="addEquipment">
         + ADICIONAR EQUIPAMENTO
       </button>
     </div>
-    
+
     <div class="equipment-info-callout">
       <span class="info-icon">ℹ️</span>
-      <span>O desconto aplica-se apenas aos equipamentos adicionais (2º, 3º, etc.). O primeiro equipamento não tem desconto.</span>
+      <span
+        >O desconto aplica-se apenas aos equipamentos adicionais (2º, 3º, etc.). O primeiro
+        equipamento não tem desconto.</span
+      >
     </div>
-    
+
     <div class="equipment-list">
       <EquipmentCard
         v-for="(equipment, index) in equipments"
@@ -31,20 +30,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import type { ContractEquipment } from '@clever/shared'
-import EquipmentCard from './EquipmentCard.vue'
+import { ref } from 'vue';
+import type { ContractEquipment } from '@clever/shared';
+import EquipmentCard from './EquipmentCard.vue';
 
 interface Props {
-  equipments: ContractEquipment[]
+  equipments: ContractEquipment[];
 }
 
 interface Emits {
-  (e: 'equipment-updated', data: { action: string, index?: number, equipment?: ContractEquipment }): void
+  (
+    e: 'equipment-updated',
+    data: { action: string; index?: number; equipment?: ContractEquipment }
+  ): void;
 }
 
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
 
 const addEquipment = () => {
   const newEquipment: ContractEquipment = {
@@ -52,19 +54,19 @@ const addEquipment = () => {
     modelo: '',
     numeroSerie: '',
     desconto: props.equipments.length === 0 ? 0 : 10, // First equipment has 0% discount
-    observacoes: ''
-  }
-  
-  emit('equipment-updated', { action: 'add', equipment: newEquipment })
-}
+    observacoes: '',
+  };
+
+  emit('equipment-updated', { action: 'add', equipment: newEquipment });
+};
 
 const updateEquipment = (index: number, equipment: ContractEquipment) => {
-  emit('equipment-updated', { action: 'update', index, equipment })
-}
+  emit('equipment-updated', { action: 'update', index, equipment });
+};
 
 const removeEquipment = (index: number) => {
-  emit('equipment-updated', { action: 'remove', index })
-}
+  emit('equipment-updated', { action: 'remove', index });
+};
 </script>
 
 <style scoped>
@@ -116,11 +118,11 @@ const removeEquipment = (index: number) => {
   .equipment-header {
     @apply flex-col gap-3 items-start;
   }
-  
+
   .add-equipment-btn {
     @apply w-full justify-center;
   }
-  
+
   .equipment-info-callout {
     @apply p-2;
   }

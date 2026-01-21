@@ -1,10 +1,10 @@
 /**
  * End-to-End Tests for Work Sheets Implementation
- * 
+ *
  * This test suite verifies complete CRUD workflows, mobile responsiveness,
  * Portuguese localization, authentication, error handling, multiselect dropdowns,
  * conditional fields, and dynamic configuration management for work-sheets.
- * 
+ *
  * Requirements: 11.3, 11.4, 13.5, 17.1, 18.1, 19.1
  */
 
@@ -38,14 +38,14 @@ const mockWorkSheets: WorkSheet[] = [
         reason: 'Problema no sistema de faturação',
         arrivalTime: '09:00',
         departureTime: '12:00',
-        totalHours: '03:00'
+        totalHours: '03:00',
       },
       displacement: {
         hasDisplacement: true,
         weekendHoliday: false,
         oneWayKms: 50,
         totalKms: 100,
-        paymentMethod: 'CONTRATO'
+        paymentMethod: 'CONTRATO',
       },
       otherData: {
         serviceType: 'ASSISTÊNCIA PRESENCIAL',
@@ -65,9 +65,9 @@ const mockWorkSheets: WorkSheet[] = [
         remoteAccessCheck: true,
         anydesk: false,
         serviceReport: 'Problema resolvido com sucesso. Sistema de faturação operacional.',
-        clientSignature: ''
-      }
-    }
+        clientSignature: '',
+      },
+    },
   },
   {
     uuid: 'worksheet-2',
@@ -87,14 +87,14 @@ const mockWorkSheets: WorkSheet[] = [
         reason: 'Instalação de novo software',
         arrivalTime: '14:00',
         departureTime: '16:30',
-        totalHours: '02:30'
+        totalHours: '02:30',
       },
       displacement: {
         hasDisplacement: false,
         weekendHoliday: false,
         oneWayKms: 0,
         totalKms: 0,
-        paymentMethod: 'DINHEIRO'
+        paymentMethod: 'DINHEIRO',
       },
       otherData: {
         serviceType: 'INSTALAÇÃO',
@@ -113,11 +113,12 @@ const mockWorkSheets: WorkSheet[] = [
         backup: false,
         remoteAccessCheck: false,
         anydesk: true,
-        serviceReport: 'Software instalado e configurado. Cliente treinado nas funcionalidades básicas.',
-        clientSignature: ''
-      }
-    }
-  }
+        serviceReport:
+          'Software instalado e configurado. Cliente treinado nas funcionalidades básicas.',
+        clientSignature: '',
+      },
+    },
+  },
 ];
 
 const mockClient: Client = {
@@ -135,8 +136,8 @@ const mockClient: Client = {
     morada: 'Rua Principal, 123',
     localidade: 'Lisboa',
     telefone: '210000000',
-    email: 'geral@empresaabc.pt'
-  }
+    email: 'geral@empresaabc.pt',
+  },
 };
 
 // Mock the useApi composable
@@ -144,7 +145,7 @@ const mockApiState = {
   items: { value: mockWorkSheets },
   currentItem: { value: mockWorkSheets[0] },
   loading: { loading: { value: false } },
-  error: { value: null }
+  error: { value: null },
 };
 
 vi.mock('@/composables/useApi', () => ({
@@ -154,21 +155,21 @@ vi.mock('@/composables/useApi', () => ({
     fetchById: vi.fn().mockResolvedValue(mockWorkSheets[0]),
     create: vi.fn().mockResolvedValue(mockWorkSheets[0]),
     update: vi.fn().mockResolvedValue(mockWorkSheets[0]),
-    delete: vi.fn().mockResolvedValue(true)
-  }))
+    delete: vi.fn().mockResolvedValue(true),
+  })),
 }));
 
 // Mock the useAuth composable
 vi.mock('@/composables/useAuth', () => ({
   useAuth: vi.fn(() => ({
-    user: { 
-      value: { 
-        userId: 'user-123', 
-        email: 'test@example.com' 
-      } 
+    user: {
+      value: {
+        userId: 'user-123',
+        email: 'test@example.com',
+      },
     },
-    isAuthenticated: { value: true }
-  }))
+    isAuthenticated: { value: true },
+  })),
 }));
 
 // Mock the useSharedFormData composable
@@ -179,8 +180,8 @@ const mockFormData = {
     technician: 'Pedro Santos',
     serviceType: 'ASSISTÊNCIA PRESENCIAL',
     hasDisplacement: true,
-    paymentMethod: 'CONTRATO'
-  }
+    paymentMethod: 'CONTRATO',
+  },
 };
 
 const mockValidationErrors = {};
@@ -200,8 +201,8 @@ vi.mock('@/composables/useSharedFormData', () => ({
       Object.keys(mockFormData.value).forEach(key => {
         delete mockFormData.value[key];
       });
-    })
-  }))
+    }),
+  })),
 }));
 
 // Create router for testing
@@ -213,8 +214,8 @@ const createTestRouter = () => {
       { path: '/work-sheets', component: WorkSheetsListView },
       { path: '/work-sheets/create', component: WorkSheetsCreateView },
       { path: '/work-sheets/:uuid', component: WorkSheetsDetailView },
-      { path: '/work-sheets/:uuid/update', component: WorkSheetsUpdateView }
-    ]
+      { path: '/work-sheets/:uuid/update', component: WorkSheetsUpdateView },
+    ],
   });
 };
 
@@ -233,30 +234,33 @@ describe('Work Sheets End-to-End Tests', () => {
       it('should display work sheets list with Portuguese labels', async () => {
         const wrapper = mount(WorkSheetsListView, {
           global: {
-            plugins: [router, pinia]
-          }
+            plugins: [router, pinia],
+          },
         });
 
         await wrapper.vm.$nextTick();
 
         // Verify component structure exists
         expect(wrapper.find('.work-sheets-list-container').exists()).toBe(true);
-        
+
         // Check for Portuguese text in the component
         const allText = wrapper.text();
-        const hasPortugueseLabels = allText.includes('Folhas') || 
-                                   allText.includes('Pesquisar') || 
-                                   allText.includes('carregar');
-        
+        const hasPortugueseLabels =
+          allText.includes('Folhas') ||
+          allText.includes('Pesquisar') ||
+          allText.includes('carregar');
+
         // Should have some Portuguese content or at least the basic structure
-        expect(hasPortugueseLabels || wrapper.find('.work-sheets-list-container').exists()).toBe(true);
+        expect(hasPortugueseLabels || wrapper.find('.work-sheets-list-container').exists()).toBe(
+          true
+        );
       });
 
       it('should handle search functionality with debouncing', async () => {
         const wrapper = mount(WorkSheetsListView, {
           global: {
-            plugins: [router, pinia]
-          }
+            plugins: [router, pinia],
+          },
         });
 
         await wrapper.vm.$nextTick();
@@ -280,7 +284,7 @@ describe('Work Sheets End-to-End Tests', () => {
           fetchById: vi.fn(),
           create: vi.fn(),
           update: vi.fn(),
-          delete: vi.fn()
+          delete: vi.fn(),
         };
 
         // Temporarily override the mock
@@ -290,21 +294,22 @@ describe('Work Sheets End-to-End Tests', () => {
           global: {
             plugins: [router, pinia],
             mocks: {
-              useApi: () => emptyApiMock
-            }
-          }
+              useApi: () => emptyApiMock,
+            },
+          },
         });
 
         await wrapper.vm.$nextTick();
 
         // Check for empty state elements that should exist
         const emptyStateElements = wrapper.findAll('div');
-        const hasEmptyStateText = emptyStateElements.some(el => 
-          el.text().includes('Nenhuma') || 
-          el.text().includes('encontrada') ||
-          el.text().includes('cadastradas')
+        const hasEmptyStateText = emptyStateElements.some(
+          el =>
+            el.text().includes('Nenhuma') ||
+            el.text().includes('encontrada') ||
+            el.text().includes('cadastradas')
         );
-        
+
         // At minimum, should have the component structure
         expect(wrapper.find('.work-sheets-list-container').exists()).toBe(true);
       });
@@ -312,8 +317,8 @@ describe('Work Sheets End-to-End Tests', () => {
       it('should have mobile-friendly touch targets', () => {
         const wrapper = mount(WorkSheetsListView, {
           global: {
-            plugins: [router, pinia]
-          }
+            plugins: [router, pinia],
+          },
         });
 
         // Check for button elements that should have touch targets
@@ -322,7 +327,9 @@ describe('Work Sheets End-to-End Tests', () => {
         const interactiveElements = [...buttons, ...links];
 
         // Should have some interactive elements or the basic structure
-        expect(interactiveElements.length > 0 || wrapper.find('.work-sheets-list-container').exists()).toBe(true);
+        expect(
+          interactiveElements.length > 0 || wrapper.find('.work-sheets-list-container').exists()
+        ).toBe(true);
       });
     });
 
@@ -333,8 +340,8 @@ describe('Work Sheets End-to-End Tests', () => {
 
         const wrapper = mount(WorkSheetsDetailView, {
           global: {
-            plugins: [router, pinia]
-          }
+            plugins: [router, pinia],
+          },
         });
 
         await wrapper.vm.$nextTick();
@@ -362,8 +369,8 @@ describe('Work Sheets End-to-End Tests', () => {
       it('should display pricing calculations when displacement is enabled', async () => {
         const wrapper = mount(WorkSheetsDetailView, {
           global: {
-            plugins: [router, pinia]
-          }
+            plugins: [router, pinia],
+          },
         });
 
         await wrapper.vm.$nextTick();
@@ -381,8 +388,8 @@ describe('Work Sheets End-to-End Tests', () => {
       it('should show edit button on desktop and mobile action bar', () => {
         const wrapper = mount(WorkSheetsDetailView, {
           global: {
-            plugins: [router, pinia]
-          }
+            plugins: [router, pinia],
+          },
         });
 
         // Desktop edit button (hidden on mobile)
@@ -397,8 +404,8 @@ describe('Work Sheets End-to-End Tests', () => {
       it('should display user email in audit trail', async () => {
         const wrapper = mount(WorkSheetsDetailView, {
           global: {
-            plugins: [router, pinia]
-          }
+            plugins: [router, pinia],
+          },
         });
 
         await wrapper.vm.$nextTick();
@@ -417,8 +424,8 @@ describe('Work Sheets End-to-End Tests', () => {
 
         const wrapper = mount(WorkSheetsCreateView, {
           global: {
-            plugins: [router, pinia]
-          }
+            plugins: [router, pinia],
+          },
         });
 
         await wrapper.vm.$nextTick();
@@ -436,8 +443,8 @@ describe('Work Sheets End-to-End Tests', () => {
       it('should handle client search and selection', async () => {
         const wrapper = mount(WorkSheetsCreateView, {
           global: {
-            plugins: [router, pinia]
-          }
+            plugins: [router, pinia],
+          },
         });
 
         await wrapper.vm.$nextTick();
@@ -457,8 +464,8 @@ describe('Work Sheets End-to-End Tests', () => {
       it('should display multiselect payment method options', async () => {
         const wrapper = mount(WorkSheetsCreateView, {
           global: {
-            plugins: [router, pinia]
-          }
+            plugins: [router, pinia],
+          },
         });
 
         await wrapper.vm.$nextTick();
@@ -478,8 +485,8 @@ describe('Work Sheets End-to-End Tests', () => {
       it('should show conditional fields based on selections', async () => {
         const wrapper = mount(WorkSheetsCreateView, {
           global: {
-            plugins: [router, pinia]
-          }
+            plugins: [router, pinia],
+          },
         });
 
         await wrapper.vm.$nextTick();
@@ -497,8 +504,8 @@ describe('Work Sheets End-to-End Tests', () => {
       it('should calculate pricing dynamically when displacement is enabled', async () => {
         const wrapper = mount(WorkSheetsCreateView, {
           global: {
-            plugins: [router, pinia]
-          }
+            plugins: [router, pinia],
+          },
         });
 
         // Enable displacement
@@ -517,8 +524,8 @@ describe('Work Sheets End-to-End Tests', () => {
       it('should validate required fields with Portuguese messages', async () => {
         const wrapper = mount(WorkSheetsCreateView, {
           global: {
-            plugins: [router, pinia]
-          }
+            plugins: [router, pinia],
+          },
         });
 
         // Clear required fields
@@ -541,8 +548,8 @@ describe('Work Sheets End-to-End Tests', () => {
 
         const wrapper = mount(WorkSheetsUpdateView, {
           global: {
-            plugins: [router, pinia]
-          }
+            plugins: [router, pinia],
+          },
         });
 
         await wrapper.vm.$nextTick();
@@ -558,8 +565,8 @@ describe('Work Sheets End-to-End Tests', () => {
       it('should handle form submission and navigation', async () => {
         const wrapper = mount(WorkSheetsUpdateView, {
           global: {
-            plugins: [router, pinia]
-          }
+            plugins: [router, pinia],
+          },
         });
 
         await wrapper.vm.$nextTick();
@@ -567,7 +574,7 @@ describe('Work Sheets End-to-End Tests', () => {
         // Should have form template
         const formTemplate = wrapper.findComponent({ name: 'ContentFormTemplate' });
         expect(formTemplate.exists()).toBe(true);
-        
+
         // Should have update and cancel functionality (labels may vary in test environment)
         expect(wrapper.text()).toContain('Cancelar');
       });
@@ -575,8 +582,8 @@ describe('Work Sheets End-to-End Tests', () => {
       it('should maintain pricing calculations during updates', async () => {
         const wrapper = mount(WorkSheetsUpdateView, {
           global: {
-            plugins: [router, pinia]
-          }
+            plugins: [router, pinia],
+          },
         });
 
         // Set displacement data
@@ -597,8 +604,8 @@ describe('Work Sheets End-to-End Tests', () => {
       // Test mobile-specific CSS classes
       const wrapper = mount(WorkSheetsListView, {
         global: {
-          plugins: [router, pinia]
-        }
+          plugins: [router, pinia],
+        },
       });
 
       // Should have mobile-responsive classes
@@ -609,8 +616,8 @@ describe('Work Sheets End-to-End Tests', () => {
     it('should have proper touch targets (minimum 44px)', () => {
       const wrapper = mount(WorkSheetsListView, {
         global: {
-          plugins: [router, pinia]
-        }
+          plugins: [router, pinia],
+        },
       });
 
       // FAB should meet touch target requirements
@@ -627,8 +634,8 @@ describe('Work Sheets End-to-End Tests', () => {
     it('should show mobile action bar in detail view', () => {
       const wrapper = mount(WorkSheetsDetailView, {
         global: {
-          plugins: [router, pinia]
-        }
+          plugins: [router, pinia],
+        },
       });
 
       const mobileActionBar = wrapper.find('.mobile-action-bar');
@@ -641,8 +648,8 @@ describe('Work Sheets End-to-End Tests', () => {
     it('should display all UI text in Portuguese', () => {
       const wrapper = mount(WorkSheetsListView, {
         global: {
-          plugins: [router, pinia]
-        }
+          plugins: [router, pinia],
+        },
       });
 
       // Verify Portuguese text throughout the interface
@@ -654,25 +661,23 @@ describe('Work Sheets End-to-End Tests', () => {
     it('should format dates in Portuguese locale', async () => {
       const wrapper = mount(WorkSheetsDetailView, {
         global: {
-          plugins: [router, pinia]
-        }
+          plugins: [router, pinia],
+        },
       });
 
       await wrapper.vm.$nextTick();
 
       // Should format dates in Portuguese format (DD/MM/YYYY)
       const dateElements = wrapper.findAll('.detail-value');
-      const hasPortugueseDate = dateElements.some(el => 
-        /\d{1,2}\/\d{1,2}\/\d{4}/.test(el.text())
-      );
+      const hasPortugueseDate = dateElements.some(el => /\d{1,2}\/\d{1,2}\/\d{4}/.test(el.text()));
       expect(hasPortugueseDate).toBe(true);
     });
 
     it('should display status text in Portuguese', () => {
       const wrapper = mount(WorkSheetsListView, {
         global: {
-          plugins: [router, pinia]
-        }
+          plugins: [router, pinia],
+        },
       });
 
       // Should show Portuguese status text
@@ -693,26 +698,27 @@ describe('Work Sheets End-to-End Tests', () => {
         fetchById: vi.fn(),
         create: vi.fn(),
         update: vi.fn(),
-        delete: vi.fn()
+        delete: vi.fn(),
       };
 
       const wrapper = mount(WorkSheetsListView, {
         global: {
           plugins: [router, pinia],
           mocks: {
-            useApi: () => loadingApiMock
-          }
-        }
+            useApi: () => loadingApiMock,
+          },
+        },
       });
 
       await wrapper.vm.$nextTick();
 
       // Should show loading indicator or have loading-related classes
-      const hasLoadingElements = wrapper.findAll('div').some(el => 
-        el.text().includes('carregar') || 
-        el.classes().some(cls => cls.includes('loading'))
-      );
-      
+      const hasLoadingElements = wrapper
+        .findAll('div')
+        .some(
+          el => el.text().includes('carregar') || el.classes().some(cls => cls.includes('loading'))
+        );
+
       // At minimum, should have the component structure
       expect(wrapper.find('.work-sheets-list-container').exists()).toBe(true);
     });
@@ -728,26 +734,25 @@ describe('Work Sheets End-to-End Tests', () => {
         fetchById: vi.fn(),
         create: vi.fn(),
         update: vi.fn(),
-        delete: vi.fn()
+        delete: vi.fn(),
       };
 
       const wrapper = mount(WorkSheetsListView, {
         global: {
           plugins: [router, pinia],
           mocks: {
-            useApi: () => errorApiMock
-          }
-        }
+            useApi: () => errorApiMock,
+          },
+        },
       });
 
       await wrapper.vm.$nextTick();
 
       // Should have error handling structure
-      const hasErrorElements = wrapper.findAll('div').some(el => 
-        el.text().includes('Erro') || 
-        el.classes().some(cls => cls.includes('error'))
-      );
-      
+      const hasErrorElements = wrapper
+        .findAll('div')
+        .some(el => el.text().includes('Erro') || el.classes().some(cls => cls.includes('error')));
+
       // At minimum, should have the component structure
       expect(wrapper.find('.work-sheets-list-container').exists()).toBe(true);
     });
@@ -755,8 +760,8 @@ describe('Work Sheets End-to-End Tests', () => {
     it('should handle authentication context', () => {
       const wrapper = mount(WorkSheetsDetailView, {
         global: {
-          plugins: [router, pinia]
-        }
+          plugins: [router, pinia],
+        },
       });
 
       // Should use authenticated user context
@@ -768,8 +773,8 @@ describe('Work Sheets End-to-End Tests', () => {
     it('should handle conditional field visibility', async () => {
       const wrapper = mount(WorkSheetsCreateView, {
         global: {
-          plugins: [router, pinia]
-        }
+          plugins: [router, pinia],
+        },
       });
 
       // Test material used conditional field
@@ -790,8 +795,8 @@ describe('Work Sheets End-to-End Tests', () => {
     it('should handle displacement conditional fields', async () => {
       const wrapper = mount(WorkSheetsCreateView, {
         global: {
-          plugins: [router, pinia]
-        }
+          plugins: [router, pinia],
+        },
       });
 
       // Enable displacement
@@ -805,8 +810,8 @@ describe('Work Sheets End-to-End Tests', () => {
     it('should calculate total kilometers automatically', async () => {
       const wrapper = mount(WorkSheetsCreateView, {
         global: {
-          plugins: [router, pinia]
-        }
+          plugins: [router, pinia],
+        },
       });
 
       // Set one-way kilometers
@@ -824,8 +829,8 @@ describe('Work Sheets End-to-End Tests', () => {
     it('should calculate total hours automatically', async () => {
       const wrapper = mount(WorkSheetsCreateView, {
         global: {
-          plugins: [router, pinia]
-        }
+          plugins: [router, pinia],
+        },
       });
 
       // Set arrival and departure times
@@ -845,8 +850,8 @@ describe('Work Sheets End-to-End Tests', () => {
     it('should persist form data across component recreation', async () => {
       const wrapper = mount(WorkSheetsCreateView, {
         global: {
-          plugins: [router, pinia]
-        }
+          plugins: [router, pinia],
+        },
       });
 
       // Set form data
@@ -863,8 +868,8 @@ describe('Work Sheets End-to-End Tests', () => {
     it('should clear conditional fields when dependencies change', async () => {
       const wrapper = mount(WorkSheetsCreateView, {
         global: {
-          plugins: [router, pinia]
-        }
+          plugins: [router, pinia],
+        },
       });
 
       // Set material used and details

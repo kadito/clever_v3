@@ -7,18 +7,22 @@
     <!-- Controls -->
     <div class="list-controls">
       <div class="controls-left">
-        <h2>Assistências Remotas {{ currentYear || 'Todos os anos' }} ({{ displayedAssistencias.length }})</h2>
+        <h2>
+          Assistências Remotas {{ currentYear || 'Todos os anos' }} ({{
+            displayedAssistencias.length
+          }})
+        </h2>
       </div>
-      
+
       <div class="controls-right">
         <!-- Year selector -->
-        <YearSelector 
-          v-model="currentYear" 
+        <YearSelector
+          v-model="currentYear"
           :years="availableYears"
           :show-all-option="true"
           @change="onYearChange"
         />
-        
+
         <button @click="refreshData" :disabled="loading" class="btn btn-refresh">
           🔄 Atualizar
         </button>
@@ -27,13 +31,13 @@
 
     <!-- Search -->
     <div class="search-container">
-      <input 
-        type="text" 
-        v-model="searchQuery" 
+      <input
+        type="text"
+        v-model="searchQuery"
         @input="handleSearch"
-        placeholder="Pesquisar por cliente, número, técnico..." 
+        placeholder="Pesquisar por cliente, número, técnico..."
         class="search-input"
-      >
+      />
       <span class="search-icon">🔍</span>
     </div>
 
@@ -50,8 +54,8 @@
 
     <!-- Assistencias List -->
     <div v-if="!loading && displayedAssistencias.length > 0" class="assistencias-list">
-      <div 
-        v-for="assistencia in displayedAssistencias" 
+      <div
+        v-for="assistencia in displayedAssistencias"
         :key="assistencia.id"
         class="assistencia-item"
         @click="navigateToDetail(assistencia)"
@@ -63,31 +67,31 @@
               {{ assistencia.tipoAssistencia }}
             </span>
           </div>
-          
+
           <div class="assistencia-client">
             <span class="cliente-name">👤 {{ assistencia.cliente }}</span>
           </div>
-          
+
           <div class="assistencia-meta">
             <span class="assistencia-data">📅 {{ formatDate(assistencia.dataAssistencia) }}</span>
             <span class="assistencia-tecnico">👨‍💻 {{ assistencia.tecnicoResponsavel }}</span>
           </div>
-          
+
           <div class="assistencia-details" v-if="assistencia.motivoPedido">
             <p class="motivo">{{ assistencia.motivoPedido }}</p>
           </div>
-          
+
           <div class="assistencia-status">
             <span v-if="assistencia.contrato" class="status-badge contract">Contrato</span>
             <span v-if="assistencia.garantia" class="status-badge warranty">Garantia</span>
-            <span v-if="assistencia.valorAssist > 0" class="value-badge">€{{ assistencia.valorAssist.toFixed(2) }}</span>
+            <span v-if="assistencia.valorAssist > 0" class="value-badge"
+              >€{{ assistencia.valorAssist.toFixed(2) }}</span
+            >
           </div>
         </div>
-        
+
         <div class="assistencia-actions">
-          <button class="action-btn" @click.stop="showActions(assistencia)">
-            ⋮
-          </button>
+          <button class="action-btn" @click.stop="showActions(assistencia)">⋮</button>
         </div>
       </div>
     </div>
@@ -95,25 +99,15 @@
     <!-- Empty State -->
     <div v-if="!loading && displayedAssistencias.length === 0" class="empty-state">
       <h3>Nenhuma assistência encontrada</h3>
-      <p v-if="searchQuery">
-        Não foram encontradas assistências com o termo "{{ searchQuery }}".
-      </p>
-      <p v-else-if="currentYear">
-        Não há assistências cadastradas para o ano {{ currentYear }}.
-      </p>
-      <p v-else>
-        Não há assistências cadastradas no sistema.
-      </p>
-      <button @click="navigateToCreate" class="btn btn-primary">
-        ➕ Criar Nova Assistência
-      </button>
+      <p v-if="searchQuery">Não foram encontradas assistências com o termo "{{ searchQuery }}".</p>
+      <p v-else-if="currentYear">Não há assistências cadastradas para o ano {{ currentYear }}.</p>
+      <p v-else>Não há assistências cadastradas no sistema.</p>
+      <button @click="navigateToCreate" class="btn btn-primary">➕ Criar Nova Assistência</button>
     </div>
 
     <!-- Search Results Info -->
     <div v-if="searchResults && searchQuery" class="search-info">
-      <p>
-        {{ searchResults.count }} resultado(s) encontrado(s) para "{{ searchQuery }}"
-      </p>
+      <p>{{ searchResults.count }} resultado(s) encontrado(s) para "{{ searchQuery }}"</p>
     </div>
 
     <!-- Actions Modal -->
@@ -121,212 +115,206 @@
       <div class="actions-modal" @click.stop>
         <h3>{{ selectedAssistenciaForActions?.assistNumero }}</h3>
         <div class="modal-actions">
-          <button @click="viewAssistencia" class="modal-btn view-btn">
-            📋 Ver Detalhes
-          </button>
-          <button @click="editAssistencia" class="modal-btn edit-btn">
-            ✏️ Editar
-          </button>
-          <button @click="deleteAssistenciaAction" class="modal-btn delete-btn">
-            🗑️ Eliminar
-          </button>
+          <button @click="viewAssistencia" class="modal-btn view-btn">📋 Ver Detalhes</button>
+          <button @click="editAssistencia" class="modal-btn edit-btn">✏️ Editar</button>
+          <button @click="deleteAssistenciaAction" class="modal-btn delete-btn">🗑️ Eliminar</button>
         </div>
-        <button @click="closeActions" class="modal-btn cancel-btn">
-          Cancelar
-        </button>
+        <button @click="closeActions" class="modal-btn cancel-btn">Cancelar</button>
       </div>
     </div>
 
     <!-- Floating Action Button -->
-    <button @click="navigateToCreate" class="fab">
-      ➕
-    </button>
+    <button @click="navigateToCreate" class="fab">➕</button>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
-import YearSelector from '@/components/YearSelector.vue'
-import { useAssistenciasRemotasStore } from '@/stores/assistencias-remotas.js'
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
+import YearSelector from '@/components/YearSelector.vue';
+import { useAssistenciasRemotasStore } from '@/stores/assistencias-remotas.js';
 
 // Router
-const router = useRouter()
+const router = useRouter();
 
 // Store
-const store = useAssistenciasRemotasStore()
-const { assistencias, availableYears, currentYear, loading, error } = storeToRefs(store)
-const { 
-  fetchAssistenciasForYear, 
-  fetchAvailableYears, 
-  searchAssistencias, 
-  deleteAssistencia, 
+const store = useAssistenciasRemotasStore();
+const { assistencias, availableYears, currentYear, loading, error } = storeToRefs(store);
+const {
+  fetchAssistenciasForYear,
+  fetchAvailableYears,
+  searchAssistencias,
+  deleteAssistencia,
   setCurrentYear,
-  clearError 
-} = store
+  clearError,
+} = store;
 
 // Reactive state
-const searchQuery = ref('')
-const searchResults = ref(null)
-const showActionsModal = ref(false)
-const selectedAssistenciaForActions = ref(null)
+const searchQuery = ref('');
+const searchResults = ref(null);
+const showActionsModal = ref(false);
+const selectedAssistenciaForActions = ref(null);
 
 // Computed
 const displayedAssistencias = computed(() => {
   if (searchResults.value && searchQuery.value) {
-    return searchResults.value.results || []
+    return searchResults.value.results || [];
   }
-  return assistencias.value
-})
+  return assistencias.value;
+});
 
 // Methods
 const refreshData = async () => {
-  searchQuery.value = ''
-  searchResults.value = null
-  
+  searchQuery.value = '';
+  searchResults.value = null;
+
   // Refresh available years first
-  await fetchAvailableYears()
-  
+  await fetchAvailableYears();
+
   // If no current year set, use the latest available year or current year
   if (!currentYear.value) {
     if (availableYears.value.length > 0) {
-      setCurrentYear(availableYears.value[availableYears.value.length - 1])
+      setCurrentYear(availableYears.value[availableYears.value.length - 1]);
     } else {
-      setCurrentYear(new Date().getFullYear().toString())
+      setCurrentYear(new Date().getFullYear().toString());
     }
   }
-  
+
   // Always fetch data for the current year
   if (currentYear.value) {
-    await fetchAssistenciasForYear(currentYear.value)
+    await fetchAssistenciasForYear(currentYear.value);
   }
-}
+};
 
 const handleSearch = async () => {
   if (!searchQuery.value || searchQuery.value.trim().length < 2) {
-    searchResults.value = null
-    return
+    searchResults.value = null;
+    return;
   }
 
   try {
-    const results = await searchAssistencias(searchQuery.value.trim(), currentYear.value)
-    searchResults.value = results
+    const results = await searchAssistencias(searchQuery.value.trim(), currentYear.value);
+    searchResults.value = results;
   } catch (err) {
-    console.error('Search error:', err)
+    console.error('Search error:', err);
   }
-}
+};
 
 const onYearChange = async () => {
-  searchQuery.value = ''
-  searchResults.value = null
-  
-  if (currentYear.value) {
-    await fetchAssistenciasForYear(currentYear.value)
-  }
-}
+  searchQuery.value = '';
+  searchResults.value = null;
 
-const formatDate = (dateString) => {
-  if (!dateString) return 'Sem data'
-  
+  if (currentYear.value) {
+    await fetchAssistenciasForYear(currentYear.value);
+  }
+};
+
+const formatDate = dateString => {
+  if (!dateString) return 'Sem data';
+
   try {
-    const date = new Date(dateString)
+    const date = new Date(dateString);
     return date.toLocaleDateString('pt-PT', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric'
-    })
+      year: 'numeric',
+    });
   } catch {
-    return 'Data inválida'
+    return 'Data inválida';
   }
-}
+};
 
-const getTipoClass = (tipo) => {
+const getTipoClass = tipo => {
   const typeMap = {
-    'REMOTA': 'tipo-remota',
-    'TELEFÓNICA': 'tipo-telefonica',
-    'TELEMÓVEL': 'tipo-telemovel'
-  }
-  return typeMap[tipo] || 'tipo-default'
-}
+    REMOTA: 'tipo-remota',
+    TELEFÓNICA: 'tipo-telefonica',
+    TELEMÓVEL: 'tipo-telemovel',
+  };
+  return typeMap[tipo] || 'tipo-default';
+};
 
-const navigateToDetail = (assistencia) => {
-  const year = store.getYearFromDate(assistencia.dataAssistencia)
-  router.push(`/assistencias-remotas/${assistencia.id}?year=${year}`)
-}
+const navigateToDetail = assistencia => {
+  const year = store.getYearFromDate(assistencia.dataAssistencia);
+  router.push(`/assistencias-remotas/${assistencia.id}?year=${year}`);
+};
 
 const navigateToCreate = () => {
-  router.push('/assistencias-remotas/new?from=list')
-}
+  router.push('/assistencias-remotas/new?from=list');
+};
 
-const showActions = (assistencia) => {
-  selectedAssistenciaForActions.value = assistencia
-  showActionsModal.value = true
-}
+const showActions = assistencia => {
+  selectedAssistenciaForActions.value = assistencia;
+  showActionsModal.value = true;
+};
 
 const closeActions = () => {
-  showActionsModal.value = false
-  selectedAssistenciaForActions.value = null
-}
+  showActionsModal.value = false;
+  selectedAssistenciaForActions.value = null;
+};
 
 const viewAssistencia = () => {
   if (selectedAssistenciaForActions.value) {
-    navigateToDetail(selectedAssistenciaForActions.value)
+    navigateToDetail(selectedAssistenciaForActions.value);
   }
-  closeActions()
-}
+  closeActions();
+};
 
 const editAssistencia = () => {
   if (selectedAssistenciaForActions.value) {
-    const year = store.getYearFromDate(selectedAssistenciaForActions.value.dataAssistencia)
-    router.push(`/assistencias-remotas/${selectedAssistenciaForActions.value.id}/edit?year=${year}`)
+    const year = store.getYearFromDate(selectedAssistenciaForActions.value.dataAssistencia);
+    router.push(
+      `/assistencias-remotas/${selectedAssistenciaForActions.value.id}/edit?year=${year}`
+    );
   }
-  closeActions()
-}
+  closeActions();
+};
 
 const deleteAssistenciaAction = async () => {
-  if (!selectedAssistenciaForActions.value) return
-  
-  const confirmed = confirm(`Tem a certeza que deseja eliminar a assistência "${selectedAssistenciaForActions.value.assistNumero}"?`)
-  
+  if (!selectedAssistenciaForActions.value) return;
+
+  const confirmed = confirm(
+    `Tem a certeza que deseja eliminar a assistência "${selectedAssistenciaForActions.value.assistNumero}"?`
+  );
+
   if (confirmed) {
     try {
-      const year = store.getYearFromDate(selectedAssistenciaForActions.value.dataAssistencia)
-      await deleteAssistencia(year, selectedAssistenciaForActions.value.id)
-      closeActions()
+      const year = store.getYearFromDate(selectedAssistenciaForActions.value.dataAssistencia);
+      await deleteAssistencia(year, selectedAssistenciaForActions.value.id);
+      closeActions();
     } catch (err) {
-      console.error('Error deleting assistencia:', err)
+      console.error('Error deleting assistencia:', err);
     }
   }
-}
+};
 
 // Lifecycle
 onMounted(async () => {
-  console.log('AssistenciasRemotasList mounted')
-  
+  console.log('AssistenciasRemotasList mounted');
+
   // Fetch available years first
-  await fetchAvailableYears()
-  
+  await fetchAvailableYears();
+
   // If we have years and current year is not in available years, use the latest year
   if (availableYears.value.length > 0) {
     if (!currentYear.value || !availableYears.value.includes(currentYear.value)) {
-      setCurrentYear(availableYears.value[availableYears.value.length - 1])
+      setCurrentYear(availableYears.value[availableYears.value.length - 1]);
     }
   }
-  
+
   // Always try to fetch data for the current year (even if no years found, try current year)
   if (currentYear.value) {
-    await fetchAssistenciasForYear(currentYear.value)
+    await fetchAssistenciasForYear(currentYear.value);
   }
-})
+});
 
 // Watch for changes in search query to reset results when empty
-watch(searchQuery, (newValue) => {
+watch(searchQuery, newValue => {
   if (!newValue || newValue.trim().length === 0) {
-    searchResults.value = null
+    searchResults.value = null;
   }
-})
+});
 </script>
 
 <style scoped>
@@ -361,8 +349,6 @@ watch(searchQuery, (newValue) => {
   align-items: center;
   gap: 1rem;
 }
-
-
 
 .btn {
   padding: 0.5rem 1rem;
@@ -558,7 +544,8 @@ watch(searchQuery, (newValue) => {
   flex-wrap: wrap;
 }
 
-.status-badge, .value-badge {
+.status-badge,
+.value-badge {
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.75rem;
@@ -736,38 +723,38 @@ watch(searchQuery, (newValue) => {
   .assistencias-container {
     padding: 1rem 0.5rem;
   }
-  
+
   .list-controls {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .controls-right {
     justify-content: space-between;
   }
-  
+
   .assistencia-item {
     padding: 1rem;
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .assistencia-actions {
     margin-left: 0;
     align-self: flex-end;
   }
-  
+
   .assistencia-header-info {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .assistencia-meta {
     flex-direction: column;
     gap: 0.25rem;
   }
-  
+
   .fab {
     bottom: 1rem;
     right: 1rem;
@@ -781,11 +768,11 @@ watch(searchQuery, (newValue) => {
   .assistencia-item {
     padding: 0.75rem;
   }
-  
+
   .assistencia-header-info h3 {
     font-size: 1rem;
   }
-  
+
   .controls-left h2 {
     font-size: 1.25rem;
   }

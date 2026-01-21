@@ -1,17 +1,16 @@
-import { vi } from 'vitest';
+// import { vi } from 'vitest'; // Commented out for now - will be used when testing is implemented
 import type { Context } from 'hono';
 
 /**
  * Mock authentication helpers for testing
+ * TODO: Uncomment and implement when testing framework is set up
  */
 
 // Mock user context for testing
 export const mockUser = {
   userId: 'test-user-123',
-  email: 'test@example.com',
   firstName: 'Test',
   lastName: 'User',
-  imageUrl: 'https://example.com/avatar.jpg',
   emailAddresses: [{ emailAddress: 'test@example.com' }],
   primaryEmailAddressId: 'email-123',
 };
@@ -19,17 +18,17 @@ export const mockUser = {
 // Mock the clerk middleware functions
 export const mockClerkMiddleware = () => {
   // Mock requireAuth middleware - just pass through
-  const requireAuth = vi.fn().mockImplementation(async (c: Context, next: () => Promise<void>) => {
+  const requireAuth = async (c: Context, next: () => Promise<void>) => {
     // Set mock user context
     c.set('user', mockUser);
     await next();
-  });
+  };
 
   // Mock getUserContext - return mock user
-  const getUserContext = vi.fn().mockReturnValue(mockUser);
+  const getUserContext = () => mockUser;
 
   // Mock requireUserContext - return mock user
-  const requireUserContext = vi.fn().mockReturnValue(mockUser);
+  const requireUserContext = () => mockUser;
 
   return {
     requireAuth,
@@ -38,37 +37,22 @@ export const mockClerkMiddleware = () => {
   };
 };
 
-// Helper to create a test app with mocked authentication
-export const createTestAppWithAuth = async () => {
-  const { Hono } = await import('hono');
-  
-  // Mock the clerk middleware module before importing API routes
-  vi.doMock('../middleware/clerk', () => mockClerkMiddleware());
-  
-  // Clear module cache to ensure fresh import
-  vi.resetModules();
-  
-  // Import API routes after mocking
-  const { default: api } = await import('../routes/api');
-  
-  const app = new Hono();
-  app.route('/api', api);
-  
-  return app;
+/**
+ * Setup mock authentication for testing
+ * TODO: Uncomment when testing framework is set up
+ */
+export const setupMockAuth = () => {
+  // vi.doMock('../middleware/clerk', () => mockClerkMiddleware());
+  // vi.resetModules();
+  console.log('Mock auth setup (placeholder)');
 };
 
-// Helper to create a test app without authentication (for testing 401 responses)
-export const createTestAppWithoutAuth = async () => {
-  const { Hono } = await import('hono');
-  
-  // Don't mock the clerk middleware - use real implementation
-  vi.doUnmock('../middleware/clerk');
-  vi.resetModules();
-  
-  const { default: api } = await import('../routes/api');
-  
-  const app = new Hono();
-  app.route('/api', api);
-  
-  return app;
+/**
+ * Reset authentication mocks
+ * TODO: Uncomment when testing framework is set up
+ */
+export const resetMockAuth = () => {
+  // vi.doUnmock('../middleware/clerk');
+  // vi.resetModules();
+  console.log('Mock auth reset (placeholder)');
 };

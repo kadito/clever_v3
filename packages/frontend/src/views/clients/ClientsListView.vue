@@ -39,16 +39,34 @@
         <!-- Location -->
         <span v-if="item.data.localidade" class="flex items-center">
           <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+            />
           </svg>
           {{ item.data.localidade }}
         </span>
 
         <!-- Contact phone -->
-        <span v-if="item.data.telefoneContato" class="flex items-center before:content-['•'] before:mx-1">
+        <span
+          v-if="item.data.telefoneContato"
+          class="flex items-center before:content-['•'] before:mx-1"
+        >
           <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+            />
           </svg>
           {{ item.data.telefoneContato }}
         </span>
@@ -73,9 +91,12 @@
         </div>
 
         <!-- Software summary -->
-        <div v-if="item.data.softwares && item.data.softwares.length > 0" class="flex flex-wrap gap-1 mt-1">
-          <span 
-            v-for="software in item.data.softwares.slice(0, 3)" 
+        <div
+          v-if="item.data.softwares && item.data.softwares.length > 0"
+          class="flex flex-wrap gap-1 mt-1"
+        >
+          <span
+            v-for="software in item.data.softwares.slice(0, 3)"
             :key="software.id"
             class="software-badge"
           >
@@ -121,7 +142,7 @@ const displayedClients = computed(() => {
   if (!searchQuery.value) {
     return clients.value;
   }
-  
+
   const query = searchQuery.value.toLowerCase();
   return clients.value.filter(client => {
     const data = client.data;
@@ -148,15 +169,15 @@ const getClientTitle = (item: BaseContent): string => {
 const getClientSubtitle = (item: BaseContent): string => {
   const client = item as Client;
   const parts = [];
-  
+
   if (client.data.contribuinte) {
     parts.push(`NIF: ${client.data.contribuinte}`);
   }
-  
+
   if (client.data.responsavel) {
     parts.push(client.data.responsavel);
   }
-  
+
   return parts.join(' • ');
 };
 
@@ -223,9 +244,9 @@ const loadClients = async () => {
   try {
     isLoading.value = true;
     clearError();
-    
+
     await api.fetchList();
-    
+
     if (api.items.value) {
       // Sort clients alphabetically by commercial name or company name
       clients.value = api.items.value.sort((a, b) => {
@@ -273,7 +294,7 @@ onMounted(() => {
   .icon-circle {
     @apply w-8 h-8 text-xs;
   }
-  
+
   .service-badge,
   .software-badge {
     @apply px-1.5 py-0.5 text-xs;

@@ -1,0 +1,187 @@
+import type { FormSection } from '@/components/common/types';
+
+export const remoteAssistanceFormSections: FormSection[] = [
+  {
+    key: 'basic',
+    title: 'Dados do Cliente',
+    description: 'Informação básica do cliente para a assistência remota',
+    fields: [
+      {
+        key: 'clientId',
+        label: 'Cliente',
+        type: 'custom',
+        required: true,
+        placeholder: 'Pesquisar cliente...',
+      },
+    ],
+  },
+  {
+    key: 'assistanceInfo',
+    title: 'Informação da Assistência',
+    description: 'Detalhes sobre o tipo e responsável pela assistência',
+    fields: [
+      {
+        key: 'tipoAssistencia',
+        label: 'Tipo de Assistência',
+        type: 'select',
+        required: true,
+        fullWidth: false,
+        options: [
+          { value: '', label: 'Selecionar tipo...' },
+          { value: 'REMOTA', label: 'REMOTA' },
+          { value: 'TELEFÓNICA', label: 'TELEFÓNICA' },
+          { value: 'TELEMÓVEL', label: 'TELEMÓVEL' },
+        ],
+      },
+      {
+        key: 'tecnicoResponsavel',
+        label: 'Técnico Responsável',
+        type: 'text',
+        required: true,
+        fullWidth: false,
+        placeholder: 'Nome do técnico',
+      },
+      {
+        key: 'quemAtendeu',
+        label: 'Quem Atendeu',
+        type: 'text',
+        fullWidth: false,
+        placeholder: 'Nome de quem atendeu',
+      },
+    ],
+  },
+  {
+    key: 'dateTime',
+    title: 'Data e Horário',
+    description: 'Datas e horários da assistência remota',
+    fields: [
+      {
+        key: 'dataPedido',
+        label: 'Data do Pedido',
+        type: 'date',
+        fullWidth: false,
+        defaultValue: new Date().toISOString().split('T')[0],
+      },
+      {
+        key: 'dataAssistencia',
+        label: 'Data da Assistência',
+        type: 'date',
+        required: true,
+        fullWidth: false,
+        defaultValue: new Date().toISOString().split('T')[0],
+      },
+      {
+        key: 'inicioAssistencia',
+        label: 'Início da Assistência',
+        type: 'custom',
+        fullWidth: false,
+        placeholder: '09:00',
+      },
+      {
+        key: 'fimAssistencia',
+        label: 'Fim da Assistência',
+        type: 'custom',
+        fullWidth: false,
+        placeholder: '10:00',
+      },
+    ],
+  },
+  {
+    key: 'description',
+    title: 'Descrição',
+    description: 'Motivo do pedido e relatório da assistência',
+    fields: [
+      {
+        key: 'motivoPedido',
+        label: 'Motivo do Pedido',
+        type: 'textarea',
+        fullWidth: true,
+        rows: 3,
+        placeholder: 'Descreva o motivo do pedido...',
+      },
+      {
+        key: 'relatorioAssistencia',
+        label: 'Relatório da Assistência',
+        type: 'textarea',
+        fullWidth: true,
+        rows: 4,
+        placeholder: 'Descreva o que foi realizado durante a assistência...',
+      },
+      {
+        key: 'relatorio',
+        label: 'Relatório Final',
+        type: 'textarea',
+        fullWidth: true,
+        rows: 3,
+        placeholder: 'Relatório final da assistência resolvida...',
+        conditional: {
+          dependsOn: 'resolvido',
+          showWhen: (value: any) => value === true,
+        },
+      },
+    ],
+  },
+  {
+    key: 'values',
+    title: 'Valores',
+    description: 'Valor da assistência (calculado automaticamente baseado no tempo)',
+    fields: [
+      {
+        key: 'valorAssist',
+        label: 'Valor da Assistência (€)',
+        type: 'number',
+        fullWidth: false,
+        min: 0,
+        step: 0.01,
+        disabled: true,
+        placeholder: 'Calculado automaticamente',
+      },
+    ],
+  },
+  {
+    key: 'status',
+    title: 'Estado',
+    description: 'Estado da assistência e tipo de cobrança',
+    fields: [
+      {
+        key: 'contrato',
+        label: 'Contrato',
+        type: 'switch',
+        fullWidth: false,
+        switchLabel: 'Assistência coberta por contrato',
+        defaultValue: false,
+      },
+      {
+        key: 'garantia',
+        label: 'Garantia',
+        type: 'switch',
+        fullWidth: false,
+        switchLabel: 'Assistência coberta por garantia',
+        defaultValue: false,
+      },
+      {
+        key: 'resolvido',
+        label: 'Resolvido',
+        type: 'switch',
+        fullWidth: false,
+        switchLabel: 'Problema foi resolvido',
+        defaultValue: false,
+      },
+    ],
+  },
+  {
+    key: 'observations',
+    title: 'Anexos',
+    description: 'Informações adicionais e anexos',
+    fields: [
+      {
+        key: 'anexos',
+        label: 'Anexos',
+        type: 'textarea',
+        fullWidth: true,
+        rows: 2,
+        placeholder: 'Informações sobre anexos ou documentos relacionados...',
+      },
+    ],
+  },
+];

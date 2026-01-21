@@ -1,9 +1,9 @@
 /**
  * Integration tests for relation validation in API endpoints
- * 
+ *
  * Verifies that the relation validation system works correctly with the API routes
  * and allows content creation/updates with relation IDs without validating referenced content exists.
- * 
+ *
  * Requirements: 1.1, 1.3, 1.4, 1.5
  */
 
@@ -16,7 +16,7 @@ import { validateLicenseCreation, validateLicenseUpdate } from '@clever/shared';
 // Mock storage bucket for testing
 const createMockStorageBucket = () => {
   const storage = new Map<string, any>();
-  
+
   return {
     get: async (key: string) => {
       const data = storage.get(key);
@@ -28,7 +28,7 @@ const createMockStorageBucket = () => {
     },
     delete: async (key: string) => {
       storage.delete(key);
-    }
+    },
   };
 };
 
@@ -40,7 +40,7 @@ const mockUserContext: UserContext = {
   lastName: 'User',
   userType: 'User',
   sessionId: 'session-123',
-  isAuthenticated: true
+  isAuthenticated: true,
 };
 
 describe('Relation Validation Integration', () => {
@@ -49,10 +49,10 @@ describe('Relation Validation Integration', () => {
 
   beforeEach(() => {
     mockBucket = createMockStorageBucket();
-    
+
     // Create a test app with license routes
     app = new Hono();
-    
+
     // Mock the environment and user context
     app.use('*', async (c, next) => {
       c.env = { R2_BUCKET: mockBucket };
@@ -80,13 +80,13 @@ describe('Relation Validation Integration', () => {
       const licenseData = {
         clientId: '123e4567-e89b-12d3-a456-426614174000', // Valid UUID format
         versao: '2024',
-        numeroSerie: 'ABC123'
+        numeroSerie: 'ABC123',
       };
 
       const response = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       expect(response.status).toBe(201);
@@ -99,13 +99,13 @@ describe('Relation Validation Integration', () => {
       const licenseData = {
         clientId: '', // Empty string - should be allowed for optional relations
         versao: '2024',
-        numeroSerie: 'ABC123'
+        numeroSerie: 'ABC123',
       };
 
       const response = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       expect(response.status).toBe(201);
@@ -116,14 +116,14 @@ describe('Relation Validation Integration', () => {
     it('should allow license creation without clientId (optional relation)', async () => {
       const licenseData = {
         versao: '2024',
-        numeroSerie: 'ABC123'
+        numeroSerie: 'ABC123',
         // No clientId field - should be allowed for optional relations
       };
 
       const response = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       expect(response.status).toBe(201);
@@ -135,13 +135,13 @@ describe('Relation Validation Integration', () => {
       const licenseData = {
         clientId: 'invalid-uuid-format', // Invalid UUID format
         versao: '2024',
-        numeroSerie: 'ABC123'
+        numeroSerie: 'ABC123',
       };
 
       const response = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       expect(response.status).toBe(400);
@@ -156,13 +156,13 @@ describe('Relation Validation Integration', () => {
       // First create a license
       const initialData = {
         versao: '2024',
-        numeroSerie: 'ABC123'
+        numeroSerie: 'ABC123',
       };
 
       const createResponse = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(initialData)
+        body: JSON.stringify(initialData),
       });
 
       expect(createResponse.status).toBe(201);
@@ -171,13 +171,13 @@ describe('Relation Validation Integration', () => {
 
       // Now update with a clientId
       const updateData = {
-        clientId: '987fcdeb-51a2-43d1-9f12-123456789abc' // Valid UUID format
+        clientId: '987fcdeb-51a2-43d1-9f12-123456789abc', // Valid UUID format
       };
 
       const updateResponse = await app.request(`/api/content/licenses/${licenseUuid}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateData)
+        body: JSON.stringify(updateData),
       });
 
       expect(updateResponse.status).toBe(200);
@@ -191,13 +191,13 @@ describe('Relation Validation Integration', () => {
       const initialData = {
         clientId: '123e4567-e89b-12d3-a456-426614174000',
         versao: '2024',
-        numeroSerie: 'ABC123'
+        numeroSerie: 'ABC123',
       };
 
       const createResponse = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(initialData)
+        body: JSON.stringify(initialData),
       });
 
       expect(createResponse.status).toBe(201);
@@ -206,13 +206,13 @@ describe('Relation Validation Integration', () => {
 
       // Now update to remove clientId
       const updateData = {
-        clientId: '' // Remove the client relation
+        clientId: '', // Remove the client relation
       };
 
       const updateResponse = await app.request(`/api/content/licenses/${licenseUuid}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateData)
+        body: JSON.stringify(updateData),
       });
 
       expect(updateResponse.status).toBe(200);
@@ -224,13 +224,13 @@ describe('Relation Validation Integration', () => {
       // First create a license
       const initialData = {
         versao: '2024',
-        numeroSerie: 'ABC123'
+        numeroSerie: 'ABC123',
       };
 
       const createResponse = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(initialData)
+        body: JSON.stringify(initialData),
       });
 
       expect(createResponse.status).toBe(201);
@@ -239,13 +239,13 @@ describe('Relation Validation Integration', () => {
 
       // Now try to update with invalid clientId
       const updateData = {
-        clientId: 'invalid-format'
+        clientId: 'invalid-format',
       };
 
       const updateResponse = await app.request(`/api/content/licenses/${licenseUuid}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateData)
+        body: JSON.stringify(updateData),
       });
 
       expect(updateResponse.status).toBe(400);
@@ -271,8 +271,8 @@ describe('Relation Validation Integration', () => {
         data: {
           clientId: '123e4567-e89b-12d3-a456-426614174000',
           versao: '2023',
-          numeroSerie: 'OLD123'
-        }
+          numeroSerie: 'OLD123',
+        },
       };
 
       await mockBucket.put(

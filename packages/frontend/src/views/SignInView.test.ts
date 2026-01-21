@@ -57,7 +57,7 @@ describe('SignInView', () => {
 
   it('renders the sign in page', () => {
     const wrapper = createWrapper();
-    
+
     // Check that the page title is present
     expect(wrapper.text()).toContain('CLEVER');
     expect(wrapper.text()).toContain('Entrar na sua conta');
@@ -65,11 +65,11 @@ describe('SignInView', () => {
 
   it('shows the Clerk SignIn component', () => {
     const wrapper = createWrapper();
-    
+
     // Check that the Clerk SignIn container is rendered
     const clerkContainer = wrapper.find('.clerk-signin-container');
     expect(clerkContainer.exists()).toBe(true);
-    
+
     // Check that the div inside the container exists (where Clerk mounts)
     const signInDiv = clerkContainer.find('div');
     expect(signInDiv.exists()).toBe(true);
@@ -77,7 +77,7 @@ describe('SignInView', () => {
 
   it('displays the correct Portuguese labels', () => {
     const wrapper = createWrapper();
-    
+
     // Check Portuguese text
     expect(wrapper.text()).toContain('Entrar na sua conta');
     expect(wrapper.text()).toContain('Aceda ao seu dashboard CLEVER');
@@ -85,7 +85,7 @@ describe('SignInView', () => {
 
   it('has mobile-friendly styling', () => {
     const wrapper = createWrapper();
-    
+
     // Check that the main container has mobile-first classes
     const container = wrapper.find('.min-h-screen');
     expect(container.exists()).toBe(true);

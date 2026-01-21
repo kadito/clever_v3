@@ -9,19 +9,13 @@
         </h1>
         <p class="page-subtitle">Informação detalhada do registo</p>
       </div>
-      
+
       <div class="header-actions">
-        <router-link 
-          :to="`/conta-corrente/${year}/${id}/edit`"
-          class="btn btn-primary"
-        >
+        <router-link :to="`/conta-corrente/${year}/${id}/edit`" class="btn btn-primary">
           <span class="btn-icon">✏️</span>
           Editar
         </router-link>
-        <button 
-          @click="confirmDelete"
-          class="btn btn-danger"
-        >
+        <button @click="confirmDelete" class="btn btn-danger">
           <span class="btn-icon">🗑️</span>
           Eliminar
         </button>
@@ -81,12 +75,18 @@
               <div class="info-item">
                 <label>VALOR DA FATURA (€)</label>
                 <div class="info-value currency">
-                  {{ contaCorrente.valorFatura ? formatCurrency(contaCorrente.valorFatura) : 'Não especificado' }}
+                  {{
+                    contaCorrente.valorFatura
+                      ? formatCurrency(contaCorrente.valorFatura)
+                      : 'Não especificado'
+                  }}
                 </div>
               </div>
               <div class="info-item">
                 <label>FORMA DE PAGAMENTO</label>
-                <div class="info-value">{{ contaCorrente.formaPagamento || 'Não especificado' }}</div>
+                <div class="info-value">
+                  {{ contaCorrente.formaPagamento || 'Não especificado' }}
+                </div>
               </div>
             </div>
           </div>
@@ -103,13 +103,21 @@
               <div class="info-item">
                 <label>DATA DA FATURA GERADA</label>
                 <div class="info-value">
-                  {{ contaCorrente.dataFaturaGerada ? formatDate(contaCorrente.dataFaturaGerada) : 'Não especificado' }}
+                  {{
+                    contaCorrente.dataFaturaGerada
+                      ? formatDate(contaCorrente.dataFaturaGerada)
+                      : 'Não especificado'
+                  }}
                 </div>
               </div>
               <div class="info-item">
                 <label>DATA DE VENCIMENTO</label>
                 <div class="info-value" :class="getDueDateClass(contaCorrente)">
-                  {{ contaCorrente.dataVencimentoFatura ? formatDate(contaCorrente.dataVencimentoFatura) : 'Não especificado' }}
+                  {{
+                    contaCorrente.dataVencimentoFatura
+                      ? formatDate(contaCorrente.dataVencimentoFatura)
+                      : 'Não especificado'
+                  }}
                 </div>
               </div>
             </div>
@@ -144,7 +152,9 @@
               </div>
               <div class="info-item">
                 <label>NÚMERO PRESENCIAL</label>
-                <div class="info-value">{{ contaCorrente.numeroPresencial || 'Não aplicável' }}</div>
+                <div class="info-value">
+                  {{ contaCorrente.numeroPresencial || 'Não aplicável' }}
+                </div>
               </div>
             </div>
             <div v-if="contaCorrente.motivoObs" class="info-item full-width">
@@ -192,10 +202,7 @@
             <span class="btn-icon">⬅️</span>
             Voltar à Lista
           </router-link>
-          <router-link 
-            :to="`/conta-corrente/${year}/${id}/edit`"
-            class="btn btn-primary"
-          >
+          <router-link :to="`/conta-corrente/${year}/${id}/edit`" class="btn btn-primary">
             <span class="btn-icon">✏️</span>
             Editar Registo
           </router-link>
@@ -222,7 +229,9 @@
         <button @click="retryLoad" class="btn btn-primary" :disabled="loading">
           {{ loading ? 'A carregar...' : 'Tentar novamente' }}
         </button>
-        <router-link to="/conta-corrente/list" class="btn btn-secondary">Voltar à Lista</router-link>
+        <router-link to="/conta-corrente/list" class="btn btn-secondary"
+          >Voltar à Lista</router-link
+        >
       </div>
     </div>
 
@@ -234,7 +243,9 @@
         <button @click="retryLoad" class="btn btn-primary" :disabled="loading">
           {{ loading ? 'A carregar...' : 'Tentar novamente' }}
         </button>
-        <router-link to="/conta-corrente/list" class="btn btn-secondary">Voltar à Lista</router-link>
+        <router-link to="/conta-corrente/list" class="btn btn-secondary"
+          >Voltar à Lista</router-link
+        >
       </div>
       <p v-if="autoRetryCountdown > 0" class="auto-retry-info">
         Tentativa automática em {{ autoRetryCountdown }}s...
@@ -251,9 +262,11 @@
           <p>Tem certeza que deseja eliminar este registo de conta corrente?</p>
           <div class="delete-item-info">
             <strong>{{ contaCorrente.nomeCliente }}</strong>
-            <br>
+            <br />
             <span v-if="contaCorrente.numeroFatura">Fatura: {{ contaCorrente.numeroFatura }}</span>
-            <span v-if="contaCorrente.valorFatura"> - {{ formatCurrency(contaCorrente.valorFatura) }}</span>
+            <span v-if="contaCorrente.valorFatura">
+              - {{ formatCurrency(contaCorrente.valorFatura) }}</span
+            >
           </div>
           <p class="warning-text">Esta ação não pode ser desfeita.</p>
         </div>
@@ -269,25 +282,25 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useContaCorrenteStore } from '@/stores/conta-corrente'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useContaCorrenteStore } from '@/stores/conta-corrente';
 
-const route = useRoute()
-const router = useRouter()
-const store = useContaCorrenteStore()
+const route = useRoute();
+const router = useRouter();
+const store = useContaCorrenteStore();
 
 // Route params
-const year = route.params.year
-const id = route.params.id
+const year = route.params.year;
+const id = route.params.id;
 
 // Local state
-const showDeleteModal = ref(false)
+const showDeleteModal = ref(false);
 
 // Auto-retry state
-const autoRetryCountdown = ref(0)
-const userInteractionCancelled = ref(false)
-const retryTimeoutId = ref(null)
+const autoRetryCountdown = ref(0);
+const userInteractionCancelled = ref(false);
+const retryTimeoutId = ref(null);
 
 // Computed properties from store
 const {
@@ -299,173 +312,177 @@ const {
   getInvoiceStatus,
   isInvoiceOverdue,
   isInvoiceDueToday,
-  clearError
-} = store
+  clearError,
+} = store;
 
 // Methods
 async function loadContaCorrente() {
   try {
-    clearError()
-    await store.fetchContaCorrenteById(year, id)
+    clearError();
+    await store.fetchContaCorrenteById(year, id);
     // If successful, cancel any pending retries
-    cancelAutoRetry()
+    cancelAutoRetry();
   } catch (err) {
-    console.error('Error loading conta corrente:', err)
+    console.error('Error loading conta corrente:', err);
     // Check if it's a 404 or "not found" error
-    const isNotFound = err.message?.toLowerCase().includes('not found') || 
-                       error.value?.toLowerCase().includes('not found')
-    
+    const isNotFound =
+      err.message?.toLowerCase().includes('not found') ||
+      error.value?.toLowerCase().includes('not found');
+
     if (isNotFound && !userInteractionCancelled.value) {
       // Start auto-retry countdown
-      startAutoRetry()
+      startAutoRetry();
     }
   }
 }
 
 const retryLoad = () => {
-  userInteractionCancelled.value = true
-  cancelAutoRetry()
-  loadContaCorrente()
-}
+  userInteractionCancelled.value = true;
+  cancelAutoRetry();
+  loadContaCorrente();
+};
 
 const startAutoRetry = () => {
-  cancelAutoRetry()
-  autoRetryCountdown.value = 10
-  
+  cancelAutoRetry();
+  autoRetryCountdown.value = 10;
+
   const updateCountdown = () => {
     if (autoRetryCountdown.value > 0 && !userInteractionCancelled.value) {
-      autoRetryCountdown.value--
-      retryTimeoutId.value = setTimeout(updateCountdown, 1000)
+      autoRetryCountdown.value--;
+      retryTimeoutId.value = setTimeout(updateCountdown, 1000);
     } else if (autoRetryCountdown.value === 0 && !userInteractionCancelled.value) {
       // Auto-retry after countdown
-      loadContaCorrente()
+      loadContaCorrente();
     }
-  }
-  
-  retryTimeoutId.value = setTimeout(updateCountdown, 1000)
-}
+  };
+
+  retryTimeoutId.value = setTimeout(updateCountdown, 1000);
+};
 
 const cancelAutoRetry = () => {
   if (retryTimeoutId.value) {
-    clearTimeout(retryTimeoutId.value)
-    retryTimeoutId.value = null
+    clearTimeout(retryTimeoutId.value);
+    retryTimeoutId.value = null;
   }
-  autoRetryCountdown.value = 0
-}
+  autoRetryCountdown.value = 0;
+};
 
 const handleUserInteraction = () => {
-  userInteractionCancelled.value = true
-  cancelAutoRetry()
-}
+  userInteractionCancelled.value = true;
+  cancelAutoRetry();
+};
 
 // Watch for successful data load to cancel retries
-watch(() => contaCorrente.value?.id, (newId) => {
-  if (newId) {
-    cancelAutoRetry()
-    userInteractionCancelled.value = false
+watch(
+  () => contaCorrente.value?.id,
+  newId => {
+    if (newId) {
+      cancelAutoRetry();
+      userInteractionCancelled.value = false;
+    }
   }
-})
+);
 
 function getStatusLabel(item) {
-  const status = getInvoiceStatus(item)
+  const status = getInvoiceStatus(item);
   const labels = {
     paid: 'Pago',
     overdue: 'Vencido',
     due_today: 'Vence Hoje',
     due_soon: 'Vence em Breve',
-    pending: 'Pendente'
-  }
-  return labels[status] || 'Desconhecido'
+    pending: 'Pendente',
+  };
+  return labels[status] || 'Desconhecido';
 }
 
 function getStatusIcon(item) {
-  const status = getInvoiceStatus(item)
+  const status = getInvoiceStatus(item);
   const icons = {
     paid: '✅',
     overdue: '🚨',
     due_today: '⏰',
     due_soon: '⏳',
-    pending: '🔄'
-  }
-  return icons[status] || '❓'
+    pending: '🔄',
+  };
+  return icons[status] || '❓';
 }
 
 function getStatusDescription(item) {
-  const status = getInvoiceStatus(item)
+  const status = getInvoiceStatus(item);
   const descriptions = {
     paid: 'Este registo está marcado como pago.',
     overdue: 'Esta fatura está vencida e requer atenção imediata.',
     due_today: 'Esta fatura vence hoje.',
     due_soon: 'Esta fatura vence em breve.',
-    pending: 'Esta fatura está pendente de pagamento.'
-  }
-  return descriptions[status] || 'Estado desconhecido.'
+    pending: 'Esta fatura está pendente de pagamento.',
+  };
+  return descriptions[status] || 'Estado desconhecido.';
 }
 
 function getDueDateClass(item) {
-  if (item.pago === 'TRUE' || item.pago === 'true') return 'paid'
-  if (isInvoiceOverdue(item)) return 'overdue'
-  if (isInvoiceDueToday(item)) return 'due-today'
-  return ''
+  if (item.pago === 'TRUE' || item.pago === 'true') return 'paid';
+  if (isInvoiceOverdue(item)) return 'overdue';
+  if (isInvoiceDueToday(item)) return 'due-today';
+  return '';
 }
 
 function getPaymentStatusClass(item) {
-  if (item.pago === 'TRUE' || item.pago === 'true') return 'paid'
-  if (isInvoiceOverdue(item)) return 'overdue'
-  return 'pending'
+  if (item.pago === 'TRUE' || item.pago === 'true') return 'paid';
+  if (isInvoiceOverdue(item)) return 'overdue';
+  return 'pending';
 }
 
 function getPaymentStatusText(item) {
-  if (item.pago === 'TRUE' || item.pago === 'true') return 'Pago'
-  if (item.pago === 'FALSE' || item.pago === 'false') return 'Não Pago'
-  return 'Não especificado'
+  if (item.pago === 'TRUE' || item.pago === 'true') return 'Pago';
+  if (item.pago === 'FALSE' || item.pago === 'false') return 'Não Pago';
+  return 'Não especificado';
 }
 
 function formatDateTime(dateString) {
-  if (!dateString) return 'Não disponível'
-  const date = new Date(dateString)
+  if (!dateString) return 'Não disponível';
+  const date = new Date(dateString);
   return date.toLocaleString('pt-PT', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
-    minute: '2-digit'
-  })
+    minute: '2-digit',
+  });
 }
 
 function confirmDelete() {
-  showDeleteModal.value = true
+  showDeleteModal.value = true;
 }
 
 function cancelDelete() {
-  showDeleteModal.value = false
+  showDeleteModal.value = false;
 }
 
 async function deleteContaCorrente() {
   try {
-    await store.deleteContaCorrente(year, id)
-    router.push('/conta-corrente/list')
+    await store.deleteContaCorrente(year, id);
+    router.push('/conta-corrente/list');
   } catch (err) {
-    console.error('Error deleting conta corrente:', err)
+    console.error('Error deleting conta corrente:', err);
   }
 }
 
 // Lifecycle
 onMounted(() => {
   // Add event listeners for user interaction
-  window.addEventListener('click', handleUserInteraction)
-  window.addEventListener('scroll', handleUserInteraction)
-  window.addEventListener('keydown', handleUserInteraction)
-  
-  loadContaCorrente()
-})
+  window.addEventListener('click', handleUserInteraction);
+  window.addEventListener('scroll', handleUserInteraction);
+  window.addEventListener('keydown', handleUserInteraction);
+
+  loadContaCorrente();
+});
 
 onBeforeUnmount(() => {
-  cancelAutoRetry()
-  window.removeEventListener('click', handleUserInteraction)
-  window.removeEventListener('scroll', handleUserInteraction)
-  window.removeEventListener('keydown', handleUserInteraction)
-})
+  cancelAutoRetry();
+  window.removeEventListener('click', handleUserInteraction);
+  window.removeEventListener('scroll', handleUserInteraction);
+  window.removeEventListener('keydown', handleUserInteraction);
+});
 </script>
 
 <style scoped>
@@ -850,8 +867,12 @@ onBeforeUnmount(() => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .error-icon {
@@ -926,25 +947,25 @@ onBeforeUnmount(() => {
   .conta-corrente-detail {
     padding: 1rem;
   }
-  
+
   .page-header {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .header-actions {
     justify-content: stretch;
   }
-  
+
   .info-row {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .action-buttons {
     flex-direction: column;
   }
-  
+
   .btn {
     justify-content: center;
   }

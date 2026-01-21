@@ -15,9 +15,7 @@
         </div>
       </div>
       <div class="header-actions">
-        <button @click="navigateToEdit" class="btn btn-edit">
-          ✏️ Editar
-        </button>
+        <button @click="navigateToEdit" class="btn btn-edit">✏️ Editar</button>
       </div>
     </div>
 
@@ -73,7 +71,11 @@
           <div class="detail-item">
             <label>TELEFONE DO CONTACTO</label>
             <span>
-              <a v-if="cliente.telefoneContato" :href="`tel:${cliente.telefoneContato}`" class="contact-link">
+              <a
+                v-if="cliente.telefoneContato"
+                :href="`tel:${cliente.telefoneContato}`"
+                class="contact-link"
+              >
                 {{ cliente.telefoneContato }}
               </a>
               <span v-else>-</span>
@@ -91,7 +93,11 @@
           <div class="detail-item">
             <label>E-MAIL DO CONTACTO</label>
             <span>
-              <a v-if="cliente.emailContato" :href="`mailto:${cliente.emailContato}`" class="contact-link">
+              <a
+                v-if="cliente.emailContato"
+                :href="`mailto:${cliente.emailContato}`"
+                class="contact-link"
+              >
                 {{ cliente.emailContato }}
               </a>
               <span v-else>-</span>
@@ -130,14 +136,17 @@
         </div>
       </section>
 
-
       <!-- Software Section -->
       <section class="detail-section">
         <h3>SOFTWARE</h3>
-        
+
         <!-- New Software Structure -->
         <div v-if="cliente.softwares && cliente.softwares.length > 0" class="software-list">
-          <div v-for="(software, index) in cliente.softwares" :key="software.id" class="software-item">
+          <div
+            v-for="(software, index) in cliente.softwares"
+            :key="software.id"
+            class="software-item"
+          >
             <div class="software-item-header">
               <strong>{{ software.name }}</strong>
             </div>
@@ -157,14 +166,17 @@
                   <span>{{ software.versaoSoftware }}</span>
                 </div>
               </template>
-              
+
               <!-- Pix -->
               <template v-if="software.name === 'Pix'">
                 <div class="software-detail-item" v-if="software.product">
                   <label>Produto:</label>
                   <span>{{ software.product }}</span>
                 </div>
-                <div class="software-detail-item" v-if="software.modules && software.modules.length > 0">
+                <div
+                  class="software-detail-item"
+                  v-if="software.modules && software.modules.length > 0"
+                >
                   <label>Módulos:</label>
                   <span>{{ software.modules.join(', ') }}</span>
                 </div>
@@ -181,7 +193,7 @@
                   <span>{{ software.versaoLicenca }}</span>
                 </div>
               </template>
-              
+
               <!-- Zon Soft -->
               <template v-if="software.name === 'Zon Soft'">
                 <div class="software-detail-item" v-if="software.product">
@@ -205,7 +217,7 @@
                   <span>{{ software.versaoLicenca }}</span>
                 </div>
               </template>
-              
+
               <!-- Pt CERT -->
               <template v-if="software.name === 'Pt CERT'">
                 <div class="software-detail-item" v-if="software.licenseType">
@@ -225,7 +237,7 @@
                   <span>{{ software.versaoLicenca }}</span>
                 </div>
               </template>
-              
+
               <!-- Dream Soft & Contas Certas -->
               <template v-if="software.name === 'Dream Soft' || software.name === 'Contas Certas'">
                 <div class="software-detail-item" v-if="software.numeroSerie">
@@ -244,7 +256,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Legacy software display (for old data) -->
         <div v-else-if="hasLegacySoftware(cliente)" class="services-grid legacy-services">
           <div class="service-item active" v-if="cliente.vectron">
@@ -272,21 +284,17 @@
             <span class="service-name">CONTAS CERTAS</span>
           </div>
         </div>
-        
+
         <!-- Empty state -->
-        <div v-else class="no-software-message">
-          Nenhum software registado
-        </div>
+        <div v-else class="no-software-message">Nenhum software registado</div>
       </section>
-      
+
       <!-- Contratos Section -->
       <section class="detail-section">
         <h3>CONTRATOS</h3>
-        
-        <div v-if="contractosLoading" class="loading-contracts">
-          A carregar contratos...
-        </div>
-        
+
+        <div v-if="contractosLoading" class="loading-contracts">A carregar contratos...</div>
+
         <div v-else-if="clienteContratos && clienteContratos.length > 0" class="contratos-list">
           <div v-for="contrato in clienteContratos" :key="contrato.id" class="contrato-card">
             <div class="contrato-header">
@@ -315,7 +323,9 @@
                   </div>
                   <div class="detail-row" v-if="getContractPrice(contrato, 'CPA')">
                     <span class="detail-label">Preço:</span>
-                    <span class="detail-value price-highlight">{{ formatPrice(getContractPrice(contrato, 'CPA')) }}</span>
+                    <span class="detail-value price-highlight">{{
+                      formatPrice(getContractPrice(contrato, 'CPA'))
+                    }}</span>
                   </div>
                   <div class="detail-row" v-if="contrato.inicioContratoCPA">
                     <span class="detail-label">Início:</span>
@@ -327,7 +337,7 @@
                   </div>
                 </div>
               </div>
-              
+
               <!-- S&H Contract -->
               <div v-if="contrato.hasSHContract" class="contrato-type">
                 <span class="type-badge sh">S&H - Software e Hardware</span>
@@ -346,7 +356,9 @@
                   </div>
                   <div class="detail-row" v-if="getContractPrice(contrato, 'S&H')">
                     <span class="detail-label">Preço:</span>
-                    <span class="detail-value price-highlight">{{ formatPrice(getContractPrice(contrato, 'S&H')) }}</span>
+                    <span class="detail-value price-highlight">{{
+                      formatPrice(getContractPrice(contrato, 'S&H'))
+                    }}</span>
                   </div>
                   <div class="detail-row" v-if="contrato.inicioContratoSH">
                     <span class="detail-label">Início:</span>
@@ -361,23 +373,23 @@
             </div>
           </div>
         </div>
-        
+
         <div v-else class="no-contratos-message">
           <p>Nenhum contrato registado para este cliente</p>
         </div>
       </section>
-      
+
       <!-- Licenças Section -->
       <section class="detail-section">
         <h3>LICENÇAS</h3>
-        
+
         <div v-if="licencasLoading" class="loading-contracts">
           <p>A carregar licenças...</p>
         </div>
-        
+
         <div v-else-if="clienteLicencas.length > 0" class="licencas-list">
-          <div 
-            v-for="licenca in clienteLicencas" 
+          <div
+            v-for="licenca in clienteLicencas"
             :key="`${licenca.year}-${licenca.id}`"
             class="licenca-card"
           >
@@ -388,33 +400,33 @@
                 <span class="licenca-year">{{ licenca.year }}</span>
               </div>
             </div>
-            
+
             <div class="licenca-details">
               <div class="detail-row" v-if="licenca.versao">
                 <span class="detail-label">Versão:</span>
                 <span class="detail-value">{{ licenca.versao }}</span>
               </div>
-              
+
               <div class="detail-row" v-if="licenca.numeroSerie">
                 <span class="detail-label">Número de Série:</span>
                 <span class="detail-value">{{ licenca.numeroSerie }}</span>
               </div>
-              
+
               <div class="detail-row" v-if="licenca.modalidade">
                 <span class="detail-label">Modalidade:</span>
                 <span class="detail-value">{{ licenca.modalidade }}</span>
               </div>
-              
+
               <div class="detail-row" v-if="licenca.dataInicio">
                 <span class="detail-label">Data Início:</span>
                 <span class="detail-value">{{ formatDate(licenca.dataInicio) }}</span>
               </div>
-              
+
               <div class="detail-row" v-if="licenca.dataVencimento">
                 <span class="detail-label">Data Vencimento:</span>
                 <span class="detail-value">{{ formatDate(licenca.dataVencimento) }}</span>
               </div>
-              
+
               <div class="detail-row" v-if="licenca.duracaoContrato">
                 <span class="detail-label">Duração:</span>
                 <span class="detail-value">{{ licenca.duracaoContrato }} meses</span>
@@ -422,12 +434,12 @@
             </div>
           </div>
         </div>
-        
+
         <div v-else class="no-licencas-message">
           <p>Nenhuma licença registada para este cliente</p>
         </div>
       </section>
-      
+
       <!-- Serviços Section -->
       <section class="detail-section">
         <h3>SERVIÇOS</h3>
@@ -457,9 +469,12 @@
             <span class="service-name">VECTRON CONNECT</span>
           </div>
         </div>
-        
+
         <!-- Conditional fields for ATCUD, DUMPS, and Vectron Connect -->
-        <div v-if="cliente.atcud || cliente.dumps || cliente.vectronConnect" class="conditional-details">
+        <div
+          v-if="cliente.atcud || cliente.dumps || cliente.vectronConnect"
+          class="conditional-details"
+        >
           <!-- ATCUD conditional fields -->
           <div v-if="cliente.atcud" class="atcud-details">
             <h4>DETALHES ATCUD</h4>
@@ -475,10 +490,12 @@
               <div class="detail-item" v-if="cliente.atPassword">
                 <label>AT PASSWORD</label>
                 <div class="password-field">
-                  <span>{{ showAtPassword ? cliente.atPassword : '•'.repeat(cliente.atPassword.length) }}</span>
-                  <button 
-                    type="button" 
-                    @click="toggleAtPassword" 
+                  <span>{{
+                    showAtPassword ? cliente.atPassword : '•'.repeat(cliente.atPassword.length)
+                  }}</span>
+                  <button
+                    type="button"
+                    @click="toggleAtPassword"
                     class="password-toggle-btn"
                     :title="showAtPassword ? 'Ocultar password' : 'Mostrar password'"
                   >
@@ -493,7 +510,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- DUMPS conditional field -->
           <div v-if="cliente.dumps" class="dumps-details">
             <h4>DETALHES DUMPS</h4>
@@ -508,7 +525,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- Vectron Connect conditional field -->
           <div v-if="cliente.vectronConnect" class="vectron-connect-details">
             <h4>DETALHES VECTRON CONNECT</h4>
@@ -552,12 +569,8 @@
 
     <!-- Action Buttons -->
     <div v-if="!loading && cliente" class="action-buttons">
-      <button @click="navigateToEdit" class="btn btn-primary">
-        ✏️ Editar Cliente
-      </button>
-      <button @click="navigateToList" class="btn btn-secondary">
-        📋 Lista de Clientes
-      </button>
+      <button @click="navigateToEdit" class="btn btn-primary">✏️ Editar Cliente</button>
+      <button @click="navigateToList" class="btn btn-secondary">📋 Lista de Clientes</button>
     </div>
 
     <!-- Not Found State -->
@@ -578,272 +591,280 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
-import { useClientesStore } from '@/stores/clientes.js'
-import { useContratosStore } from '@/stores/contratos.js'
-import { useLicencasStore } from '@/stores/licencas.js'
-import contractPlans from '@/config/contract-plans.json'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
+import { useClientesStore } from '@/stores/clientes.js';
+import { useContratosStore } from '@/stores/contratos.js';
+import { useLicencasStore } from '@/stores/licencas.js';
+import contractPlans from '@/config/contract-plans.json';
 
 // Router
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
 // Clientes Store
-const store = useClientesStore()
-const { loading, error, selectedCliente } = storeToRefs(store)
-const { fetchClienteById, clearError } = store
+const store = useClientesStore();
+const { loading, error, selectedCliente } = storeToRefs(store);
+const { fetchClienteById, clearError } = store;
 
 // Contratos Store
-const contratosStore = useContratosStore()
-const contractosLoading = ref(false)
-const clienteContratos = ref([])
+const contratosStore = useContratosStore();
+const contractosLoading = ref(false);
+const clienteContratos = ref([]);
 
 // Licenças Store
-const licencasStore = useLicencasStore()
-const licencasLoading = ref(false)
-const clienteLicencas = ref([])
+const licencasStore = useLicencasStore();
+const licencasLoading = ref(false);
+const clienteLicencas = ref([]);
 
 // Password visibility state
-const showAtPassword = ref(false)
+const showAtPassword = ref(false);
 
 // Auto-retry state
-const autoRetryCountdown = ref(0)
-const userInteractionCancelled = ref(false)
-const retryTimeoutId = ref(null)
+const autoRetryCountdown = ref(0);
+const userInteractionCancelled = ref(false);
+const retryTimeoutId = ref(null);
 
 // Computed
-const cliente = computed(() => selectedCliente.value)
+const cliente = computed(() => selectedCliente.value);
 
 // Methods
-const formatDate = (dateString) => {
-  if (!dateString) return null
-  return new Date(dateString).toLocaleDateString('pt-PT')
-}
+const formatDate = dateString => {
+  if (!dateString) return null;
+  return new Date(dateString).toLocaleDateString('pt-PT');
+};
 
-const formatDateTime = (dateString) => {
-  if (!dateString) return null
-  return new Date(dateString).toLocaleString('pt-PT')
-}
+const formatDateTime = dateString => {
+  if (!dateString) return null;
+  return new Date(dateString).toLocaleString('pt-PT');
+};
 
-const hasLegacySoftware = (cliente) => {
-  return cliente.vectron || cliente.dreamSoft || cliente.ptcert || 
-         cliente.pix || cliente.zsrest || cliente.contasCertas
-}
+const hasLegacySoftware = cliente => {
+  return (
+    cliente.vectron ||
+    cliente.dreamSoft ||
+    cliente.ptcert ||
+    cliente.pix ||
+    cliente.zsrest ||
+    cliente.contasCertas
+  );
+};
 
 const toggleAtPassword = () => {
-  showAtPassword.value = !showAtPassword.value
-}
+  showAtPassword.value = !showAtPassword.value;
+};
 
 const navigateToEdit = () => {
-  router.push(`/clientes/${route.params.id}/edit`)
-}
+  router.push(`/clientes/${route.params.id}/edit`);
+};
 
 const navigateToList = () => {
-  router.push('/clientes/list')
-}
+  router.push('/clientes/list');
+};
 
 // Contratos-related methods
-const fetchClienteContratos = async (clienteId) => {
-  contractosLoading.value = true
+const fetchClienteContratos = async clienteId => {
+  contractosLoading.value = true;
   try {
     // Get the contratos array from the cliente
-    const cliente = selectedCliente.value
+    const cliente = selectedCliente.value;
     if (!cliente || !cliente.contratos || cliente.contratos.length === 0) {
-      clienteContratos.value = []
-      return
+      clienteContratos.value = [];
+      return;
     }
-    
+
     // Fetch each contrato details
-    const contratosPromises = cliente.contratos.map(async (contratoRef) => {
+    const contratosPromises = cliente.contratos.map(async contratoRef => {
       try {
-        const contrato = await contratosStore.fetchContratoById(contratoRef.year, contratoRef.id)
+        const contrato = await contratosStore.fetchContratoById(contratoRef.year, contratoRef.id);
         return {
           ...contrato,
-          year: contratoRef.year
-        }
+          year: contratoRef.year,
+        };
       } catch (err) {
-        console.error(`Error fetching contrato ${contratoRef.id}:`, err)
-        return null
+        console.error(`Error fetching contrato ${contratoRef.id}:`, err);
+        return null;
       }
-    })
-    
-    const contratos = await Promise.all(contratosPromises)
-    clienteContratos.value = contratos.filter(c => c !== null)
-  } catch (err) {
-    console.error('Error fetching cliente contratos:', err)
-    clienteContratos.value = []
-  } finally {
-    contractosLoading.value = false
-  }
-}
+    });
 
-const fetchClienteLicencas = async (clienteNomeComercial) => {
-  licencasLoading.value = true
+    const contratos = await Promise.all(contratosPromises);
+    clienteContratos.value = contratos.filter(c => c !== null);
+  } catch (err) {
+    console.error('Error fetching cliente contratos:', err);
+    clienteContratos.value = [];
+  } finally {
+    contractosLoading.value = false;
+  }
+};
+
+const fetchClienteLicencas = async clienteNomeComercial => {
+  licencasLoading.value = true;
   try {
     // Fetch all licenses
-    await licencasStore.fetchLicencasForYear(null) // Fetch all years
-    
+    await licencasStore.fetchLicencasForYear(null); // Fetch all years
+
     // Filter licenses by cliente name (nomeComercial)
-    const allLicencas = licencasStore.licencas || []
-    clienteLicencas.value = allLicencas.filter(licenca => 
-      licenca.cliente === clienteNomeComercial
-    )
-    
-    console.log('Filtered licencas for cliente:', clienteLicencas.value.length)
+    const allLicencas = licencasStore.licencas || [];
+    clienteLicencas.value = allLicencas.filter(licenca => licenca.cliente === clienteNomeComercial);
+
+    console.log('Filtered licencas for cliente:', clienteLicencas.value.length);
   } catch (err) {
-    console.error('Error fetching cliente licencas:', err)
-    clienteLicencas.value = []
+    console.error('Error fetching cliente licencas:', err);
+    clienteLicencas.value = [];
   } finally {
-    licencasLoading.value = false
+    licencasLoading.value = false;
   }
-}
+};
 
 const getPlanName = (planId, type) => {
-  const plans = contractPlans[type]?.plans || []
-  const plan = plans.find(p => p.id === planId)
-  return plan?.name || planId
-}
+  const plans = contractPlans[type]?.plans || [];
+  const plan = plans.find(p => p.id === planId);
+  return plan?.name || planId;
+};
 
-const formatDistance = (distance) => {
-  if (distance === 'under180km') return '< 180 km'
-  if (distance === 'over180km') return '> 180 km'
-  return distance
-}
+const formatDistance = distance => {
+  if (distance === 'under180km') return '< 180 km';
+  if (distance === 'over180km') return '> 180 km';
+  return distance;
+};
 
 const getContractPrice = (contrato, type) => {
   if (type === 'CPA') {
-    const planId = contrato.planIdCPA
-    const distance = contrato.distanceCPA
-    const paymentMethod = contrato.modalidadePagamentoCPA
-    
-    if (!planId || !distance || !paymentMethod) return null
-    
-    const plan = contractPlans.CPA?.plans?.find(p => p.id === planId)
-    if (!plan) return null
-    
-    const period = paymentMethod === 'MENSAL' ? 'monthly' : 'annual'
-    return plan.prices?.[distance]?.[period] || null
-  } else if (type === 'S&H') {
-    const planId = contrato.planIdSH
-    const distance = contrato.distanceSH
-    const paymentMethod = contrato.modalidadePagamentoSH
-    
-    if (!planId || !distance || !paymentMethod) return null
-    
-    const plan = contractPlans['S&H']?.plans?.find(p => p.id === planId)
-    if (!plan) return null
-    
-    const period = paymentMethod === 'MENSAL' ? 'monthly' : 'annual'
-    return plan.prices?.[distance]?.[period] || null
-  }
-  
-  return null
-}
+    const planId = contrato.planIdCPA;
+    const distance = contrato.distanceCPA;
+    const paymentMethod = contrato.modalidadePagamentoCPA;
 
-const formatPrice = (price) => {
-  if (!price) return '-'
+    if (!planId || !distance || !paymentMethod) return null;
+
+    const plan = contractPlans.CPA?.plans?.find(p => p.id === planId);
+    if (!plan) return null;
+
+    const period = paymentMethod === 'MENSAL' ? 'monthly' : 'annual';
+    return plan.prices?.[distance]?.[period] || null;
+  } else if (type === 'S&H') {
+    const planId = contrato.planIdSH;
+    const distance = contrato.distanceSH;
+    const paymentMethod = contrato.modalidadePagamentoSH;
+
+    if (!planId || !distance || !paymentMethod) return null;
+
+    const plan = contractPlans['S&H']?.plans?.find(p => p.id === planId);
+    if (!plan) return null;
+
+    const period = paymentMethod === 'MENSAL' ? 'monthly' : 'annual';
+    return plan.prices?.[distance]?.[period] || null;
+  }
+
+  return null;
+};
+
+const formatPrice = price => {
+  if (!price) return '-';
   return new Intl.NumberFormat('pt-PT', {
     style: 'currency',
-    currency: 'EUR'
-  }).format(price)
-}
+    currency: 'EUR',
+  }).format(price);
+};
 
 const retryLoad = () => {
-  userInteractionCancelled.value = true
-  cancelAutoRetry()
-  loadCliente()
-}
+  userInteractionCancelled.value = true;
+  cancelAutoRetry();
+  loadCliente();
+};
 
 const startAutoRetry = () => {
-  cancelAutoRetry()
-  autoRetryCountdown.value = 10
-  
+  cancelAutoRetry();
+  autoRetryCountdown.value = 10;
+
   const updateCountdown = () => {
     if (autoRetryCountdown.value > 0 && !userInteractionCancelled.value) {
-      autoRetryCountdown.value--
-      retryTimeoutId.value = setTimeout(updateCountdown, 1000)
+      autoRetryCountdown.value--;
+      retryTimeoutId.value = setTimeout(updateCountdown, 1000);
     } else if (autoRetryCountdown.value === 0 && !userInteractionCancelled.value) {
       // Auto-retry after countdown
-      loadCliente()
+      loadCliente();
     }
-  }
-  
-  retryTimeoutId.value = setTimeout(updateCountdown, 1000)
-}
+  };
+
+  retryTimeoutId.value = setTimeout(updateCountdown, 1000);
+};
 
 const cancelAutoRetry = () => {
   if (retryTimeoutId.value) {
-    clearTimeout(retryTimeoutId.value)
-    retryTimeoutId.value = null
+    clearTimeout(retryTimeoutId.value);
+    retryTimeoutId.value = null;
   }
-  autoRetryCountdown.value = 0
-}
+  autoRetryCountdown.value = 0;
+};
 
 const handleUserInteraction = () => {
-  userInteractionCancelled.value = true
-  cancelAutoRetry()
-}
+  userInteractionCancelled.value = true;
+  cancelAutoRetry();
+};
 
 const loadCliente = async () => {
-  const id = route.params.id
+  const id = route.params.id;
   if (!id) {
-    router.push('/clientes/list')
-    return
+    router.push('/clientes/list');
+    return;
   }
-  
+
   try {
-    clearError()
-    await fetchClienteById(id)
+    clearError();
+    await fetchClienteById(id);
     // If successful, cancel any pending retries
-    cancelAutoRetry()
-    
+    cancelAutoRetry();
+
     // Fetch contratos after cliente is loaded
-    await fetchClienteContratos(id)
-    
+    await fetchClienteContratos(id);
+
     // Fetch licencas after cliente is loaded
     if (selectedCliente.value?.nomeComercial) {
-      await fetchClienteLicencas(selectedCliente.value.nomeComercial)
+      await fetchClienteLicencas(selectedCliente.value.nomeComercial);
     }
   } catch (err) {
-    console.error('Error loading cliente:', err)
+    console.error('Error loading cliente:', err);
     // Check if it's a 404 or "not found" error
-    const isNotFound = err.message?.toLowerCase().includes('not found') || 
-                       error.value?.toLowerCase().includes('not found')
-    
+    const isNotFound =
+      err.message?.toLowerCase().includes('not found') ||
+      error.value?.toLowerCase().includes('not found');
+
     if (isNotFound && !userInteractionCancelled.value) {
       // Start auto-retry countdown
-      startAutoRetry()
+      startAutoRetry();
     }
   }
-}
+};
 
 // Watch for successful data load to cancel retries
-watch(() => cliente.value?.id, (newId) => {
-  if (newId) {
-    cancelAutoRetry()
-    userInteractionCancelled.value = false
+watch(
+  () => cliente.value?.id,
+  newId => {
+    if (newId) {
+      cancelAutoRetry();
+      userInteractionCancelled.value = false;
+    }
   }
-})
+);
 
 // Lifecycle
 onMounted(async () => {
   // Add event listeners for user interaction
-  window.addEventListener('click', handleUserInteraction)
-  window.addEventListener('scroll', handleUserInteraction)
-  window.addEventListener('keydown', handleUserInteraction)
-  
-  await loadCliente()
-})
+  window.addEventListener('click', handleUserInteraction);
+  window.addEventListener('scroll', handleUserInteraction);
+  window.addEventListener('keydown', handleUserInteraction);
+
+  await loadCliente();
+});
 
 onBeforeUnmount(() => {
-  cancelAutoRetry()
-  window.removeEventListener('click', handleUserInteraction)
-  window.removeEventListener('scroll', handleUserInteraction)
-  window.removeEventListener('keydown', handleUserInteraction)
-})
+  cancelAutoRetry();
+  window.removeEventListener('click', handleUserInteraction);
+  window.removeEventListener('scroll', handleUserInteraction);
+  window.removeEventListener('keydown', handleUserInteraction);
+});
 </script>
 
 <style scoped>
@@ -887,7 +908,8 @@ onBeforeUnmount(() => {
   opacity: 0.9;
 }
 
-.contribuinte, .localidade {
+.contribuinte,
+.localidade {
   background: rgba(255, 255, 255, 0.2);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
@@ -1332,24 +1354,24 @@ onBeforeUnmount(() => {
     flex-direction: column;
     padding: 1rem;
   }
-  
+
   .software-item {
     padding: 0.75rem;
   }
-  
+
   .software-detail-item {
     flex-direction: column;
     gap: 0.25rem;
   }
-  
+
   .software-detail-item label {
     min-width: unset;
   }
-  
+
   .contratos-list {
     grid-template-columns: 1fr;
   }
-  
+
   .contrato-details {
     gap: 1rem;
   }
@@ -1586,4 +1608,4 @@ onBeforeUnmount(() => {
     font-size: 0.75rem;
   }
 }
-</style> 
+</style>

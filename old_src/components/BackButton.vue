@@ -1,39 +1,34 @@
 <template>
-  <button 
-    @click="handleBack" 
-    :class="['back-button', variant]"
-  >
-    ← Voltar
-  </button>
+  <button @click="handleBack" :class="['back-button', variant]">← Voltar</button>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
+import { useRouter } from 'vue-router';
 
 // Props
 const props = defineProps({
   to: {
     type: String,
-    default: null
+    default: null,
   },
   variant: {
     type: String,
     default: 'default', // 'default', 'inline', 'full-width'
-    validator: (value) => ['default', 'inline', 'full-width'].includes(value)
-  }
-})
+    validator: value => ['default', 'inline', 'full-width'].includes(value),
+  },
+});
 
 // Router
-const router = useRouter()
+const router = useRouter();
 
 // Methods
 const handleBack = () => {
   if (props.to) {
-    router.push(props.to)
+    router.push(props.to);
   } else {
-    router.go(-1)
+    router.go(-1);
   }
-}
+};
 </script>
 
 <style scoped>
@@ -80,7 +75,7 @@ const handleBack = () => {
     padding: 0.5rem 0.75rem;
     font-size: 0.85rem;
   }
-  
+
   .back-button.inline {
     padding: 0.5rem 0.75rem;
     font-size: 0.85rem;
@@ -92,4 +87,4 @@ const handleBack = () => {
     font-size: 0.85rem;
   }
 }
-</style> 
+</style>

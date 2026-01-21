@@ -6,18 +6,20 @@
         <div class="module-icon">💻</div>
         <div class="module-content">
           <h1>Instalações e Programações</h1>
-          <p class="module-description">Gestão de instalações de equipamentos e programações de sistemas</p>
+          <p class="module-description">
+            Gestão de instalações de equipamentos e programações de sistemas
+          </p>
         </div>
       </div>
     </div>
-    
+
     <div class="module-actions">
       <button @click="navigateToList" class="action-btn primary">
         <span class="action-icon">📋</span>
         <span class="action-label">CONSULTAR</span>
         <span class="action-description">Ver lista de instalações e programações</span>
       </button>
-      
+
       <button @click="navigateToCreate" class="action-btn secondary">
         <span class="action-icon">➕</span>
         <span class="action-label">NOVA INSTALAÇÃO</span>
@@ -28,18 +30,18 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
-import BackButton from '@/components/BackButton.vue'
+import { useRouter } from 'vue-router';
+import BackButton from '@/components/BackButton.vue';
 
-const router = useRouter()
+const router = useRouter();
 
 const navigateToList = () => {
-  router.push('/instalacoes-programacoes/list')
-}
+  router.push('/instalacoes-programacoes/list');
+};
 
 const navigateToCreate = () => {
-  router.push('/instalacoes-programacoes/new?from=module')
-}
+  router.push('/instalacoes-programacoes/new?from=module');
+};
 </script>
 
 <style scoped>
@@ -157,30 +159,30 @@ const navigateToCreate = () => {
   .instalacoes-module {
     padding: 1rem 0.5rem;
   }
-  
+
   .module-info {
     flex-direction: column;
     text-align: center;
     gap: 1rem;
   }
-  
+
   .module-content h1 {
     font-size: 1.75rem;
   }
-  
+
   .action-btn {
     padding: 1.25rem;
     gap: 0.75rem;
   }
-  
+
   .action-icon {
     font-size: 1.25rem;
   }
-  
+
   .action-label {
     font-size: 0.9rem;
   }
-  
+
   .action-description {
     font-size: 0.8rem;
   }
@@ -192,11 +194,11 @@ const navigateToCreate = () => {
     height: 60px;
     font-size: 2rem;
   }
-  
+
   .module-content h1 {
     font-size: 1.5rem;
   }
-  
+
   .action-btn {
     padding: 1rem;
   }

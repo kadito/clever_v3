@@ -54,7 +54,11 @@
       <div class="toggle-test">
         <div class="toggle-item">
           <span class="toggle-label">Test Toggle</span>
-          <button class="toggle-switch-consistent" :class="{ active: testToggle }" @click="testToggle = !testToggle">
+          <button
+            class="toggle-switch-consistent"
+            :class="{ active: testToggle }"
+            @click="testToggle = !testToggle"
+          >
             <span class="toggle-slider-consistent" :class="{ active: testToggle }"></span>
           </button>
         </div>
@@ -104,10 +108,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import LoadingIndicator from './LoadingIndicator.vue'
+import { ref } from 'vue';
+import LoadingIndicator from './LoadingIndicator.vue';
 
-const testToggle = ref(false)
+const testToggle = ref(false);
 </script>
 
 <style scoped>
@@ -249,21 +253,21 @@ const testToggle = ref(false)
   .responsive-test-container {
     @apply p-2 space-y-6;
   }
-  
+
   .test-title {
     @apply text-xl;
   }
-  
+
   .section-title {
     @apply text-base p-3;
   }
-  
+
   .button-test-grid,
   .touch-target-test,
   .loading-test-grid {
     @apply gap-2 p-3;
   }
-  
+
   .toggle-item {
     @apply p-3;
   }

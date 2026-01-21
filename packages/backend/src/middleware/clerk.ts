@@ -39,7 +39,7 @@ export async function verifyClerkJwt(token: string): Promise<any> {
     }
 
     const payload = JSON.parse(atob(parts[1]));
-    
+
     // Basic validation - check if token is not expired
     const now = Math.floor(Date.now() / 1000);
     if (payload.exp && payload.exp < now) {
@@ -59,7 +59,7 @@ export async function verifyClerkJwt(token: string): Promise<any> {
  */
 export const extractUserContext = createMiddleware(async (c, next) => {
   const token = extractJwtToken(c);
-  
+
   if (!token) {
     const response: ApiResponse = {
       success: false,
@@ -71,7 +71,7 @@ export const extractUserContext = createMiddleware(async (c, next) => {
 
   try {
     const payload = await verifyClerkJwt(token);
-    
+
     // Extract user information from JWT payload
     const userContext: UserContext = {
       userId: payload.sub || '',
@@ -85,7 +85,7 @@ export const extractUserContext = createMiddleware(async (c, next) => {
 
     // Make user context available to route handlers
     c.set('user', userContext);
-    
+
     await next();
   } catch (error) {
     console.error('Error extracting user context:', error);

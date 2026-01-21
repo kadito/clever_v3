@@ -18,7 +18,7 @@ describe('API Routes', () => {
       for (const endpoint of protectedEndpoints) {
         const res = await app.request(endpoint);
         expect(res.status).toBe(401);
-        
+
         const body: ApiResponse = await res.json();
         expect(body.success).toBe(false);
         expect(body.error).toContain('Authentication');
@@ -28,15 +28,15 @@ describe('API Routes', () => {
 
     it('should return 401 for unauthenticated POST requests', async () => {
       const testData = { name: 'Test Client', email: 'test@example.com' };
-      
+
       const res = await app.request('/api/content/clients', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(testData)
+        body: JSON.stringify(testData),
       });
-      
+
       expect(res.status).toBe(401);
-      
+
       const body: ApiResponse = await res.json();
       expect(body.success).toBe(false);
       expect(body.error).toContain('Authentication');
@@ -44,15 +44,15 @@ describe('API Routes', () => {
 
     it('should return 401 for unauthenticated PUT requests', async () => {
       const updateData = { data: { name: 'Updated Client' } };
-      
+
       const res = await app.request('/api/content/clients/test-uuid', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateData)
+        body: JSON.stringify(updateData),
       });
-      
+
       expect(res.status).toBe(401);
-      
+
       const body: ApiResponse = await res.json();
       expect(body.success).toBe(false);
       expect(body.error).toContain('Authentication');
@@ -60,11 +60,11 @@ describe('API Routes', () => {
 
     it('should return 401 for unauthenticated DELETE requests', async () => {
       const res = await app.request('/api/content/clients/test-uuid', {
-        method: 'DELETE'
+        method: 'DELETE',
       });
-      
+
       expect(res.status).toBe(401);
-      
+
       const body: ApiResponse = await res.json();
       expect(body.success).toBe(false);
       expect(body.error).toContain('Authentication');
@@ -75,7 +75,7 @@ describe('API Routes', () => {
     it('should return 401 for invalid content type requests (authentication takes precedence)', async () => {
       const res = await app.request('/api/content/invalid-type');
       expect(res.status).toBe(401);
-      
+
       const body: ApiResponse = await res.json();
       expect(body.success).toBe(false);
       expect(body.error).toContain('Authentication');
@@ -85,19 +85,19 @@ describe('API Routes', () => {
     it('should return 401 for valid content types without authentication', async () => {
       const validTypes = [
         'clients',
-        'contracts', 
+        'contracts',
         'licenses',
         'work-sheets',
         'daily-records',
         'remote-assistance',
         'reminders',
-        'pending'
+        'pending',
       ];
 
       for (const type of validTypes) {
         const res = await app.request(`/api/content/${type}`);
         expect(res.status).toBe(401);
-        
+
         const body: ApiResponse = await res.json();
         expect(body.success).toBe(false);
         expect(body.error).toContain('Authentication');
@@ -109,12 +109,12 @@ describe('API Routes', () => {
     it('should include CORS headers in 401 responses', async () => {
       const res = await app.request('/api/content/clients', {
         headers: {
-          'Origin': 'http://localhost:3000'
-        }
+          Origin: 'http://localhost:3000',
+        },
       });
-      
+
       expect(res.status).toBe(401);
-      
+
       // CORS headers should still be present
       expect(res.headers.get('access-control-allow-origin')).toBeTruthy();
     });
@@ -123,10 +123,10 @@ describe('API Routes', () => {
       const res = await app.request('/api/content/clients', {
         method: 'OPTIONS',
         headers: {
-          'Origin': 'http://localhost:3000',
+          Origin: 'http://localhost:3000',
           'Access-Control-Request-Method': 'GET',
           'Access-Control-Request-Headers': 'Content-Type,Authorization',
-        }
+        },
       });
 
       expect(res.status).toBe(204);

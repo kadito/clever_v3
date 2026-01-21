@@ -5,13 +5,17 @@
  */
 
 import { Hono } from 'hono';
-import { createContentRoutes, createStandardContentConfig, contentErrorHandler } from './content-route-template';
+import {
+  createContentRoutes,
+  createStandardContentConfig,
+  contentErrorHandler,
+} from './content-route-template';
 import type { License, LicenseData } from '@clever/shared';
-import { 
-  validateLicenseCreation, 
-  validateLicenseUpdate, 
+import {
+  validateLicenseCreation,
+  validateLicenseUpdate,
   sanitizeLicenseData,
-  calculateLicenseStatus 
+  calculateLicenseStatus,
 } from '@clever/shared';
 
 /**
@@ -22,10 +26,10 @@ import {
 function validateLicenseCreate(requestData: any): void {
   // Extract the actual license data from the request
   const licenseData = requestData.data || requestData;
-  
+
   // Sanitize the data first
   const sanitizedData = sanitizeLicenseData(licenseData as LicenseData);
-  
+
   // Ensure required fields are present for creation validation
   const completeData: LicenseData = {
     clientId: sanitizedData.clientId || '',
@@ -37,12 +41,12 @@ function validateLicenseCreate(requestData: any): void {
     modalidade: sanitizedData.modalidade,
     duracaoContrato: sanitizedData.duracaoContrato,
     software: sanitizedData.software || { name: [], modules: [] },
-    invoices: sanitizedData.invoices || []
+    invoices: sanitizedData.invoices || [],
   };
-  
+
   // Use the comprehensive validation from shared package
   const errors = validateLicenseCreation(completeData);
-  
+
   if (errors.length > 0) {
     throw new Error(errors[0]); // Return first error for API response
   }
@@ -57,15 +61,19 @@ function validateLicenseCreate(requestData: any): void {
 function validateLicenseUpdateData(requestData: any, existingContent?: License): void {
   // Extract the actual license data from the request
   const licenseData = requestData.data || requestData;
-  
+
   // Prevent client changes during updates for data integrity
-  if (existingContent && licenseData.clientId && licenseData.clientId !== existingContent.data.clientId) {
+  if (
+    existingContent &&
+    licenseData.clientId &&
+    licenseData.clientId !== existingContent.data.clientId
+  ) {
     throw new Error('Cliente não pode ser alterado durante atualizações');
   }
-  
+
   // Use the update validation from shared package
   const errors = validateLicenseUpdate(licenseData as Partial<LicenseData>);
-  
+
   if (errors.length > 0) {
     throw new Error(errors[0]); // Return first error for API response
   }
@@ -77,14 +85,14 @@ function validateLicenseUpdateData(requestData: any, existingContent?: License):
  */
 function createLicenseSearchText(data: LicenseData): string {
   const searchTerms: string[] = [];
-  
+
   // Basic information
   if (data.clientName) searchTerms.push(data.clientName.toLowerCase());
   if (data.versao) searchTerms.push(data.versao.toLowerCase());
   if (data.numeroSerie) searchTerms.push(data.numeroSerie.toLowerCase());
   if (data.modalidade) searchTerms.push(data.modalidade.toLowerCase());
   if (data.duracaoContrato) searchTerms.push(data.duracaoContrato.toLowerCase());
-  
+
   // Software information
   if (data.software?.name) {
     data.software.name.forEach(name => searchTerms.push(name.toLowerCase()));
@@ -96,7 +104,7 @@ function createLicenseSearchText(data: LicenseData): string {
   if (data.software?.modules) {
     data.software.modules.forEach(module => searchTerms.push(module.toLowerCase()));
   }
-  
+
   // Invoice information
   if (data.invoices) {
     data.invoices.forEach(invoice => {
@@ -104,7 +112,7 @@ function createLicenseSearchText(data: LicenseData): string {
       if (invoice.numeroFatura) searchTerms.push(invoice.numeroFatura.toLowerCase());
     });
   }
-  
+
   return searchTerms.join(' ');
 }
 
@@ -135,11 +143,11 @@ licenseConfig.extractIndexFields = (content: License) => {
     numeroSerie: data.numeroSerie || '',
     modalidade: data.modalidade || '',
     duracaoContrato: data.duracaoContrato || '',
-    
+
     // License period information
     dataInicio: data.dataInicio || '',
     dataVencimento: data.dataVencimento || '',
-    
+
     // Software information for search and filtering
     software: data.software?.name || [],
     softwareModel: data.software?.model || '',
@@ -147,12 +155,12 @@ licenseConfig.extractIndexFields = (content: License) => {
     softwareVersion: data.software?.version || '',
     softwareLicenseType: data.software?.licenseType || '',
     softwareModules: data.software?.modules || [],
-    
+
     // License status for filtering
     status: calculateLicenseStatus(data.dataVencimento),
-    
+
     // Invoice count for display
-    invoiceCount: data.invoices?.length || 0
+    invoiceCount: data.invoices?.length || 0,
   };
 };
 

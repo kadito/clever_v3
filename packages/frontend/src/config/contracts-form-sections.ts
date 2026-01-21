@@ -11,9 +11,9 @@ export const contractsFormSections: FormSection[] = [
         label: 'Cliente',
         type: 'custom',
         required: true,
-        placeholder: 'Pesquisar cliente...'
-      }
-    ]
+        placeholder: 'Pesquisar cliente...',
+      },
+    ],
   },
   {
     key: 'contractTypes',
@@ -24,9 +24,9 @@ export const contractsFormSections: FormSection[] = [
         key: 'contractTypes',
         label: 'Tipos de Contrato',
         type: 'custom',
-        fullWidth: true
-      }
-    ]
+        fullWidth: true,
+      },
+    ],
   },
   {
     key: 'additionalInfo',
@@ -38,8 +38,8 @@ export const contractsFormSections: FormSection[] = [
         label: 'Método de Pagamento',
         type: 'custom',
         required: true,
-        fullWidth: true
-      }
-    ]
-  }
+        fullWidth: true,
+      },
+    ],
+  },
 ];

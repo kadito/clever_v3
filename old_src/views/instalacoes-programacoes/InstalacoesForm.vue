@@ -24,42 +24,42 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="nomeCliente">NOME DO CLIENTE</label>
-            <input 
-              type="text" 
-              id="nomeCliente" 
-              v-model="formData.nomeCliente" 
+            <input
+              type="text"
+              id="nomeCliente"
+              v-model="formData.nomeCliente"
               class="form-control"
               placeholder="Nome do cliente"
               required
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="numeroEncomenda">NÚMERO DA ENCOMENDA</label>
-            <input 
-              type="text" 
-              id="numeroEncomenda" 
-              v-model="formData.numeroEncomenda" 
+            <input
+              type="text"
+              id="numeroEncomenda"
+              v-model="formData.numeroEncomenda"
               class="form-control"
               placeholder="Número da encomenda"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="dataRecepcao">DATA DE RECEPÇÃO</label>
-            <input 
-              type="datetime-local" 
-              id="dataRecepcao" 
-              v-model="formData.dataRecepcao" 
+            <input
+              type="datetime-local"
+              id="dataRecepcao"
+              v-model="formData.dataRecepcao"
               class="form-control"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="tecnicoInstalacao">TÉCNICO DA INSTALAÇÃO</label>
-            <select 
-              id="tecnicoInstalacao" 
-              v-model="formData.tecnicoInstalacao" 
+            <select
+              id="tecnicoInstalacao"
+              v-model="formData.tecnicoInstalacao"
               class="form-control"
             >
               <option value="">--</option>
@@ -79,85 +79,85 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="dataInstalacao">DATA DA INSTALAÇÃO</label>
-            <input 
-              type="datetime-local" 
-              id="dataInstalacao" 
-              v-model="formData.dataInstalacao" 
+            <input
+              type="datetime-local"
+              id="dataInstalacao"
+              v-model="formData.dataInstalacao"
               class="form-control"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="dataFinalInstalacao">DATA FINAL DA INSTALAÇÃO</label>
-            <input 
-              type="datetime-local" 
-              id="dataFinalInstalacao" 
-              v-model="formData.dataFinalInstalacao" 
+            <input
+              type="datetime-local"
+              id="dataFinalInstalacao"
+              v-model="formData.dataFinalInstalacao"
               class="form-control"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label>TRANSFORMADOR</label>
             <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                id="transformador" 
+              <input
+                type="checkbox"
+                id="transformador"
                 v-model="formData.transformador"
                 class="toggle-input"
-              >
+              />
               <label for="transformador" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
             </div>
           </div>
-          
+
           <div class="form-group">
             <label>CABO DE ALIMENTAÇÃO</label>
             <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                id="caboAlimentacao" 
+              <input
+                type="checkbox"
+                id="caboAlimentacao"
                 v-model="formData.caboAlimentacao"
                 class="toggle-input"
-              >
+              />
               <label for="caboAlimentacao" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
             </div>
           </div>
-          
+
           <div class="form-group">
             <label>INSTALAÇÃO DE CÂMERAS</label>
             <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                id="instalacaoCameras" 
+              <input
+                type="checkbox"
+                id="instalacaoCameras"
                 v-model="formData.instalacaoCameras"
                 class="toggle-input"
-              >
+              />
               <label for="instalacaoCameras" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
             </div>
           </div>
-          
+
           <div class="form-group">
             <label for="quantidadeCamerasInstaladas">QUANTIDADE DE CÂMERAS INSTALADAS</label>
-            <input 
-              type="number" 
-              id="quantidadeCamerasInstaladas" 
-              v-model.number="formData.quantidadeCamerasInstaladas" 
+            <input
+              type="number"
+              id="quantidadeCamerasInstaladas"
+              v-model.number="formData.quantidadeCamerasInstaladas"
               class="form-control"
               min="0"
-            >
+            />
           </div>
-          
+
           <div class="form-group full-width">
             <label for="equipamentosUtilizados">EQUIPAMENTOS UTILIZADOS E MODELOS</label>
-            <textarea 
-              id="equipamentosUtilizados" 
-              v-model="formData.equipamentosUtilizados" 
+            <textarea
+              id="equipamentosUtilizados"
+              v-model="formData.equipamentosUtilizados"
               class="form-control"
               rows="4"
               placeholder="Descreva os equipamentos utilizados e seus modelos"
@@ -173,45 +173,41 @@
           <div class="form-group">
             <label>PROGRAMADO</label>
             <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                id="programado" 
+              <input
+                type="checkbox"
+                id="programado"
                 v-model="formData.programado"
                 class="toggle-input"
-              >
+              />
               <label for="programado" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
             </div>
           </div>
-          
+
           <div class="form-group" v-if="formData.programado">
             <label for="dataProgramacao">DATA DA PROGRAMAÇÃO</label>
-            <input 
-              type="datetime-local" 
-              id="dataProgramacao" 
-              v-model="formData.dataProgramacao" 
+            <input
+              type="datetime-local"
+              id="dataProgramacao"
+              v-model="formData.dataProgramacao"
               class="form-control"
-            >
+            />
           </div>
-          
+
           <div class="form-group" v-if="formData.programado">
             <label for="finalProgramacao">FINAL DA PROGRAMAÇÃO</label>
-            <input 
-              type="datetime-local" 
-              id="finalProgramacao" 
-              v-model="formData.finalProgramacao" 
+            <input
+              type="datetime-local"
+              id="finalProgramacao"
+              v-model="formData.finalProgramacao"
               class="form-control"
-            >
+            />
           </div>
-          
+
           <div class="form-group" v-if="formData.programado">
             <label for="programadoPor">PROGRAMADO POR</label>
-            <select 
-              id="programadoPor" 
-              v-model="formData.programadoPor" 
-              class="form-control"
-            >
+            <select id="programadoPor" v-model="formData.programadoPor" class="form-control">
               <option value="">--</option>
               <option value="JOSÉ BATISTA">JOSÉ BATISTA</option>
               <option value="MARIA SILVA">MARIA SILVA</option>
@@ -220,25 +216,21 @@
               <option value="ANA COSTA">ANA COSTA</option>
             </select>
           </div>
-          
+
           <div class="form-group" v-if="formData.programado">
             <label for="programadoEmpresa">PROGRAMADO EMPRESA</label>
-            <input 
-              type="text" 
-              id="programadoEmpresa" 
-              v-model="formData.programadoEmpresa" 
+            <input
+              type="text"
+              id="programadoEmpresa"
+              v-model="formData.programadoEmpresa"
               class="form-control"
               placeholder="Nome da empresa"
-            >
+            />
           </div>
-          
+
           <div class="form-group" v-if="formData.programado">
             <label for="qualSistema">QUAL SISTEMA</label>
-            <select 
-              id="qualSistema" 
-              v-model="formData.qualSistema" 
-              class="form-control"
-            >
+            <select id="qualSistema" v-model="formData.qualSistema" class="form-control">
               <option value="">--</option>
               <option value="PIX REST">PIX REST</option>
               <option value="VECTRON POS">VECTRON POS</option>
@@ -256,68 +248,68 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="equipamento">EQUIPAMENTO</label>
-            <input 
-              type="text" 
-              id="equipamento" 
-              v-model="formData.equipamento" 
+            <input
+              type="text"
+              id="equipamento"
+              v-model="formData.equipamento"
               class="form-control"
               placeholder="Tipo de equipamento"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="modeloEquipamento">MODELO EQUIPAMENTO</label>
-            <input 
-              type="text" 
-              id="modeloEquipamento" 
-              v-model="formData.modeloEquipamento" 
+            <input
+              type="text"
+              id="modeloEquipamento"
+              v-model="formData.modeloEquipamento"
               class="form-control"
               placeholder="Modelo do equipamento"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="numeroSerieEquipamento">NÚMERO DE SÉRIE DO EQUIPAMENTO</label>
-            <input 
-              type="text" 
-              id="numeroSerieEquipamento" 
-              v-model="formData.numeroSerieEquipamento" 
+            <input
+              type="text"
+              id="numeroSerieEquipamento"
+              v-model="formData.numeroSerieEquipamento"
               class="form-control"
               placeholder="Número de série"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="numeroSerie">NÚMERO DE SÉRIE</label>
-            <input 
-              type="text" 
-              id="numeroSerie" 
-              v-model="formData.numeroSerie" 
+            <input
+              type="text"
+              id="numeroSerie"
+              v-model="formData.numeroSerie"
               class="form-control"
               placeholder="Número de série adicional"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="modelo">MODELO</label>
-            <input 
-              type="text" 
-              id="modelo" 
-              v-model="formData.modelo" 
+            <input
+              type="text"
+              id="modelo"
+              v-model="formData.modelo"
               class="form-control"
               placeholder="Modelo adicional"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="versaoSistema">VERSÃO DO SISTEMA</label>
-            <input 
-              type="text" 
-              id="versaoSistema" 
-              v-model="formData.versaoSistema" 
+            <input
+              type="text"
+              id="versaoSistema"
+              v-model="formData.versaoSistema"
               class="form-control"
               placeholder="Ex: V21 M1"
-            >
+            />
           </div>
         </div>
       </section>
@@ -329,94 +321,94 @@
           <div class="form-group">
             <label>TESTOU EQUIPAMENTO</label>
             <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                id="testouEquipamento" 
+              <input
+                type="checkbox"
+                id="testouEquipamento"
                 v-model="formData.testouEquipamento"
                 class="toggle-input"
-              >
+              />
               <label for="testouEquipamento" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
             </div>
           </div>
-          
+
           <div class="form-group">
             <label>ASSISTÊNCIA REMOTA</label>
             <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                id="assistenciaRemota" 
+              <input
+                type="checkbox"
+                id="assistenciaRemota"
                 v-model="formData.assistenciaRemota"
                 class="toggle-input"
-              >
+              />
               <label for="assistenciaRemota" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
             </div>
           </div>
-          
+
           <div class="form-group">
             <label>PREPARAÇÃO DOS PERIFÉRICOS</label>
             <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                id="preparacaoPerificos" 
+              <input
+                type="checkbox"
+                id="preparacaoPerificos"
                 v-model="formData.preparacaoPerificos"
                 class="toggle-input"
-              >
+              />
               <label for="preparacaoPerificos" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
             </div>
           </div>
-          
+
           <div class="form-group">
             <label>INSTALAÇÃO DE POS E CPA</label>
             <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                id="instalacaoPosECpa" 
+              <input
+                type="checkbox"
+                id="instalacaoPosECpa"
                 v-model="formData.instalacaoPosECpa"
                 class="toggle-input"
-              >
+              />
               <label for="instalacaoPosECpa" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
             </div>
           </div>
-          
+
           <div class="form-group">
             <label>MOVIMENTOS A ZERO</label>
             <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                id="movimentosZero" 
+              <input
+                type="checkbox"
+                id="movimentosZero"
                 v-model="formData.movimentosZero"
                 class="toggle-input"
-              >
+              />
               <label for="movimentosZero" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
             </div>
           </div>
-          
+
           <div class="form-group">
             <label for="anydesk">ANYDESK</label>
-            <input 
-              type="text" 
-              id="anydesk" 
-              v-model="formData.anydesk" 
+            <input
+              type="text"
+              id="anydesk"
+              v-model="formData.anydesk"
               class="form-control"
               placeholder="ID do AnyDesk"
-            >
+            />
           </div>
-          
+
           <div class="form-group full-width">
             <label for="testes">TESTES</label>
-            <textarea 
-              id="testes" 
-              v-model="formData.testes" 
+            <textarea
+              id="testes"
+              v-model="formData.testes"
               class="form-control"
               rows="3"
               placeholder="Descreva os testes realizados"
@@ -432,38 +424,38 @@
           <div class="form-group">
             <label>FORMAÇÃO</label>
             <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                id="formacao" 
+              <input
+                type="checkbox"
+                id="formacao"
                 v-model="formData.formacao"
                 class="toggle-input"
-              >
+              />
               <label for="formacao" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
             </div>
           </div>
-          
+
           <div class="form-group" v-if="formData.formacao">
             <label for="quemRecebeuFormacao">QUEM RECEBEU FORMAÇÃO</label>
-            <input 
-              type="text" 
-              id="quemRecebeuFormacao" 
-              v-model="formData.quemRecebeuFormacao" 
+            <input
+              type="text"
+              id="quemRecebeuFormacao"
+              v-model="formData.quemRecebeuFormacao"
               class="form-control"
               placeholder="Nome da pessoa que recebeu formação"
-            >
+            />
           </div>
-          
+
           <div class="form-group" v-if="formData.formacao">
             <label>TESTE PÓS FORMAÇÃO</label>
             <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                id="testePosFomacao" 
+              <input
+                type="checkbox"
+                id="testePosFomacao"
                 v-model="formData.testePosFomacao"
                 class="toggle-input"
-              >
+              />
               <label for="testePosFomacao" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
@@ -479,68 +471,54 @@
           <div class="form-group">
             <label>ASSINA</label>
             <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                id="assina" 
-                v-model="formData.assina"
-                class="toggle-input"
-              >
+              <input type="checkbox" id="assina" v-model="formData.assina" class="toggle-input" />
               <label for="assina" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
             </div>
           </div>
-          
+
           <div class="form-group" v-if="formData.assina">
             <label for="quemAssinou">QUEM ASSINOU</label>
-            <input 
-              type="text" 
-              id="quemAssinou" 
-              v-model="formData.quemAssinou" 
+            <input
+              type="text"
+              id="quemAssinou"
+              v-model="formData.quemAssinou"
               class="form-control"
               placeholder="Nome de quem assinou"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="assinatura">ASSINATURA (URL)</label>
-            <input 
-              type="url" 
-              id="assinatura" 
-              v-model="formData.assinatura" 
+            <input
+              type="url"
+              id="assinatura"
+              v-model="formData.assinatura"
               class="form-control"
               placeholder="URL da assinatura digital"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="anexarImagem">ANEXAR IMAGEM (URL)</label>
-            <input 
-              type="url" 
-              id="anexarImagem" 
-              v-model="formData.anexarImagem" 
+            <input
+              type="url"
+              id="anexarImagem"
+              v-model="formData.anexarImagem"
               class="form-control"
               placeholder="URL da imagem anexada"
-            >
+            />
           </div>
         </div>
       </section>
 
       <!-- Action buttons -->
       <div class="form-actions">
-        <button 
-          type="button" 
-          @click="handleCancel" 
-          class="btn btn-cancel"
-          :disabled="loading"
-        >
+        <button type="button" @click="handleCancel" class="btn btn-cancel" :disabled="loading">
           Cancelar
         </button>
-        <button 
-          type="submit" 
-          class="btn btn-primary"
-          :disabled="loading || !isFormValid"
-        >
+        <button type="submit" class="btn btn-primary" :disabled="loading || !isFormValid">
           <span v-if="loading" class="btn-spinner"></span>
           {{ isEditing ? 'Atualizar' : 'Criar' }} Instalação
         </button>
@@ -550,31 +528,26 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
-import { useInstalacoesStore } from '@/stores/instalacoes-programacoes.js'
+import { ref, computed, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
+import { useInstalacoesStore } from '@/stores/instalacoes-programacoes.js';
 
 // Router
-const router = useRouter()
-const route = useRoute()
+const router = useRouter();
+const route = useRoute();
 
 // Store
-const store = useInstalacoesStore()
-const { loading, error } = storeToRefs(store)
-const { 
-  createInstalacao, 
-  updateInstalacao, 
-  fetchInstalacaoById, 
-  clearError,
-  getYearFromDate 
-} = store
+const store = useInstalacoesStore();
+const { loading, error } = storeToRefs(store);
+const { createInstalacao, updateInstalacao, fetchInstalacaoById, clearError, getYearFromDate } =
+  store;
 
 // Form state
-const isEditing = ref(false)
-const instalacaoYear = ref(null)
-const instalacaoId = ref(null)
+const isEditing = ref(false);
+const instalacaoYear = ref(null);
+const instalacaoId = ref(null);
 
 // Form data
 const formData = ref({
@@ -620,82 +593,82 @@ const formData = ref({
   tecnicoInstalacao: '',
   assina: false,
   quemAssinou: '',
-  anexarImagem: ''
-})
+  anexarImagem: '',
+});
 
 // Computed
 const isFormValid = computed(() => {
-  return formData.value.nomeCliente.trim()
-})
+  return formData.value.nomeCliente.trim();
+});
 
 const cancelRoute = computed(() => {
-  const from = route.query.from
+  const from = route.query.from;
   if (from === 'detail' && instalacaoYear.value && instalacaoId.value) {
-    return `/instalacoes-programacoes/${instalacaoYear.value}/${instalacaoId.value}`
+    return `/instalacoes-programacoes/${instalacaoYear.value}/${instalacaoId.value}`;
   } else if (from === 'list') {
-    return '/instalacoes-programacoes/list'
+    return '/instalacoes-programacoes/list';
   } else {
-    return '/instalacoes-programacoes'
+    return '/instalacoes-programacoes';
   }
-})
+});
 
 // Methods
 const handleSubmit = async () => {
-  if (!isFormValid.value) return
+  if (!isFormValid.value) return;
 
   try {
-    let year = instalacaoYear.value
-    
+    let year = instalacaoYear.value;
+
     // If creating new, determine year from installation date or use current year
     if (!isEditing.value) {
       if (formData.value.dataInstalacao) {
-        year = getYearFromDate(formData.value.dataInstalacao)
+        year = getYearFromDate(formData.value.dataInstalacao);
       } else if (formData.value.dataRecepcao) {
-        year = getYearFromDate(formData.value.dataRecepcao)
+        year = getYearFromDate(formData.value.dataRecepcao);
       } else {
-        year = new Date().getFullYear().toString()
+        year = new Date().getFullYear().toString();
       }
     }
-    
+
     if (isEditing.value) {
-      await updateInstalacao(instalacaoYear.value, instalacaoId.value, formData.value)
-      router.push(`/instalacoes-programacoes/${instalacaoYear.value}/${instalacaoId.value}`)
+      await updateInstalacao(instalacaoYear.value, instalacaoId.value, formData.value);
+      router.push(`/instalacoes-programacoes/${instalacaoYear.value}/${instalacaoId.value}`);
     } else {
-      const newInstalacao = await createInstalacao(year, formData.value)
-      router.push(`/instalacoes-programacoes/${year}/${newInstalacao.id}`)
+      const newInstalacao = await createInstalacao(year, formData.value);
+      router.push(`/instalacoes-programacoes/${year}/${newInstalacao.id}`);
     }
   } catch (err) {
-    console.error('Error saving instalacao:', err)
+    console.error('Error saving instalacao:', err);
   }
-}
+};
 
 const handleCancel = () => {
-  router.push(cancelRoute.value)
-}
+  router.push(cancelRoute.value);
+};
 
 const loadInstalacaoForEditing = async () => {
   if (instalacaoYear.value && instalacaoId.value) {
     try {
-      const instalacao = await fetchInstalacaoById(instalacaoYear.value, instalacaoId.value)
+      const instalacao = await fetchInstalacaoById(instalacaoYear.value, instalacaoId.value);
       if (instalacao) {
-        formData.value = { ...instalacao }
+        formData.value = { ...instalacao };
       }
     } catch (err) {
-      console.error('Error loading instalacao:', err)
+      console.error('Error loading instalacao:', err);
     }
   }
-}
+};
 
 // Lifecycle
 onMounted(async () => {
   // Check if we're editing
   if (route.params.year && route.params.id) {
-    isEditing.value = true
-    instalacaoYear.value = route.params.year
-    instalacaoId.value = route.params.id
-    await loadInstalacaoForEditing()
+    isEditing.value = true;
+    instalacaoYear.value = route.params.year;
+    instalacaoId.value = route.params.id;
+    await loadInstalacaoForEditing();
   }
-})
+});
 </script>
 
 <style scoped>
@@ -941,8 +914,12 @@ onMounted(async () => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Mobile responsiveness */
@@ -950,50 +927,50 @@ onMounted(async () => {
   .instalacoes-form-container {
     padding: 0.5rem;
   }
-  
+
   .form-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .form-header h1 {
     font-size: 1.3rem;
   }
-  
+
   .form-section {
     padding: 1rem;
     margin-bottom: 1rem;
   }
-  
+
   .form-section h2 {
     font-size: 1rem;
     margin-bottom: 0.75rem;
   }
-  
+
   .form-grid {
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
-  
+
   .form-group {
     min-height: auto;
   }
-  
+
   .form-group label {
     font-size: 0.85rem;
   }
-  
+
   .form-control {
     padding: 0.65rem;
     font-size: 0.9rem;
   }
-  
+
   .form-actions {
     flex-direction: column;
     gap: 0.75rem;
   }
-  
+
   .btn {
     width: 100%;
     padding: 0.75rem;
@@ -1004,24 +981,24 @@ onMounted(async () => {
   .instalacoes-form-container {
     padding: 0.25rem;
   }
-  
+
   .form-section {
     padding: 0.75rem;
   }
-  
+
   .form-section h2 {
     font-size: 0.9rem;
   }
-  
+
   .form-group label {
     font-size: 0.8rem;
   }
-  
+
   .form-control {
     padding: 0.6rem;
     font-size: 0.85rem;
   }
-  
+
   .form-header h1 {
     font-size: 1.2rem;
   }

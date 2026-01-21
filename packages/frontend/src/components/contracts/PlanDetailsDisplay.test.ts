@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { ref } from 'vue'
-import ContractsCreateView from '@/views/contracts/ContractsCreateView.vue'
+import { describe, it, expect, beforeEach } from 'vitest';
+import { mount } from '@vue/test-utils';
+import { ref } from 'vue';
+import ContractsCreateView from '@/views/contracts/ContractsCreateView.vue';
 
 // Mock the composables
 const mockFormData = ref({
@@ -14,44 +14,44 @@ const mockFormData = ref({
   planIdCPA: '',
   distanceCPA: '',
   planIdSH: '',
-  distanceSH: ''
-})
+  distanceSH: '',
+});
 
 const mockUpdateFieldValue = (field: string, value: any) => {
-  mockFormData.value[field as keyof typeof mockFormData.value] = value
-}
+  mockFormData.value[field as keyof typeof mockFormData.value] = value;
+};
 
 // Mock all the required composables and components
 vi.mock('@/composables/useSharedFormData', () => ({
   useSharedFormData: () => ({
     formData: mockFormData,
-    updateFieldValue: mockUpdateFieldValue
-  })
-}))
+    updateFieldValue: mockUpdateFieldValue,
+  }),
+}));
 
 vi.mock('@/composables/useApi', () => ({
   useApi: () => ({
     create: vi.fn(),
-    item: ref(null)
-  })
-}))
+    item: ref(null),
+  }),
+}));
 
 vi.mock('@/composables/useErrorHandler', () => ({
-  useErrorHandler: () => ({})
-}))
+  useErrorHandler: () => ({}),
+}));
 
 vi.mock('@/composables/usePerformanceOptimizations', () => ({
   usePerformanceOptimizations: () => ({
     createDebounced: (fn: Function) => fn,
-    createCache: () => new Map()
-  })
-}))
+    createCache: () => new Map(),
+  }),
+}));
 
 vi.mock('vue-router', () => ({
   useRouter: () => ({
-    push: vi.fn()
-  })
-}))
+    push: vi.fn(),
+  }),
+}));
 
 // Mock the child components
 vi.mock('@/components/common/ContentCreateTemplate.vue', () => ({
@@ -81,20 +81,21 @@ vi.mock('@/components/common/ContentCreateTemplate.vue', () => ({
     setup() {
       return {
         formData: mockFormData,
-        updateFieldValue: mockUpdateFieldValue
-      }
-    }
-  }
-}))
+        updateFieldValue: mockUpdateFieldValue,
+      };
+    },
+  },
+}));
 
 vi.mock('@/components/contracts/DisplayToggleSwitch.vue', () => ({
   default: {
     name: 'DisplayToggleSwitch',
-    template: '<button class="toggle-switch" :class="{ active: isActive }" @click="$emit(\'toggle\', !isActive)">{{ title }}</button>',
+    template:
+      '<button class="toggle-switch" :class="{ active: isActive }" @click="$emit(\'toggle\', !isActive)">{{ title }}</button>',
     props: ['title', 'isActive'],
-    emits: ['toggle']
-  }
-}))
+    emits: ['toggle'],
+  },
+}));
 
 vi.mock('@/components/contracts/CPAContractSection.vue', () => ({
   default: {
@@ -109,9 +110,9 @@ vi.mock('@/components/contracts/CPAContractSection.vue', () => ({
       </div>
     `,
     props: ['formData', 'cpaEquipments', 'selectedPlanDetails', 'isLoadingPlan'],
-    emits: ['update-field', 'equipment-updated', 'plan-selected']
-  }
-}))
+    emits: ['update-field', 'equipment-updated', 'plan-selected'],
+  },
+}));
 
 vi.mock('@/components/contracts/SHContractSection.vue', () => ({
   default: {
@@ -126,12 +127,12 @@ vi.mock('@/components/contracts/SHContractSection.vue', () => ({
       </div>
     `,
     props: ['formData', 'shEquipments', 'selectedPlanDetails', 'isLoadingPlan'],
-    emits: ['update-field', 'plan-selected', 'equipment-updated']
-  }
-}))
+    emits: ['update-field', 'plan-selected', 'equipment-updated'],
+  },
+}));
 
 describe('Plan Details Display', () => {
-  let wrapper: any
+  let wrapper: any;
 
   beforeEach(() => {
     // Reset form data
@@ -145,96 +146,106 @@ describe('Plan Details Display', () => {
       planIdCPA: '',
       distanceCPA: '',
       planIdSH: '',
-      distanceSH: ''
-    }
+      distanceSH: '',
+    };
 
-    wrapper = mount(ContractsCreateView)
-  })
+    wrapper = mount(ContractsCreateView);
+  });
 
   it('should display CPA plan details when CPA contract type and plan are selected', async () => {
-    const toggleSwitches = wrapper.findAllComponents({ name: 'DisplayToggleSwitch' })
-    const cpaToggle = toggleSwitches.find((toggle: any) => toggle.props('title') === 'CPA - CASHLOGY')
+    const toggleSwitches = wrapper.findAllComponents({ name: 'DisplayToggleSwitch' });
+    const cpaToggle = toggleSwitches.find(
+      (toggle: any) => toggle.props('title') === 'CPA - CASHLOGY'
+    );
 
     // Activate CPA toggle
-    await cpaToggle.vm.$emit('toggle', true)
-    await wrapper.vm.$nextTick()
+    await cpaToggle.vm.$emit('toggle', true);
+    await wrapper.vm.$nextTick();
 
     // Set CPA contract type and plan
-    mockFormData.value.cpaContractType = 'CPA_1500'
-    mockFormData.value.planIdCPA = 'cpa_1500_essential'
-    await wrapper.vm.$nextTick()
+    mockFormData.value.cpaContractType = 'CPA_1500';
+    mockFormData.value.planIdCPA = 'cpa_1500_essential';
+    await wrapper.vm.$nextTick();
 
     // Check if CPA section is visible
-    const cpaSection = wrapper.findComponent({ name: 'CPAContractSection' })
-    expect(cpaSection.exists()).toBe(true)
+    const cpaSection = wrapper.findComponent({ name: 'CPAContractSection' });
+    expect(cpaSection.exists()).toBe(true);
 
     // Check if plan details are passed to the component
-    expect(cpaSection.props('selectedPlanDetails')).toBeTruthy()
-    expect(cpaSection.props('selectedPlanDetails').name).toBe('ESSENTIAL CARE')
-  })
+    expect(cpaSection.props('selectedPlanDetails')).toBeTruthy();
+    expect(cpaSection.props('selectedPlanDetails').name).toBe('ESSENTIAL CARE');
+  });
 
   it('should display S&H plan details when S&H plan is selected', async () => {
-    const toggleSwitches = wrapper.findAllComponents({ name: 'DisplayToggleSwitch' })
-    const shToggle = toggleSwitches.find((toggle: any) => toggle.props('title') === 'S&H - SOFTWARE E HARDWARE')
+    const toggleSwitches = wrapper.findAllComponents({ name: 'DisplayToggleSwitch' });
+    const shToggle = toggleSwitches.find(
+      (toggle: any) => toggle.props('title') === 'S&H - SOFTWARE E HARDWARE'
+    );
 
     // Activate S&H toggle
-    await shToggle.vm.$emit('toggle', true)
-    await wrapper.vm.$nextTick()
+    await shToggle.vm.$emit('toggle', true);
+    await wrapper.vm.$nextTick();
 
     // Set S&H plan
-    mockFormData.value.planIdSH = 'sh_simple'
-    await wrapper.vm.$nextTick()
+    mockFormData.value.planIdSH = 'sh_simple';
+    await wrapper.vm.$nextTick();
 
     // Check if S&H section is visible
-    const shSection = wrapper.findComponent({ name: 'SHContractSection' })
-    expect(shSection.exists()).toBe(true)
+    const shSection = wrapper.findComponent({ name: 'SHContractSection' });
+    expect(shSection.exists()).toBe(true);
 
     // Check if plan details are passed to the component
-    expect(shSection.props('selectedPlanDetails')).toBeTruthy()
-    expect(shSection.props('selectedPlanDetails').name).toBe('SIMPLE')
-  })
+    expect(shSection.props('selectedPlanDetails')).toBeTruthy();
+    expect(shSection.props('selectedPlanDetails').name).toBe('SIMPLE');
+  });
 
   it('should not display plan details when plan is not selected', async () => {
-    const toggleSwitches = wrapper.findAllComponents({ name: 'DisplayToggleSwitch' })
-    const cpaToggle = toggleSwitches.find((toggle: any) => toggle.props('title') === 'CPA - CASHLOGY')
+    const toggleSwitches = wrapper.findAllComponents({ name: 'DisplayToggleSwitch' });
+    const cpaToggle = toggleSwitches.find(
+      (toggle: any) => toggle.props('title') === 'CPA - CASHLOGY'
+    );
 
     // Activate CPA toggle but don't select plan
-    await cpaToggle.vm.$emit('toggle', true)
-    await wrapper.vm.$nextTick()
+    await cpaToggle.vm.$emit('toggle', true);
+    await wrapper.vm.$nextTick();
 
     // Check if CPA section is visible but no plan details
-    const cpaSection = wrapper.findComponent({ name: 'CPAContractSection' })
-    expect(cpaSection.exists()).toBe(true)
-    expect(cpaSection.props('selectedPlanDetails')).toBeNull()
-  })
+    const cpaSection = wrapper.findComponent({ name: 'CPAContractSection' });
+    expect(cpaSection.exists()).toBe(true);
+    expect(cpaSection.props('selectedPlanDetails')).toBeNull();
+  });
 
   it('should display both plan details when both contract types are configured', async () => {
-    const toggleSwitches = wrapper.findAllComponents({ name: 'DisplayToggleSwitch' })
-    const cpaToggle = toggleSwitches.find((toggle: any) => toggle.props('title') === 'CPA - CASHLOGY')
-    const shToggle = toggleSwitches.find((toggle: any) => toggle.props('title') === 'S&H - SOFTWARE E HARDWARE')
+    const toggleSwitches = wrapper.findAllComponents({ name: 'DisplayToggleSwitch' });
+    const cpaToggle = toggleSwitches.find(
+      (toggle: any) => toggle.props('title') === 'CPA - CASHLOGY'
+    );
+    const shToggle = toggleSwitches.find(
+      (toggle: any) => toggle.props('title') === 'S&H - SOFTWARE E HARDWARE'
+    );
 
     // Activate both toggles
-    await cpaToggle.vm.$emit('toggle', true)
-    await shToggle.vm.$emit('toggle', true)
-    await wrapper.vm.$nextTick()
+    await cpaToggle.vm.$emit('toggle', true);
+    await shToggle.vm.$emit('toggle', true);
+    await wrapper.vm.$nextTick();
 
     // Set both contract types and plans
-    mockFormData.value.cpaContractType = 'CPA_1500'
-    mockFormData.value.planIdCPA = 'cpa_1500_professional'
-    mockFormData.value.planIdSH = 'sh_gold'
-    await wrapper.vm.$nextTick()
+    mockFormData.value.cpaContractType = 'CPA_1500';
+    mockFormData.value.planIdCPA = 'cpa_1500_professional';
+    mockFormData.value.planIdSH = 'sh_gold';
+    await wrapper.vm.$nextTick();
 
     // Check if both sections have plan details
-    const cpaSection = wrapper.findComponent({ name: 'CPAContractSection' })
-    const shSection = wrapper.findComponent({ name: 'SHContractSection' })
+    const cpaSection = wrapper.findComponent({ name: 'CPAContractSection' });
+    const shSection = wrapper.findComponent({ name: 'SHContractSection' });
 
-    expect(cpaSection.exists()).toBe(true)
-    expect(shSection.exists()).toBe(true)
+    expect(cpaSection.exists()).toBe(true);
+    expect(shSection.exists()).toBe(true);
 
-    expect(cpaSection.props('selectedPlanDetails')).toBeTruthy()
-    expect(cpaSection.props('selectedPlanDetails').name).toBe('PROFESSIONAL CARE')
+    expect(cpaSection.props('selectedPlanDetails')).toBeTruthy();
+    expect(cpaSection.props('selectedPlanDetails').name).toBe('PROFESSIONAL CARE');
 
-    expect(shSection.props('selectedPlanDetails')).toBeTruthy()
-    expect(shSection.props('selectedPlanDetails').name).toBe('GOLD')
-  })
-})
+    expect(shSection.props('selectedPlanDetails')).toBeTruthy();
+    expect(shSection.props('selectedPlanDetails').name).toBe('GOLD');
+  });
+});

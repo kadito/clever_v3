@@ -1,53 +1,53 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import { useAuth } from '@clerk/vue'
-import Home from '@/views/Home.vue'
-import Dashboard from '@/views/Dashboard.vue'
-import SignIn from '@/views/auth/SignIn.vue'
-import UserManagement from '@/views/admin/UserManagement.vue'
-import FolhasObraModule from '@/views/folhas-obra/FolhasObraModule.vue'
-import FolhasObraList from '@/views/folhas-obra/FolhasObraList.vue'
-import FolhasObraDetail from '@/views/folhas-obra/FolhasObraDetail.vue'
-import FolhaObraForm from '@/views/folhas-obra/FolhaObraForm.vue'
-import ContratosModule from '@/views/contratos/ContratosModule.vue'
-import ContratosList from '@/views/contratos/ContratosList.vue'
-import ContratoDetail from '@/views/contratos/ContratoDetail.vue'
-import ContratoForm from '@/views/contratos/ContratoForm.vue'
-import ClientesModule from '@/views/clientes/ClientesModule.vue'
-import ClientesList from '@/views/clientes/ClientesList.vue'
-import ClienteDetail from '@/views/clientes/ClienteDetail.vue'
-import ClienteForm from '@/views/clientes/ClienteForm.vue'
-import AssistenciasRemotasModule from '@/views/assistencias-remotas/AssistenciasRemotasModule.vue'
-import AssistenciasRemotasList from '@/views/assistencias-remotas/AssistenciasRemotasList.vue'
-import AssistenciasRemotasDetail from '@/views/assistencias-remotas/AssistenciasRemotasDetail.vue'
-import AssistenciasRemotasForm from '@/views/assistencias-remotas/AssistenciasRemotasForm.vue'
-import AgendamentosModule from '@/views/agendamentos/AgendamentosModule.vue'
-import AgendamentosList from '@/views/agendamentos/AgendamentosList.vue'
-import AgendamentosDetail from '@/views/agendamentos/AgendamentosDetail.vue'
-import AgendamentosForm from '@/views/agendamentos/AgendamentosForm.vue'
-import LicencasModule from '@/views/licencas/LicencasModule.vue'
-import LicencasList from '@/views/licencas/LicencasList.vue'
-import LicencasDetail from '@/views/licencas/LicencasDetail.vue'
-import LicencasForm from '@/views/licencas/LicencasForm.vue'
-import ContaCorrenteModule from '@/views/conta-corrente/ContaCorrenteModule.vue'
-import ContaCorrenteList from '@/views/conta-corrente/ContaCorrenteList.vue'
-import ContaCorrenteDetail from '@/views/conta-corrente/ContaCorrenteDetail.vue'
-import ContaCorrenteForm from '@/views/conta-corrente/ContaCorrenteForm.vue'
-import RegistoDiarioAtividadeModule from '@/views/registo-diario-atividade/RegistoDiarioAtividadeModule.vue'
-import RegistoDiarioAtividadeList from '@/views/registo-diario-atividade/RegistoDiarioAtividadeList.vue'
-import RegistoDiarioAtividadeDetail from '@/views/registo-diario-atividade/RegistoDiarioAtividadeDetail.vue'
-import RegistoDiarioAtividadeForm from '@/views/registo-diario-atividade/RegistoDiarioAtividadeForm.vue'
-import InstalacoesModule from '@/views/instalacoes-programacoes/InstalacoesModule.vue'
-import InstalacoesList from '@/views/instalacoes-programacoes/InstalacoesList.vue'
-import InstalacoesDetail from '@/views/instalacoes-programacoes/InstalacoesDetail.vue'
-import InstalacoesForm from '@/views/instalacoes-programacoes/InstalacoesForm.vue'
-import EquipamentoUsadoModule from '@/views/equipamento-usado/EquipamentoUsadoModule.vue'
-import EquipamentoUsadoList from '@/views/equipamento-usado/EquipamentoUsadoList.vue'
-import EquipamentoUsadoDetail from '@/views/equipamento-usado/EquipamentoUsadoDetail.vue'
-import EquipamentoUsadoForm from '@/views/equipamento-usado/EquipamentoUsadoForm.vue'
-import EquipaModule from '@/views/equipa/EquipaModule.vue'
-import EquipaList from '@/views/equipa/EquipaList.vue'
-import EquipaDetail from '@/views/equipa/EquipaDetail.vue'
-import EquipaForm from '@/views/equipa/EquipaForm.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import { useAuth } from '@clerk/vue';
+import Home from '@/views/Home.vue';
+import Dashboard from '@/views/Dashboard.vue';
+import SignIn from '@/views/auth/SignIn.vue';
+import UserManagement from '@/views/admin/UserManagement.vue';
+import FolhasObraModule from '@/views/folhas-obra/FolhasObraModule.vue';
+import FolhasObraList from '@/views/folhas-obra/FolhasObraList.vue';
+import FolhasObraDetail from '@/views/folhas-obra/FolhasObraDetail.vue';
+import FolhaObraForm from '@/views/folhas-obra/FolhaObraForm.vue';
+import ContratosModule from '@/views/contratos/ContratosModule.vue';
+import ContratosList from '@/views/contratos/ContratosList.vue';
+import ContratoDetail from '@/views/contratos/ContratoDetail.vue';
+import ContratoForm from '@/views/contratos/ContratoForm.vue';
+import ClientesModule from '@/views/clientes/ClientesModule.vue';
+import ClientesList from '@/views/clientes/ClientesList.vue';
+import ClienteDetail from '@/views/clientes/ClienteDetail.vue';
+import ClienteForm from '@/views/clientes/ClienteForm.vue';
+import AssistenciasRemotasModule from '@/views/assistencias-remotas/AssistenciasRemotasModule.vue';
+import AssistenciasRemotasList from '@/views/assistencias-remotas/AssistenciasRemotasList.vue';
+import AssistenciasRemotasDetail from '@/views/assistencias-remotas/AssistenciasRemotasDetail.vue';
+import AssistenciasRemotasForm from '@/views/assistencias-remotas/AssistenciasRemotasForm.vue';
+import AgendamentosModule from '@/views/agendamentos/AgendamentosModule.vue';
+import AgendamentosList from '@/views/agendamentos/AgendamentosList.vue';
+import AgendamentosDetail from '@/views/agendamentos/AgendamentosDetail.vue';
+import AgendamentosForm from '@/views/agendamentos/AgendamentosForm.vue';
+import LicencasModule from '@/views/licencas/LicencasModule.vue';
+import LicencasList from '@/views/licencas/LicencasList.vue';
+import LicencasDetail from '@/views/licencas/LicencasDetail.vue';
+import LicencasForm from '@/views/licencas/LicencasForm.vue';
+import ContaCorrenteModule from '@/views/conta-corrente/ContaCorrenteModule.vue';
+import ContaCorrenteList from '@/views/conta-corrente/ContaCorrenteList.vue';
+import ContaCorrenteDetail from '@/views/conta-corrente/ContaCorrenteDetail.vue';
+import ContaCorrenteForm from '@/views/conta-corrente/ContaCorrenteForm.vue';
+import RegistoDiarioAtividadeModule from '@/views/registo-diario-atividade/RegistoDiarioAtividadeModule.vue';
+import RegistoDiarioAtividadeList from '@/views/registo-diario-atividade/RegistoDiarioAtividadeList.vue';
+import RegistoDiarioAtividadeDetail from '@/views/registo-diario-atividade/RegistoDiarioAtividadeDetail.vue';
+import RegistoDiarioAtividadeForm from '@/views/registo-diario-atividade/RegistoDiarioAtividadeForm.vue';
+import InstalacoesModule from '@/views/instalacoes-programacoes/InstalacoesModule.vue';
+import InstalacoesList from '@/views/instalacoes-programacoes/InstalacoesList.vue';
+import InstalacoesDetail from '@/views/instalacoes-programacoes/InstalacoesDetail.vue';
+import InstalacoesForm from '@/views/instalacoes-programacoes/InstalacoesForm.vue';
+import EquipamentoUsadoModule from '@/views/equipamento-usado/EquipamentoUsadoModule.vue';
+import EquipamentoUsadoList from '@/views/equipamento-usado/EquipamentoUsadoList.vue';
+import EquipamentoUsadoDetail from '@/views/equipamento-usado/EquipamentoUsadoDetail.vue';
+import EquipamentoUsadoForm from '@/views/equipamento-usado/EquipamentoUsadoForm.vue';
+import EquipaModule from '@/views/equipa/EquipaModule.vue';
+import EquipaList from '@/views/equipa/EquipaList.vue';
+import EquipaDetail from '@/views/equipa/EquipaDetail.vue';
+import EquipaForm from '@/views/equipa/EquipaForm.vue';
 
 // Router configuration
 const routes = [
@@ -56,15 +56,15 @@ const routes = [
     path: '/sign-in',
     name: 'SignIn',
     component: SignIn,
-    meta: { requiresAuth: false }
+    meta: { requiresAuth: false },
   },
-  
+
   // Admin routes (requires admin role)
   {
     path: '/admin/users',
     name: 'UserManagement',
     component: UserManagement,
-    meta: { requiresAuth: true, requiresAdmin: true }
+    meta: { requiresAuth: true, requiresAdmin: true },
   },
 
   // Protected routes
@@ -72,11 +72,11 @@ const routes = [
     path: '/',
     name: 'home',
     component: Home,
-    meta: { 
+    meta: {
       requiresAuth: true,
       title: 'Início',
-      description: 'Página inicial do sistema'
-    }
+      description: 'Página inicial do sistema',
+    },
   },
   {
     path: '/dashboard',
@@ -85,8 +85,8 @@ const routes = [
     meta: {
       requiresAuth: true,
       title: 'Dashboard',
-      description: 'Painel de controle'
-    }
+      description: 'Painel de controle',
+    },
   },
   // Folhas de Obra - Custom module component
   {
@@ -95,8 +95,8 @@ const routes = [
     name: 'folhas-obra',
     meta: {
       title: 'Folhas de Obra',
-      description: 'Gestão de folhas de obra'
-    }
+      description: 'Gestão de folhas de obra',
+    },
   },
   // Folhas de Obra specific routes
   {
@@ -105,8 +105,8 @@ const routes = [
     name: 'folhas-obra-list',
     meta: {
       title: 'Lista de Folhas de Obra',
-      description: 'Lista de todas as folhas de obra'
-    }
+      description: 'Lista de todas as folhas de obra',
+    },
   },
   {
     path: '/folhas-obra/new',
@@ -114,8 +114,8 @@ const routes = [
     name: 'folhas-obra-new',
     meta: {
       title: 'Nova Folha de Obra',
-      description: 'Criar uma nova folha de obra'
-    }
+      description: 'Criar uma nova folha de obra',
+    },
   },
   {
     path: '/folhas-obra/:id/edit',
@@ -123,8 +123,8 @@ const routes = [
     name: 'folhas-obra-edit',
     meta: {
       title: 'Editar Folha de Obra',
-      description: 'Editar uma folha de obra existente'
-    }
+      description: 'Editar uma folha de obra existente',
+    },
   },
   {
     path: '/folhas-obra/:id',
@@ -132,8 +132,8 @@ const routes = [
     name: 'folhas-obra-detail',
     meta: {
       title: 'Detalhes da Folha de Obra',
-      description: 'Detalhes de uma folha de obra específica'
-    }
+      description: 'Detalhes de uma folha de obra específica',
+    },
   },
   // Gestor de Contratos - Custom module component
   {
@@ -142,8 +142,8 @@ const routes = [
     name: 'gestor-contratos',
     meta: {
       title: 'Gestor de Contratos',
-      description: 'Gestão de contratos'
-    }
+      description: 'Gestão de contratos',
+    },
   },
   // Contratos specific routes
   {
@@ -152,8 +152,8 @@ const routes = [
     name: 'contratos-list',
     meta: {
       title: 'Lista de Contratos',
-      description: 'Lista de todos os contratos'
-    }
+      description: 'Lista de todos os contratos',
+    },
   },
   {
     path: '/contratos/new',
@@ -161,8 +161,8 @@ const routes = [
     name: 'contratos-new',
     meta: {
       title: 'Novo Contrato',
-      description: 'Criar um novo contrato'
-    }
+      description: 'Criar um novo contrato',
+    },
   },
   {
     path: '/contratos/:id/edit',
@@ -170,8 +170,8 @@ const routes = [
     name: 'contratos-edit',
     meta: {
       title: 'Editar Contrato',
-      description: 'Editar um contrato existente'
-    }
+      description: 'Editar um contrato existente',
+    },
   },
   {
     path: '/contratos/:id',
@@ -179,8 +179,8 @@ const routes = [
     name: 'contratos-detail',
     meta: {
       title: 'Detalhes do Contrato',
-      description: 'Detalhes de um contrato específico'
-    }
+      description: 'Detalhes de um contrato específico',
+    },
   },
   // Clientes - Custom module component
   {
@@ -189,8 +189,8 @@ const routes = [
     name: 'clientes',
     meta: {
       title: 'Clientes',
-      description: 'Gestão de clientes'
-    }
+      description: 'Gestão de clientes',
+    },
   },
   // Clientes specific routes
   {
@@ -199,8 +199,8 @@ const routes = [
     name: 'clientes-list',
     meta: {
       title: 'Lista de Clientes',
-      description: 'Lista de todos os clientes'
-    }
+      description: 'Lista de todos os clientes',
+    },
   },
   {
     path: '/clientes/new',
@@ -208,8 +208,8 @@ const routes = [
     name: 'clientes-new',
     meta: {
       title: 'Novo Cliente',
-      description: 'Criar um novo cliente'
-    }
+      description: 'Criar um novo cliente',
+    },
   },
   {
     path: '/clientes/:id/edit',
@@ -217,8 +217,8 @@ const routes = [
     name: 'clientes-edit',
     meta: {
       title: 'Editar Cliente',
-      description: 'Editar um cliente existente'
-    }
+      description: 'Editar um cliente existente',
+    },
   },
   {
     path: '/clientes/:id',
@@ -226,8 +226,8 @@ const routes = [
     name: 'clientes-detail',
     meta: {
       title: 'Detalhes do Cliente',
-      description: 'Detalhes de um cliente específico'
-    }
+      description: 'Detalhes de um cliente específico',
+    },
   },
   // Assistências Remotas - Custom module component
   {
@@ -236,8 +236,8 @@ const routes = [
     name: 'assistencias-remotas',
     meta: {
       title: 'Assistências Remotas',
-      description: 'Gestão de assistências remotas'
-    }
+      description: 'Gestão de assistências remotas',
+    },
   },
   // Assistências Remotas specific routes
   {
@@ -246,8 +246,8 @@ const routes = [
     name: 'assistencias-remotas-list',
     meta: {
       title: 'Lista de Assistências Remotas',
-      description: 'Lista de todas as assistências remotas'
-    }
+      description: 'Lista de todas as assistências remotas',
+    },
   },
   {
     path: '/assistencias-remotas/new',
@@ -255,8 +255,8 @@ const routes = [
     name: 'assistencias-remotas-new',
     meta: {
       title: 'Nova Assistência Remota',
-      description: 'Criar uma nova assistência remota'
-    }
+      description: 'Criar uma nova assistência remota',
+    },
   },
   {
     path: '/assistencias-remotas/:id/edit',
@@ -264,8 +264,8 @@ const routes = [
     name: 'assistencias-remotas-edit',
     meta: {
       title: 'Editar Assistência Remota',
-      description: 'Editar uma assistência remota existente'
-    }
+      description: 'Editar uma assistência remota existente',
+    },
   },
   {
     path: '/assistencias-remotas/:id',
@@ -273,8 +273,8 @@ const routes = [
     name: 'assistencias-remotas-detail',
     meta: {
       title: 'Detalhes da Assistência Remota',
-      description: 'Detalhes de uma assistência remota específica'
-    }
+      description: 'Detalhes de uma assistência remota específica',
+    },
   },
   // Agendamentos - Custom module component
   {
@@ -283,8 +283,8 @@ const routes = [
     name: 'agendamentos',
     meta: {
       title: 'Agendamentos',
-      description: 'Gestão de agendamentos'
-    }
+      description: 'Gestão de agendamentos',
+    },
   },
   // Agendamentos specific routes
   {
@@ -293,8 +293,8 @@ const routes = [
     name: 'agendamentos-list',
     meta: {
       title: 'Lista de Agendamentos',
-      description: 'Lista de todos os agendamentos'
-    }
+      description: 'Lista de todos os agendamentos',
+    },
   },
   {
     path: '/agendamentos/new',
@@ -302,8 +302,8 @@ const routes = [
     name: 'agendamentos-new',
     meta: {
       title: 'Novo Agendamento',
-      description: 'Criar um novo agendamento'
-    }
+      description: 'Criar um novo agendamento',
+    },
   },
   {
     path: '/agendamentos/:year/:id/edit',
@@ -311,8 +311,8 @@ const routes = [
     name: 'agendamentos-edit',
     meta: {
       title: 'Editar Agendamento',
-      description: 'Editar um agendamento existente'
-    }
+      description: 'Editar um agendamento existente',
+    },
   },
   {
     path: '/agendamentos/:year/:id',
@@ -320,8 +320,8 @@ const routes = [
     name: 'agendamentos-detail',
     meta: {
       title: 'Detalhes do Agendamento',
-      description: 'Detalhes de um agendamento específico'
-    }
+      description: 'Detalhes de um agendamento específico',
+    },
   },
   // Gestor de Licenças - Custom module component
   {
@@ -330,8 +330,8 @@ const routes = [
     name: 'gestor-licencas',
     meta: {
       title: 'Gestor de Licenças',
-      description: 'Gestão de licenças de software'
-    }
+      description: 'Gestão de licenças de software',
+    },
   },
   // Licenças specific routes
   {
@@ -340,8 +340,8 @@ const routes = [
     name: 'licencas-list',
     meta: {
       title: 'Lista de Licenças',
-      description: 'Lista de todas as licenças'
-    }
+      description: 'Lista de todas as licenças',
+    },
   },
   {
     path: '/licencas/new',
@@ -349,8 +349,8 @@ const routes = [
     name: 'licencas-new',
     meta: {
       title: 'Nova Licença',
-      description: 'Criar uma nova licença'
-    }
+      description: 'Criar uma nova licença',
+    },
   },
   {
     path: '/licencas/:year/:id/edit',
@@ -358,8 +358,8 @@ const routes = [
     name: 'licencas-edit',
     meta: {
       title: 'Editar Licença',
-      description: 'Editar uma licença existente'
-    }
+      description: 'Editar uma licença existente',
+    },
   },
   {
     path: '/licencas/:year/:id',
@@ -367,8 +367,8 @@ const routes = [
     name: 'licencas-detail',
     meta: {
       title: 'Detalhes da Licença',
-      description: 'Detalhes de uma licença específica'
-    }
+      description: 'Detalhes de uma licença específica',
+    },
   },
   // Conta Corrente - Custom module component
   {
@@ -377,8 +377,8 @@ const routes = [
     name: 'conta-corrente',
     meta: {
       title: 'Conta Corrente',
-      description: 'Gestão de conta corrente de clientes'
-    }
+      description: 'Gestão de conta corrente de clientes',
+    },
   },
   // Conta Corrente specific routes
   {
@@ -387,8 +387,8 @@ const routes = [
     name: 'conta-corrente-list',
     meta: {
       title: 'Lista de Conta Corrente',
-      description: 'Lista de todos os registos de conta corrente'
-    }
+      description: 'Lista de todos os registos de conta corrente',
+    },
   },
   {
     path: '/conta-corrente/new',
@@ -396,8 +396,8 @@ const routes = [
     name: 'conta-corrente-new',
     meta: {
       title: 'Novo Registo de Conta Corrente',
-      description: 'Criar um novo registo de conta corrente'
-    }
+      description: 'Criar um novo registo de conta corrente',
+    },
   },
   {
     path: '/conta-corrente/:year/:id/edit',
@@ -405,8 +405,8 @@ const routes = [
     name: 'conta-corrente-edit',
     meta: {
       title: 'Editar Conta Corrente',
-      description: 'Editar um registo de conta corrente existente'
-    }
+      description: 'Editar um registo de conta corrente existente',
+    },
   },
   {
     path: '/conta-corrente/:year/:id',
@@ -414,8 +414,8 @@ const routes = [
     name: 'conta-corrente-detail',
     meta: {
       title: 'Detalhes da Conta Corrente',
-      description: 'Detalhes de um registo de conta corrente específico'
-    }
+      description: 'Detalhes de um registo de conta corrente específico',
+    },
   },
   // Registo Diário de Atividade - Custom module component
   {
@@ -424,8 +424,8 @@ const routes = [
     name: 'registo-diario',
     meta: {
       title: 'Registo Diário de Atividade',
-      description: 'Gestão de registos diários de atividades'
-    }
+      description: 'Gestão de registos diários de atividades',
+    },
   },
   // Registo Diário de Atividade specific routes
   {
@@ -434,8 +434,8 @@ const routes = [
     name: 'registo-diario-atividade-list',
     meta: {
       title: 'Lista de Registos Diários',
-      description: 'Lista de todos os registos diários de atividade'
-    }
+      description: 'Lista de todos os registos diários de atividade',
+    },
   },
   {
     path: '/registo-diario-atividade/new',
@@ -443,8 +443,8 @@ const routes = [
     name: 'registo-diario-atividade-new',
     meta: {
       title: 'Novo Registo Diário',
-      description: 'Criar um novo registo de atividade diária'
-    }
+      description: 'Criar um novo registo de atividade diária',
+    },
   },
   {
     path: '/registo-diario-atividade/:year/:id/edit',
@@ -452,8 +452,8 @@ const routes = [
     name: 'registo-diario-atividade-edit',
     meta: {
       title: 'Editar Registo Diário',
-      description: 'Editar um registo de atividade existente'
-    }
+      description: 'Editar um registo de atividade existente',
+    },
   },
   {
     path: '/registo-diario-atividade/:year/:id',
@@ -461,8 +461,8 @@ const routes = [
     name: 'registo-diario-atividade-detail',
     meta: {
       title: 'Detalhes do Registo Diário',
-      description: 'Detalhes de um registo de atividade específico'
-    }
+      description: 'Detalhes de um registo de atividade específico',
+    },
   },
   // Instalações e Programações - Custom module component
   {
@@ -471,8 +471,8 @@ const routes = [
     name: 'instalacoes-programacoes',
     meta: {
       title: 'Instalações e Programações',
-      description: 'Gestão de instalações e programações de equipamentos'
-    }
+      description: 'Gestão de instalações e programações de equipamentos',
+    },
   },
   // Instalações e Programações specific routes
   {
@@ -481,8 +481,8 @@ const routes = [
     name: 'instalacoes-list',
     meta: {
       title: 'Lista de Instalações',
-      description: 'Lista de todas as instalações e programações'
-    }
+      description: 'Lista de todas as instalações e programações',
+    },
   },
   {
     path: '/instalacoes-programacoes/new',
@@ -490,8 +490,8 @@ const routes = [
     name: 'instalacao-form',
     meta: {
       title: 'Nova Instalação',
-      description: 'Criar uma nova instalação e programação'
-    }
+      description: 'Criar uma nova instalação e programação',
+    },
   },
   {
     path: '/instalacoes-programacoes/:year/:id/edit',
@@ -499,8 +499,8 @@ const routes = [
     name: 'instalacao-edit',
     meta: {
       title: 'Editar Instalação',
-      description: 'Editar uma instalação existente'
-    }
+      description: 'Editar uma instalação existente',
+    },
   },
   {
     path: '/instalacoes-programacoes/:year/:id',
@@ -508,8 +508,8 @@ const routes = [
     name: 'instalacao-detail',
     meta: {
       title: 'Detalhes da Instalação',
-      description: 'Detalhes de uma instalação específica'
-    }
+      description: 'Detalhes de uma instalação específica',
+    },
   },
   // Equipamento Usado - Custom module component
   {
@@ -518,8 +518,8 @@ const routes = [
     name: 'equipamento-usado',
     meta: {
       title: 'Empréstimo de Equipamentos',
-      description: 'Gestão de equipamentos em empréstimo e controlo de stock'
-    }
+      description: 'Gestão de equipamentos em empréstimo e controlo de stock',
+    },
   },
   // Equipamento Usado specific routes
   {
@@ -528,8 +528,8 @@ const routes = [
     name: 'equipamento-usado-list',
     meta: {
       title: 'Lista de Equipamentos',
-      description: 'Lista de todos os equipamentos'
-    }
+      description: 'Lista de todos os equipamentos',
+    },
   },
   {
     path: '/equipamento-usado/new',
@@ -537,8 +537,8 @@ const routes = [
     name: 'equipamento-usado-form',
     meta: {
       title: 'Novo Equipamento',
-      description: 'Registar um novo equipamento'
-    }
+      description: 'Registar um novo equipamento',
+    },
   },
   {
     path: '/equipamento-usado/:year/:id/edit',
@@ -546,8 +546,8 @@ const routes = [
     name: 'equipamento-usado-edit',
     meta: {
       title: 'Editar Equipamento',
-      description: 'Editar um equipamento existente'
-    }
+      description: 'Editar um equipamento existente',
+    },
   },
   {
     path: '/equipamento-usado/:year/:id',
@@ -555,8 +555,8 @@ const routes = [
     name: 'equipamento-usado-detail',
     meta: {
       title: 'Detalhes do Equipamento',
-      description: 'Detalhes de um equipamento específico'
-    }
+      description: 'Detalhes de um equipamento específico',
+    },
   },
   // Equipa - Custom module component
   {
@@ -565,8 +565,8 @@ const routes = [
     name: 'equipa',
     meta: {
       title: 'Equipa',
-      description: 'Gestão da equipa'
-    }
+      description: 'Gestão da equipa',
+    },
   },
   // Equipa specific routes
   {
@@ -575,8 +575,8 @@ const routes = [
     name: 'equipa-list',
     meta: {
       title: 'Lista de Colaboradores',
-      description: 'Lista de todos os colaboradores'
-    }
+      description: 'Lista de todos os colaboradores',
+    },
   },
   {
     path: '/equipa/new',
@@ -584,8 +584,8 @@ const routes = [
     name: 'equipa-new',
     meta: {
       title: 'Novo Colaborador',
-      description: 'Adicionar um novo colaborador'
-    }
+      description: 'Adicionar um novo colaborador',
+    },
   },
   {
     path: '/equipa/:id/edit',
@@ -593,8 +593,8 @@ const routes = [
     name: 'equipa-edit',
     meta: {
       title: 'Editar Colaborador',
-      description: 'Editar um colaborador existente'
-    }
+      description: 'Editar um colaborador existente',
+    },
   },
   {
     path: '/equipa/:id',
@@ -602,16 +602,16 @@ const routes = [
     name: 'equipa-detail',
     meta: {
       title: 'Detalhes do Colaborador',
-      description: 'Detalhes de um colaborador específico'
-    }
+      description: 'Detalhes de um colaborador específico',
+    },
   },
   // 404 catch-all route
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
-    redirect: '/'
-  }
-]
+    redirect: '/',
+  },
+];
 
 // Create router instance
 const router = createRouter({
@@ -620,82 +620,83 @@ const router = createRouter({
   scrollBehavior(to, from, savedPosition) {
     // Always scroll to top when changing routes
     if (savedPosition) {
-      return savedPosition
+      return savedPosition;
     } else {
-      return { top: 0 }
+      return { top: 0 };
     }
-  }
-})
+  },
+});
 
 // Navigation guards
 router.beforeEach(async (to, from, next) => {
   // Set document title based on route meta
   if (to.meta.title) {
-    document.title = `${to.meta.title} - Clever`
+    document.title = `${to.meta.title} - Clever`;
   } else {
-    document.title = 'Clever'
+    document.title = 'Clever';
   }
-  
+
   // Check authentication requirements
-  const { isSignedIn, user, isLoaded } = useAuth()
-  
+  const { isSignedIn, user, isLoaded } = useAuth();
+
   // Wait for auth to load with timeout
-  let waitCount = 0
-  while (!isLoaded.value && waitCount < 30) { // Max 3 seconds wait
-    await new Promise(resolve => setTimeout(resolve, 100))
-    waitCount++
+  let waitCount = 0;
+  while (!isLoaded.value && waitCount < 30) {
+    // Max 3 seconds wait
+    await new Promise(resolve => setTimeout(resolve, 100));
+    waitCount++;
   }
-  
-  const requiresAuth = to.meta.requiresAuth !== false // Default to requiring auth
-  const requiresAdmin = to.meta.requiresAdmin === true
-  const isPublicRoute = to.meta.requiresAuth === false
-  
+
+  const requiresAuth = to.meta.requiresAuth !== false; // Default to requiring auth
+  const requiresAdmin = to.meta.requiresAdmin === true;
+  const isPublicRoute = to.meta.requiresAuth === false;
+
   console.log('Navigation Guard:', {
     to: to.path,
     from: from.path,
     isSignedIn: isSignedIn.value,
     isLoaded: isLoaded.value,
     requiresAuth,
-    isPublicRoute
-  })
-  
+    isPublicRoute,
+  });
+
   // If auth is still loading, allow navigation to continue
   if (!isLoaded.value) {
-    console.log('Auth still loading, allowing navigation')
-    next()
-    return
+    console.log('Auth still loading, allowing navigation');
+    next();
+    return;
   }
-  
+
   // If route requires auth and user is not signed in
   if (requiresAuth && !isSignedIn.value) {
-    console.log('Redirecting to sign-in - user not authenticated')
+    console.log('Redirecting to sign-in - user not authenticated');
     if (to.path !== '/sign-in') {
-      next('/sign-in')
-      return
+      next('/sign-in');
+      return;
     }
   }
-  
+
   // If user is signed in and trying to access auth pages, redirect to home
   if (isSignedIn.value && to.path === '/sign-in') {
-    console.log('User signed in, redirecting to home')
-    next('/')
-    return
+    console.log('User signed in, redirecting to home');
+    next('/');
+    return;
   }
-  
+
   // Check admin requirements
   if (requiresAdmin && (!user.value || user.value.publicMetadata?.role !== 'admin')) {
-    console.log('Admin access required but user is not admin')
-    next('/')
-    return
+    console.log('Admin access required but user is not admin');
+    next('/');
+    return;
   }
-  
-  console.log('Navigation allowed')
-  next()
-})
+
+  console.log('Navigation allowed');
+  next();
+});
 
 // Error handling
-router.onError((error) => {
-  console.error('Router error:', error)
-})
+router.onError(error => {
+  console.error('Router error:', error);
+});
 
-export default router 
+export default router;

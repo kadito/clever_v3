@@ -2,7 +2,10 @@
 
 ## Overview
 
-This implementation plan creates a simple content relations system that automatically detects relation fields (ending in 'Id'), resolves them in API responses, and displays the related basic data in the frontend. No complex configuration is needed - the system uses simple patterns and conventions.
+This implementation plan creates a simple content relations system that
+automatically detects relation fields (ending in 'Id'), resolves them in API
+responses, and displays the related basic data in the frontend. No complex
+configuration is needed - the system uses simple patterns and conventions.
 
 ## Tasks
 
@@ -17,17 +20,23 @@ This implementation plan creates a simple content relations system that automati
 
 - [x] 2. Create basic data extraction utility
   - Implement `extractBasicFields` function with content-type specific logic
-  - Add basic field definitions for clients (nomeEmpresa, nomeComercial, contribuinte, localidade)
-  - Add basic field definitions for contracts (numeroContrato, dataInicio, dataFim)
+  - Add basic field definitions for clients (nomeEmpresa, nomeComercial,
+    contribuinte, localidade)
+  - Add basic field definitions for contracts (numeroContrato, dataInicio,
+    dataFim)
   - Add fallback logic for unknown content types using common fields
   - Write unit tests for basic data extraction
   - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-   - [x] 3. Implement relation resolution utility
-  - Create `resolveContentRelations` function that uses detection and extraction utilities
-  - Use sequential resolution approach (resolve relations one by one for simplicity)
-  - Add structured error handling for missing/invalid relations (return error objects with code and message)
-  - Implement proper TypeScript interfaces for `ContentWithRelations`, `RelationResult`, `RelationError`
+  - [x] 3.  Implement relation resolution utility
+  - Create `resolveContentRelations` function that uses detection and extraction
+    utilities
+  - Use sequential resolution approach (resolve relations one by one for
+    simplicity)
+  - Add structured error handling for missing/invalid relations (return error
+    objects with code and message)
+  - Implement proper TypeScript interfaces for `ContentWithRelations`,
+    `RelationResult`, `RelationError`
   - Add minimal logging for relation resolution failures
   - Write unit tests for relation resolution with success and error scenarios
   - _Requirements: 2.1, 2.2, 2.3, 2.5, 8.1, 8.2_
@@ -43,7 +52,8 @@ This implementation plan creates a simple content relations system that automati
   - _Requirements: 2.1, 2.2, 2.3, 7.1, 7.2_
 
 - [x] 5. Add relation validation to content operations
-  - Allow creation/update of content with relation IDs without validating referenced content exists
+  - Allow creation/update of content with relation IDs without validating
+    referenced content exists
   - Allow null/empty relation IDs for optional relationships
   - Maintain audit trail for relation changes
   - Ensure backward compatibility with existing content
@@ -62,7 +72,8 @@ This implementation plan creates a simple content relations system that automati
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 8.4_
 
 - [x] 7. Update shared types and interfaces
-  - Add `ContentWithRelations`, `RelationResult`, `ResolvedRelation`, `RelationError` interfaces to shared package
+  - Add `ContentWithRelations`, `RelationResult`, `ResolvedRelation`,
+    `RelationError` interfaces to shared package
   - Export relation system types and utilities
   - Update API response documentation with error handling examples
   - Ensure type safety across frontend and backend
@@ -78,16 +89,21 @@ This implementation plan creates a simple content relations system that automati
   - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
 - [x] 9. Update license views with relation display
-  - Add RelationInfoDisplay component to LicensesDetailView (explicit integration)
+  - Add RelationInfoDisplay component to LicensesDetailView (explicit
+    integration)
   - Update LicensesListView to show client company name or error states
-  - Update LicensesCreateView and LicensesEditView (no client validation during creation)
-  - Test comprehensive license-client relationship functionality with error scenarios
+  - Update LicensesCreateView and LicensesEditView (no client validation during
+    creation)
+  - Test comprehensive license-client relationship functionality with error
+    scenarios
   - _Requirements: 6.1, 6.2, 6.3, 6.4_
 
 - [x] 10. Test license relation system thoroughly
   - Test with existing license data that has clientId
-  - Test with licenses that have invalid/missing clientId (verify error handling)
-  - Test license creation with any clientId values (no validation during creation)
+  - Test with licenses that have invalid/missing clientId (verify error
+    handling)
+  - Test license creation with any clientId values (no validation during
+    creation)
   - Test license updates that change client relations
   - Verify structured error handling and user experience (404/500 error display)
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_

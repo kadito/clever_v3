@@ -38,10 +38,16 @@
       <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
         <!-- Contract types -->
         <div class="flex flex-wrap gap-1">
-          <span v-if="item.data.hasCPAContract" class="contract-type-badge bg-blue-100 text-blue-800">
+          <span
+            v-if="item.data.hasCPAContract"
+            class="contract-type-badge bg-blue-100 text-blue-800"
+          >
             {{ item.data.cpaContractType || 'CPA' }}
           </span>
-          <span v-if="item.data.hasSHContract" class="contract-type-badge bg-green-100 text-green-800">
+          <span
+            v-if="item.data.hasSHContract"
+            class="contract-type-badge bg-green-100 text-green-800"
+          >
             S&H
           </span>
         </div>
@@ -52,39 +58,47 @@
         </span>
 
         <!-- Contract dates -->
-        <span v-if="getContractDateRange(item)" class="flex items-center before:content-['•'] before:mx-1">
+        <span
+          v-if="getContractDateRange(item)"
+          class="flex items-center before:content-['•'] before:mx-1"
+        >
           <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
           </svg>
           {{ getContractDateRange(item) }}
         </span>
 
         <!-- Equipment count -->
-        <span v-if="getEquipmentCount(item) > 0" class="flex items-center before:content-['•'] before:mx-1">
+        <span
+          v-if="getEquipmentCount(item) > 0"
+          class="flex items-center before:content-['•'] before:mx-1"
+        >
           <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+            />
           </svg>
           {{ getEquipmentCount(item) }} equipamento{{ getEquipmentCount(item) > 1 ? 's' : '' }}
         </span>
 
         <!-- Payment methods -->
         <div v-if="getPaymentMethods(item).length > 0" class="flex flex-wrap gap-1 mt-1">
-          <span 
-            v-for="method in getPaymentMethods(item)" 
-            :key="method"
-            class="payment-badge"
-          >
+          <span v-for="method in getPaymentMethods(item)" :key="method" class="payment-badge">
             {{ formatPaymentMethod(method) }}
           </span>
         </div>
 
         <!-- Plan names -->
         <div v-if="getPlanNames(item).length > 0" class="flex flex-wrap gap-1 mt-1">
-          <span 
-            v-for="plan in getPlanNames(item)" 
-            :key="plan"
-            class="plan-badge"
-          >
+          <span v-for="plan in getPlanNames(item)" :key="plan" class="plan-badge">
             {{ plan }}
           </span>
         </div>
@@ -125,7 +139,7 @@ const displayedContracts = computed(() => {
   if (!searchQuery.value) {
     return contracts.value;
   }
-  
+
   const query = searchQuery.value.toLowerCase();
   return contracts.value.filter(contract => {
     const data = contract.data;
@@ -138,9 +152,9 @@ const displayedContracts = computed(() => {
       data.planoSH?.toLowerCase().includes(query) ||
       data.modalidadePagamentoCPA?.toLowerCase().includes(query) ||
       data.modalidadePagamentoSH?.toLowerCase().includes(query) ||
-      data.cpaEquipments?.some(eq => 
-        eq.modelo?.toLowerCase().includes(query) ||
-        eq.numeroSerie?.toLowerCase().includes(query)
+      data.cpaEquipments?.some(
+        eq =>
+          eq.modelo?.toLowerCase().includes(query) || eq.numeroSerie?.toLowerCase().includes(query)
       ) ||
       data.modeloCPA?.toLowerCase().includes(query) ||
       data.numeroSerieCPA?.toLowerCase().includes(query) ||
@@ -154,22 +168,27 @@ const displayedContracts = computed(() => {
 // Display functions for ContentListTemplate
 const getContractTitle = (item: BaseContent): string => {
   const contract = item as ContentWithRelations<Contract['data']>;
-  
+
   // Try to get client name from resolved relations first
   if (contract.relations?.client) {
     const clientRelation = contract.relations.client;
-    
+
     // Check if it's a resolved relation with client data
     if (clientRelation && typeof clientRelation === 'object' && 'nomeEmpresa' in clientRelation) {
       return clientRelation.nomeComercial || clientRelation.nomeEmpresa || 'Cliente sem nome';
     }
-    
+
     // Check if it's an error
-    if (clientRelation && typeof clientRelation === 'object' && 'type' in clientRelation && clientRelation.type === 'error') {
+    if (
+      clientRelation &&
+      typeof clientRelation === 'object' &&
+      'type' in clientRelation &&
+      clientRelation.type === 'error'
+    ) {
       return 'Cliente não encontrado';
     }
   }
-  
+
   // Fallback to default if no client data available
   return 'Contrato sem cliente';
 };
@@ -178,15 +197,15 @@ const getContractSubtitle = (item: BaseContent): string => {
   const contract = item as ContentWithRelations<Contract['data']>;
   const summary = getContractSummary(contract.data);
   const parts = [];
-  
+
   if (summary.contractTypes.length > 0) {
     parts.push(summary.contractTypes.join(' + '));
   }
-  
+
   if (summary.planNames.length > 0) {
     parts.push(summary.planNames.join(', '));
   }
-  
+
   return parts.join(' • ');
 };
 
@@ -208,7 +227,7 @@ const getContractMeta2 = (item: BaseContent): string => {
 // Helper functions for custom template slots
 const getContractInitials = (item: BaseContent): string => {
   const contract = item as ContentWithRelations<Contract['data']>;
-  
+
   // Try to get client name from resolved relations first
   let name = 'C';
   if (contract.relations?.client) {
@@ -219,7 +238,7 @@ const getContractInitials = (item: BaseContent): string => {
   } else if (contract.data.clienteName) {
     name = contract.data.clienteName;
   }
-  
+
   return name
     .split(' ')
     .map(word => word.charAt(0))
@@ -230,12 +249,17 @@ const getContractInitials = (item: BaseContent): string => {
 
 const getContractIconClass = (item: BaseContent): string => {
   const contract = item as ContentWithRelations<Contract['data']>;
-  
+
   // Check if there's a client relation error
-  if (contract.relations?.client && typeof contract.relations.client === 'object' && 'type' in contract.relations.client && contract.relations.client.type === 'error') {
+  if (
+    contract.relations?.client &&
+    typeof contract.relations.client === 'object' &&
+    'type' in contract.relations.client &&
+    contract.relations.client.type === 'error'
+  ) {
     return 'bg-red-500 text-white'; // Error state
   }
-  
+
   const isActive = hasActiveContract(contract.data);
   if (isActive) {
     // Active contract - use contract type colors
@@ -247,30 +271,40 @@ const getContractIconClass = (item: BaseContent): string => {
       return 'bg-green-500 text-white'; // S&H only
     }
   }
-  
+
   return 'bg-gray-500 text-white'; // Inactive
 };
 
 const getContractStatusClass = (item: BaseContent): string => {
   const contract = item as ContentWithRelations<Contract['data']>;
-  
+
   // Check if there's a client relation error
-  if (contract.relations?.client && typeof contract.relations.client === 'object' && 'type' in contract.relations.client && contract.relations.client.type === 'error') {
+  if (
+    contract.relations?.client &&
+    typeof contract.relations.client === 'object' &&
+    'type' in contract.relations.client &&
+    contract.relations.client.type === 'error'
+  ) {
     return 'bg-red-100 text-red-800'; // Error state
   }
-  
+
   const isActive = hasActiveContract(contract.data);
   return isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800';
 };
 
 const getContractStatusText = (item: BaseContent): string => {
   const contract = item as ContentWithRelations<Contract['data']>;
-  
+
   // Check if there's a client relation error
-  if (contract.relations?.client && typeof contract.relations.client === 'object' && 'type' in contract.relations.client && contract.relations.client.type === 'error') {
+  if (
+    contract.relations?.client &&
+    typeof contract.relations.client === 'object' &&
+    'type' in contract.relations.client &&
+    contract.relations.client.type === 'error'
+  ) {
     return 'Erro Cliente'; // Error state
   }
-  
+
   const isActive = hasActiveContract(contract.data);
   return isActive ? 'Ativo' : 'Inativo';
 };
@@ -278,7 +312,7 @@ const getContractStatusText = (item: BaseContent): string => {
 const getContractDateRange = (item: BaseContent): string => {
   const contract = item as ContentWithRelations<Contract['data']>;
   const summary = getContractSummary(contract.data);
-  
+
   if (summary.startDate && summary.endDate) {
     const startDate = new Date(summary.startDate);
     const endDate = new Date(summary.endDate);
@@ -287,28 +321,28 @@ const getContractDateRange = (item: BaseContent): string => {
     const startDate = new Date(summary.startDate);
     return `Desde ${startDate.toLocaleDateString('pt-PT')}`;
   }
-  
+
   return '';
 };
 
 const getEquipmentCount = (item: BaseContent): number => {
   const contract = item as ContentWithRelations<Contract['data']>;
   let count = 0;
-  
+
   // Count CPA equipments (new format)
   if (contract.data.cpaEquipments && contract.data.cpaEquipments.length > 0) {
     count += contract.data.cpaEquipments.length;
   }
-  
+
   // Count legacy equipment fields
   if (contract.data.modeloCPA || contract.data.numeroSerieCPA) {
     count += 1;
   }
-  
+
   if (contract.data.modeloPSO || contract.data.numeroSeriePSO) {
     count += 1;
   }
-  
+
   return count;
 };
 
@@ -326,18 +360,18 @@ const getPlanNames = (item: BaseContent): string[] => {
 
 const formatPaymentMethod = (method: string): string => {
   const methodMap: Record<string, string> = {
-    'TRANSFERENCIA_BANCARIA': 'Transferência',
-    'DEBITO_DIRETO': 'Débito Direto',
-    'MULTIBANCO': 'Multibanco',
-    'CHEQUE': 'Cheque',
-    'NUMERARIO': 'Numerário',
-    'MB_WAY': 'MB WAY',
-    'MENSAL': 'Mensal',
-    'TRIMESTRAL': 'Trimestral',
-    'SEMESTRAL': 'Semestral',
-    'ANUAL': 'Anual'
+    TRANSFERENCIA_BANCARIA: 'Transferência',
+    DEBITO_DIRETO: 'Débito Direto',
+    MULTIBANCO: 'Multibanco',
+    CHEQUE: 'Cheque',
+    NUMERARIO: 'Numerário',
+    MB_WAY: 'MB WAY',
+    MENSAL: 'Mensal',
+    TRIMESTRAL: 'Trimestral',
+    SEMESTRAL: 'Semestral',
+    ANUAL: 'Anual',
   };
-  
+
   return methodMap[method] || method;
 };
 
@@ -369,16 +403,18 @@ const loadContracts = async () => {
   try {
     isLoading.value = true;
     clearError();
-    
+
     await api.fetchList();
-    
+
     if (api.items.value) {
       // Sort contracts by creation date (most recent first) - as per requirements 8.6
-      contracts.value = (api.items.value as ContentWithRelations<Contract['data']>[]).sort((a, b) => {
-        const dateA = new Date(a.createdAt);
-        const dateB = new Date(b.createdAt);
-        return dateB.getTime() - dateA.getTime();
-      });
+      contracts.value = (api.items.value as ContentWithRelations<Contract['data']>[]).sort(
+        (a, b) => {
+          const dateA = new Date(a.createdAt);
+          const dateB = new Date(b.createdAt);
+          return dateB.getTime() - dateA.getTime();
+        }
+      );
     } else {
       throw new Error('Erro ao carregar contratos');
     }
@@ -427,7 +463,7 @@ onMounted(() => {
   .icon-circle {
     @apply w-8 h-8 text-xs;
   }
-  
+
   .contract-type-badge,
   .contract-status-badge,
   .payment-badge,

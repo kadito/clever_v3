@@ -6,17 +6,17 @@ import type { ApiResponse } from '@clever/shared';
 const mockAssetsFetch = vi.fn();
 const mockEnv = {
   ASSETS: {
-    fetch: mockAssetsFetch
-  }
+    fetch: mockAssetsFetch,
+  },
 };
 
 describe('Main App', () => {
   describe('Health Check Endpoint', () => {
     it('should return 200 with health status', async () => {
       const res = await app.request('/health');
-      
+
       expect(res.status).toBe(200);
-      
+
       const body = await res.json();
       expect(body.status).toBe('ok');
       expect(body.timestamp).toBeDefined();
@@ -27,9 +27,9 @@ describe('Main App', () => {
   describe('API Routes Integration', () => {
     it('should return 401 for unauthenticated API requests (authentication working)', async () => {
       const res = await app.request('/api/content/clients');
-      
+
       expect(res.status).toBe(401);
-      
+
       const body: ApiResponse = await res.json();
       expect(body.success).toBe(false);
       expect(body.error).toContain('Authentication');
@@ -37,9 +37,9 @@ describe('Main App', () => {
 
     it('should return 401 for unauthenticated invalid API routes (authentication takes precedence)', async () => {
       const res = await app.request('/api/content/invalid-type');
-      
+
       expect(res.status).toBe(401);
-      
+
       const body: ApiResponse = await res.json();
       expect(body.success).toBe(false);
       expect(body.error).toContain('Authentication');
@@ -50,13 +50,13 @@ describe('Main App', () => {
     it('should pass non-API requests to ASSETS binding', async () => {
       // Mock the ASSETS.fetch to return a response
       const mockResponse = new Response('<!DOCTYPE html><html></html>', {
-        headers: { 'Content-Type': 'text/html' }
+        headers: { 'Content-Type': 'text/html' },
       });
       mockAssetsFetch.mockResolvedValueOnce(mockResponse);
 
       // Test that static assets are handled by ASSETS binding
       const res = await app.request('/index.html', {}, mockEnv);
-      
+
       // The response should be handled by the static middleware
       // Since we're testing the integration, we expect the middleware to be called
       expect(res).toBeDefined();
@@ -68,21 +68,21 @@ describe('Main App', () => {
       // Create a separate test app to avoid route conflicts
       const { Hono } = await import('hono');
       const { errorHandler } = await import('./middleware/error');
-      
+
       const testApp = new Hono();
       testApp.onError(errorHandler);
-      
+
       // Add a route that throws an error for testing
       testApp.get('/test-error', () => {
         throw new Error('Test error');
       });
 
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      
+
       const res = await testApp.request('/test-error');
-      
+
       expect(res.status).toBe(500);
-      
+
       const body: ApiResponse = await res.json();
       expect(body.success).toBe(false);
       expect(body.error).toBe('Internal server error');

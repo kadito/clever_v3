@@ -24,32 +24,32 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="nomeCliente">NOME DO CLIENTE</label>
-            <input 
-              type="text" 
-              id="nomeCliente" 
-              v-model="formData.nomeCliente" 
+            <input
+              type="text"
+              id="nomeCliente"
+              v-model="formData.nomeCliente"
               class="form-control"
               placeholder="Nome do cliente"
               required
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="dataPedido">DATA DO PEDIDO</label>
-            <input 
-              type="datetime-local" 
-              id="dataPedido" 
-              v-model="formData.dataPedido" 
+            <input
+              type="datetime-local"
+              id="dataPedido"
+              v-model="formData.dataPedido"
               class="form-control"
               required
-            >
+            />
           </div>
-          
+
           <div class="form-group full-width">
             <label for="motivo">MOTIVO</label>
-            <textarea 
-              id="motivo" 
-              v-model="formData.motivo" 
+            <textarea
+              id="motivo"
+              v-model="formData.motivo"
               class="form-control"
               rows="3"
               placeholder="Descreva o motivo do agendamento"
@@ -65,19 +65,19 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="dataPrevistaAssistencia">DATA PREVISTA PARA ASSISTÊNCIA</label>
-            <input 
-              type="datetime-local" 
-              id="dataPrevistaAssistencia" 
-              v-model="formData.dataPrevistaAssistencia" 
+            <input
+              type="datetime-local"
+              id="dataPrevistaAssistencia"
+              v-model="formData.dataPrevistaAssistencia"
               class="form-control"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="responsavelAgendamento">RESPONSÁVEL PELO AGENDAMENTO</label>
-            <select 
-              id="responsavelAgendamento" 
-              v-model="formData.responsavelAgendamento" 
+            <select
+              id="responsavelAgendamento"
+              v-model="formData.responsavelAgendamento"
               class="form-control"
             >
               <option value="">--</option>
@@ -88,14 +88,10 @@
               <option value="ANA COSTA">ANA COSTA</option>
             </select>
           </div>
-          
+
           <div class="form-group">
             <label for="tecnico">TÉCNICO</label>
-            <select 
-              id="tecnico" 
-              v-model="formData.tecnico" 
-              class="form-control"
-            >
+            <select id="tecnico" v-model="formData.tecnico" class="form-control">
               <option value="">--</option>
               <option value="JOSÉ BATISTA">JOSÉ BATISTA</option>
               <option value="MARIA SILVA">MARIA SILVA</option>
@@ -104,14 +100,10 @@
               <option value="ANA COSTA">ANA COSTA</option>
             </select>
           </div>
-          
+
           <div class="form-group">
             <label for="assunto">ASSUNTO</label>
-            <select 
-              id="assunto" 
-              v-model="formData.assunto" 
-              class="form-control"
-            >
+            <select id="assunto" v-model="formData.assunto" class="form-control">
               <option value="">--</option>
               <option value="Instalação">Instalação</option>
               <option value="Manutenção">Manutenção</option>
@@ -131,42 +123,42 @@
           <div class="form-group">
             <label>INSTALAÇÃO</label>
             <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                id="instalacao" 
+              <input
+                type="checkbox"
+                id="instalacao"
                 v-model="formData.instalacao"
                 class="toggle-input"
-              >
+              />
               <label for="instalacao" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
             </div>
           </div>
-          
+
           <div class="form-group">
             <label>HOUVE ADIAMENTO</label>
             <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                id="houveAdiamento" 
+              <input
+                type="checkbox"
+                id="houveAdiamento"
                 v-model="formData.houveAdiamento"
                 class="toggle-input"
-              >
+              />
               <label for="houveAdiamento" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
             </div>
           </div>
-          
+
           <div class="form-group">
             <label>TAREFA CONCLUÍDA</label>
             <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                id="tarefaConcluida" 
+              <input
+                type="checkbox"
+                id="tarefaConcluida"
                 v-model="formData.tarefaConcluida"
                 class="toggle-input"
-              >
+              />
               <label for="tarefaConcluida" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
@@ -181,23 +173,23 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="motivoAdiamento">MOTIVO DO ADIAMENTO</label>
-            <textarea 
-              id="motivoAdiamento" 
-              v-model="formData.motivoAdiamento" 
+            <textarea
+              id="motivoAdiamento"
+              v-model="formData.motivoAdiamento"
               class="form-control"
               rows="2"
               placeholder="Descreva o motivo do adiamento"
             ></textarea>
           </div>
-          
+
           <div class="form-group">
             <label for="novaData">NOVA DATA</label>
-            <input 
-              type="datetime-local" 
-              id="novaData" 
-              v-model="formData.novaData" 
+            <input
+              type="datetime-local"
+              id="novaData"
+              v-model="formData.novaData"
               class="form-control"
-            >
+            />
           </div>
         </div>
       </section>
@@ -208,54 +200,45 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="folhaObra">FOLHA DE OBRA</label>
-            <input 
-              type="text" 
-              id="folhaObra" 
-              v-model="formData.folhaObra" 
+            <input
+              type="text"
+              id="folhaObra"
+              v-model="formData.folhaObra"
               class="form-control"
               placeholder="Número da folha de obra"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="assistenciaRemota">ASSISTÊNCIA REMOTA</label>
-            <input 
-              type="text" 
-              id="assistenciaRemota" 
-              v-model="formData.assistenciaRemota" 
+            <input
+              type="text"
+              id="assistenciaRemota"
+              v-model="formData.assistenciaRemota"
               class="form-control"
               placeholder="Número da assistência remota"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="contrato">CONTRATO</label>
-            <input 
-              type="text" 
-              id="contrato" 
-              v-model="formData.contrato" 
+            <input
+              type="text"
+              id="contrato"
+              v-model="formData.contrato"
               class="form-control"
               placeholder="Número do contrato"
-            >
+            />
           </div>
         </div>
       </section>
 
       <!-- Action buttons -->
       <div class="form-actions">
-        <button 
-          type="button" 
-          @click="handleCancel" 
-          class="btn btn-cancel"
-          :disabled="loading"
-        >
+        <button type="button" @click="handleCancel" class="btn btn-cancel" :disabled="loading">
           Cancelar
         </button>
-        <button 
-          type="submit" 
-          class="btn btn-primary"
-          :disabled="loading || !isFormValid"
-        >
+        <button type="submit" class="btn btn-primary" :disabled="loading || !isFormValid">
           <span v-if="loading" class="btn-spinner"></span>
           {{ isEditing ? 'Atualizar' : 'Criar' }} Agendamento
         </button>
@@ -265,31 +248,26 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
-import { useAgendamentosStore } from '@/stores/agendamentos.js'
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
+import { useAgendamentosStore } from '@/stores/agendamentos.js';
 
 // Router
-const router = useRouter()
-const route = useRoute()
+const router = useRouter();
+const route = useRoute();
 
 // Store
-const store = useAgendamentosStore()
-const { loading, error } = storeToRefs(store)
-const { 
-  createAgendamento, 
-  updateAgendamento, 
-  fetchAgendamentoById, 
-  clearError,
-  getYearFromDate 
-} = store
+const store = useAgendamentosStore();
+const { loading, error } = storeToRefs(store);
+const { createAgendamento, updateAgendamento, fetchAgendamentoById, clearError, getYearFromDate } =
+  store;
 
 // Form state
-const isEditing = ref(false)
-const agendamentoYear = ref(null)
-const agendamentoId = ref(null)
+const isEditing = ref(false);
+const agendamentoYear = ref(null);
+const agendamentoId = ref(null);
 
 // Form data
 const formData = ref({
@@ -307,81 +285,84 @@ const formData = ref({
   assistenciaRemota: '',
   contrato: '',
   motivoAdiamento: '',
-  novaData: ''
-})
+  novaData: '',
+});
 
 // Computed
 const isFormValid = computed(() => {
-  return formData.value.nomeCliente.trim() && 
-         formData.value.dataPedido && 
-         formData.value.motivo.trim()
-})
+  return (
+    formData.value.nomeCliente.trim() && formData.value.dataPedido && formData.value.motivo.trim()
+  );
+});
 
 const cancelRoute = computed(() => {
-  const from = route.query.from
+  const from = route.query.from;
   if (from === 'detail' && agendamentoYear.value && agendamentoId.value) {
-    return `/agendamentos/${agendamentoYear.value}/${agendamentoId.value}`
+    return `/agendamentos/${agendamentoYear.value}/${agendamentoId.value}`;
   } else if (from === 'list') {
-    return '/agendamentos/list'
+    return '/agendamentos/list';
   } else {
-    return '/agendamentos'
+    return '/agendamentos';
   }
-})
+});
 
 // Methods
 const handleSubmit = async () => {
-  if (!isFormValid.value) return
+  if (!isFormValid.value) return;
 
   try {
-    const year = getYearFromDate(formData.value.dataPedido)
-    
+    const year = getYearFromDate(formData.value.dataPedido);
+
     if (isEditing.value) {
-      await updateAgendamento(agendamentoYear.value, agendamentoId.value, formData.value)
-      router.push(`/agendamentos/${agendamentoYear.value}/${agendamentoId.value}`)
+      await updateAgendamento(agendamentoYear.value, agendamentoId.value, formData.value);
+      router.push(`/agendamentos/${agendamentoYear.value}/${agendamentoId.value}`);
     } else {
-      const newAgendamento = await createAgendamento(year, formData.value)
-      router.push(`/agendamentos/${year}/${newAgendamento.id}`)
+      const newAgendamento = await createAgendamento(year, formData.value);
+      router.push(`/agendamentos/${year}/${newAgendamento.id}`);
     }
   } catch (err) {
-    console.error('Error saving agendamento:', err)
+    console.error('Error saving agendamento:', err);
   }
-}
+};
 
 const handleCancel = () => {
-  router.push(cancelRoute.value)
-}
+  router.push(cancelRoute.value);
+};
 
 const loadAgendamentoForEditing = async () => {
   if (agendamentoYear.value && agendamentoId.value) {
     try {
-      const agendamento = await fetchAgendamentoById(agendamentoYear.value, agendamentoId.value)
+      const agendamento = await fetchAgendamentoById(agendamentoYear.value, agendamentoId.value);
       if (agendamento) {
-        formData.value = { ...agendamento }
+        formData.value = { ...agendamento };
       }
     } catch (err) {
-      console.error('Error loading agendamento:', err)
+      console.error('Error loading agendamento:', err);
     }
   }
-}
+};
 
 // Watch for postponement changes to clear related fields
-watch(() => formData.value.houveAdiamento, (hasPostponement) => {
-  if (!hasPostponement) {
-    formData.value.motivoAdiamento = ''
-    formData.value.novaData = ''
+watch(
+  () => formData.value.houveAdiamento,
+  hasPostponement => {
+    if (!hasPostponement) {
+      formData.value.motivoAdiamento = '';
+      formData.value.novaData = '';
+    }
   }
-})
+);
 
 // Lifecycle
 onMounted(async () => {
   // Check if we're editing
   if (route.params.year && route.params.id) {
-    isEditing.value = true
-    agendamentoYear.value = route.params.year
-    agendamentoId.value = route.params.id
-    await loadAgendamentoForEditing()
+    isEditing.value = true;
+    agendamentoYear.value = route.params.year;
+    agendamentoId.value = route.params.id;
+    await loadAgendamentoForEditing();
   }
-})
+});
 </script>
 
 <style scoped>
@@ -627,8 +608,12 @@ onMounted(async () => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Mobile responsiveness */
@@ -636,50 +621,50 @@ onMounted(async () => {
   .agendamentos-form-container {
     padding: 0.5rem;
   }
-  
+
   .form-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .form-header h1 {
     font-size: 1.3rem;
   }
-  
+
   .form-section {
     padding: 1rem;
     margin-bottom: 1rem;
   }
-  
+
   .form-section h2 {
     font-size: 1rem;
     margin-bottom: 0.75rem;
   }
-  
+
   .form-grid {
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
-  
+
   .form-group {
     min-height: auto;
   }
-  
+
   .form-group label {
     font-size: 0.85rem;
   }
-  
+
   .form-control {
     padding: 0.65rem;
     font-size: 0.9rem;
   }
-  
+
   .form-actions {
     flex-direction: column;
     gap: 0.75rem;
   }
-  
+
   .btn {
     width: 100%;
     padding: 0.75rem;
@@ -690,27 +675,26 @@ onMounted(async () => {
   .agendamentos-form-container {
     padding: 0.25rem;
   }
-  
+
   .form-section {
     padding: 0.75rem;
   }
-  
+
   .form-section h2 {
     font-size: 0.9rem;
   }
-  
+
   .form-group label {
     font-size: 0.8rem;
   }
-  
+
   .form-control {
     padding: 0.6rem;
     font-size: 0.85rem;
   }
-  
+
   .form-header h1 {
     font-size: 1.2rem;
   }
 }
 </style>
-

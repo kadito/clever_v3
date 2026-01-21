@@ -4,7 +4,11 @@
       <BackButton :to="backRoute" />
       <div class="detail-title">
         <h1>{{ equipamento ? getEquipamentoSummary(equipamento) : 'Equipamento' }}</h1>
-        <div class="status-badge" v-if="equipamento" :class="getEquipamentoStatus(equipamento).status">
+        <div
+          class="status-badge"
+          v-if="equipamento"
+          :class="getEquipamentoStatus(equipamento).status"
+        >
           {{ getEquipamentoStatus(equipamento).label }}
         </div>
       </div>
@@ -83,7 +87,10 @@
           </div>
           <div class="condition-item">
             <span class="condition-label">TRANSFORMADOR E CABOS:</span>
-            <span class="condition-value" :class="getConditionClass(equipamento.transformadorCabos)">
+            <span
+              class="condition-value"
+              :class="getConditionClass(equipamento.transformadorCabos)"
+            >
               {{ equipamento.transformadorCabos || 'N/A' }}
             </span>
           </div>
@@ -104,7 +111,6 @@
         </div>
       </section>
 
-
       <!-- Timestamps -->
       <section class="detail-section timestamps">
         <h2>🕒 Informações do Sistema</h2>
@@ -122,18 +128,8 @@
 
       <!-- Actions -->
       <div class="detail-actions">
-        <button 
-          @click="goToEdit"
-          class="btn btn-primary"
-        >
-          ✏️ Editar Equipamento
-        </button>
-        <button 
-          @click="confirmDelete"
-          class="btn btn-danger"
-        >
-          🗑️ Eliminar
-        </button>
+        <button @click="goToEdit" class="btn btn-primary">✏️ Editar Equipamento</button>
+        <button @click="confirmDelete" class="btn btn-danger">🗑️ Eliminar</button>
       </div>
     </div>
 
@@ -157,11 +153,11 @@
       <div class="modal-content" @click.stop>
         <h3>Confirmar Eliminação</h3>
         <p>Tem a certeza que pretende eliminar este equipamento?</p>
-        <p><strong>{{ equipamento ? getEquipamentoSummary(equipamento) : '' }}</strong></p>
+        <p>
+          <strong>{{ equipamento ? getEquipamentoSummary(equipamento) : '' }}</strong>
+        </p>
         <div class="modal-actions">
-          <button @click="showDeleteModal = false" class="btn btn-secondary">
-            Cancelar
-          </button>
+          <button @click="showDeleteModal = false" class="btn btn-secondary">Cancelar</button>
           <button @click="handleDelete" class="btn btn-danger" :disabled="loading">
             {{ loading ? 'A eliminar...' : 'Eliminar' }}
           </button>
@@ -172,29 +168,29 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
-import { useEquipamentoUsadoStore } from '@/stores/equipamento-usado'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
+import { useEquipamentoUsadoStore } from '@/stores/equipamento-usado';
 
-const router = useRouter()
-const route = useRoute()
-const equipamentoUsadoStore = useEquipamentoUsadoStore()
+const router = useRouter();
+const route = useRoute();
+const equipamentoUsadoStore = useEquipamentoUsadoStore();
 
 // Local state
-const showDeleteModal = ref(false)
+const showDeleteModal = ref(false);
 
 // Auto-retry state
-const autoRetryCountdown = ref(0)
-const userInteractionCancelled = ref(false)
-const retryTimeoutId = ref(null)
+const autoRetryCountdown = ref(0);
+const userInteractionCancelled = ref(false);
+const retryTimeoutId = ref(null);
 
 // Store refs
-const { selectedEquipamento: equipamento, loading, error } = storeToRefs(equipamentoUsadoStore)
+const { selectedEquipamento: equipamento, loading, error } = storeToRefs(equipamentoUsadoStore);
 
 // Store actions
-const { 
+const {
   fetchEquipamentoById,
   deleteEquipamento,
   clearError,
@@ -203,145 +199,149 @@ const {
   isEquipamentoEmprestado,
   formatDate,
   formatDateTime,
-  getDaysOnLoan
-} = equipamentoUsadoStore
+  getDaysOnLoan,
+} = equipamentoUsadoStore;
 
 // Computed
 const backRoute = computed(() => {
-  const from = route.query.from
+  const from = route.query.from;
   if (from === 'list') {
-    return '/equipamento-usado/list'
+    return '/equipamento-usado/list';
   } else {
-    return '/equipamento-usado'
+    return '/equipamento-usado';
   }
-})
+});
 
 // Methods
-const getConditionClass = (condition) => {
-  if (!condition) return ''
-  
-  const conditionLower = condition.toLowerCase()
+const getConditionClass = condition => {
+  if (!condition) return '';
+
+  const conditionLower = condition.toLowerCase();
   if (conditionLower.includes('ótimas') || conditionLower.includes('otimas')) {
-    return 'excellent'
+    return 'excellent';
   } else if (conditionLower.includes('boas')) {
-    return 'good'
+    return 'good';
   } else if (conditionLower.includes('necessita') || conditionLower.includes('avariado')) {
-    return 'poor'
+    return 'poor';
   }
-  return ''
-}
+  return '';
+};
 
 const goToEdit = () => {
-  const year = route.params.year
-  const id = route.params.id
-  router.push(`/equipamento-usado/${year}/${id}/edit?from=detail`)
-}
+  const year = route.params.year;
+  const id = route.params.id;
+  router.push(`/equipamento-usado/${year}/${id}/edit?from=detail`);
+};
 
 const confirmDelete = () => {
-  showDeleteModal.value = true
-}
+  showDeleteModal.value = true;
+};
 
 const handleDelete = async () => {
   try {
-    const year = route.params.year
-    const id = route.params.id
-    
-    await deleteEquipamento(year, id)
-    
-    showDeleteModal.value = false
-    router.push('/equipamento-usado/list')
+    const year = route.params.year;
+    const id = route.params.id;
+
+    await deleteEquipamento(year, id);
+
+    showDeleteModal.value = false;
+    router.push('/equipamento-usado/list');
   } catch (err) {
-    console.error('Delete error:', err)
-    showDeleteModal.value = false
+    console.error('Delete error:', err);
+    showDeleteModal.value = false;
   }
-}
+};
 
 const retryLoad = () => {
-  userInteractionCancelled.value = true
-  cancelAutoRetry()
-  loadEquipamento()
-}
+  userInteractionCancelled.value = true;
+  cancelAutoRetry();
+  loadEquipamento();
+};
 
 const startAutoRetry = () => {
-  cancelAutoRetry()
-  autoRetryCountdown.value = 10
-  
+  cancelAutoRetry();
+  autoRetryCountdown.value = 10;
+
   const updateCountdown = () => {
     if (autoRetryCountdown.value > 0 && !userInteractionCancelled.value) {
-      autoRetryCountdown.value--
-      retryTimeoutId.value = setTimeout(updateCountdown, 1000)
+      autoRetryCountdown.value--;
+      retryTimeoutId.value = setTimeout(updateCountdown, 1000);
     } else if (autoRetryCountdown.value === 0 && !userInteractionCancelled.value) {
       // Auto-retry after countdown
-      loadEquipamento()
+      loadEquipamento();
     }
-  }
-  
-  retryTimeoutId.value = setTimeout(updateCountdown, 1000)
-}
+  };
+
+  retryTimeoutId.value = setTimeout(updateCountdown, 1000);
+};
 
 const cancelAutoRetry = () => {
   if (retryTimeoutId.value) {
-    clearTimeout(retryTimeoutId.value)
-    retryTimeoutId.value = null
+    clearTimeout(retryTimeoutId.value);
+    retryTimeoutId.value = null;
   }
-  autoRetryCountdown.value = 0
-}
+  autoRetryCountdown.value = 0;
+};
 
 const handleUserInteraction = () => {
-  userInteractionCancelled.value = true
-  cancelAutoRetry()
-}
+  userInteractionCancelled.value = true;
+  cancelAutoRetry();
+};
 
 const loadEquipamento = async () => {
-  const year = route.params.year
-  const id = route.params.id
-  
+  const year = route.params.year;
+  const id = route.params.id;
+
   if (!year || !id) {
-    return
+    return;
   }
-  
+
   try {
-    clearError()
-    await fetchEquipamentoById(year, id)
+    clearError();
+    await fetchEquipamentoById(year, id);
     // If successful, cancel any pending retries
-    cancelAutoRetry()
+    cancelAutoRetry();
   } catch (err) {
-    console.error('Error loading equipamento:', err)
+    console.error('Error loading equipamento:', err);
     // Check if it's a 404 or "not found" error
-    const isNotFound = err.message?.toLowerCase().includes('not found') || 
-                       error.value?.toLowerCase().includes('not found')
-    
+    const isNotFound =
+      err.message?.toLowerCase().includes('not found') ||
+      error.value?.toLowerCase().includes('not found');
+
     if (isNotFound && !userInteractionCancelled.value) {
       // Start auto-retry countdown
-      startAutoRetry()
+      startAutoRetry();
     }
   }
-}
+};
 
 // Watch for successful data load to cancel retries
-watch(() => equipamento.value?.id, (newId) => {
-  if (newId) {
-    cancelAutoRetry()
-    userInteractionCancelled.value = false
+watch(
+  () => equipamento.value?.id,
+  newId => {
+    if (newId) {
+      cancelAutoRetry();
+      userInteractionCancelled.value = false;
+    }
   }
-})
+);
 
 // Lifecycle
 onMounted(async () => {
   // Add event listeners for user interaction
-  window.addEventListener('click', handleUserInteraction)
-  window.addEventListener('scroll', handleUserInteraction)
-  window.addEventListener('keydown', handleUserInteraction)
-  
-  await loadEquipamento()
-})
+  window.addEventListener('click', handleUserInteraction);
+  window.addEventListener('scroll', handleUserInteraction);
+  window.addEventListener('keydown', handleUserInteraction);
+
+  await loadEquipamento();
+});
 
 onBeforeUnmount(() => {
-  cancelAutoRetry()
-  window.removeEventListener('click', handleUserInteraction)
-  window.removeEventListener('scroll', handleUserInteraction)
-  window.removeEventListener('keydown', handleUserInteraction)
-})
+  cancelAutoRetry();
+  window.removeEventListener('click', handleUserInteraction);
+  window.removeEventListener('scroll', handleUserInteraction);
+  window.removeEventListener('keydown', handleUserInteraction);
+});
 </script>
 
 <style scoped>
@@ -702,41 +702,41 @@ onBeforeUnmount(() => {
   .detail-container {
     padding: 0.5rem;
   }
-  
+
   .detail-header {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .detail-title {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .info-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .label {
     min-width: auto;
   }
-  
+
   .value {
     text-align: left;
   }
-  
+
   .condition-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .detail-actions {
     flex-direction: column;
   }
-  
+
   .modal-actions {
     flex-direction: column;
   }

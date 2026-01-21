@@ -17,7 +17,12 @@
   >
     <!-- Custom form sections for update-specific fields -->
     <template #customSections="{ formData, errors, updateFieldValue }">
-      <slot name="updateSections" :form-data="formData" :errors="errors" :update-field-value="updateFieldValue" />
+      <slot
+        name="updateSections"
+        :form-data="formData"
+        :errors="errors"
+        :update-field-value="updateFieldValue"
+      />
     </template>
 
     <!-- Custom field overrides -->
@@ -37,24 +42,24 @@ interface Props {
   // Content data
   item: BaseContent | null;
   initialData?: Record<string, any>;
-  
+
   // Content configuration
   contentType: string;
   editTitle?: string;
   subtitle?: string;
   cancelRoute?: string;
-  
+
   // Form configuration
   formSections: FormSection[];
-  
+
   // State
   isLoading?: boolean;
   isSaving?: boolean;
   error?: string | null;
-  
+
   // Validation
   customValidator?: (data: Record<string, any>) => Record<string, string>;
-  
+
   // Field behavior
   disabledFields?: string[];
   readOnlyFields?: string[];
@@ -85,7 +90,7 @@ const formSections = computed(() => {
       ...field,
       disabled: field.disabled || props.disabledFields.includes(field.key),
       readonly: field.readonly || props.readOnlyFields.includes(field.key),
-    }))
+    })),
   }));
 });
 
@@ -94,7 +99,7 @@ const initialData = computed(() => {
   if (props.initialData) {
     return props.initialData;
   }
-  
+
   if (props.item) {
     return {
       ...props.item.data,
@@ -105,14 +110,14 @@ const initialData = computed(() => {
       version: props.item.version,
     };
   }
-  
+
   return {};
 });
 
 // Update-specific validation that can be overridden
 const validateUpdateForm = (data: Record<string, any>): Record<string, string> => {
   const errors: Record<string, string> = {};
-  
+
   // Default update validation - more lenient than create
   // Only validate required fields that are not disabled/readonly AND are visible based on conditional logic
   for (const section of formSections.value) {
@@ -124,28 +129,31 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
           const dependentValue = data[field.conditional.dependsOn];
           shouldValidate = field.conditional.showWhen(dependentValue);
         }
-        
+
         // Only validate if field should be visible
         if (shouldValidate) {
-          if (!data[field.key] || (typeof data[field.key] === 'string' && data[field.key].trim() === '')) {
+          if (
+            !data[field.key] ||
+            (typeof data[field.key] === 'string' && data[field.key].trim() === '')
+          ) {
             errors[field.key] = `${field.label} é obrigatório`;
           }
         }
       }
     }
   }
-  
+
   // Apply custom validation if provided - this should override default validation
   if (props.customValidator) {
     const customErrors = props.customValidator(data);
-    
+
     // Custom validator has complete control - clear default errors and use custom ones
     Object.keys(errors).forEach(key => {
       delete errors[key];
     });
     Object.assign(errors, customErrors);
   }
-  
+
   return errors;
 };
 
@@ -153,7 +161,7 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
 const handleUpdate = (data: Record<string, any>) => {
   // Filter out readonly fields and BaseContent fields from the update data
   const updateData = { ...data };
-  
+
   // Remove BaseContent fields that shouldn't be updated
   delete updateData.uuid;
   delete updateData.createdAt;
@@ -164,12 +172,12 @@ const handleUpdate = (data: Record<string, any>) => {
   delete updateData.isDeleted;
   delete updateData.deletedAt;
   delete updateData.deletedBy;
-  
+
   // Remove readonly fields
   props.readOnlyFields.forEach(fieldKey => {
     delete updateData[fieldKey];
   });
-  
+
   emit('update', updateData);
 };
 

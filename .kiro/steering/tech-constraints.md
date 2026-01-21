@@ -14,8 +14,10 @@
 - TailwindCSS
 - No Options API
 - No class-based components
-- 5-view pattern: Home → List → Detail → Create → Update (separate Create/Update components)
-- Shared form data composable (`useSharedFormData`) for component recreation handling
+- 5-view pattern: Home → List → Detail → Create → Update (separate Create/Update
+  components)
+- Shared form data composable (`useSharedFormData`) for component recreation
+  handling
 - Multiselect dropdowns for better mobile experience
 - Conditional fields via JSON configuration
 - Dynamic configuration management for complex items

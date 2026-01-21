@@ -21,15 +21,15 @@ export { default as ContentCreateTemplate } from './ContentCreateTemplate.vue';
 export { default as ContentUpdateTemplate } from './ContentUpdateTemplate.vue';
 
 // Types
-export type { 
-  FormField, 
-  FormSection, 
-  ContentListProps, 
-  ContentDetailProps, 
+export type {
+  FormField,
+  FormSection,
+  ContentListProps,
+  ContentDetailProps,
   ContentFormProps,
   RelationInfoDisplayProps,
   RelationFieldConfig,
   RelationDisplayConfig,
   ConfirmationDialogProps,
-  ConfirmationDialogEmits
+  ConfirmationDialogEmits,
 } from './types';

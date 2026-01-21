@@ -42,9 +42,17 @@
         </span>
 
         <!-- Assistance date -->
-        <span v-if="item.data.request?.assistanceDate" class="flex items-center before:content-['•'] before:mx-1">
+        <span
+          v-if="item.data.request?.assistanceDate"
+          class="flex items-center before:content-['•'] before:mx-1"
+        >
           <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
           </svg>
           {{ formatDate(item.data.request.assistanceDate) }}
         </span>
@@ -52,32 +60,66 @@
         <!-- Displacement indicator -->
         <span v-if="item.data.displacement?.hasDisplacement" class="displacement-badge">
           <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+            />
           </svg>
           Deslocação
         </span>
 
         <!-- Service type -->
-        <span v-if="item.data.otherData?.serviceType" class="flex items-center before:content-['•'] before:mx-1">
+        <span
+          v-if="item.data.otherData?.serviceType"
+          class="flex items-center before:content-['•'] before:mx-1"
+        >
           <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
           {{ item.data.otherData.serviceType }}
         </span>
 
         <!-- Total hours -->
-        <span v-if="item.data.request?.totalHours" class="flex items-center before:content-['•'] before:mx-1">
+        <span
+          v-if="item.data.request?.totalHours"
+          class="flex items-center before:content-['•'] before:mx-1"
+        >
           <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
           {{ item.data.request.totalHours }}h
         </span>
 
         <!-- Payment method -->
-        <span v-if="item.data.displacement?.paymentMethod" class="flex items-center before:content-['•'] before:mx-1">
+        <span
+          v-if="item.data.displacement?.paymentMethod"
+          class="flex items-center before:content-['•'] before:mx-1"
+        >
           <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+            />
           </svg>
           {{ item.data.displacement.paymentMethod }}
         </span>
@@ -117,7 +159,7 @@ const displayedWorkSheets = computed(() => {
   if (!searchQuery.value) {
     return workSheets.value;
   }
-  
+
   const query = searchQuery.value.toLowerCase();
   return workSheets.value.filter(workSheet => {
     const data = workSheet.data;
@@ -127,28 +169,33 @@ const displayedWorkSheets = computed(() => {
       data.request?.reason?.toLowerCase().includes(query) ||
       data.displacement?.paymentMethod?.toLowerCase().includes(query)
     );
-  });;
+  });
 });
 
 // Display functions for ContentListTemplate
 const getWorkSheetTitle = (item: BaseContent): string => {
   const workSheet = item as ContentWithRelations<WorkSheet['data']>;
-  
+
   // Try to get client name from resolved relations first
   if (workSheet.relations?.client) {
     const clientRelation = workSheet.relations.client;
-    
+
     // Check if it's a resolved relation with client data
     if (clientRelation && typeof clientRelation === 'object' && 'nomeEmpresa' in clientRelation) {
       return clientRelation.nomeComercial || clientRelation.nomeEmpresa || 'Cliente sem nome';
     }
-    
+
     // Check if it's an error
-    if (clientRelation && typeof clientRelation === 'object' && 'type' in clientRelation && clientRelation.type === 'error') {
+    if (
+      clientRelation &&
+      typeof clientRelation === 'object' &&
+      'type' in clientRelation &&
+      clientRelation.type === 'error'
+    ) {
       return 'Cliente não encontrado';
     }
   }
-  
+
   // Fallback to default
   return 'Folha de obra sem cliente';
 };
@@ -156,15 +203,15 @@ const getWorkSheetTitle = (item: BaseContent): string => {
 const getWorkSheetSubtitle = (item: BaseContent): string => {
   const workSheet = item as ContentWithRelations<WorkSheet['data']>;
   const parts = [];
-  
+
   if (workSheet.data.otherData?.serviceType) {
     parts.push(workSheet.data.otherData.serviceType);
   }
-  
+
   if (workSheet.data.otherData?.technician) {
     parts.push(workSheet.data.otherData.technician);
   }
-  
+
   return parts.join(' • ');
 };
 
@@ -187,7 +234,7 @@ const getWorkSheetMeta2 = (item: BaseContent): string => {
 // Helper functions for custom template slots
 const getWorkSheetInitials = (item: BaseContent): string => {
   const workSheet = item as ContentWithRelations<WorkSheet['data']>;
-  
+
   // Try to get client name from resolved relations first
   let name = 'F';
   if (workSheet.relations?.client) {
@@ -196,7 +243,7 @@ const getWorkSheetInitials = (item: BaseContent): string => {
       name = clientRelation.nomeComercial || clientRelation.nomeEmpresa || 'F';
     }
   }
-  
+
   return name
     .split(' ')
     .map(word => word.charAt(0))
@@ -207,12 +254,17 @@ const getWorkSheetInitials = (item: BaseContent): string => {
 
 const getWorkSheetIconClass = (item: BaseContent): string => {
   const workSheet = item as ContentWithRelations<WorkSheet['data']>;
-  
+
   // Check if there's a client relation error
-  if (workSheet.relations?.client && typeof workSheet.relations.client === 'object' && 'type' in workSheet.relations.client && workSheet.relations.client.type === 'error') {
+  if (
+    workSheet.relations?.client &&
+    typeof workSheet.relations.client === 'object' &&
+    'type' in workSheet.relations.client &&
+    workSheet.relations.client.type === 'error'
+  ) {
     return 'bg-red-500 text-white'; // Error state
   }
-  
+
   if (workSheet.data.otherData?.totallyResolved) {
     return 'bg-green-500 text-white'; // Resolved
   } else if (workSheet.data.displacement?.hasDisplacement) {
@@ -223,12 +275,17 @@ const getWorkSheetIconClass = (item: BaseContent): string => {
 
 const getWorkSheetStatusClass = (item: BaseContent): string => {
   const workSheet = item as ContentWithRelations<WorkSheet['data']>;
-  
+
   // Check if there's a client relation error
-  if (workSheet.relations?.client && typeof workSheet.relations.client === 'object' && 'type' in workSheet.relations.client && workSheet.relations.client.type === 'error') {
+  if (
+    workSheet.relations?.client &&
+    typeof workSheet.relations.client === 'object' &&
+    'type' in workSheet.relations.client &&
+    workSheet.relations.client.type === 'error'
+  ) {
     return 'bg-red-100 text-red-800'; // Error state
   }
-  
+
   if (workSheet.data.otherData?.totallyResolved) {
     return 'bg-green-100 text-green-800';
   }
@@ -237,12 +294,17 @@ const getWorkSheetStatusClass = (item: BaseContent): string => {
 
 const getWorkSheetStatusText = (item: BaseContent): string => {
   const workSheet = item as ContentWithRelations<WorkSheet['data']>;
-  
+
   // Check if there's a client relation error
-  if (workSheet.relations?.client && typeof workSheet.relations.client === 'object' && 'type' in workSheet.relations.client && workSheet.relations.client.type === 'error') {
+  if (
+    workSheet.relations?.client &&
+    typeof workSheet.relations.client === 'object' &&
+    'type' in workSheet.relations.client &&
+    workSheet.relations.client.type === 'error'
+  ) {
     return 'Erro Cliente'; // Error state
   }
-  
+
   if (workSheet.data.otherData?.totallyResolved) {
     return 'Resolvido';
   }
@@ -283,17 +345,19 @@ const loadWorkSheets = async () => {
   try {
     isLoading.value = true;
     clearError();
-    
+
     console.log('Loading work sheets...');
     await api.fetchList();
-    
+
     if (api.items.value) {
       // Sort work sheets by creation date (most recent first)
-      workSheets.value = (api.items.value as ContentWithRelations<WorkSheet['data']>[]).sort((a, b) => {
-        const dateA = new Date(a.createdAt);
-        const dateB = new Date(b.createdAt);
-        return dateB.getTime() - dateA.getTime();
-      });
+      workSheets.value = (api.items.value as ContentWithRelations<WorkSheet['data']>[]).sort(
+        (a, b) => {
+          const dateA = new Date(a.createdAt);
+          const dateB = new Date(b.createdAt);
+          return dateB.getTime() - dateA.getTime();
+        }
+      );
       console.log(`Loaded ${workSheets.value.length} work sheets`);
     } else {
       throw new Error('Erro ao carregar folhas de obra');
@@ -336,7 +400,7 @@ onMounted(() => {
   .icon-circle {
     @apply w-8 h-8 text-xs;
   }
-  
+
   .work-sheet-status-badge,
   .displacement-badge {
     @apply px-1.5 py-0.5 text-xs;

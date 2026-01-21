@@ -26,18 +26,16 @@
           </p>
         </div>
         <div class="header-actions">
-          <router-link 
-            :to="{ name: 'registo-diario-atividade-edit', params: { year: $route.params.year, id: $route.params.id } }"
+          <router-link
+            :to="{
+              name: 'registo-diario-atividade-edit',
+              params: { year: $route.params.year, id: $route.params.id },
+            }"
             class="btn btn-primary"
           >
             ✏️ Editar
           </router-link>
-          <button 
-            @click="confirmDelete"
-            class="btn btn-danger"
-          >
-            🗑️ Eliminar
-          </button>
+          <button @click="confirmDelete" class="btn btn-danger">🗑️ Eliminar</button>
         </div>
       </div>
 
@@ -54,7 +52,9 @@
           <div class="info-card-icon">⏱️</div>
           <div class="info-card-content">
             <div class="info-card-label">Total de Horas</div>
-            <div class="info-card-value highlight">{{ registro.totalHorasCalculado || registro.totalHoras || 'N/A' }}</div>
+            <div class="info-card-value highlight">
+              {{ registro.totalHorasCalculado || registro.totalHoras || 'N/A' }}
+            </div>
           </div>
         </div>
         <div class="info-card" v-if="registro.respRegisto">
@@ -65,11 +65,19 @@
           </div>
         </div>
         <div class="info-card">
-          <div class="info-card-icon">{{ registro.internoOuExterno === 'INTERNO' ? '🏢' : '🚗' }}</div>
+          <div class="info-card-icon">
+            {{ registro.internoOuExterno === 'INTERNO' ? '🏢' : '🚗' }}
+          </div>
           <div class="info-card-content">
             <div class="info-card-label">Tipo</div>
             <div class="info-card-value">
-              <span class="type-badge" :class="{ 'interno': registro.internoOuExterno === 'INTERNO', 'externo': registro.internoOuExterno === 'EXTERNO' }">
+              <span
+                class="type-badge"
+                :class="{
+                  interno: registro.internoOuExterno === 'INTERNO',
+                  externo: registro.internoOuExterno === 'EXTERNO',
+                }"
+              >
                 {{ registro.internoOuExterno || 'N/A' }}
               </span>
             </div>
@@ -92,7 +100,13 @@
               <div class="info-item">
                 <label class="info-label">Tipo de Atividade</label>
                 <div class="info-value">
-                  <span class="type-badge" :class="{ 'interno': registro.internoOuExterno === 'INTERNO', 'externo': registro.internoOuExterno === 'EXTERNO' }">
+                  <span
+                    class="type-badge"
+                    :class="{
+                      interno: registro.internoOuExterno === 'INTERNO',
+                      externo: registro.internoOuExterno === 'EXTERNO',
+                    }"
+                  >
                     {{ registro.internoOuExterno || 'N/A' }}
                   </span>
                 </div>
@@ -192,7 +206,10 @@
       </div>
 
       <!-- Distances and Displacements -->
-      <div class="detail-section" v-if="registro.internoOuExterno === 'EXTERNO' && (registro.kmsSaida || registro.kmsChegada)">
+      <div
+        class="detail-section"
+        v-if="registro.internoOuExterno === 'EXTERNO' && (registro.kmsSaida || registro.kmsChegada)"
+      >
         <div class="section-header">
           <h2 class="section-title">🚗 Distâncias e Deslocações</h2>
         </div>
@@ -229,33 +246,40 @@
       </div>
 
       <!-- Additional Activities -->
-      <div class="detail-section" v-if="registro.atividadesAdicionais && registro.atividadesAdicionais.length > 0">
+      <div
+        class="detail-section"
+        v-if="registro.atividadesAdicionais && registro.atividadesAdicionais.length > 0"
+      >
         <div class="section-header">
           <h2 class="section-title">➕ Atividades Adicionais</h2>
         </div>
         <div class="section-content">
           <div class="additional-activities-list">
-            <div 
-              v-for="(atividade, index) in registro.atividadesAdicionais" 
-              :key="index" 
+            <div
+              v-for="(atividade, index) in registro.atividadesAdicionais"
+              :key="index"
               class="activity-card"
               :class="{
                 'activity-folha-obra': atividade.tipo === 'FOLHA DE OBRA',
-                'activity-assistencia-remota': atividade.tipo === 'ASSISTENCIA REMOTA'
+                'activity-assistencia-remota': atividade.tipo === 'ASSISTENCIA REMOTA',
               }"
             >
               <div class="activity-card-header">
                 <div class="activity-header-left">
                   <h3 class="activity-title">Atividade {{ index + 1 }}</h3>
                 </div>
-                <span 
+                <span
                   class="activity-type-badge"
                   :class="{
                     'badge-folha-obra': atividade.tipo === 'FOLHA DE OBRA',
-                    'badge-assistencia-remota': atividade.tipo === 'ASSISTENCIA REMOTA'
+                    'badge-assistencia-remota': atividade.tipo === 'ASSISTENCIA REMOTA',
                   }"
                 >
-                  {{ atividade.tipo === 'FOLHA DE OBRA' ? '📄 Folha de Obra' : '💻 Assistência Remota' }}
+                  {{
+                    atividade.tipo === 'FOLHA DE OBRA'
+                      ? '📄 Folha de Obra'
+                      : '💻 Assistência Remota'
+                  }}
                 </span>
               </div>
               <div class="info-grid">
@@ -362,16 +386,13 @@
       <div class="modal-content" @click.stop>
         <h3>Confirmar Eliminação</h3>
         <p>
-          Tem a certeza que pretende eliminar o registo de 
-          <strong>{{ registro?.cliente }}</strong>?
+          Tem a certeza que pretende eliminar o registo de
+          <strong>{{ registro?.cliente }}</strong
+          >?
         </p>
-        <p class="warning-text">
-          Esta ação não pode ser desfeita.
-        </p>
+        <p class="warning-text">Esta ação não pode ser desfeita.</p>
         <div class="modal-actions">
-          <button @click="cancelDelete" class="btn btn-secondary">
-            Cancelar
-          </button>
+          <button @click="cancelDelete" class="btn btn-secondary">Cancelar</button>
           <button @click="deleteRegistro" class="btn btn-danger" :disabled="loading">
             {{ loading ? 'A eliminar...' : 'Eliminar' }}
           </button>
@@ -382,143 +403,147 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useRegistoDiarioAtividadeStore } from '@/stores/registo-diario-atividade'
-import BackButton from '@/components/BackButton.vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useRegistoDiarioAtividadeStore } from '@/stores/registo-diario-atividade';
+import BackButton from '@/components/BackButton.vue';
 
 // Router
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
 // Store
-const store = useRegistoDiarioAtividadeStore()
+const store = useRegistoDiarioAtividadeStore();
 
 // Local state
-const showDeleteModal = ref(false)
-const autoRetryCountdown = ref(0)
-const userInteractionCancelled = ref(false)
-const retryTimeoutId = ref(null)
+const showDeleteModal = ref(false);
+const autoRetryCountdown = ref(0);
+const userInteractionCancelled = ref(false);
+const retryTimeoutId = ref(null);
 
 // Computed properties
-const registro = computed(() => store.selectedRegistro)
-const loading = computed(() => store.loading)
-const error = computed(() => store.error)
+const registro = computed(() => store.selectedRegistro);
+const loading = computed(() => store.loading);
+const error = computed(() => store.error);
 
 // Methods
 const confirmDelete = () => {
-  showDeleteModal.value = true
-}
+  showDeleteModal.value = true;
+};
 
 const cancelDelete = () => {
-  showDeleteModal.value = false
-}
+  showDeleteModal.value = false;
+};
 
 const deleteRegistro = async () => {
-  if (!registro.value) return
-  
+  if (!registro.value) return;
+
   try {
-    await store.deleteRegistro(route.params.year, registro.value.id)
-    router.push({ name: 'registo-diario-atividade-list' })
+    await store.deleteRegistro(route.params.year, registro.value.id);
+    router.push({ name: 'registo-diario-atividade-list' });
   } catch (error) {
-    console.error('Delete failed:', error)
-    cancelDelete()
+    console.error('Delete failed:', error);
+    cancelDelete();
   }
-}
+};
 
 const clearError = () => {
-  store.clearError()
-}
+  store.clearError();
+};
 
-const formatDate = (dateString) => {
-  return store.formatDate(dateString)
-}
+const formatDate = dateString => {
+  return store.formatDate(dateString);
+};
 
-const formatDateTime = (dateString) => {
-  return store.formatDateTime(dateString)
-}
+const formatDateTime = dateString => {
+  return store.formatDateTime(dateString);
+};
 
 const retryLoad = () => {
-  userInteractionCancelled.value = true
-  cancelAutoRetry()
-  loadRegistro()
-}
+  userInteractionCancelled.value = true;
+  cancelAutoRetry();
+  loadRegistro();
+};
 
 const startAutoRetry = () => {
-  cancelAutoRetry()
-  autoRetryCountdown.value = 10
-  
+  cancelAutoRetry();
+  autoRetryCountdown.value = 10;
+
   const updateCountdown = () => {
     if (autoRetryCountdown.value > 0 && !userInteractionCancelled.value) {
-      autoRetryCountdown.value--
-      retryTimeoutId.value = setTimeout(updateCountdown, 1000)
+      autoRetryCountdown.value--;
+      retryTimeoutId.value = setTimeout(updateCountdown, 1000);
     } else if (autoRetryCountdown.value === 0 && !userInteractionCancelled.value) {
       // Auto-retry after countdown
-      loadRegistro()
+      loadRegistro();
     }
-  }
-  
-  retryTimeoutId.value = setTimeout(updateCountdown, 1000)
-}
+  };
+
+  retryTimeoutId.value = setTimeout(updateCountdown, 1000);
+};
 
 const cancelAutoRetry = () => {
   if (retryTimeoutId.value) {
-    clearTimeout(retryTimeoutId.value)
-    retryTimeoutId.value = null
+    clearTimeout(retryTimeoutId.value);
+    retryTimeoutId.value = null;
   }
-  autoRetryCountdown.value = 0
-}
+  autoRetryCountdown.value = 0;
+};
 
 const handleUserInteraction = () => {
-  userInteractionCancelled.value = true
-  cancelAutoRetry()
-}
+  userInteractionCancelled.value = true;
+  cancelAutoRetry();
+};
 
 // Lifecycle
 onMounted(async () => {
   // Add event listeners for user interaction
-  window.addEventListener('click', handleUserInteraction)
-  window.addEventListener('scroll', handleUserInteraction)
-  window.addEventListener('keydown', handleUserInteraction)
-  
-  await loadRegistro()
-})
+  window.addEventListener('click', handleUserInteraction);
+  window.addEventListener('scroll', handleUserInteraction);
+  window.addEventListener('keydown', handleUserInteraction);
+
+  await loadRegistro();
+});
 
 onBeforeUnmount(() => {
-  cancelAutoRetry()
-  window.removeEventListener('click', handleUserInteraction)
-  window.removeEventListener('scroll', handleUserInteraction)
-  window.removeEventListener('keydown', handleUserInteraction)
-})
+  cancelAutoRetry();
+  window.removeEventListener('click', handleUserInteraction);
+  window.removeEventListener('scroll', handleUserInteraction);
+  window.removeEventListener('keydown', handleUserInteraction);
+});
 
 const loadRegistro = async () => {
-  const { year, id } = route.params
-  
+  const { year, id } = route.params;
+
   try {
-    store.clearError()
-    await store.fetchRegistroById(year, id)
+    store.clearError();
+    await store.fetchRegistroById(year, id);
     // If successful, cancel any pending retries
-    cancelAutoRetry()
+    cancelAutoRetry();
   } catch (error) {
-    console.error('Failed to fetch registro:', error)
+    console.error('Failed to fetch registro:', error);
     // Check if it's a 404 or "not found" error
-    const isNotFound = error?.message?.toLowerCase().includes('not found') || 
-                       store.error?.toLowerCase().includes('not found')
-    
+    const isNotFound =
+      error?.message?.toLowerCase().includes('not found') ||
+      store.error?.toLowerCase().includes('not found');
+
     if (isNotFound && !userInteractionCancelled.value) {
       // Start auto-retry countdown
-      startAutoRetry()
+      startAutoRetry();
     }
   }
-}
+};
 
 // Watch for successful data load to cancel retries
-watch(() => registro.value?.id, (newId) => {
-  if (newId) {
-    cancelAutoRetry()
-    userInteractionCancelled.value = false
+watch(
+  () => registro.value?.id,
+  newId => {
+    if (newId) {
+      cancelAutoRetry();
+      userInteractionCancelled.value = false;
+    }
   }
-})
+);
 </script>
 
 <style scoped>
@@ -998,8 +1023,12 @@ watch(() => registro.value?.id, (newId) => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .error-message {
@@ -1063,36 +1092,36 @@ watch(() => registro.value?.id, (newId) => {
   .registo-detail-container {
     padding: 0.5rem;
   }
-  
+
   .detail-header {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .header-actions {
     flex-direction: column;
     width: 100%;
   }
-  
+
   .header-actions .btn {
     width: 100%;
     justify-content: center;
   }
-  
+
   .quick-info-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .info-row {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .info-card {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .info-card-icon {
     font-size: 2.5rem;
   }

@@ -10,11 +10,11 @@ import type { UserContext } from '@clever/shared';
 
 /**
  * Frontend Authentication Integration Tests
- * 
+ *
  * Tests complete authentication flow from frontend perspective
  * Verifies route protection and user state management
  * Ensures proper integration with Vue Router and Pinia
- * 
+ *
  * Requirements: All requirements integration
  */
 
@@ -54,7 +54,7 @@ describe('Frontend Authentication Integration', () => {
     it('should initialize Vue app with all required plugins', () => {
       // Test that the app can be created with all plugins
       const app = createApp(App);
-      
+
       expect(() => {
         app.use(pinia);
         app.use(testRouter);
@@ -64,7 +64,7 @@ describe('Frontend Authentication Integration', () => {
     it('should have authentication store available', () => {
       const app = createApp(App);
       app.use(pinia);
-      
+
       const authStore = useAuthStore();
       expect(authStore).toBeDefined();
       expect(authStore.isAuthenticated).toBe(false);
@@ -75,18 +75,18 @@ describe('Frontend Authentication Integration', () => {
   describe('Route Protection Integration', () => {
     it('should protect all routes except SignIn by default', () => {
       const routes = testRouter.getRoutes();
-      
+
       // Find routes that should be protected
-      const protectedRoutes = routes.filter(route => 
-        route.name !== 'signin' && 
-        route.name !== 'not-found' &&
-        route.meta?.requiresAuth !== false
+      const protectedRoutes = routes.filter(
+        route =>
+          route.name !== 'signin' &&
+          route.name !== 'not-found' &&
+          route.meta?.requiresAuth !== false
       );
 
       // Find routes that should not be protected
-      const unprotectedRoutes = routes.filter(route => 
-        route.name === 'signin' || 
-        route.meta?.requiresAuth === false
+      const unprotectedRoutes = routes.filter(
+        route => route.name === 'signin' || route.meta?.requiresAuth === false
       );
 
       expect(protectedRoutes.length).toBeGreaterThan(0);
@@ -419,18 +419,19 @@ describe('Frontend Authentication Integration', () => {
 
     it('should have proper route structure for mobile navigation', () => {
       const routes = testRouter.getRoutes();
-      
+
       // Verify home route exists (dashboard)
       const homeRoute = routes.find(route => route.name === 'home');
       expect(homeRoute).toBeDefined();
       expect(homeRoute?.path).toBe('/');
 
       // Verify content routes follow mobile-friendly pattern
-      const contentRoutes = routes.filter(route => 
-        route.name?.toString().includes('-list') ||
-        route.name?.toString().includes('-detail') ||
-        route.name?.toString().includes('-create') ||
-        route.name?.toString().includes('-edit')
+      const contentRoutes = routes.filter(
+        route =>
+          route.name?.toString().includes('-list') ||
+          route.name?.toString().includes('-detail') ||
+          route.name?.toString().includes('-create') ||
+          route.name?.toString().includes('-edit')
       );
 
       expect(contentRoutes.length).toBeGreaterThan(0);

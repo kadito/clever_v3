@@ -5,7 +5,11 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Hono } from 'hono';
-import { createContentRoutes, createStandardContentConfig, createClientContentConfig } from './content-route-template';
+import {
+  createContentRoutes,
+  createStandardContentConfig,
+  createClientContentConfig,
+} from './content-route-template';
 import type { BaseContent, ApiResponse, ListResponse, SearchResponse } from '@clever/shared';
 
 // Mock the middleware
@@ -41,14 +45,14 @@ describe('Content Route Template', () => {
   describe('createStandardContentConfig', () => {
     it('should create standard configuration with default date-desc sorting', () => {
       const config = createStandardContentConfig('contracts');
-      
+
       expect(config.contentType).toBe('contracts');
       expect(config.sortStrategy).toBe('date-desc');
     });
 
     it('should create standard configuration with custom sorting', () => {
       const config = createStandardContentConfig('licenses', 'date-asc');
-      
+
       expect(config.contentType).toBe('licenses');
       expect(config.sortStrategy).toBe('date-asc');
     });
@@ -57,7 +61,7 @@ describe('Content Route Template', () => {
   describe('createClientContentConfig', () => {
     it('should create client-specific configuration with alphabetical sorting', () => {
       const config = createClientContentConfig();
-      
+
       expect(config.contentType).toBe('clients');
       expect(config.sortStrategy).toBe('alphabetical');
       expect(config.extractSearchableText).toBeDefined();
@@ -87,7 +91,7 @@ describe('Content Route Template', () => {
       };
 
       const searchableText = config.extractSearchableText!(mockContent);
-      
+
       expect(searchableText).toContain('test company');
       expect(searchableText).toContain('test commercial');
       expect(searchableText).toContain('123456789');
@@ -117,7 +121,7 @@ describe('Content Route Template', () => {
       };
 
       const indexFields = config.extractIndexFields!(mockContent);
-      
+
       expect(indexFields).toEqual({
         nomeEmpresa: 'Test Company',
         nomeComercial: 'Test Commercial',
@@ -134,7 +138,7 @@ describe('Content Route Template', () => {
     it('should create a Hono router with CRUD endpoints', () => {
       const config = createStandardContentConfig('contracts');
       const router = createContentRoutes(config);
-      
+
       expect(router).toBeDefined();
       expect(typeof router.request).toBe('function');
     });
@@ -142,19 +146,23 @@ describe('Content Route Template', () => {
     it('should require authentication for all routes', async () => {
       const config = createStandardContentConfig('contracts');
       const router = createContentRoutes(config);
-      
+
       // Mount the router
       app.route('/content/contracts', router);
-      
+
       // Mock environment with R2 bucket
       const mockEnv = { R2_BUCKET: mockR2Bucket };
-      
+
       // Test that routes exist (they should return responses, not 404)
-      const listResponse = await app.request('/content/contracts', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      }, mockEnv);
-      
+      const listResponse = await app.request(
+        '/content/contracts',
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        },
+        mockEnv
+      );
+
       // Should not be 404 (route exists)
       expect(listResponse.status).not.toBe(404);
     });
@@ -162,19 +170,23 @@ describe('Content Route Template', () => {
     it('should handle missing R2 bucket gracefully', async () => {
       const config = createStandardContentConfig('contracts');
       const router = createContentRoutes(config);
-      
+
       app.route('/content/contracts', router);
-      
+
       // Mock environment without R2 bucket
       const mockEnv = {};
-      
-      const response = await app.request('/content/contracts', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      }, mockEnv);
-      
+
+      const response = await app.request(
+        '/content/contracts',
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        },
+        mockEnv
+      );
+
       expect(response.status).toBe(500);
-      
+
       const body: ApiResponse = await response.json();
       expect(body.success).toBe(false);
       expect(body.error).toBe('Storage not available');
@@ -183,19 +195,23 @@ describe('Content Route Template', () => {
     it('should validate pagination parameters', async () => {
       const config = createStandardContentConfig('contracts');
       const router = createContentRoutes(config);
-      
+
       app.route('/content/contracts', router);
-      
+
       const mockEnv = { R2_BUCKET: mockR2Bucket };
-      
+
       // Test invalid page parameter
-      const response = await app.request('/content/contracts?page=0', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      }, mockEnv);
-      
+      const response = await app.request(
+        '/content/contracts?page=0',
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        },
+        mockEnv
+      );
+
       expect(response.status).toBe(400);
-      
+
       const body: ApiResponse = await response.json();
       expect(body.success).toBe(false);
       expect(body.error).toContain('Invalid pagination parameters');
@@ -204,19 +220,23 @@ describe('Content Route Template', () => {
     it('should validate UUID format for single item requests', async () => {
       const config = createStandardContentConfig('contracts');
       const router = createContentRoutes(config);
-      
+
       app.route('/content/contracts', router);
-      
+
       const mockEnv = { R2_BUCKET: mockR2Bucket };
-      
+
       // Test invalid UUID format
-      const response = await app.request('/content/contracts/invalid-uuid', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      }, mockEnv);
-      
+      const response = await app.request(
+        '/content/contracts/invalid-uuid',
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        },
+        mockEnv
+      );
+
       expect(response.status).toBe(400);
-      
+
       const body: ApiResponse = await response.json();
       expect(body.success).toBe(false);
       expect(body.error).toBe('Invalid UUID format');
@@ -225,20 +245,24 @@ describe('Content Route Template', () => {
     it('should handle JSON parsing errors in POST requests', async () => {
       const config = createStandardContentConfig('contracts');
       const router = createContentRoutes(config);
-      
+
       app.route('/content/contracts', router);
-      
+
       const mockEnv = { R2_BUCKET: mockR2Bucket };
-      
+
       // Test invalid JSON
-      const response = await app.request('/content/contracts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: 'invalid json',
-      }, mockEnv);
-      
+      const response = await app.request(
+        '/content/contracts',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: 'invalid json',
+        },
+        mockEnv
+      );
+
       expect(response.status).toBe(400);
-      
+
       const body: ApiResponse = await response.json();
       expect(body.success).toBe(false);
       expect(body.error).toBe('Invalid JSON body');
@@ -253,21 +277,25 @@ describe('Content Route Template', () => {
           throw new Error('Title is required');
         }
       };
-      
+
       const router = createContentRoutes(config);
       app.route('/content/contracts', router);
-      
+
       const mockEnv = { R2_BUCKET: mockR2Bucket };
-      
+
       // Test validation failure
-      const response = await app.request('/content/contracts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ description: 'Test contract' }),
-      }, mockEnv);
-      
+      const response = await app.request(
+        '/content/contracts',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ description: 'Test contract' }),
+        },
+        mockEnv
+      );
+
       expect(response.status).toBe(400);
-      
+
       const body: ApiResponse = await response.json();
       expect(body.success).toBe(false);
       expect(body.error).toBe('Title is required');
@@ -278,24 +306,28 @@ describe('Content Route Template', () => {
     it('should handle storage errors gracefully', async () => {
       const config = createStandardContentConfig('contracts');
       const router = createContentRoutes(config);
-      
+
       app.route('/content/contracts', router);
-      
+
       // Mock R2 bucket that throws errors
       const errorR2Bucket = {
         ...mockR2Bucket,
         get: vi.fn().mockRejectedValue(new Error('Storage error')),
       };
-      
+
       const mockEnv = { R2_BUCKET: errorR2Bucket };
-      
-      const response = await app.request('/content/contracts', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      }, mockEnv);
-      
+
+      const response = await app.request(
+        '/content/contracts',
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        },
+        mockEnv
+      );
+
       expect(response.status).toBe(500);
-      
+
       const body: ApiResponse = await response.json();
       expect(body.success).toBe(false);
       expect(body.error).toBe('Failed to retrieve contracts');

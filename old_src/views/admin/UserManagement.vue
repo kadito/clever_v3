@@ -14,9 +14,7 @@
         <div class="access-denied-icon">🚫</div>
         <h2>Acesso Negado</h2>
         <p>Não tem permissões para aceder a esta página.</p>
-        <router-link to="/dashboard" class="btn btn-primary">
-          Voltar ao Dashboard
-        </router-link>
+        <router-link to="/dashboard" class="btn btn-primary"> Voltar ao Dashboard </router-link>
       </div>
     </div>
 
@@ -51,7 +49,7 @@
               {{ (user.firstName?.[0] || '') + (user.lastName?.[0] || '') }}
             </div>
           </div>
-          
+
           <div class="user-info">
             <h3>{{ user.firstName }} {{ user.lastName }}</h3>
             <p class="user-email">{{ user.emailAddresses?.[0]?.emailAddress }}</p>
@@ -63,23 +61,21 @@
                 {{ user.banned ? '🚫 Banido' : '✅ Activo' }}
               </span>
             </div>
-            <p class="user-created">
-              Registado: {{ formatDate(user.createdAt) }}
-            </p>
+            <p class="user-created">Registado: {{ formatDate(user.createdAt) }}</p>
           </div>
 
           <div class="user-actions">
-            <button 
-              v-if="user.id !== currentUser?.id" 
+            <button
+              v-if="user.id !== currentUser?.id"
               @click="toggleUserRole(user)"
               class="btn btn-sm btn-outline"
               :disabled="updatingUser === user.id"
             >
               {{ getUserRole(user) === 'admin' ? '👤 Remover Admin' : '👑 Tornar Admin' }}
             </button>
-            
-            <button 
-              v-if="user.id !== currentUser?.id" 
+
+            <button
+              v-if="user.id !== currentUser?.id"
               @click="toggleUserBan(user)"
               class="btn btn-sm"
               :class="user.banned ? 'btn-success' : 'btn-danger'"
@@ -106,20 +102,20 @@
           <h2>Convidar Utilizador</h2>
           <button @click="closeInviteModal" class="close-btn">×</button>
         </div>
-        
+
         <form @submit.prevent="sendInvite" class="invite-form">
           <div class="form-group">
             <label for="inviteEmail">Email *</label>
-            <input 
-              type="email" 
-              id="inviteEmail" 
+            <input
+              type="email"
+              id="inviteEmail"
               v-model="inviteForm.email"
               class="form-control"
               placeholder="utilizador@exemplo.com"
               required
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="inviteRole">Papel</label>
             <select id="inviteRole" v-model="inviteForm.role" class="form-control">
@@ -129,9 +125,7 @@
           </div>
 
           <div class="modal-actions">
-            <button type="button" @click="closeInviteModal" class="btn btn-cancel">
-              Cancelar
-            </button>
+            <button type="button" @click="closeInviteModal" class="btn btn-cancel">Cancelar</button>
             <button type="submit" class="btn btn-primary" :disabled="sendingInvite">
               {{ sendingInvite ? 'A enviar...' : '📧 Enviar Convite' }}
             </button>
@@ -143,184 +137,184 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useUser, useClerk } from '@clerk/vue'
-import BackButton from '@/components/BackButton.vue'
+import { ref, computed, onMounted } from 'vue';
+import { useUser, useClerk } from '@clerk/vue';
+import BackButton from '@/components/BackButton.vue';
 
 // Clerk composables
-const { user: currentUser, isLoaded } = useUser()
-const clerk = useClerk()
+const { user: currentUser, isLoaded } = useUser();
+const clerk = useClerk();
 
 // State
-const users = ref([])
-const loading = ref(false)
-const error = ref(null)
-const updatingUser = ref(null)
-const showInviteModal = ref(false)
-const sendingInvite = ref(false)
+const users = ref([]);
+const loading = ref(false);
+const error = ref(null);
+const updatingUser = ref(null);
+const showInviteModal = ref(false);
+const sendingInvite = ref(false);
 
 // Form data
 const inviteForm = ref({
   email: '',
-  role: 'user'
-})
+  role: 'user',
+});
 
 // Check if current user is admin
 const isAdmin = computed(() => {
-  if (!isLoaded.value || !currentUser.value) return false
-  return currentUser.value.publicMetadata?.role === 'admin'
-})
+  if (!isLoaded.value || !currentUser.value) return false;
+  return currentUser.value.publicMetadata?.role === 'admin';
+});
 
 // Methods
 const refreshUsers = async () => {
-  loading.value = true
-  error.value = null
-  
+  loading.value = true;
+  error.value = null;
+
   try {
     // Note: In a real implementation, you would call your backend API
     // that uses Clerk's Backend API to fetch users
     const response = await fetch('/api/admin/users', {
       headers: {
-        'Authorization': `Bearer ${await clerk.value.session?.getToken()}`
-      }
-    })
-    
+        Authorization: `Bearer ${await clerk.value.session?.getToken()}`,
+      },
+    });
+
     if (!response.ok) {
-      throw new Error('Failed to fetch users')
+      throw new Error('Failed to fetch users');
     }
-    
-    const data = await response.json()
-    users.value = data.users || []
+
+    const data = await response.json();
+    users.value = data.users || [];
   } catch (err) {
-    error.value = err.message
-    console.error('Error fetching users:', err)
+    error.value = err.message;
+    console.error('Error fetching users:', err);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
-const getUserRole = (user) => {
-  return user.publicMetadata?.role === 'admin' ? 'admin' : 'user'
-}
+const getUserRole = user => {
+  return user.publicMetadata?.role === 'admin' ? 'admin' : 'user';
+};
 
-const toggleUserRole = async (user) => {
-  updatingUser.value = user.id
-  const newRole = getUserRole(user) === 'admin' ? 'user' : 'admin'
-  
+const toggleUserRole = async user => {
+  updatingUser.value = user.id;
+  const newRole = getUserRole(user) === 'admin' ? 'user' : 'admin';
+
   try {
     const response = await fetch(`/api/admin/users/${user.id}/role`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${await clerk.value.session?.getToken()}`
+        Authorization: `Bearer ${await clerk.value.session?.getToken()}`,
       },
-      body: JSON.stringify({ role: newRole })
-    })
-    
+      body: JSON.stringify({ role: newRole }),
+    });
+
     if (!response.ok) {
-      throw new Error('Failed to update user role')
+      throw new Error('Failed to update user role');
     }
-    
+
     // Update local state
-    const userIndex = users.value.findIndex(u => u.id === user.id)
+    const userIndex = users.value.findIndex(u => u.id === user.id);
     if (userIndex !== -1) {
-      users.value[userIndex].publicMetadata = { 
-        ...users.value[userIndex].publicMetadata, 
-        role: newRole 
-      }
+      users.value[userIndex].publicMetadata = {
+        ...users.value[userIndex].publicMetadata,
+        role: newRole,
+      };
     }
   } catch (err) {
-    error.value = err.message
-    console.error('Error updating user role:', err)
+    error.value = err.message;
+    console.error('Error updating user role:', err);
   } finally {
-    updatingUser.value = null
+    updatingUser.value = null;
   }
-}
+};
 
-const toggleUserBan = async (user) => {
-  updatingUser.value = user.id
-  
+const toggleUserBan = async user => {
+  updatingUser.value = user.id;
+
   try {
-    const action = user.banned ? 'unban' : 'ban'
+    const action = user.banned ? 'unban' : 'ban';
     const response = await fetch(`/api/admin/users/${user.id}/${action}`, {
       method: 'PUT',
       headers: {
-        'Authorization': `Bearer ${await clerk.value.session?.getToken()}`
-      }
-    })
-    
+        Authorization: `Bearer ${await clerk.value.session?.getToken()}`,
+      },
+    });
+
     if (!response.ok) {
-      throw new Error(`Failed to ${action} user`)
+      throw new Error(`Failed to ${action} user`);
     }
-    
+
     // Update local state
-    const userIndex = users.value.findIndex(u => u.id === user.id)
+    const userIndex = users.value.findIndex(u => u.id === user.id);
     if (userIndex !== -1) {
-      users.value[userIndex].banned = !user.banned
+      users.value[userIndex].banned = !user.banned;
     }
   } catch (err) {
-    error.value = err.message
-    console.error('Error updating user ban status:', err)
+    error.value = err.message;
+    console.error('Error updating user ban status:', err);
   } finally {
-    updatingUser.value = null
+    updatingUser.value = null;
   }
-}
+};
 
 const sendInvite = async () => {
-  if (!inviteForm.value.email) return
-  
-  sendingInvite.value = true
-  
+  if (!inviteForm.value.email) return;
+
+  sendingInvite.value = true;
+
   try {
     const response = await fetch('/api/admin/invite', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${await clerk.value.session?.getToken()}`
+        Authorization: `Bearer ${await clerk.value.session?.getToken()}`,
       },
       body: JSON.stringify({
         email: inviteForm.value.email,
-        role: inviteForm.value.role
-      })
-    })
-    
+        role: inviteForm.value.role,
+      }),
+    });
+
     if (!response.ok) {
-      throw new Error('Failed to send invitation')
+      throw new Error('Failed to send invitation');
     }
-    
+
     // Reset form and close modal
-    inviteForm.value = { email: '', role: 'user' }
-    showInviteModal.value = false
-    
+    inviteForm.value = { email: '', role: 'user' };
+    showInviteModal.value = false;
+
     // Refresh users list
-    await refreshUsers()
+    await refreshUsers();
   } catch (err) {
-    error.value = err.message
-    console.error('Error sending invitation:', err)
+    error.value = err.message;
+    console.error('Error sending invitation:', err);
   } finally {
-    sendingInvite.value = false
+    sendingInvite.value = false;
   }
-}
+};
 
 const closeInviteModal = () => {
-  showInviteModal.value = false
-  inviteForm.value = { email: '', role: 'user' }
-}
+  showInviteModal.value = false;
+  inviteForm.value = { email: '', role: 'user' };
+};
 
 const clearError = () => {
-  error.value = null
-}
+  error.value = null;
+};
 
-const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleDateString('pt-PT')
-}
+const formatDate = dateString => {
+  return new Date(dateString).toLocaleDateString('pt-PT');
+};
 
 // Lifecycle
 onMounted(() => {
   if (isAdmin.value) {
-    refreshUsers()
+    refreshUsers();
   }
-})
+});
 </script>
 
 <style scoped>
@@ -446,7 +440,8 @@ onMounted(() => {
   flex-wrap: wrap;
 }
 
-.user-role, .user-status {
+.user-role,
+.user-status {
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.8rem;
@@ -639,7 +634,8 @@ onMounted(() => {
   cursor: not-allowed;
 }
 
-.loading-state, .empty-state {
+.loading-state,
+.empty-state {
   text-align: center;
   padding: 3rem 1rem;
   color: var(--text-muted);
@@ -675,29 +671,27 @@ onMounted(() => {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .users-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .actions-bar {
     flex-direction: column;
   }
-  
+
   .user-meta {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .modal-card {
     margin: 0.5rem;
     padding: 1.5rem;
   }
-  
+
   .modal-actions {
     flex-direction: column;
   }
 }
 </style>
-
-

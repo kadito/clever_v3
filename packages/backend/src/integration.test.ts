@@ -6,10 +6,10 @@ import { promisify } from 'util';
 
 /**
  * End-to-End Integration Tests
- * 
+ *
  * Tests complete build process produces deployable Worker
  * Tests development environment works end-to-end
- * 
+ *
  * Requirements: 6.6, 5.1
  */
 
@@ -24,38 +24,45 @@ describe('End-to-End Integration Tests', () => {
   const FRONTEND_DIST = join(PROJECT_ROOT, 'packages/frontend/dist');
 
   // Helper function to run shell commands
-  const runCommand = (command: string, cwd: string = PROJECT_ROOT): Promise<{ stdout: string; stderr: string; code: number }> => {
-    return new Promise((resolve) => {
+  const runCommand = (
+    command: string,
+    cwd: string = PROJECT_ROOT
+  ): Promise<{ stdout: string; stderr: string; code: number }> => {
+    return new Promise(resolve => {
       const [cmd, ...args] = command.split(' ');
-      const child = spawn(cmd, args, { 
-        cwd, 
+      const child = spawn(cmd, args, {
+        cwd,
         shell: true,
-        stdio: ['pipe', 'pipe', 'pipe']
+        stdio: ['pipe', 'pipe', 'pipe'],
       });
 
       let stdout = '';
       let stderr = '';
 
-      child.stdout?.on('data', (data) => {
+      child.stdout?.on('data', data => {
         stdout += data.toString();
       });
 
-      child.stderr?.on('data', (data) => {
+      child.stderr?.on('data', data => {
         stderr += data.toString();
       });
 
-      child.on('close', (code) => {
+      child.on('close', code => {
         resolve({ stdout, stderr, code: code || 0 });
       });
 
-      child.on('error', (error) => {
+      child.on('error', error => {
         resolve({ stdout, stderr: error.message, code: 1 });
       });
     });
   };
 
   // Helper function to make HTTP requests
-  const fetchWithTimeout = async (url: string, options: RequestInit = {}, timeout = 10000): Promise<Response> => {
+  const fetchWithTimeout = async (
+    url: string,
+    options: RequestInit = {},
+    timeout = 10000
+  ): Promise<Response> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -93,7 +100,7 @@ describe('End-to-End Integration Tests', () => {
       // Check if build artifacts exist (assuming build has been run)
       const workerEntryPath = join(BACKEND_DIST, 'index.js');
       const frontendIndexPath = join(FRONTEND_DIST, 'index.html');
-      
+
       // If artifacts don't exist, try to build them
       if (!existsSync(workerEntryPath) || !existsSync(frontendIndexPath)) {
         const buildResult = await runCommand('npm run build');
@@ -106,7 +113,7 @@ describe('End-to-End Integration Tests', () => {
       // Verify backend artifacts if they exist
       if (existsSync(BACKEND_DIST)) {
         expect(existsSync(BACKEND_DIST)).toBe(true);
-        
+
         if (existsSync(workerEntryPath)) {
           const workerContent = readFileSync(workerEntryPath, 'utf-8');
           expect(workerContent).toContain('export default');
@@ -117,7 +124,7 @@ describe('End-to-End Integration Tests', () => {
       // Verify frontend artifacts if they exist
       if (existsSync(FRONTEND_DIST)) {
         expect(existsSync(FRONTEND_DIST)).toBe(true);
-        
+
         if (existsSync(frontendIndexPath)) {
           const indexHtmlContent = readFileSync(frontendIndexPath, 'utf-8');
           expect(indexHtmlContent).toMatch(/<!doctype html>/i);
@@ -135,17 +142,17 @@ describe('End-to-End Integration Tests', () => {
 
     it('should have correct Worker artifact structure when built', async () => {
       const workerPath = join(BACKEND_DIST, 'index.js');
-      
+
       // Only test if the worker file exists
       if (existsSync(workerPath)) {
         const workerContent = readFileSync(workerPath, 'utf-8');
 
         // Should export a default Hono app
         expect(workerContent).toContain('export default');
-        
+
         // Should include API routes
         expect(workerContent).toMatch(/\/api\/|api\//);
-        
+
         // Should include error handling
         expect(workerContent).toMatch(/error|Error/);
 
@@ -166,7 +173,7 @@ describe('End-to-End Integration Tests', () => {
       devProcess = spawn('npm', ['run', 'dev'], {
         cwd: PROJECT_ROOT,
         stdio: ['pipe', 'pipe', 'pipe'],
-        detached: false
+        detached: false,
       });
 
       // Wait for server to be ready
@@ -190,7 +197,7 @@ describe('End-to-End Integration Tests', () => {
       // Test API endpoint - should return 401 without authentication
       const apiResponse = await fetchWithTimeout(`${DEV_URL}/api/content/clients`);
       expect(apiResponse.status).toBe(401);
-      
+
       const apiData = await apiResponse.json();
       expect(apiData).toHaveProperty('success', false);
       expect(apiData).toHaveProperty('error');
@@ -200,7 +207,7 @@ describe('End-to-End Integration Tests', () => {
       // Test health endpoint - should work without authentication
       const healthResponse = await fetchWithTimeout(`${DEV_URL}/health`);
       expect(healthResponse.ok).toBe(true);
-      
+
       const healthData = await healthResponse.json();
       expect(healthData).toHaveProperty('status', 'ok');
       expect(healthData).toHaveProperty('timestamp');
@@ -209,7 +216,7 @@ describe('End-to-End Integration Tests', () => {
       const frontendResponse = await fetchWithTimeout(`${DEV_URL}/`);
       expect(frontendResponse.ok).toBe(true);
       expect(frontendResponse.headers.get('content-type')).toContain('text/html');
-      
+
       const frontendContent = await frontendResponse.text();
       expect(frontendContent).toMatch(/<!doctype html>/i);
       expect(frontendContent).toContain('<div id="app">');
@@ -232,7 +239,7 @@ describe('End-to-End Integration Tests', () => {
       const response = await fetchWithTimeout(`${DEV_URL}/api/content/clients`, {
         method: 'OPTIONS',
         headers: {
-          'Origin': 'http://localhost:3000',
+          Origin: 'http://localhost:3000',
           'Access-Control-Request-Method': 'GET',
           'Access-Control-Request-Headers': 'Content-Type',
         },
@@ -247,7 +254,7 @@ describe('End-to-End Integration Tests', () => {
       // Test invalid content type - should return 401 without authentication
       const invalidResponse = await fetchWithTimeout(`${DEV_URL}/api/content/invalid-type`);
       expect(invalidResponse.status).toBe(401);
-      
+
       const errorData = await invalidResponse.json();
       expect(errorData).toHaveProperty('success', false);
       expect(errorData).toHaveProperty('error');
@@ -263,10 +270,10 @@ describe('End-to-End Integration Tests', () => {
       // Test that static assets are served with correct headers
       const response = await fetchWithTimeout(`${DEV_URL}/`);
       expect(response.ok).toBe(true);
-      
+
       // Should serve HTML with correct content type
       expect(response.headers.get('content-type')).toContain('text/html');
-      
+
       const content = await response.text();
       expect(content).toMatch(/<!doctype html>/i);
       expect(content).toMatch(/<meta\s+name="viewport"/);
@@ -277,17 +284,26 @@ describe('End-to-End Integration Tests', () => {
   describe('Cross-Package Integration', () => {
     it('should allow frontend and backend to use shared types correctly', async () => {
       // Test individual package type checking (more lenient)
-      const typeCheckShared = await runCommand('npm run type-check', join(PROJECT_ROOT, 'packages/shared'));
+      const typeCheckShared = await runCommand(
+        'npm run type-check',
+        join(PROJECT_ROOT, 'packages/shared')
+      );
       if (typeCheckShared.code !== 0) {
         console.warn('Shared package type check failed:', typeCheckShared.stderr);
       }
 
-      const typeCheckBackend = await runCommand('npm run type-check', join(PROJECT_ROOT, 'packages/backend'));
+      const typeCheckBackend = await runCommand(
+        'npm run type-check',
+        join(PROJECT_ROOT, 'packages/backend')
+      );
       if (typeCheckBackend.code !== 0) {
         console.warn('Backend package type check failed:', typeCheckBackend.stderr);
       }
 
-      const typeCheckFrontend = await runCommand('npm run type-check', join(PROJECT_ROOT, 'packages/frontend'));
+      const typeCheckFrontend = await runCommand(
+        'npm run type-check',
+        join(PROJECT_ROOT, 'packages/frontend')
+      );
       if (typeCheckFrontend.code !== 0) {
         console.warn('Frontend package type check failed:', typeCheckFrontend.stderr);
       }
@@ -297,7 +313,7 @@ describe('End-to-End Integration Tests', () => {
         try {
           const response = await fetchWithTimeout(`${DEV_URL}/api/content/clients`);
           const data = await response.json();
-          
+
           // Should follow ApiResponse interface structure (expecting 401 for unauthenticated)
           expect(data).toHaveProperty('success');
           expect(data).toHaveProperty('error');

@@ -275,8 +275,6 @@ const handleSubmit = async (data: Record<string, any>) => {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-
-
     // Navigate back to list or detail view
     if (isEditMode.value) {
       router.push({ name: `${contentType.value}-detail`, params: { id: route.params.id } });

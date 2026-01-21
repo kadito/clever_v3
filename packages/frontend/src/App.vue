@@ -4,7 +4,7 @@
     <RouterView />
     <ErrorNotification />
   </AppLayout>
-  
+
   <!-- Direct view for auth pages -->
   <div v-else>
     <RouterView />

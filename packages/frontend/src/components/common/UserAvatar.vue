@@ -1,13 +1,10 @@
 <template>
-  <div 
+  <div
     class="user-avatar flex-shrink-0 rounded-full bg-primary-100 flex items-center justify-center"
     :class="sizeClasses"
   >
     <!-- User initials -->
-    <span 
-      class="font-medium text-primary-700"
-      :class="textSizeClasses"
-    >
+    <span class="font-medium text-primary-700" :class="textSizeClasses">
       {{ initials }}
     </span>
   </div>
@@ -30,7 +27,7 @@ const props = withDefaults(defineProps<Props>(), {
 const initials = computed(() => {
   const firstName = props.user.firstName?.trim() || '';
   const lastName = props.user.lastName?.trim() || '';
-  
+
   if (firstName && lastName) {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   } else if (firstName) {

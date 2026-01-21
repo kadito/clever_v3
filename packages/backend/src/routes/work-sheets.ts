@@ -5,13 +5,22 @@
  */
 
 import { Hono } from 'hono';
-import { createContentRoutes, createStandardContentConfig, contentErrorHandler } from './content-route-template';
-import type { WorkSheet, WorkSheetData, WorkSheetCreationData, WorkSheetUpdateData } from '@clever/shared';
-import { 
-  validateWorkSheetCreation, 
-  validateWorkSheetUpdate, 
+import {
+  createContentRoutes,
+  createStandardContentConfig,
+  contentErrorHandler,
+} from './content-route-template';
+import type {
+  WorkSheet,
+  WorkSheetData,
+  WorkSheetCreationData,
+  WorkSheetUpdateData,
+} from '@clever/shared';
+import {
+  validateWorkSheetCreation,
+  validateWorkSheetUpdate,
   getWorkSheetSummary,
-  calculateWorkSheetTotals
+  calculateWorkSheetTotals,
 } from '@clever/shared';
 
 /**
@@ -22,7 +31,7 @@ import {
 function validateWorkSheetCreate(requestData: any): void {
   // Extract the actual work sheet data from the request
   const workSheetData = requestData.data || requestData;
-  
+
   // Create a proper WorkSheetCreationData object with defaults
   const workSheetCreationData: WorkSheetCreationData = {
     clientId: workSheetData.clientId || '',
@@ -33,14 +42,14 @@ function validateWorkSheetCreate(requestData: any): void {
       reason: workSheetData.request?.reason || '',
       arrivalTime: workSheetData.request?.arrivalTime || '',
       departureTime: workSheetData.request?.departureTime || '',
-      totalHours: workSheetData.request?.totalHours || '0:00'
+      totalHours: workSheetData.request?.totalHours || '0:00',
     },
     displacement: {
       hasDisplacement: workSheetData.displacement?.hasDisplacement || false,
       weekendHoliday: workSheetData.displacement?.weekendHoliday || false,
       oneWayKms: workSheetData.displacement?.oneWayKms || 0,
       totalKms: workSheetData.displacement?.totalKms || 0,
-      paymentMethod: workSheetData.displacement?.paymentMethod || 'PENDENTE'
+      paymentMethod: workSheetData.displacement?.paymentMethod || 'PENDENTE',
     },
     otherData: {
       serviceType: workSheetData.otherData?.serviceType || '',
@@ -60,13 +69,13 @@ function validateWorkSheetCreate(requestData: any): void {
       remoteAccessCheck: workSheetData.otherData?.remoteAccessCheck || false,
       anydesk: workSheetData.otherData?.anydesk || false,
       serviceReport: workSheetData.otherData?.serviceReport || '',
-      clientSignature: workSheetData.otherData?.clientSignature || ''
-    }
+      clientSignature: workSheetData.otherData?.clientSignature || '',
+    },
   };
-  
+
   // Use the comprehensive validation from shared package
   const errors = validateWorkSheetCreation(workSheetCreationData);
-  
+
   if (errors.length > 0) {
     throw new Error(errors[0]); // Return first error for API response
   }
@@ -81,13 +90,13 @@ function validateWorkSheetCreate(requestData: any): void {
 function validateWorkSheetUpdateData(requestData: any, existingContent?: WorkSheet): void {
   // Extract the actual work sheet data from the request
   const workSheetData = requestData.data || requestData;
-  
+
   // Work sheets allow client changes during updates (unlike contracts/licenses)
   // This is because work sheets are service records that may need client corrections
-  
+
   // Use the update validation from shared package
   const errors = validateWorkSheetUpdate(workSheetData as Partial<WorkSheetData>);
-  
+
   if (errors.length > 0) {
     throw new Error(errors[0]); // Return first error for API response
   }
@@ -99,29 +108,34 @@ function validateWorkSheetUpdateData(requestData: any, existingContent?: WorkShe
  */
 function createWorkSheetSearchText(data: WorkSheetData): string {
   const searchTerms: string[] = [];
-  
+
   // Client information (only clientId, client data comes from relations)
   if (data.clientId) searchTerms.push(data.clientId.toLowerCase());
-  
+
   // Request information
   if (data.request?.receivedBy) searchTerms.push(data.request.receivedBy.toLowerCase());
   if (data.request?.reason) searchTerms.push(data.request.reason.toLowerCase());
-  
+
   // Service information
   if (data.otherData?.serviceType) searchTerms.push(data.otherData.serviceType.toLowerCase());
   if (data.otherData?.technician) searchTerms.push(data.otherData.technician.toLowerCase());
-  if (data.otherData?.serviceObservations) searchTerms.push(data.otherData.serviceObservations.toLowerCase());
+  if (data.otherData?.serviceObservations)
+    searchTerms.push(data.otherData.serviceObservations.toLowerCase());
   if (data.otherData?.serviceReport) searchTerms.push(data.otherData.serviceReport.toLowerCase());
   if (data.otherData?.contractYear) searchTerms.push(data.otherData.contractYear.toLowerCase());
-  
+
   // Material and equipment details
-  if (data.otherData?.materialDetails) searchTerms.push(data.otherData.materialDetails.toLowerCase());
-  if (data.otherData?.equipmentDetails) searchTerms.push(data.otherData.equipmentDetails.toLowerCase());
-  if (data.otherData?.resolutionIssues) searchTerms.push(data.otherData.resolutionIssues.toLowerCase());
-  
+  if (data.otherData?.materialDetails)
+    searchTerms.push(data.otherData.materialDetails.toLowerCase());
+  if (data.otherData?.equipmentDetails)
+    searchTerms.push(data.otherData.equipmentDetails.toLowerCase());
+  if (data.otherData?.resolutionIssues)
+    searchTerms.push(data.otherData.resolutionIssues.toLowerCase());
+
   // Payment method
-  if (data.displacement?.paymentMethod) searchTerms.push(data.displacement.paymentMethod.toLowerCase());
-  
+  if (data.displacement?.paymentMethod)
+    searchTerms.push(data.displacement.paymentMethod.toLowerCase());
+
   // Service status indicators
   if (data.otherData?.totallyResolved) searchTerms.push('resolvido', 'completo');
   if (data.displacement?.hasDisplacement) searchTerms.push('deslocação', 'deslocacao');
@@ -130,7 +144,7 @@ function createWorkSheetSearchText(data: WorkSheetData): string {
   if (data.otherData?.contract) searchTerms.push('contrato');
   if (data.otherData?.materialUsed) searchTerms.push('material');
   if (data.otherData?.equipment) searchTerms.push('equipamento');
-  
+
   return searchTerms.join(' ');
 }
 
@@ -155,12 +169,12 @@ workSheetConfig.extractIndexFields = (content: WorkSheet) => {
   const data = content.data;
   const summary = getWorkSheetSummary(content);
   const totals = calculateWorkSheetTotals(data);
-  
+
   return {
     // Basic information for search and display
     clientId: data.clientId || '',
     // Client data now comes from relations
-    
+
     // Request information
     assistanceDate: data.request?.assistanceDate || '',
     requestDate: data.request?.date || '',
@@ -169,43 +183,43 @@ workSheetConfig.extractIndexFields = (content: WorkSheet) => {
     arrivalTime: data.request?.arrivalTime || '',
     departureTime: data.request?.departureTime || '',
     totalHours: totals.totalHours,
-    
+
     // Service information
     serviceType: data.otherData?.serviceType || '',
     technician: data.otherData?.technician || '',
     totallyResolved: data.otherData?.totallyResolved || false,
-    
+
     // Displacement information
     hasDisplacement: data.displacement?.hasDisplacement || false,
     weekendHoliday: data.displacement?.weekendHoliday || false,
     oneWayKms: data.displacement?.oneWayKms || 0,
     totalKms: data.displacement?.totalKms || 0,
     paymentMethod: data.displacement?.paymentMethod || 'PENDENTE',
-    
+
     // Contract and warranty information
     warranty: data.otherData?.warranty || false,
     contract: data.otherData?.contract || false,
     contractYear: data.otherData?.contractYear || '',
-    
+
     // Material and equipment flags
     materialUsed: data.otherData?.materialUsed || false,
     equipment: data.otherData?.equipment || false,
-    
+
     // Technical operations flags
     dumpReading: data.otherData?.dumpReading || false,
     backup: data.otherData?.backup || false,
     remoteAccessCheck: data.otherData?.remoteAccessCheck || false,
     anydesk: data.otherData?.anydesk || false,
-    
+
     // Pricing information (calculated)
     displacementRate: totals.displacementRate,
     kmsPrice: totals.kmsPrice,
     hourlyRate: totals.hourlyRate,
     laborPrice: totals.laborPrice,
     totalPrice: totals.totalPrice,
-    
+
     // Summary for display
-    summary
+    summary,
   };
 };
 

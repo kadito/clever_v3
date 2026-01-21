@@ -4,11 +4,11 @@ import { promisify } from 'util';
 
 /**
  * End-to-End Authentication Integration Tests
- * 
+ *
  * Tests complete authentication flow between frontend and backend
  * Verifies all error handling scenarios work correctly
  * Ensures proper integration with existing application structure
- * 
+ *
  * Requirements: All requirements integration
  */
 
@@ -22,7 +22,11 @@ describe.skip('Authentication Integration E2E Tests', () => {
   const PROJECT_ROOT = process.cwd() + '/../..';
 
   // Helper function to make HTTP requests with timeout
-  const fetchWithTimeout = async (url: string, options: RequestInit = {}, timeout = 10000): Promise<Response> => {
+  const fetchWithTimeout = async (
+    url: string,
+    options: RequestInit = {},
+    timeout = 10000
+  ): Promise<Response> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -60,7 +64,7 @@ describe.skip('Authentication Integration E2E Tests', () => {
     devProcess = spawn('pnpm', ['dev'], {
       cwd: PROJECT_ROOT,
       stdio: ['pipe', 'pipe', 'pipe'],
-      detached: false
+      detached: false,
     });
 
     // Wait for server to be ready
@@ -86,7 +90,7 @@ describe.skip('Authentication Integration E2E Tests', () => {
       const response = await fetchWithTimeout(`${DEV_URL}/`);
       expect(response.ok).toBe(true);
       expect(response.headers.get('content-type')).toContain('text/html');
-      
+
       const content = await response.text();
       expect(content).toMatch(/<!doctype html>/i);
       expect(content).toContain('<div id="app">');
@@ -96,11 +100,11 @@ describe.skip('Authentication Integration E2E Tests', () => {
     it('should redirect unauthenticated users to SignIn page', async () => {
       // Test protected route redirection
       const protectedRoutes = ['/clientes', '/contratos', '/licencas'];
-      
+
       for (const route of protectedRoutes) {
         const response = await fetchWithTimeout(`${DEV_URL}${route}`);
         expect(response.ok).toBe(true);
-        
+
         // Should serve the Vue SPA which will handle client-side routing
         const content = await response.text();
         expect(content).toMatch(/<!doctype html>/i);
@@ -112,7 +116,7 @@ describe.skip('Authentication Integration E2E Tests', () => {
       // Test that SignIn page is accessible without authentication
       const response = await fetchWithTimeout(`${DEV_URL}/entrar`);
       expect(response.ok).toBe(true);
-      
+
       const content = await response.text();
       expect(content).toMatch(/<!doctype html>/i);
       expect(content).toContain('<div id="app">');
@@ -132,7 +136,7 @@ describe.skip('Authentication Integration E2E Tests', () => {
       for (const endpoint of protectedEndpoints) {
         const response = await fetchWithTimeout(`${DEV_URL}${endpoint}`);
         expect(response.status).toBe(401);
-        
+
         const data = await response.json();
         expect(data).toHaveProperty('success', false);
         expect(data).toHaveProperty('error');
@@ -148,7 +152,7 @@ describe.skip('Authentication Integration E2E Tests', () => {
       for (const endpoint of healthEndpoints) {
         const response = await fetchWithTimeout(`${DEV_URL}${endpoint}`);
         expect(response.ok).toBe(true);
-        
+
         const data = await response.json();
         expect(data).toHaveProperty('status', 'ok');
         expect(data).toHaveProperty('timestamp');
@@ -159,7 +163,7 @@ describe.skip('Authentication Integration E2E Tests', () => {
       // Test that invalid content types return proper error responses
       const response = await fetchWithTimeout(`${DEV_URL}/api/content/invalid-type`);
       expect(response.status).toBe(400);
-      
+
       const data = await response.json();
       expect(data).toHaveProperty('success', false);
       expect(data).toHaveProperty('error');
@@ -172,7 +176,7 @@ describe.skip('Authentication Integration E2E Tests', () => {
       const response = await fetchWithTimeout(`${DEV_URL}/api/content/clients`, {
         method: 'OPTIONS',
         headers: {
-          'Origin': 'http://localhost:3000',
+          Origin: 'http://localhost:3000',
           'Access-Control-Request-Method': 'GET',
           'Access-Control-Request-Headers': 'Content-Type, Authorization',
         },
@@ -190,12 +194,12 @@ describe.skip('Authentication Integration E2E Tests', () => {
       // Test with invalid authorization header
       const response = await fetchWithTimeout(`${DEV_URL}/api/content/clients`, {
         headers: {
-          'Authorization': 'Bearer invalid-token',
+          Authorization: 'Bearer invalid-token',
         },
       });
 
       expect(response.status).toBe(401);
-      
+
       const data = await response.json();
       expect(data).toHaveProperty('success', false);
       expect(data).toHaveProperty('error');
@@ -208,14 +212,14 @@ describe.skip('Authentication Integration E2E Tests', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer invalid-token',
+          Authorization: 'Bearer invalid-token',
         },
         body: 'invalid-json',
       });
 
       // Should return 401 for authentication first, not 400 for bad JSON
       expect(response.status).toBe(401);
-      
+
       const data = await response.json();
       expect(data).toHaveProperty('success', false);
       expect(data).toHaveProperty('error');
@@ -225,7 +229,7 @@ describe.skip('Authentication Integration E2E Tests', () => {
       // Test 404 handling for non-existent API routes
       const response = await fetchWithTimeout(`${DEV_URL}/api/nonexistent`);
       expect([404, 500]).toContain(response.status);
-      
+
       // Should return JSON error response
       const data = await response.json();
       expect(data).toHaveProperty('success', false);
@@ -240,7 +244,7 @@ describe.skip('Authentication Integration E2E Tests', () => {
       const response = await fetchWithTimeout(`${DEV_URL}/`);
       expect(response.ok).toBe(true);
       expect(response.headers.get('content-type')).toContain('text/html');
-      
+
       const content = await response.text();
       expect(content).toMatch(/<!doctype html>/i);
       expect(content).toMatch(/<meta\s+name="viewport"/);
@@ -250,11 +254,11 @@ describe.skip('Authentication Integration E2E Tests', () => {
     it('should handle SPA routing fallback correctly', async () => {
       // Test that unknown routes serve the Vue SPA
       const unknownRoutes = ['/unknown-route', '/clientes/123', '/contratos/new'];
-      
+
       for (const route of unknownRoutes) {
         const response = await fetchWithTimeout(`${DEV_URL}${route}`);
         expect(response.ok).toBe(true);
-        
+
         // Should serve the Vue SPA HTML
         const content = await response.text();
         expect(content).toMatch(/<!doctype html>/i);
@@ -274,13 +278,13 @@ describe.skip('Authentication Integration E2E Tests', () => {
       for (const endpoint of endpoints) {
         const response = await fetchWithTimeout(`${DEV_URL}${endpoint}`);
         const data = await response.json();
-        
+
         // All responses should have these fields
         expect(data).toHaveProperty('success');
         expect(data).toHaveProperty('timestamp');
         expect(typeof data.success).toBe('boolean');
         expect(typeof data.timestamp).toBe('string');
-        
+
         // Error responses should have error field
         if (!data.success) {
           expect(data).toHaveProperty('error');
@@ -295,7 +299,7 @@ describe.skip('Authentication Integration E2E Tests', () => {
       // Test that Clerk configuration is properly loaded
       const response = await fetchWithTimeout(`${DEV_URL}/`);
       const content = await response.text();
-      
+
       // Should contain Clerk publishable key reference
       expect(content).toContain('VITE_CLERK_PUBLISHABLE_KEY');
     });
@@ -305,7 +309,7 @@ describe.skip('Authentication Integration E2E Tests', () => {
       const response = await fetchWithTimeout(`${DEV_URL}/api/content/clients`, {
         method: 'OPTIONS',
         headers: {
-          'Origin': 'http://localhost:3000',
+          Origin: 'http://localhost:3000',
         },
       });
 
@@ -318,11 +322,11 @@ describe.skip('Authentication Integration E2E Tests', () => {
       // Test that health endpoint reflects correct environment
       const response = await fetchWithTimeout(`${DEV_URL}/health`);
       expect(response.ok).toBe(true);
-      
+
       const data = await response.json();
       expect(data).toHaveProperty('status', 'ok');
       expect(data).toHaveProperty('timestamp');
-      
+
       // Timestamp should be valid ISO string
       expect(() => new Date(data.timestamp)).not.toThrow();
     });
@@ -333,9 +337,9 @@ describe.skip('Authentication Integration E2E Tests', () => {
       // Test that API responses match expected TypeScript interfaces
       const response = await fetchWithTimeout(`${DEV_URL}/api/content/clients`);
       expect(response.status).toBe(401); // Expected due to no auth
-      
+
       const data = await response.json();
-      
+
       // Should match ApiResponse interface from shared package
       expect(data).toHaveProperty('success');
       expect(data).toHaveProperty('error');

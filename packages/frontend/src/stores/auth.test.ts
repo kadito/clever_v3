@@ -11,7 +11,7 @@ describe('useAuthStore', () => {
 
   it('should initialize with default state', () => {
     const store = useAuthStore();
-    
+
     expect(store.isLoaded).toBe(true); // Changed to true for better UX
     expect(store.isSignedIn).toBe(false);
     expect(store.user).toBe(null);
@@ -60,7 +60,7 @@ describe('useAuthStore', () => {
 
     // Clear state
     store.clearAuthState();
-    
+
     expect(store.isLoaded).toBe(true); // Should remain true
     expect(store.isSignedIn).toBe(false);
     expect(store.user).toBe(null);

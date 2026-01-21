@@ -12,10 +12,10 @@
         "remoteSupport": "De Segunda a Sexta-Feira entre as 9:00 e as 19:00",
         "weekendSupport": false,
         "prices": {
-          "monthly": 30.00,
-          "quarterly": 100.00,
-          "semiannual": 170.00,
-          "annual": 325.00
+          "monthly": 30.0,
+          "quarterly": 100.0,
+          "semiannual": 170.0,
+          "annual": 325.0
         }
       },
       {
@@ -27,10 +27,10 @@
         "remoteSupport": "De Segunda a Sexta-Feira entre as 9:00 e as 22:00",
         "weekendSupport": false,
         "prices": {
-          "monthly": 60.00,
-          "quarterly": 190.00,
-          "semiannual": 345.00,
-          "annual": 675.00
+          "monthly": 60.0,
+          "quarterly": 190.0,
+          "semiannual": 345.0,
+          "annual": 675.0
         }
       },
       {
@@ -43,13 +43,13 @@
         "weekendSupport": true,
         "additionalPackage": {
           "description": "Pack de 10h de assistência para POS",
-          "price": 100.00
+          "price": 100.0
         },
         "prices": {
-          "monthly": 75.00,
-          "quarterly": 235.00,
-          "semiannual": 420.00,
-          "annual": 825.00
+          "monthly": 75.0,
+          "quarterly": 235.0,
+          "semiannual": 420.0,
+          "annual": 825.0
         }
       }
     ]
@@ -68,16 +68,16 @@
         "weekendSupport": false,
         "prices": {
           "under180km": {
-            "monthly": 30.00,
-            "quarterly": 130.00,
-            "semiannual": 185.00,
-            "annual": 330.00
+            "monthly": 30.0,
+            "quarterly": 130.0,
+            "semiannual": 185.0,
+            "annual": 330.0
           },
           "over180km": {
-            "monthly": 35.00,
-            "quarterly": 150.00,
-            "semiannual": 215.00,
-            "annual": 390.00
+            "monthly": 35.0,
+            "quarterly": 150.0,
+            "semiannual": 215.0,
+            "annual": 390.0
           }
         }
       },
@@ -91,16 +91,16 @@
         "weekendSupport": true,
         "prices": {
           "under180km": {
-            "monthly": 60.00,
-            "quarterly": 240.00,
-            "semiannual": 350.00,
-            "annual": 660.00
+            "monthly": 60.0,
+            "quarterly": 240.0,
+            "semiannual": 350.0,
+            "annual": 660.0
           },
           "over180km": {
-            "monthly": 65.00,
-            "quarterly": 260.00,
-            "semiannual": 380.00,
-            "annual": 720.00
+            "monthly": 65.0,
+            "quarterly": 260.0,
+            "semiannual": 380.0,
+            "annual": 720.0
           }
         }
       },
@@ -115,16 +115,16 @@
         "weekendCallouts": true,
         "prices": {
           "under180km": {
-            "monthly": 75.00,
-            "quarterly": 295.00,
-            "semiannual": 435.00,
-            "annual": 825.00
+            "monthly": 75.0,
+            "quarterly": 295.0,
+            "semiannual": 435.0,
+            "annual": 825.0
           },
           "over180km": {
-            "monthly": 80.00,
-            "quarterly": 315.00,
-            "semiannual": 465.00,
-            "annual": 885.00
+            "monthly": 80.0,
+            "quarterly": 315.0,
+            "semiannual": 465.0,
+            "annual": 885.0
           }
         }
       }
@@ -146,16 +146,16 @@
         "prioritySupport": false,
         "prices": {
           "under180km": {
-            "monthly": 30.00,
-            "quarterly": 130.00,
-            "semiannual": 185.00,
-            "annual": 330.00
+            "monthly": 30.0,
+            "quarterly": 130.0,
+            "semiannual": 185.0,
+            "annual": 330.0
           },
           "over180km": {
-            "monthly": 35.00,
-            "quarterly": 150.00,
-            "semiannual": 215.00,
-            "annual": 390.00
+            "monthly": 35.0,
+            "quarterly": 150.0,
+            "semiannual": 215.0,
+            "annual": 390.0
           }
         }
       },
@@ -171,16 +171,16 @@
         "prioritySupport": false,
         "prices": {
           "under180km": {
-            "monthly": 35.00,
-            "quarterly": 150.00,
-            "semiannual": 215.00,
-            "annual": 385.00
+            "monthly": 35.0,
+            "quarterly": 150.0,
+            "semiannual": 215.0,
+            "annual": 385.0
           },
           "over180km": {
-            "monthly": 40.00,
-            "quarterly": 170.00,
-            "semiannual": 245.00,
-            "annual": 445.00
+            "monthly": 40.0,
+            "quarterly": 170.0,
+            "semiannual": 245.0,
+            "annual": 445.0
           }
         }
       },
@@ -196,16 +196,16 @@
         "prioritySupport": false,
         "prices": {
           "under180km": {
-            "monthly": 45.00,
-            "quarterly": 185.00,
-            "semiannual": 270.00,
-            "annual": 495.00
+            "monthly": 45.0,
+            "quarterly": 185.0,
+            "semiannual": 270.0,
+            "annual": 495.0
           },
           "over180km": {
-            "monthly": 50.00,
-            "quarterly": 205.00,
-            "semiannual": 300.00,
-            "annual": 555.00
+            "monthly": 50.0,
+            "quarterly": 205.0,
+            "semiannual": 300.0,
+            "annual": 555.0
           }
         }
       },
@@ -221,16 +221,16 @@
         "prioritySupport": false,
         "prices": {
           "under180km": {
-            "monthly": 50.00,
-            "quarterly": 205.00,
-            "semiannual": 295.00,
-            "annual": 550.00
+            "monthly": 50.0,
+            "quarterly": 205.0,
+            "semiannual": 295.0,
+            "annual": 550.0
           },
           "over180km": {
-            "monthly": 55.00,
-            "quarterly": 225.00,
-            "semiannual": 325.00,
-            "annual": 610.00
+            "monthly": 55.0,
+            "quarterly": 225.0,
+            "semiannual": 325.0,
+            "annual": 610.0
           }
         }
       },
@@ -246,16 +246,16 @@
         "prioritySupport": false,
         "prices": {
           "under180km": {
-            "monthly": 55.00,
-            "quarterly": 220.00,
-            "semiannual": 325.00,
-            "annual": 605.00
+            "monthly": 55.0,
+            "quarterly": 220.0,
+            "semiannual": 325.0,
+            "annual": 605.0
           },
           "over180km": {
-            "monthly": 60.00,
-            "quarterly": 240.00,
-            "semiannual": 355.00,
-            "annual": 665.00
+            "monthly": 60.0,
+            "quarterly": 240.0,
+            "semiannual": 355.0,
+            "annual": 665.0
           }
         }
       },
@@ -271,16 +271,16 @@
         "prioritySupport": false,
         "prices": {
           "under180km": {
-            "monthly": 65.00,
-            "quarterly": 260.00,
-            "semiannual": 380.00,
-            "annual": 715.00
+            "monthly": 65.0,
+            "quarterly": 260.0,
+            "semiannual": 380.0,
+            "annual": 715.0
           },
           "over180km": {
-            "monthly": 70.00,
-            "quarterly": 280.00,
-            "semiannual": 410.00,
-            "annual": 775.00
+            "monthly": 70.0,
+            "quarterly": 280.0,
+            "semiannual": 410.0,
+            "annual": 775.0
           }
         }
       }

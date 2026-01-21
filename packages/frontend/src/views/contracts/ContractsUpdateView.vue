@@ -24,13 +24,23 @@
         :readonly="true"
         :has-error="!!error"
         :selected-client="selectedClient"
-        @update:model-value="(value) => updateFieldValue('clientId', value)"
+        @update:model-value="value => updateFieldValue('clientId', value)"
         @client-selected="handleClientSelected"
       />
       <p v-if="error" class="form-error text-red-600 text-sm mt-1">{{ error }}</p>
       <p class="form-help text-xs text-gray-500 mt-1">
-        <svg class="w-4 h-4 text-gray-400 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+        <svg
+          class="w-4 h-4 text-gray-400 inline mr-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+          />
         </svg>
         O cliente não pode ser alterado durante a edição do contrato.
       </p>
@@ -47,7 +57,7 @@
               <span>O cliente pode ter um ou ambos os tipos de contrato (CPA e/ou S&H)</span>
             </div>
           </div>
-          
+
           <!-- CPA Contract Type Section -->
           <div class="contract-type-section">
             <!-- CPA Display Toggle -->
@@ -56,7 +66,7 @@
               :is-active="showCPASection"
               @toggle="handleCPADisplayToggle"
             />
-            
+
             <!-- CPA Configuration (appears directly below CPA toggle when enabled) -->
             <Transition name="section-slide" mode="out-in">
               <CPAContractSection
@@ -71,7 +81,7 @@
               />
             </Transition>
           </div>
-          
+
           <!-- S&H Contract Type Section -->
           <div class="contract-type-section">
             <!-- S&H Display Toggle -->
@@ -80,7 +90,7 @@
               :is-active="showSHSection"
               @toggle="handleSHDisplayToggle"
             />
-            
+
             <!-- S&H Configuration (appears directly below S&H toggle when enabled) -->
             <Transition name="section-slide" mode="out-in">
               <SHContractSection
@@ -103,11 +113,11 @@
     <template #field-metodoPagamento="{ formData, error, updateFieldValue }">
       <div class="form-field">
         <label class="form-label required">Método de Pagamento</label>
-        <select 
+        <select
           :value="formData?.metodoPagamento || ''"
-          @change="(e) => updateFieldValue('metodoPagamento', (e.target as HTMLSelectElement).value)"
+          @change="e => updateFieldValue('metodoPagamento', (e.target as HTMLSelectElement).value)"
           class="form-select"
-          :class="{ 'error': !!error }"
+          :class="{ error: !!error }"
         >
           <option value="">Selecione o método...</option>
           <option value="TRANSFERENCIA_BANCARIA">Transferência Bancária</option>
@@ -129,17 +139,26 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, onBeforeUnmount, shallowRef, markRaw } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import type { Contract, ContractUpdateData, ContractEquipment, Client, ContentWithRelations } from '@clever/shared';
+import type {
+  Contract,
+  ContractUpdateData,
+  ContractEquipment,
+  Client,
+  ContentWithRelations,
+} from '@clever/shared';
 
 interface SHEquipment {
-  id: string
-  modelo: string
-  numeroSerie: string
-  software: string
-  observacoes: string
+  id: string;
+  modelo: string;
+  numeroSerie: string;
+  software: string;
+  observacoes: string;
 }
 
-import { validateContractUpdate as validateContractUpdateShared, sanitizeContractData } from '@clever/shared';
+import {
+  validateContractUpdate as validateContractUpdateShared,
+  sanitizeContractData,
+} from '@clever/shared';
 import ContentFormTemplate from '@/components/common/ContentFormTemplate.vue';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
 import DisplayToggleSwitch from '@/components/contracts/DisplayToggleSwitch.vue';
@@ -156,11 +175,11 @@ const modifiedFormSections = computed(() => {
       if (field.key === 'clientId') {
         return {
           ...field,
-          readonly: true
+          readonly: true,
         };
       }
       return field;
-    })
+    }),
   }));
 });
 import { useApi } from '@/composables/useApi';
@@ -217,11 +236,11 @@ const selectedCPAPlanDetails = computed(() => {
   if (!formData.value?.planIdCPA || !formData.value?.cpaContractType) {
     return null;
   }
-  
+
   try {
     const contractType = formData.value.cpaContractType as ContractType;
     const planDetails = getPlanDetails(contractType, formData.value.planIdCPA);
-    
+
     return planDetails;
   } catch (error) {
     console.error('Error getting CPA plan details:', JSON.stringify(error, null, 2));
@@ -233,10 +252,10 @@ const selectedSHPlanDetails = computed(() => {
   if (!formData.value?.planIdSH) {
     return null;
   }
-  
+
   try {
     const planDetails = getPlanDetails('S&H', formData.value.planIdSH);
-    
+
     return planDetails;
   } catch (error) {
     console.error('Error getting S&H plan details:', JSON.stringify(error, null, 2));
@@ -252,26 +271,26 @@ const debouncedUpdateField = createDebounced((field: string, value: any) => {
 // Optimized plan loading functions with proper error handling and caching
 const loadCPAPlanDetails = async (planId: string, contractType: string) => {
   if (!planId || !contractType) return null;
-  
+
   const cacheKey = `${contractType}-${planId}`;
-  
+
   // Return cached result if available
   if (planDetailsCache.has(cacheKey)) {
     return planDetailsCache.get(cacheKey);
   }
-  
+
   try {
     isLoadingCPAPlan.value = true;
-    
+
     // Simulate async loading with shorter delay for better UX
     await new Promise(resolve => setTimeout(resolve, 200));
-    
+
     const planDetails = getPlanDetails(contractType as ContractType, planId);
-    
+
     if (planDetails) {
       planDetailsCache.set(cacheKey, markRaw(planDetails));
     }
-    
+
     return planDetails;
   } catch (error) {
     console.error('Error loading CPA plan details:', JSON.stringify(error, null, 2));
@@ -283,26 +302,26 @@ const loadCPAPlanDetails = async (planId: string, contractType: string) => {
 
 const loadSHPlanDetails = async (planId: string) => {
   if (!planId) return null;
-  
+
   const cacheKey = `SH-${planId}`;
-  
+
   // Return cached result if available
   if (planDetailsCache.has(cacheKey)) {
     return planDetailsCache.get(cacheKey);
   }
-  
+
   try {
     isLoadingSHPlan.value = true;
-    
+
     // Simulate async loading with shorter delay for better UX
     await new Promise(resolve => setTimeout(resolve, 200));
-    
+
     const planDetails = getPlanDetails('S&H', planId);
-    
+
     if (planDetails) {
       planDetailsCache.set(cacheKey, markRaw(planDetails));
     }
-    
+
     return planDetails;
   } catch (error) {
     console.error('Error loading S&H plan details:', JSON.stringify(error, null, 2));
@@ -326,7 +345,7 @@ const handleClientSelected = (client: Client | null) => {
 // Display toggle handlers - both sections can be active simultaneously
 const handleCPADisplayToggle = (active: boolean) => {
   showCPASection.value = active;
-  
+
   if (active) {
     // Initialize CPA data if it doesn't exist
     if (formData.value && !formData.value.hasCPAContract) {
@@ -345,7 +364,7 @@ const handleCPADisplayToggle = (active: boolean) => {
 
 const handleSHDisplayToggle = (active: boolean) => {
   showSHSection.value = active;
-  
+
   if (active) {
     // Initialize S&H data if it doesn't exist
     if (formData.value && !formData.value.hasSHContract) {
@@ -366,10 +385,15 @@ const handleSHDisplayToggle = (active: boolean) => {
 const clearCPAValidationErrors = () => {
   // Clear CPA-specific errors from the error state if they exist
   const fieldsToClean = [
-    'cpaContractType', 'planIdCPA', 'distanceCPA', 'modalidadePagamentoCPA',
-    'inicioContratoCPA', 'fimContratoCPA', 'cpaEquipments'
+    'cpaContractType',
+    'planIdCPA',
+    'distanceCPA',
+    'modalidadePagamentoCPA',
+    'inicioContratoCPA',
+    'fimContratoCPA',
+    'cpaEquipments',
   ];
-  
+
   fieldsToClean.forEach(field => {
     if (error.value && error.value.includes(field)) {
       // This is a simple approach - in a more complex app you'd have structured error handling
@@ -380,10 +404,14 @@ const clearCPAValidationErrors = () => {
 const clearSHValidationErrors = () => {
   // Clear S&H-specific errors from the error state if they exist
   const fieldsToClean = [
-    'planIdSH', 'distanceSH', 'modalidadePagamentoSH',
-    'inicioContratoSH', 'fimContratoSH', 'shEquipments'
+    'planIdSH',
+    'distanceSH',
+    'modalidadePagamentoSH',
+    'inicioContratoSH',
+    'fimContratoSH',
+    'shEquipments',
   ];
-  
+
   fieldsToClean.forEach(field => {
     if (error.value && error.value.includes(field)) {
       // This is a simple approach - in a more complex app you'd have structured error handling
@@ -395,30 +423,30 @@ const clearSHValidationErrors = () => {
 const initializeCPAData = () => {
   // Only initialize if formData is available
   if (!formData.value) return;
-  
+
   // Initialize CPA-specific fields with default values if they don't exist
   if (!formData.value.cpaContractType) {
-    updateFieldValue('cpaContractType', '')
+    updateFieldValue('cpaContractType', '');
   }
   if (!formData.value.planIdCPA) {
-    updateFieldValue('planIdCPA', '')
+    updateFieldValue('planIdCPA', '');
   }
   if (!formData.value.distanceCPA) {
-    updateFieldValue('distanceCPA', '')
+    updateFieldValue('distanceCPA', '');
   }
   if (!formData.value.modalidadePagamentoCPA) {
-    updateFieldValue('modalidadePagamentoCPA', '')
+    updateFieldValue('modalidadePagamentoCPA', '');
   }
   if (!formData.value.inicioContratoCPA) {
-    updateFieldValue('inicioContratoCPA', '')
+    updateFieldValue('inicioContratoCPA', '');
   }
   if (!formData.value.fimContratoCPA) {
-    updateFieldValue('fimContratoCPA', '')
+    updateFieldValue('fimContratoCPA', '');
   }
   if (formData.value.hasPOSPackage === undefined) {
-    updateFieldValue('hasPOSPackage', false)
+    updateFieldValue('hasPOSPackage', false);
   }
-  
+
   // Initialize equipment array if empty
   if (cpaEquipments.value.length === 0) {
     const newEquipment: ContractEquipment = {
@@ -426,33 +454,33 @@ const initializeCPAData = () => {
       modelo: '',
       numeroSerie: '',
       desconto: 0, // First equipment has 0% discount
-      observacoes: ''
+      observacoes: '',
     };
     cpaEquipments.value.push(newEquipment);
   }
-}
+};
 
 const initializeSHData = () => {
   // Only initialize if formData is available
   if (!formData.value) return;
-  
+
   // Initialize S&H-specific fields with default values if they don't exist
   if (!formData.value.planIdSH) {
-    updateFieldValue('planIdSH', '')
+    updateFieldValue('planIdSH', '');
   }
   if (!formData.value.distanceSH) {
-    updateFieldValue('distanceSH', '')
+    updateFieldValue('distanceSH', '');
   }
   if (!formData.value.modalidadePagamentoSH) {
-    updateFieldValue('modalidadePagamentoSH', '')
+    updateFieldValue('modalidadePagamentoSH', '');
   }
   if (!formData.value.inicioContratoSH) {
-    updateFieldValue('inicioContratoSH', '')
+    updateFieldValue('inicioContratoSH', '');
   }
   if (!formData.value.fimContratoSH) {
-    updateFieldValue('fimContratoSH', '')
+    updateFieldValue('fimContratoSH', '');
   }
-  
+
   // Initialize S&H equipment array if empty
   if (shEquipments.value.length === 0) {
     const newEquipment: SHEquipment = {
@@ -460,17 +488,22 @@ const initializeSHData = () => {
       modelo: '',
       numeroSerie: '',
       software: '',
-      observacoes: ''
+      observacoes: '',
     };
     shEquipments.value.push(newEquipment);
   }
-}
+};
 
 // Note: Equipment watchers are handled below with proper cleanup
 
 // Helper functions for client relation handling
 const isClientError = (clientRelation: any): boolean => {
-  return clientRelation && typeof clientRelation === 'object' && 'type' in clientRelation && clientRelation.type === 'error';
+  return (
+    clientRelation &&
+    typeof clientRelation === 'object' &&
+    'type' in clientRelation &&
+    clientRelation.type === 'error'
+  );
 };
 
 const isResolvedClient = (clientRelation: any): boolean => {
@@ -487,19 +520,19 @@ const getClientErrorMessage = (clientRelation: any): string => {
 // Plan selection handlers with loading states
 const handleCPAPlanSelection = async (planId: string) => {
   updateFieldValue('planIdCPA', planId);
-  
+
   if (planId && formData.value?.cpaContractType) {
     await loadCPAPlanDetails(planId, formData.value.cpaContractType);
-    
+
     // Auto-populate service details from plan data
     const planDetails = getPlanDetails(formData.value.cpaContractType as ContractType, planId);
-    
+
     if (planDetails) {
       // Set maintenance per year (CPA plans have this field)
       if (planDetails.maintenancePerYear !== undefined) {
         updateFieldValue('manutencoesPorAnoCPA', planDetails.maintenancePerYear);
       }
-      
+
       // Set displacements per year (try to extract number from callouts if it's a number)
       if (planDetails.callouts !== undefined) {
         if (typeof planDetails.callouts === 'number') {
@@ -512,8 +545,10 @@ const handleCPAPlanSelection = async (planId: string) => {
             updateFieldValue('deslocacoesPorAnoCPA', value);
           } else {
             // If no number found, check if it's unlimited (contains "sem limite" or "unlimited")
-            if (planDetails.callouts.toLowerCase().includes('sem limite') || 
-                planDetails.callouts.toLowerCase().includes('unlimited')) {
+            if (
+              planDetails.callouts.toLowerCase().includes('sem limite') ||
+              planDetails.callouts.toLowerCase().includes('unlimited')
+            ) {
               updateFieldValue('deslocacoesPorAnoCPA', -1); // -1 represents unlimited
             } else {
               updateFieldValue('deslocacoesPorAnoCPA', 0);
@@ -521,7 +556,7 @@ const handleCPAPlanSelection = async (planId: string) => {
           }
         }
       }
-      
+
       // CPA plans don't typically have hours, so set to 0
       updateFieldValue('horasAssistenciaAnualCPA', 0);
     }
@@ -530,19 +565,19 @@ const handleCPAPlanSelection = async (planId: string) => {
 
 const handleSHPlanSelection = async (planId: string) => {
   updateFieldValue('planIdSH', planId);
-  
+
   if (planId) {
     await loadSHPlanDetails(planId);
-    
+
     // Auto-populate service details from plan data
     const planDetails = getPlanDetails('S&H', planId);
-    
+
     if (planDetails) {
       // Set hours per year (S&H plans have this field)
       if (planDetails.hoursPerYear !== undefined) {
         updateFieldValue('horasAssistenciaAnualSH', planDetails.hoursPerYear);
       }
-      
+
       // Set displacements per year (S&H plans have displacementsIncluded)
       if (planDetails.displacementsIncluded !== undefined) {
         if (typeof planDetails.displacementsIncluded === 'number') {
@@ -555,8 +590,10 @@ const handleSHPlanSelection = async (planId: string) => {
             updateFieldValue('deslocacoesPorAnoSH', value);
           } else {
             // If no number found, check if it's unlimited (contains "sem limite" or "unlimited")
-            if (planDetails.displacementsIncluded.toLowerCase().includes('sem limite') || 
-                planDetails.displacementsIncluded.toLowerCase().includes('unlimited')) {
+            if (
+              planDetails.displacementsIncluded.toLowerCase().includes('sem limite') ||
+              planDetails.displacementsIncluded.toLowerCase().includes('unlimited')
+            ) {
               updateFieldValue('deslocacoesPorAnoSH', -1); // -1 represents unlimited
             } else {
               updateFieldValue('deslocacoesPorAnoSH', 0);
@@ -564,7 +601,7 @@ const handleSHPlanSelection = async (planId: string) => {
           }
         }
       }
-      
+
       // S&H plans don't typically have maintenance, so set to 0
       updateFieldValue('manutencoesPorAnoSH', 0);
     }
@@ -572,51 +609,59 @@ const handleSHPlanSelection = async (planId: string) => {
 };
 
 // Equipment update handler for the new system
-const handleEquipmentUpdate = (data: { action: string, index?: number, equipment?: ContractEquipment }) => {
+const handleEquipmentUpdate = (data: {
+  action: string;
+  index?: number;
+  equipment?: ContractEquipment;
+}) => {
   switch (data.action) {
     case 'add':
       if (data.equipment) {
-        cpaEquipments.value.push(data.equipment)
+        cpaEquipments.value.push(data.equipment);
       }
-      break
+      break;
     case 'update':
       if (data.index !== undefined && data.equipment) {
-        cpaEquipments.value[data.index] = data.equipment
+        cpaEquipments.value[data.index] = data.equipment;
       }
-      break
+      break;
     case 'remove':
       if (data.index !== undefined) {
-        cpaEquipments.value.splice(data.index, 1)
+        cpaEquipments.value.splice(data.index, 1);
       }
-      break
+      break;
   }
-}
+};
 
 // S&H equipment update handler
-const handleSHEquipmentUpdate = (data: { action: string, index?: number, equipment?: SHEquipment }) => {
+const handleSHEquipmentUpdate = (data: {
+  action: string;
+  index?: number;
+  equipment?: SHEquipment;
+}) => {
   switch (data.action) {
     case 'add':
       if (data.equipment) {
-        shEquipments.value.push(data.equipment)
+        shEquipments.value.push(data.equipment);
       }
-      break
+      break;
     case 'update':
       if (data.index !== undefined && data.equipment) {
-        shEquipments.value[data.index] = data.equipment
+        shEquipments.value[data.index] = data.equipment;
       }
-      break
+      break;
     case 'remove':
       if (data.index !== undefined) {
-        shEquipments.value.splice(data.index, 1)
+        shEquipments.value.splice(data.index, 1);
       }
-      break
+      break;
   }
-}
+};
 
 // Watch for CPA contract type changes to reload plan details with debouncing
 const stopCPAContractTypeWatcher = watch(
   () => formData.value?.cpaContractType,
-  async (newContractType) => {
+  async newContractType => {
     if (newContractType && formData.value?.planIdCPA) {
       await loadCPAPlanDetails(formData.value.planIdCPA, newContractType);
     }
@@ -631,7 +676,7 @@ const stopCPAPlanWatcher = watch(
     // Clear POS package if not CPA_1500 PREMIUM
     if (contractType !== 'CPA_1500' || planId !== 'cpa_1500_premium') {
       if (formData.value?.hasPOSPackage) {
-        updateFieldValue('hasPOSPackage', false)
+        updateFieldValue('hasPOSPackage', false);
       }
     }
   }
@@ -641,7 +686,7 @@ cleanupFunctions.push(stopCPAPlanWatcher);
 // Watch for CPA equipment changes and update form data immediately
 const stopCPAEquipmentWatcher = watch(
   cpaEquipments,
-  (newEquipments) => {
+  newEquipments => {
     // Update immediately without debouncing for form submission
     if (formData.value) {
       updateFieldValue('cpaEquipments', newEquipments);
@@ -654,7 +699,7 @@ cleanupFunctions.push(stopCPAEquipmentWatcher);
 // Watch for S&H equipment changes and update form data immediately
 const stopSHEquipmentWatcher = watch(
   shEquipments,
-  (newEquipments) => {
+  newEquipments => {
     // Update immediately without debouncing for form submission
     if (formData.value) {
       updateFieldValue('shEquipments', newEquipments);
@@ -667,7 +712,7 @@ cleanupFunctions.push(stopSHEquipmentWatcher);
 // Watch for form data changes to initialize equipment array
 const stopCPAInitWatcher = watch(
   () => formData.value?.hasCPAContract,
-  (hasCPA) => {
+  hasCPA => {
     if (hasCPA && cpaEquipments.value.length === 0) {
       // Initialize with one empty equipment when CPA is enabled
       const newEquipment: ContractEquipment = {
@@ -675,7 +720,7 @@ const stopCPAInitWatcher = watch(
         modelo: '',
         numeroSerie: '',
         desconto: 0, // First equipment has 0% discount
-        observacoes: ''
+        observacoes: '',
       };
       cpaEquipments.value.push(newEquipment);
     }
@@ -686,7 +731,7 @@ cleanupFunctions.push(stopCPAInitWatcher);
 // Watch for S&H form data changes to initialize equipment array
 const stopSHInitWatcher = watch(
   () => formData.value?.hasSHContract,
-  (hasSH) => {
+  hasSH => {
     if (hasSH && shEquipments.value.length === 0) {
       // Initialize with one empty equipment when S&H is enabled
       const newEquipment: SHEquipment = {
@@ -694,7 +739,7 @@ const stopSHInitWatcher = watch(
         modelo: '',
         numeroSerie: '',
         software: '',
-        observacoes: ''
+        observacoes: '',
       };
       shEquipments.value.push(newEquipment);
     }
@@ -703,32 +748,26 @@ const stopSHInitWatcher = watch(
 cleanupFunctions.push(stopSHInitWatcher);
 
 // Watch for display section changes and persist to form data
-const stopCPADisplayWatcher = watch(
-  showCPASection,
-  (showCPA) => {
-    if (formData.value) {
-      updateFieldValue('showCPASection', showCPA)
-    }
+const stopCPADisplayWatcher = watch(showCPASection, showCPA => {
+  if (formData.value) {
+    updateFieldValue('showCPASection', showCPA);
   }
-);
+});
 cleanupFunctions.push(stopCPADisplayWatcher);
 
-const stopSHDisplayWatcher = watch(
-  showSHSection,
-  (showSH) => {
-    if (formData.value) {
-      updateFieldValue('showSHSection', showSH)
-    }
+const stopSHDisplayWatcher = watch(showSHSection, showSH => {
+  if (formData.value) {
+    updateFieldValue('showSHSection', showSH);
   }
-);
+});
 cleanupFunctions.push(stopSHDisplayWatcher);
 
 // Watch for form data changes to restore display section state
 const stopCPADisplayRestoreWatcher = watch(
   () => formData.value?.showCPASection,
-  (savedShowCPA) => {
+  savedShowCPA => {
     if (savedShowCPA !== undefined && savedShowCPA !== showCPASection.value) {
-      showCPASection.value = savedShowCPA
+      showCPASection.value = savedShowCPA;
     }
   },
   { immediate: true }
@@ -737,9 +776,9 @@ cleanupFunctions.push(stopCPADisplayRestoreWatcher);
 
 const stopSHDisplayRestoreWatcher = watch(
   () => formData.value?.showSHSection,
-  (savedShowSH) => {
+  savedShowSH => {
     if (savedShowSH !== undefined && savedShowSH !== showSHSection.value) {
-      showSHSection.value = savedShowSH
+      showSHSection.value = savedShowSH;
     }
   },
   { immediate: true }
@@ -752,12 +791,12 @@ const stopDisplaySectionMatchWatcher = watch(
   ([hasCPA, hasSH]) => {
     // Auto-show sections when contracts are configured
     if (hasCPA && !showCPASection.value) {
-      showCPASection.value = true
+      showCPASection.value = true;
     }
     if (hasSH && !showSHSection.value) {
-      showSHSection.value = true
+      showSHSection.value = true;
     }
-    
+
     // Auto-hide sections when contracts are not configured (optional)
     // For now, we'll allow users to manually control display
   },
@@ -769,7 +808,7 @@ cleanupFunctions.push(stopDisplaySectionMatchWatcher);
 onBeforeUnmount(() => {
   // Clear plan details cache
   planDetailsCache.clear();
-  
+
   // Run all cleanup functions
   cleanupFunctions.forEach(cleanup => cleanup());
   cleanupFunctions.length = 0;
@@ -778,40 +817,40 @@ onBeforeUnmount(() => {
 // Contract validation function for updates - updated for display toggle system
 const validateContractUpdate = (data: Record<string, any>): Record<string, string> => {
   const errors: Record<string, string> = {};
-  
+
   try {
     // Contract type validation - at least one must be configured
     const hasCPA = data.hasCPAContract;
     const hasSH = data.hasSHContract;
-    
+
     if (!hasCPA && !hasSH) {
       errors.contractTypes = 'Por favor, mantenha pelo menos um tipo de contrato (CPA ou S&H)';
     }
-    
+
     // Payment method validation (required if any contract is configured)
     if ((hasCPA || hasSH) && !data.metodoPagamento) {
       errors.metodoPagamento = 'Por favor, selecione um método de pagamento';
     }
-    
+
     // CPA-specific validation (if CPA is configured)
     if (hasCPA) {
       if (!data.cpaContractType) {
         errors.cpaContractType = 'Por favor, selecione o tipo de contrato CPA';
       }
-      
+
       if (!data.planIdCPA) {
         errors.planIdCPA = 'Por favor, selecione um plano CPA';
       }
-      
+
       // Distance is only required for CPA (2023), not CPA_1500
       if (data.cpaContractType === 'CPA' && !data.distanceCPA) {
         errors.distanceCPA = 'Por favor, selecione a distância para contratos CPA (2023)';
       }
-      
+
       if (!data.modalidadePagamentoCPA) {
         errors.modalidadePagamentoCPA = 'Por favor, selecione a modalidade de pagamento CPA';
       }
-      
+
       // Validate CPA equipment from form data
       const cpaEquipmentsData = data.cpaEquipments || cpaEquipments.value;
       if (!cpaEquipmentsData || cpaEquipmentsData.length === 0) {
@@ -820,30 +859,38 @@ const validateContractUpdate = (data: Record<string, any>): Record<string, strin
         // Validate each equipment
         cpaEquipmentsData.forEach((equipment: any, index: number) => {
           if (!equipment.modelo?.trim()) {
-            errors[`cpaEquipment${index}Model`] = `Por favor, introduza o modelo do equipamento ${index + 1}`;
+            errors[`cpaEquipment${index}Model`] =
+              `Por favor, introduza o modelo do equipamento ${index + 1}`;
           }
-          
+
           // First equipment should have 0% discount
           if (index === 0 && equipment.desconto !== 0) {
-            errors[`cpaEquipment${index}Discount`] = 'O primeiro equipamento não deve ter desconto aplicado';
+            errors[`cpaEquipment${index}Discount`] =
+              'O primeiro equipamento não deve ter desconto aplicado';
           }
-          
+
           // Discount validation for additional equipment
-          if (index > 0 && (typeof equipment.desconto !== 'number' || equipment.desconto < 0 || equipment.desconto > 100)) {
-            errors[`cpaEquipment${index}Discount`] = `O desconto do equipamento ${index + 1} deve estar entre 0 e 100%`;
+          if (
+            index > 0 &&
+            (typeof equipment.desconto !== 'number' ||
+              equipment.desconto < 0 ||
+              equipment.desconto > 100)
+          ) {
+            errors[`cpaEquipment${index}Discount`] =
+              `O desconto do equipamento ${index + 1} deve estar entre 0 e 100%`;
           }
         });
       }
-      
+
       // Validate contract dates
       if (!data.inicioContratoCPA) {
         errors.inicioContratoCPA = 'Por favor, selecione a data de início do contrato CPA';
       }
-      
+
       if (!data.fimContratoCPA) {
         errors.fimContratoCPA = 'Por favor, selecione a data de fim do contrato CPA';
       }
-      
+
       // Date range validation
       if (data.inicioContratoCPA && data.fimContratoCPA) {
         const startDate = new Date(data.inicioContratoCPA);
@@ -853,21 +900,21 @@ const validateContractUpdate = (data: Record<string, any>): Record<string, strin
         }
       }
     }
-    
+
     // S&H-specific validation (if S&H is configured)
     if (hasSH) {
       if (!data.planIdSH) {
         errors.planIdSH = 'Por favor, selecione um plano S&H';
       }
-      
+
       if (!data.distanceSH) {
         errors.distanceSH = 'Por favor, selecione a distância para o contrato S&H';
       }
-      
+
       if (!data.modalidadePagamentoSH) {
         errors.modalidadePagamentoSH = 'Por favor, selecione a modalidade de pagamento S&H';
       }
-      
+
       // Validate S&H equipment from form data
       const shEquipmentsData = data.shEquipments || shEquipments.value;
       if (!shEquipmentsData || shEquipmentsData.length === 0) {
@@ -876,20 +923,21 @@ const validateContractUpdate = (data: Record<string, any>): Record<string, strin
         // Validate each S&H equipment
         shEquipmentsData.forEach((equipment: any, index: number) => {
           if (!equipment.modelo?.trim()) {
-            errors[`shEquipment${index}Model`] = `Por favor, introduza o modelo do equipamento S&H ${index + 1}`;
+            errors[`shEquipment${index}Model`] =
+              `Por favor, introduza o modelo do equipamento S&H ${index + 1}`;
           }
         });
       }
-      
+
       // Validate contract dates
       if (!data.inicioContratoSH) {
         errors.inicioContratoSH = 'Por favor, selecione a data de início do contrato S&H';
       }
-      
+
       if (!data.fimContratoSH) {
         errors.fimContratoSH = 'Por favor, selecione a data de fim do contrato S&H';
       }
-      
+
       // Date range validation
       if (data.inicioContratoSH && data.fimContratoSH) {
         const startDate = new Date(data.inicioContratoSH);
@@ -899,12 +947,11 @@ const validateContractUpdate = (data: Record<string, any>): Record<string, strin
         }
       }
     }
-    
   } catch (err) {
     console.error('Contract validation error:', err);
     errors.general = 'Erro na validação do contrato';
   }
-  
+
   return errors;
 };
 
@@ -919,11 +966,11 @@ const handleUpdate = async (data: Record<string, any>) => {
   try {
     isSaving.value = true;
     clearError();
-    
+
     // Use formData.value instead of data parameter to get the most up-to-date values
     // including those set by plan selection handlers
     const currentFormData = formData.value || {};
-    
+
     // Prepare the contract update data with equipment and client ID
     const contractUpdateData: Partial<Contract['data']> = {
       // Always include the client ID (read-only field)
@@ -933,40 +980,45 @@ const handleUpdate = async (data: Record<string, any>) => {
       cpaContractType: currentFormData.cpaContractType || data.cpaContractType || '',
       planIdCPA: currentFormData.planIdCPA || data.planIdCPA || '',
       distanceCPA: currentFormData.distanceCPA || data.distanceCPA || '',
-      modalidadePagamentoCPA: currentFormData.modalidadePagamentoCPA || data.modalidadePagamentoCPA || '',
+      modalidadePagamentoCPA:
+        currentFormData.modalidadePagamentoCPA || data.modalidadePagamentoCPA || '',
       hasPOSPackage: currentFormData.hasPOSPackage || data.hasPOSPackage || false,
       inicioContratoCPA: currentFormData.inicioContratoCPA || data.inicioContratoCPA || '',
       fimContratoCPA: currentFormData.fimContratoCPA || data.fimContratoCPA || '',
       // Use the values from formData which should have been set by plan selection handlers
-      horasAssistenciaAnualCPA: currentFormData.horasAssistenciaAnualCPA ?? data.horasAssistenciaAnualCPA ?? 0,
+      horasAssistenciaAnualCPA:
+        currentFormData.horasAssistenciaAnualCPA ?? data.horasAssistenciaAnualCPA ?? 0,
       deslocacoesPorAnoCPA: currentFormData.deslocacoesPorAnoCPA ?? data.deslocacoesPorAnoCPA ?? 0,
       manutencoesPorAnoCPA: currentFormData.manutencoesPorAnoCPA ?? data.manutencoesPorAnoCPA ?? 0,
       planIdSH: currentFormData.planIdSH || data.planIdSH || '',
       distanceSH: currentFormData.distanceSH || data.distanceSH || '',
-      modalidadePagamentoSH: currentFormData.modalidadePagamentoSH || data.modalidadePagamentoSH || '',
+      modalidadePagamentoSH:
+        currentFormData.modalidadePagamentoSH || data.modalidadePagamentoSH || '',
       inicioContratoSH: currentFormData.inicioContratoSH || data.inicioContratoSH || '',
       fimContratoSH: currentFormData.fimContratoSH || data.fimContratoSH || '',
       // Use the values from formData which should have been set by plan selection handlers
-      horasAssistenciaAnualSH: currentFormData.horasAssistenciaAnualSH ?? data.horasAssistenciaAnualSH ?? 0,
+      horasAssistenciaAnualSH:
+        currentFormData.horasAssistenciaAnualSH ?? data.horasAssistenciaAnualSH ?? 0,
       deslocacoesPorAnoSH: currentFormData.deslocacoesPorAnoSH ?? data.deslocacoesPorAnoSH ?? 0,
       manutencoesPorAnoSH: currentFormData.manutencoesPorAnoSH ?? data.manutencoesPorAnoSH ?? 0,
       metodoPagamento: currentFormData.metodoPagamento || data.metodoPagamento || '',
       // Use equipment data from form data instead of local arrays
       cpaEquipments: currentFormData.cpaEquipments || data.cpaEquipments || [],
-      shEquipments: currentFormData.shEquipments || data.shEquipments || []
+      shEquipments: currentFormData.shEquipments || data.shEquipments || [],
     };
-    
+
     const result = await api.update(uuid, { data: contractUpdateData } as any);
-    
+
     // Check if API returned an error
     if (api.error.value) {
       console.error('API returned error:', api.error.value);
-      error.value = typeof api.error.value === 'string' 
-        ? api.error.value 
-        : api.error.value.message || 'Erro ao atualizar contrato';
+      error.value =
+        typeof api.error.value === 'string'
+          ? api.error.value
+          : api.error.value.message || 'Erro ao atualizar contrato';
       return;
     }
-    
+
     if (result) {
       router.push(`/contracts/${uuid}`);
     } else {
@@ -996,15 +1048,15 @@ const loadContract = async () => {
   try {
     isLoading.value = true;
     clearError();
-    
+
     // Clear plan details cache when loading a new contract
     planDetailsCache.clear();
-    
+
     await api.fetchById(uuid);
-    
+
     if (api.currentItem.value) {
       contract.value = api.currentItem.value as ContentWithRelations<Contract['data']>;
-      
+
       // Set up initial data for the form
       const data = contract.value.data;
       const contractData = {
@@ -1029,24 +1081,24 @@ const loadContract = async () => {
         horasAssistenciaAnualSH: data.horasAssistenciaAnualSH || 0,
         deslocacoesPorAnoSH: data.deslocacoesPorAnoSH || 0,
         manutencoesPorAnoSH: data.manutencoesPorAnoSH || 0,
-        metodoPagamento: data.metodoPagamento || ''
+        metodoPagamento: data.metodoPagamento || '',
       };
-      
+
       // Set initial data for the template
       initialData.value = contractData;
-      
+
       // Clear and reinitialize form data to ensure proper reactivity
       if (formData.value) {
         Object.keys(formData.value).forEach(key => {
           delete formData.value[key];
         });
       }
-      
+
       // Use updateFieldValue to properly set each field in the shared form data
       Object.entries(contractData).forEach(([key, value]) => {
         updateFieldValue(key, value);
       });
-      
+
       // Set up equipment data
       if (data.cpaEquipments && data.cpaEquipments.length > 0) {
         cpaEquipments.value = [...data.cpaEquipments];
@@ -1055,7 +1107,7 @@ const loadContract = async () => {
         cpaEquipments.value = [];
         updateFieldValue('cpaEquipments', []);
       }
-      
+
       if (data.shEquipments && data.shEquipments.length > 0) {
         shEquipments.value = [...data.shEquipments];
         updateFieldValue('shEquipments', [...data.shEquipments]);
@@ -1063,18 +1115,18 @@ const loadContract = async () => {
         shEquipments.value = [];
         updateFieldValue('shEquipments', []);
       }
-      
+
       // Set up display toggle states based on existing contract configuration
       if (data.hasCPAContract) {
         showCPASection.value = true;
         updateFieldValue('showCPASection', true);
       }
-      
+
       if (data.hasSHContract) {
         showSHSection.value = true;
         updateFieldValue('showSHSection', true);
       }
-      
+
       // Set up client data from relations
       if (contract.value.relations?.client && isResolvedClient(contract.value.relations.client)) {
         selectedClient.value = contract.value.relations.client as Client;
@@ -1090,7 +1142,6 @@ const loadContract = async () => {
           console.error('Error loading client separately:', JSON.stringify(clientError, null, 2));
         }
       }
-      
     } else {
       throw new Error('Contrato não encontrado');
     }
@@ -1195,7 +1246,7 @@ onMounted(() => {
   .section-slide-leave-active {
     transition: opacity 0.2s ease;
   }
-  
+
   .section-slide-enter-from,
   .section-slide-leave-to {
     transform: none;

@@ -6,14 +6,14 @@
       <nav class="navbar">
         <div class="nav-container">
           <h1 class="nav-title">Clever</h1>
-          
+
           <!-- User controls for desktop -->
           <div class="user-controls desktop-only">
             <span class="user-welcome" v-if="user">
               Olá, {{ user.firstName || user.emailAddresses?.[0]?.emailAddress }}
             </span>
-            <button 
-              v-if="isAdmin" 
+            <button
+              v-if="isAdmin"
               @click="goToUserManagement"
               class="nav-link admin-link"
               title="Gestão de Utilizadores"
@@ -23,13 +23,17 @@
             </button>
             <UserButton />
           </div>
-          
-          <button class="mobile-menu-toggle" @click="toggleMobileMenu" :class="{ active: isMobileMenuOpen }">
+
+          <button
+            class="mobile-menu-toggle"
+            @click="toggleMobileMenu"
+            :class="{ active: isMobileMenuOpen }"
+          >
             <span></span>
             <span></span>
             <span></span>
           </button>
-          
+
           <div class="nav-links" :class="{ 'mobile-open': isMobileMenuOpen }">
             <router-link to="/" class="nav-link" @click="closeMobileMenu">
               <span class="nav-icon">🏠</span>
@@ -39,14 +43,10 @@
               <span class="nav-icon">📊</span>
               Dashboard
             </router-link>
-            
+
             <!-- Mobile user controls -->
             <div class="mobile-user-controls mobile-only">
-              <button 
-                v-if="isAdmin" 
-                @click="goToUserManagement"
-                class="nav-link admin-link"
-              >
+              <button v-if="isAdmin" @click="goToUserManagement" class="nav-link admin-link">
                 <span class="nav-icon">👥</span>
                 Gestão de Utilizadores
               </button>
@@ -58,7 +58,7 @@
         </div>
       </nav>
     </SignedIn>
-    
+
     <main class="main-content" :class="{ 'no-nav': !isSignedIn }">
       <router-view />
     </main>
@@ -66,37 +66,37 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { SignedIn, UserButton, useUser } from '@clerk/vue'
+import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { SignedIn, UserButton, useUser } from '@clerk/vue';
 
-const router = useRouter()
+const router = useRouter();
 
 // Clerk composables
-const { user, isSignedIn, isLoaded } = useUser()
+const { user, isSignedIn, isLoaded } = useUser();
 
 // Reactive state
-const isMobileMenuOpen = ref(false)
+const isMobileMenuOpen = ref(false);
 
 // Computed properties
 const isAdmin = computed(() => {
-  if (!isLoaded.value || !user.value) return false
-  return user.value.publicMetadata?.role === 'admin'
-})
+  if (!isLoaded.value || !user.value) return false;
+  return user.value.publicMetadata?.role === 'admin';
+});
 
 // Methods
 const toggleMobileMenu = () => {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value
-}
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+};
 
 const closeMobileMenu = () => {
-  isMobileMenuOpen.value = false
-}
+  isMobileMenuOpen.value = false;
+};
 
 const goToUserManagement = () => {
-  router.push('/admin/users')
-  closeMobileMenu()
-}
+  router.push('/admin/users');
+  closeMobileMenu();
+};
 </script>
 
 <style>
@@ -140,7 +140,7 @@ body {
   background-color: var(--primary-color);
   color: white;
   padding: 1rem 0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: relative;
   z-index: 1000;
 }
@@ -230,11 +230,11 @@ body {
   .nav-title {
     font-size: 1.1rem;
   }
-  
+
   .mobile-menu-toggle {
     display: flex;
   }
-  
+
   .nav-links {
     position: absolute;
     top: 100%;
@@ -250,13 +250,13 @@ body {
     transition: all 0.3s ease;
     padding: 0;
   }
-  
+
   .nav-links.mobile-open {
     transform: translateY(0);
     opacity: 1;
     visibility: visible;
   }
-  
+
   .nav-link {
     padding: 1rem 1.5rem;
     border-radius: 0;
@@ -264,11 +264,11 @@ body {
     justify-content: flex-start;
     font-size: 1rem;
   }
-  
+
   .nav-link:last-child {
     border-bottom: none;
   }
-  
+
   .main-content {
     padding: 1rem 0.75rem;
   }
@@ -279,11 +279,11 @@ body {
   .nav-container {
     padding: 0 0.75rem;
   }
-  
+
   .nav-title {
     font-size: 1rem;
   }
-  
+
   .main-content {
     padding: 0.75rem 0.5rem;
   }
@@ -340,19 +340,19 @@ body {
   .desktop-only {
     display: none;
   }
-  
+
   .mobile-only {
     display: block;
   }
-  
+
   .user-controls {
     order: 3;
   }
-  
+
   .mobile-menu-toggle {
     order: 2;
   }
-  
+
   .nav-title {
     order: 1;
   }
@@ -365,4 +365,4 @@ body {
     padding: 0.75rem 1rem;
   }
 }
-</style> 
+</style>

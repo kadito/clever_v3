@@ -1,24 +1,26 @@
 <template>
   <div class="year-selector">
     <div class="dropdown-wrapper">
-      <select 
-        :value="modelValue" 
+      <select
+        :value="modelValue"
         @change="handleChange"
         class="year-dropdown"
         :class="{ 'has-all-option': showAllOption }"
       >
         <option v-if="showAllOption" value="">Todos os anos</option>
-        <option 
-          v-for="year in years" 
-          :key="year" 
-          :value="year"
-        >
+        <option v-for="year in years" :key="year" :value="year">
           {{ year }}
         </option>
       </select>
       <div class="dropdown-icon">
         <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
-          <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path
+            d="M1 1.5L6 6.5L11 1.5"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
       </div>
     </div>
@@ -26,37 +28,37 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue'
+import { defineProps, defineEmits } from 'vue';
 
 // Props
 const props = defineProps({
   modelValue: {
     type: [String, Number],
-    default: ''
+    default: '',
   },
   years: {
     type: Array,
-    default: () => []
+    default: () => [],
   },
   showAllOption: {
     type: Boolean,
-    default: false
+    default: false,
   },
   placeholder: {
     type: String,
-    default: 'Selecionar ano'
-  }
-})
+    default: 'Selecionar ano',
+  },
+});
 
 // Emits
-const emit = defineEmits(['update:modelValue', 'change'])
+const emit = defineEmits(['update:modelValue', 'change']);
 
 // Methods
-const handleChange = (event) => {
-  const value = event.target.value
-  emit('update:modelValue', value)
-  emit('change', value)
-}
+const handleChange = event => {
+  const value = event.target.value;
+  emit('update:modelValue', value);
+  emit('change', value);
+};
 </script>
 
 <style scoped>
@@ -170,7 +172,7 @@ const handleChange = (event) => {
     -webkit-appearance: none;
     -moz-appearance: none;
   }
-  
+
   .dropdown-icon {
     display: block;
   }
@@ -187,14 +189,14 @@ const handleChange = (event) => {
     z-index: 1;
     isolation: isolate;
   }
-  
+
   .dropdown-wrapper {
     width: 100%;
     /* Ensure wrapper creates proper stacking context */
     position: relative;
     transform: translateZ(0); /* Force hardware acceleration */
   }
-  
+
   .year-dropdown {
     padding: 0.65rem 2.25rem 0.65rem 0.875rem;
     font-size: 0.85rem;
@@ -213,7 +215,7 @@ const handleChange = (event) => {
     width: 100%;
     box-sizing: border-box;
   }
-  
+
   .year-dropdown option {
     padding: 0.75rem 1rem;
     font-size: 0.85rem;
@@ -224,7 +226,7 @@ const handleChange = (event) => {
     font-family: inherit;
     line-height: 1.4;
   }
-  
+
   .dropdown-icon {
     /* Hide custom icon on mobile */
     display: none;
@@ -241,14 +243,14 @@ const handleChange = (event) => {
     z-index: 1;
     isolation: isolate;
   }
-  
+
   .dropdown-wrapper {
     width: 100%;
     /* Force proper stacking context */
     position: relative;
     transform: translateZ(0);
   }
-  
+
   .year-dropdown {
     padding: 0.6rem 2rem 0.6rem 0.75rem;
     font-size: 0.8rem;
@@ -266,7 +268,7 @@ const handleChange = (event) => {
     width: 100%;
     box-sizing: border-box;
   }
-  
+
   .year-dropdown option {
     padding: 0.75rem 0.75rem;
     font-size: 0.8rem;
@@ -276,7 +278,7 @@ const handleChange = (event) => {
     line-height: 1.5;
     font-family: inherit;
   }
-  
+
   .dropdown-icon {
     /* Hide custom icon on mobile */
     display: none;
@@ -290,12 +292,12 @@ const handleChange = (event) => {
     color: white;
     border-color: #4a5568;
   }
-  
+
   .year-dropdown option {
     background: #2c3e50;
     color: white;
   }
-  
+
   .year-dropdown:hover {
     border-color: var(--primary-color);
   }
@@ -307,7 +309,7 @@ const handleChange = (event) => {
     border-width: 3px;
     border-color: #000;
   }
-  
+
   .year-dropdown:focus {
     border-color: #0066cc;
     box-shadow: 0 0 0 2px #0066cc;
@@ -320,7 +322,7 @@ const handleChange = (event) => {
   .dropdown-icon {
     transition: none;
   }
-  
+
   .year-dropdown:active {
     transform: none;
   }

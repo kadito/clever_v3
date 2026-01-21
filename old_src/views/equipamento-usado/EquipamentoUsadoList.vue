@@ -7,48 +7,48 @@
 
     <!-- Controls -->
     <div class="controls">
-      <YearSelector 
-        :years="availableYears" 
+      <YearSelector
+        :years="availableYears"
         :current-year="currentYear"
         @year-changed="handleYearChange"
       />
-      
+
       <div class="search-box">
-        <input 
-          type="text" 
+        <input
+          type="text"
           v-model="searchQuery"
           @input="handleSearch"
           placeholder="Pesquisar por tipo, marca, modelo, série..."
           class="search-input"
-        >
+        />
         <div class="search-icon">🔍</div>
       </div>
     </div>
 
     <!-- Filter Tabs -->
     <div class="filter-tabs">
-      <button 
+      <button
         @click="activeFilter = 'todos'"
         :class="{ active: activeFilter === 'todos' }"
         class="filter-tab"
       >
         Todos ({{ filteredEquipamentos.length }})
       </button>
-      <button 
+      <button
         @click="activeFilter = 'disponivel'"
         :class="{ active: activeFilter === 'disponivel' }"
         class="filter-tab disponivel"
       >
         Disponíveis ({{ getEquipamentosByStatus.disponivel.length }})
       </button>
-      <button 
+      <button
         @click="activeFilter = 'emprestado'"
         :class="{ active: activeFilter === 'emprestado' }"
         class="filter-tab emprestado"
       >
         Emprestados ({{ getEquipamentosByStatus.emprestado.length }})
       </button>
-      <button 
+      <button
         @click="activeFilter = 'manutencao'"
         :class="{ active: activeFilter === 'manutencao' }"
         class="filter-tab manutencao"
@@ -72,12 +72,8 @@
     <div v-if="!loading && displayedEquipamentos.length === 0" class="empty-state">
       <div class="empty-icon">📦</div>
       <h3>{{ searchQuery ? 'Nenhum equipamento encontrado' : 'Nenhum equipamento registado' }}</h3>
-      <p v-if="searchQuery">
-        Tente ajustar os termos de pesquisa ou selecionar um ano diferente.
-      </p>
-      <p v-else>
-        Comece por adicionar o primeiro equipamento ao sistema.
-      </p>
+      <p v-if="searchQuery">Tente ajustar os termos de pesquisa ou selecionar um ano diferente.</p>
+      <p v-else>Comece por adicionar o primeiro equipamento ao sistema.</p>
       <router-link to="/equipamento-usado/new" class="btn btn-primary">
         ➕ Adicionar Equipamento
       </router-link>
@@ -85,8 +81,8 @@
 
     <!-- Equipment Cards -->
     <div v-else class="equipment-grid">
-      <div 
-        v-for="equipamento in displayedEquipamentos" 
+      <div
+        v-for="equipamento in displayedEquipamentos"
         :key="equipamento.id"
         class="equipment-card"
         @click="goToDetail(equipamento)"
@@ -150,16 +146,8 @@
         </div>
 
         <div class="card-actions">
-          <button 
-            @click.stop="goToEdit(equipamento)"
-            class="btn btn-edit"
-          >
-            ✏️ Editar
-          </button>
-          <button 
-            @click.stop="goToDetail(equipamento)"
-            class="btn btn-detail"
-          >
+          <button @click.stop="goToEdit(equipamento)" class="btn btn-edit">✏️ Editar</button>
+          <button @click.stop="goToDetail(equipamento)" class="btn btn-detail">
             👁️ Ver Detalhes
           </button>
         </div>
@@ -167,45 +155,35 @@
     </div>
 
     <!-- Add Button (Floating) -->
-    <router-link 
-      to="/equipamento-usado/new"
-      class="fab"
-      title="Adicionar Equipamento"
-    >
+    <router-link to="/equipamento-usado/new" class="fab" title="Adicionar Equipamento">
       ➕
     </router-link>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
-import YearSelector from '@/components/YearSelector.vue'
-import { useEquipamentoUsadoStore } from '@/stores/equipamento-usado'
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
+import YearSelector from '@/components/YearSelector.vue';
+import { useEquipamentoUsadoStore } from '@/stores/equipamento-usado';
 
-const router = useRouter()
-const equipamentoUsadoStore = useEquipamentoUsadoStore()
+const router = useRouter();
+const equipamentoUsadoStore = useEquipamentoUsadoStore();
 
 // State
-const searchQuery = ref('')
-const searchResults = ref([])
-const isSearching = ref(false)
-const activeFilter = ref('todos')
+const searchQuery = ref('');
+const searchResults = ref([]);
+const isSearching = ref(false);
+const activeFilter = ref('todos');
 
 // Store refs
-const { 
-  equipamentos, 
-  loading, 
-  error, 
-  currentYear, 
-  availableYears,
-  getEquipamentosByStatus
-} = storeToRefs(equipamentoUsadoStore)
+const { equipamentos, loading, error, currentYear, availableYears, getEquipamentosByStatus } =
+  storeToRefs(equipamentoUsadoStore);
 
 // Store actions
-const { 
+const {
   fetchEquipamentosForYear,
   fetchAvailableYears,
   setCurrentYear,
@@ -216,88 +194,85 @@ const {
   isEquipamentoEmprestado,
   formatDate,
   getDaysOnLoan,
-  getYearFromDate
-} = equipamentoUsadoStore
+  getYearFromDate,
+} = equipamentoUsadoStore;
 
 // Computed
 const filteredEquipamentos = computed(() => {
   if (isSearching.value && searchResults.value.length >= 0) {
-    return searchResults.value
+    return searchResults.value;
   }
-  
-  const baseEquipamentos = equipamentos.value
-  
+
+  const baseEquipamentos = equipamentos.value;
+
   switch (activeFilter.value) {
     case 'disponivel':
-      return getEquipamentosByStatus.value.disponivel
+      return getEquipamentosByStatus.value.disponivel;
     case 'emprestado':
-      return getEquipamentosByStatus.value.emprestado
+      return getEquipamentosByStatus.value.emprestado;
     case 'manutencao':
-      return getEquipamentosByStatus.value.manutencao
+      return getEquipamentosByStatus.value.manutencao;
     default:
-      return baseEquipamentos
+      return baseEquipamentos;
   }
-})
+});
 
 const displayedEquipamentos = computed(() => {
-  return filteredEquipamentos.value
-})
+  return filteredEquipamentos.value;
+});
 
 // Methods
-const handleYearChange = async (year) => {
-  setCurrentYear(year)
-  await fetchEquipamentosForYear(year)
-  
+const handleYearChange = async year => {
+  setCurrentYear(year);
+  await fetchEquipamentosForYear(year);
+
   // Clear search when changing year
   if (searchQuery.value) {
-    searchQuery.value = ''
-    searchResults.value = []
-    isSearching.value = false
+    searchQuery.value = '';
+    searchResults.value = [];
+    isSearching.value = false;
   }
-}
+};
 
 const handleSearch = async () => {
   if (!searchQuery.value.trim()) {
-    searchResults.value = []
-    isSearching.value = false
-    return
+    searchResults.value = [];
+    isSearching.value = false;
+    return;
   }
-  
-  isSearching.value = true
+
+  isSearching.value = true;
   try {
-    const results = await searchEquipamentos(searchQuery.value, currentYear.value)
-    searchResults.value = results
+    const results = await searchEquipamentos(searchQuery.value, currentYear.value);
+    searchResults.value = results;
   } catch (err) {
-    console.error('Search error:', err)
-    searchResults.value = []
+    console.error('Search error:', err);
+    searchResults.value = [];
   }
-}
+};
 
-const goToDetail = (equipamento) => {
-  const year = getYearFromDate(equipamento.dataRevisao)
-  router.push(`/equipamento-usado/${year}/${equipamento.id}`)
-}
+const goToDetail = equipamento => {
+  const year = getYearFromDate(equipamento.dataRevisao);
+  router.push(`/equipamento-usado/${year}/${equipamento.id}`);
+};
 
-const goToEdit = (equipamento) => {
-  const year = getYearFromDate(equipamento.dataRevisao)
-  router.push(`/equipamento-usado/${year}/${equipamento.id}/edit?from=list`)
-}
+const goToEdit = equipamento => {
+  const year = getYearFromDate(equipamento.dataRevisao);
+  router.push(`/equipamento-usado/${year}/${equipamento.id}/edit?from=list`);
+};
 
 // Watchers
-watch(searchQuery, (newQuery) => {
+watch(searchQuery, newQuery => {
   if (!newQuery.trim()) {
-    searchResults.value = []
-    isSearching.value = false
+    searchResults.value = [];
+    isSearching.value = false;
   }
-})
+});
 
 // Lifecycle
 onMounted(async () => {
-  await Promise.all([
-    fetchAvailableYears(),
-    fetchEquipamentosForYear()
-  ])
-})
+  await Promise.all([fetchAvailableYears(), fetchEquipamentosForYear()]);
+});
 </script>
 
 <style scoped>
@@ -451,7 +426,9 @@ onMounted(async () => {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   cursor: pointer;
 }
 
@@ -627,35 +604,35 @@ onMounted(async () => {
     padding: 0.5rem;
     padding-bottom: 80px;
   }
-  
+
   .list-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .controls {
     flex-direction: column;
   }
-  
+
   .search-box {
     min-width: auto;
   }
-  
+
   .equipment-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .card-header {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .card-actions {
     flex-direction: column;
   }
-  
+
   .fab {
     bottom: 1rem;
     right: 1rem;

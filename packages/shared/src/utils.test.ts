@@ -1,13 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { 
-  detectRelationFields, 
-  getContentTypeFromRelation, 
+import {
+  detectRelationFields,
+  getContentTypeFromRelation,
   RELATION_TYPE_MAPPING,
   extractBasicFields,
   BASIC_FIELD_DEFINITIONS,
   COMMON_FALLBACK_FIELDS,
   resolveContentRelations,
-  type ContentFetcher
+  type ContentFetcher,
 } from './utils';
 
 describe('Relation Detection Utilities', () => {
@@ -17,7 +17,7 @@ describe('Relation Detection Utilities', () => {
         clientId: 'client-uuid-123',
         contractId: 'contract-uuid-456',
         name: 'Test Name',
-        description: 'Test Description'
+        description: 'Test Description',
       };
 
       const result = detectRelationFields(data);
@@ -29,7 +29,7 @@ describe('Relation Detection Utilities', () => {
         clientId: 'client-uuid-123',
         contractId: null,
         licenseId: undefined,
-        name: 'Test Name'
+        name: 'Test Name',
       };
 
       const result = detectRelationFields(data);
@@ -41,7 +41,7 @@ describe('Relation Detection Utilities', () => {
         clientName: 'Client Name',
         contractNumber: '12345',
         userId: 'user-123', // This should be detected
-        description: 'Test Description'
+        description: 'Test Description',
       };
 
       const result = detectRelationFields(data);
@@ -68,9 +68,9 @@ describe('Relation Detection Utilities', () => {
       const data = {
         clientId: 'client-uuid-123',
         metadata: {
-          contractId: 'contract-uuid-456' // Nested relation fields should not be detected
+          contractId: 'contract-uuid-456', // Nested relation fields should not be detected
         },
-        workSheetId: 'worksheet-uuid-789'
+        workSheetId: 'worksheet-uuid-789',
       };
 
       const result = detectRelationFields(data);
@@ -83,7 +83,7 @@ describe('Relation Detection Utilities', () => {
         remoteAssistanceId: 'remote-456',
         dailyRecordId: 'daily-789',
         someOtherId: 'other-999',
-        notARelation: 'not-relation' // This should NOT be detected as it doesn't end in 'Id'
+        notARelation: 'not-relation', // This should NOT be detected as it doesn't end in 'Id'
       };
 
       const result = detectRelationFields(data);
@@ -149,16 +149,16 @@ describe('Relation Detection Utilities', () => {
           localidade: 'Lisboa',
           telefone: '123456789',
           email: 'test@example.com',
-          morada: 'Rua Test, 123'
+          morada: 'Rua Test, 123',
         };
 
         const result = extractBasicFields(clientData, 'clients');
-        
+
         expect(result).toEqual({
           nomeEmpresa: 'Empresa ABC Lda',
           nomeComercial: 'ABC',
           contribuinte: '123456789',
-          localidade: 'Lisboa'
+          localidade: 'Lisboa',
         });
       });
 
@@ -166,14 +166,14 @@ describe('Relation Detection Utilities', () => {
         const clientData = {
           nomeEmpresa: 'Empresa ABC Lda',
           contribuinte: '123456789',
-          telefone: '123456789' // Not a basic field
+          telefone: '123456789', // Not a basic field
         };
 
         const result = extractBasicFields(clientData, 'clients');
-        
+
         expect(result).toEqual({
           nomeEmpresa: 'Empresa ABC Lda',
-          contribuinte: '123456789'
+          contribuinte: '123456789',
         });
       });
 
@@ -182,14 +182,14 @@ describe('Relation Detection Utilities', () => {
           nomeEmpresa: 'Empresa ABC Lda',
           nomeComercial: null,
           contribuinte: undefined,
-          localidade: 'Lisboa'
+          localidade: 'Lisboa',
         };
 
         const result = extractBasicFields(clientData, 'clients');
-        
+
         expect(result).toEqual({
           nomeEmpresa: 'Empresa ABC Lda',
-          localidade: 'Lisboa'
+          localidade: 'Lisboa',
         });
       });
     });
@@ -202,28 +202,28 @@ describe('Relation Detection Utilities', () => {
           dataFim: '2024-12-31',
           valor: 1000,
           clientId: 'client-uuid-123',
-          observacoes: 'Contract notes'
+          observacoes: 'Contract notes',
         };
 
         const result = extractBasicFields(contractData, 'contracts');
-        
+
         expect(result).toEqual({
           numeroContrato: 'CT-2024-001',
           dataInicio: '2024-01-01',
-          dataFim: '2024-12-31'
+          dataFim: '2024-12-31',
         });
       });
 
       it('should handle missing contract fields gracefully', () => {
         const contractData = {
           numeroContrato: 'CT-2024-001',
-          valor: 1000
+          valor: 1000,
         };
 
         const result = extractBasicFields(contractData, 'contracts');
-        
+
         expect(result).toEqual({
-          numeroContrato: 'CT-2024-001'
+          numeroContrato: 'CT-2024-001',
         });
       });
     });
@@ -237,28 +237,28 @@ describe('Relation Detection Utilities', () => {
           numero: '12345',
           data: '2024-01-01',
           customField: 'Custom Value',
-          anotherField: 'Another Value'
+          anotherField: 'Another Value',
         };
 
         const result = extractBasicFields(unknownData, 'unknown-type');
-        
+
         expect(result).toEqual({
           name: 'Test Name',
           title: 'Test Title',
           description: 'Test Description',
           numero: '12345',
-          data: '2024-01-01'
+          data: '2024-01-01',
         });
       });
 
       it('should handle empty fallback results for unknown types', () => {
         const unknownData = {
           customField: 'Custom Value',
-          anotherField: 'Another Value'
+          anotherField: 'Another Value',
         };
 
         const result = extractBasicFields(unknownData, 'unknown-type');
-        
+
         expect(result).toEqual({});
       });
 
@@ -267,14 +267,14 @@ describe('Relation Detection Utilities', () => {
           name: 'Test Name',
           title: null,
           description: undefined,
-          numero: '12345'
+          numero: '12345',
         };
 
         const result = extractBasicFields(unknownData, 'unknown-type');
-        
+
         expect(result).toEqual({
           name: 'Test Name',
-          numero: '12345'
+          numero: '12345',
         });
       });
     });
@@ -306,13 +306,13 @@ describe('Relation Detection Utilities', () => {
       it('should have basic field definitions for all content types', () => {
         const expectedContentTypes = [
           'clients',
-          'contracts', 
+          'contracts',
           'licenses',
           'work-sheets',
           'daily-records',
           'remote-assistance',
           'reminders',
-          'pending'
+          'pending',
         ];
 
         for (const contentType of expectedContentTypes) {
@@ -329,38 +329,38 @@ describe('Relation Detection Utilities', () => {
           nomeComercial: 'Test Commercial',
           contribuinte: '123456789',
           localidade: 'Test Location',
-          
+
           // Contract fields
           numeroContrato: 'CT-001',
           dataInicio: '2024-01-01',
           dataFim: '2024-12-31',
-          
+
           // License fields
           versao: '2024',
           numeroSerie: 'SN-001',
           dataVencimento: '2024-12-31',
-          
+
           // Work sheet fields
           numeroFolha: 'WS-001',
-          
+
           // Daily record fields
           atividade: 'Test Activity',
           duracao: '2h',
-          
+
           // Remote assistance fields
           tipo: 'Remote Support',
-          
+
           // Reminder fields
           titulo: 'Test Reminder',
           dataLembrete: '2024-01-01',
           prioridade: 'High',
-          
+
           // Pending fields
           dataLimite: '2024-01-01',
           status: 'Pending',
-          
+
           // Common field
-          data: '2024-01-01'
+          data: '2024-01-01',
         };
 
         // Test each content type
@@ -388,12 +388,12 @@ describe('Relation Detection Utilities', () => {
       const expectedContentTypes = [
         'clients',
         'contracts',
-        'licenses', 
+        'licenses',
         'work-sheets',
         'daily-records',
         'remote-assistance',
         'reminders',
-        'pending'
+        'pending',
       ];
 
       for (const contentType of expectedContentTypes) {
@@ -404,13 +404,18 @@ describe('Relation Detection Utilities', () => {
 
     it('should have correct field definitions for clients', () => {
       expect(BASIC_FIELD_DEFINITIONS.clients).toEqual([
-        'nomeEmpresa', 'nomeComercial', 'contribuinte', 'localidade'
+        'nomeEmpresa',
+        'nomeComercial',
+        'contribuinte',
+        'localidade',
       ]);
     });
 
     it('should have correct field definitions for contracts', () => {
       expect(BASIC_FIELD_DEFINITIONS.contracts).toEqual([
-        'numeroContrato', 'dataInicio', 'dataFim'
+        'numeroContrato',
+        'dataInicio',
+        'dataFim',
       ]);
     });
   });
@@ -418,7 +423,13 @@ describe('Relation Detection Utilities', () => {
   describe('COMMON_FALLBACK_FIELDS', () => {
     it('should contain expected fallback fields', () => {
       const expectedFields = [
-        'name', 'title', 'description', 'numero', 'data', 'dataInicio', 'dataFim'
+        'name',
+        'title',
+        'description',
+        'numero',
+        'data',
+        'dataInicio',
+        'dataFim',
       ];
 
       expect(COMMON_FALLBACK_FIELDS).toEqual(expectedFields);
@@ -446,12 +457,12 @@ describe('Relation Resolution Utilities', () => {
           contribuinte: '123456789',
           localidade: 'Lisboa',
           telefone: '123456789',
-          email: 'test@example.com'
-        }
+          email: 'test@example.com',
+        },
       };
 
       const mockFetcher = createMockContentFetcher({
-        'clients:client-uuid-123': mockClient
+        'clients:client-uuid-123': mockClient,
       });
 
       const licenseContent = {
@@ -460,8 +471,8 @@ describe('Relation Resolution Utilities', () => {
         data: {
           clientId: 'client-uuid-123',
           versao: '2024',
-          numeroSerie: 'SN-001'
-        }
+          numeroSerie: 'SN-001',
+        },
       };
 
       const result = await resolveContentRelations(licenseContent, mockFetcher);
@@ -472,7 +483,7 @@ describe('Relation Resolution Utilities', () => {
         data: {
           clientId: 'client-uuid-123',
           versao: '2024',
-          numeroSerie: 'SN-001'
+          numeroSerie: 'SN-001',
         },
         relations: {
           client: {
@@ -481,9 +492,9 @@ describe('Relation Resolution Utilities', () => {
             nomeEmpresa: 'Empresa ABC Lda',
             nomeComercial: 'ABC',
             contribuinte: '123456789',
-            localidade: 'Lisboa'
-          }
-        }
+            localidade: 'Lisboa',
+          },
+        },
       });
     });
 
@@ -494,8 +505,8 @@ describe('Relation Resolution Utilities', () => {
         data: {
           nomeEmpresa: 'Empresa ABC Lda',
           contribuinte: '123456789',
-          localidade: 'Lisboa'
-        }
+          localidade: 'Lisboa',
+        },
       };
 
       const mockContract = {
@@ -505,13 +516,13 @@ describe('Relation Resolution Utilities', () => {
           numeroContrato: 'CT-2024-001',
           dataInicio: '2024-01-01',
           dataFim: '2024-12-31',
-          valor: 1000
-        }
+          valor: 1000,
+        },
       };
 
       const mockFetcher = createMockContentFetcher({
         'clients:client-uuid-123': mockClient,
-        'contracts:contract-uuid-456': mockContract
+        'contracts:contract-uuid-456': mockContract,
       });
 
       const workSheetContent = {
@@ -521,8 +532,8 @@ describe('Relation Resolution Utilities', () => {
           clientId: 'client-uuid-123',
           contractId: 'contract-uuid-456',
           numeroFolha: 'WS-001',
-          dataInicio: '2024-01-01'
-        }
+          dataInicio: '2024-01-01',
+        },
       };
 
       const result = await resolveContentRelations(workSheetContent, mockFetcher);
@@ -534,14 +545,14 @@ describe('Relation Resolution Utilities', () => {
         contentType: 'clients',
         nomeEmpresa: 'Empresa ABC Lda',
         contribuinte: '123456789',
-        localidade: 'Lisboa'
+        localidade: 'Lisboa',
       });
       expect(result.relations.contract).toEqual({
         uuid: 'contract-uuid-456',
         contentType: 'contracts',
         numeroContrato: 'CT-2024-001',
         dataInicio: '2024-01-01',
-        dataFim: '2024-12-31'
+        dataFim: '2024-12-31',
       });
     });
 
@@ -553,8 +564,8 @@ describe('Relation Resolution Utilities', () => {
         contentType: 'licenses',
         data: {
           clientId: 'non-existent-client-uuid',
-          versao: '2024'
-        }
+          versao: '2024',
+        },
       };
 
       const result = await resolveContentRelations(licenseContent, mockFetcher);
@@ -563,8 +574,8 @@ describe('Relation Resolution Utilities', () => {
         client: {
           type: 'error',
           code: 404,
-          message: 'Not found'
-        }
+          message: 'Not found',
+        },
       });
     });
 
@@ -578,8 +589,8 @@ describe('Relation Resolution Utilities', () => {
         contentType: 'licenses',
         data: {
           clientId: 'client-uuid-123',
-          versao: '2024'
-        }
+          versao: '2024',
+        },
       };
 
       const result = await resolveContentRelations(licenseContent, mockFetcher);
@@ -588,8 +599,8 @@ describe('Relation Resolution Utilities', () => {
         client: {
           type: 'error',
           code: 500,
-          message: 'Internal Server Error'
-        }
+          message: 'Internal Server Error',
+        },
       });
     });
 
@@ -602,8 +613,8 @@ describe('Relation Resolution Utilities', () => {
         data: {
           nomeEmpresa: 'Empresa ABC Lda',
           contribuinte: '123456789',
-          localidade: 'Lisboa'
-        }
+          localidade: 'Lisboa',
+        },
       };
 
       const result = await resolveContentRelations(clientContent, mockFetcher);
@@ -620,8 +631,8 @@ describe('Relation Resolution Utilities', () => {
         data: {
           clientId: null,
           contractId: undefined,
-          versao: '2024'
-        }
+          versao: '2024',
+        },
       };
 
       const result = await resolveContentRelations(licenseContent, mockFetcher);
@@ -637,8 +648,8 @@ describe('Relation Resolution Utilities', () => {
         contentType: 'unknown',
         data: {
           unknownRelationId: 'some-uuid',
-          name: 'Test Content'
-        }
+          name: 'Test Content',
+        },
       };
 
       const result = await resolveContentRelations(contentWithUnknownRelation, mockFetcher);
@@ -653,12 +664,12 @@ describe('Relation Resolution Utilities', () => {
         contentType: 'clients',
         data: {
           nomeEmpresa: 'Empresa ABC Lda',
-          contribuinte: '123456789'
-        }
+          contribuinte: '123456789',
+        },
       };
 
       const mockFetcher = createMockContentFetcher({
-        'clients:client-uuid-123': mockClient
+        'clients:client-uuid-123': mockClient,
         // Missing contract data will cause 404 error
       });
 
@@ -668,8 +679,8 @@ describe('Relation Resolution Utilities', () => {
         data: {
           clientId: 'client-uuid-123',
           contractId: 'non-existent-contract-uuid',
-          numeroFolha: 'WS-001'
-        }
+          numeroFolha: 'WS-001',
+        },
       };
 
       const result = await resolveContentRelations(workSheetContent, mockFetcher);
@@ -678,25 +689,25 @@ describe('Relation Resolution Utilities', () => {
         uuid: 'client-uuid-123',
         contentType: 'clients',
         nomeEmpresa: 'Empresa ABC Lda',
-        contribuinte: '123456789'
+        contribuinte: '123456789',
       });
 
       expect(result.relations.contract).toEqual({
         type: 'error',
         code: 404,
-        message: 'Not found'
+        message: 'Not found',
       });
     });
 
     it('should handle related content with missing data field', async () => {
       const mockClientWithoutData = {
         uuid: 'client-uuid-123',
-        contentType: 'clients'
+        contentType: 'clients',
         // Missing data field
       };
 
       const mockFetcher = createMockContentFetcher({
-        'clients:client-uuid-123': mockClientWithoutData
+        'clients:client-uuid-123': mockClientWithoutData,
       });
 
       const licenseContent = {
@@ -704,8 +715,8 @@ describe('Relation Resolution Utilities', () => {
         contentType: 'licenses',
         data: {
           clientId: 'client-uuid-123',
-          versao: '2024'
-        }
+          versao: '2024',
+        },
       };
 
       const result = await resolveContentRelations(licenseContent, mockFetcher);
@@ -714,8 +725,8 @@ describe('Relation Resolution Utilities', () => {
         client: {
           type: 'error',
           code: 404,
-          message: 'Not found'
-        }
+          message: 'Not found',
+        },
       });
     });
 
@@ -727,8 +738,8 @@ describe('Relation Resolution Utilities', () => {
         contentType: 'clients',
         data: {
           nomeEmpresa: 'Test Company',
-          contribuinte: '123456789'
-        }
+          contribuinte: '123456789',
+        },
       };
 
       const result = await resolveContentRelations(originalContent, mockFetcher);
@@ -750,18 +761,18 @@ describe('Relation Resolution Utilities', () => {
           nomeComercial: 'ABC',
           contribuinte: '123456789',
           localidade: 'Lisboa',
-          
+
           // Non-basic fields (should be excluded)
           telefone: '123456789',
           email: 'test@example.com',
           morada: 'Rua Test, 123',
           observacoes: 'Client notes',
-          createdAt: '2024-01-01T00:00:00Z'
-        }
+          createdAt: '2024-01-01T00:00:00Z',
+        },
       };
 
       const mockFetcher = createMockContentFetcher({
-        'clients:client-uuid-123': mockClient
+        'clients:client-uuid-123': mockClient,
       });
 
       const licenseContent = {
@@ -769,8 +780,8 @@ describe('Relation Resolution Utilities', () => {
         contentType: 'licenses',
         data: {
           clientId: 'client-uuid-123',
-          versao: '2024'
-        }
+          versao: '2024',
+        },
       };
 
       const result = await resolveContentRelations(licenseContent, mockFetcher);
@@ -782,7 +793,7 @@ describe('Relation Resolution Utilities', () => {
         nomeEmpresa: 'Empresa ABC Lda',
         nomeComercial: 'ABC',
         contribuinte: '123456789',
-        localidade: 'Lisboa'
+        localidade: 'Lisboa',
       });
 
       // Should not include non-basic fields

@@ -24,14 +24,14 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="nomeCliente">NOME DO CLIENTE</label>
-            <input 
-              type="text" 
-              id="nomeCliente" 
-              v-model="form.nomeCliente" 
+            <input
+              type="text"
+              id="nomeCliente"
+              v-model="form.nomeCliente"
               class="form-control"
               placeholder="Digite o nome do cliente"
               required
-            >
+            />
           </div>
         </div>
       </section>
@@ -42,50 +42,41 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="tipoFatura">TIPO DE FATURA</label>
-            <select 
-              id="tipoFatura" 
-              v-model="form.tipoFatura" 
-              class="form-control"
-              required
-            >
+            <select id="tipoFatura" v-model="form.tipoFatura" class="form-control" required>
               <option value="">--</option>
               <option value="REMOTA">REMOTA</option>
               <option value="PRESENCIAL">PRESENCIAL</option>
               <option value="OUTROS">OUTROS</option>
             </select>
           </div>
-          
+
           <div class="form-group">
             <label for="numeroFatura">NÚMERO DA FATURA</label>
-            <input 
-              type="text" 
-              id="numeroFatura" 
-              v-model="form.numeroFatura" 
+            <input
+              type="text"
+              id="numeroFatura"
+              v-model="form.numeroFatura"
               class="form-control"
               placeholder="Número da fatura"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="valorFatura">VALOR DA FATURA (€)</label>
-            <input 
-              type="number" 
-              id="valorFatura" 
-              v-model="form.valorFatura" 
+            <input
+              type="number"
+              id="valorFatura"
+              v-model="form.valorFatura"
               class="form-control"
               step="0.01"
               min="0"
               placeholder="0.00"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="formaPagamento">FORMA DE PAGAMENTO</label>
-            <select 
-              id="formaPagamento" 
-              v-model="form.formaPagamento" 
-              class="form-control"
-            >
+            <select id="formaPagamento" v-model="form.formaPagamento" class="form-control">
               <option value="">--</option>
               <option value="TRANSFERÊNCIA">TRANSFERÊNCIA</option>
               <option value="MULTIBANCO">MULTIBANCO</option>
@@ -104,22 +95,22 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="dataFaturaGerada">DATA DA FATURA GERADA</label>
-            <input 
-              type="datetime-local" 
-              id="dataFaturaGerada" 
-              v-model="form.dataFaturaGerada" 
+            <input
+              type="datetime-local"
+              id="dataFaturaGerada"
+              v-model="form.dataFaturaGerada"
               class="form-control"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="dataVencimentoFatura">DATA DE VENCIMENTO</label>
-            <input 
-              type="datetime-local" 
-              id="dataVencimentoFatura" 
-              v-model="form.dataVencimentoFatura" 
+            <input
+              type="datetime-local"
+              id="dataVencimentoFatura"
+              v-model="form.dataVencimentoFatura"
               class="form-control"
-            >
+            />
           </div>
         </div>
       </section>
@@ -130,65 +121,61 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="horasGastas">HORAS GASTAS</label>
-            <input 
-              type="text" 
-              id="horasGastas" 
-              v-model="form.horasGastas" 
+            <input
+              type="text"
+              id="horasGastas"
+              v-model="form.horasGastas"
               class="form-control"
               placeholder="Ex: 02:30"
               pattern="^([0-9]{1,2}):([0-5][0-9])$"
-            >
+            />
             <small class="field-help">Formato: HH:MM (ex: 02:30)</small>
           </div>
-          
+
           <div class="form-group">
             <label for="pago">ESTADO DO PAGAMENTO</label>
-            <select 
-              id="pago" 
-              v-model="form.pago" 
-              class="form-control"
-            >
+            <select id="pago" v-model="form.pago" class="form-control">
               <option value="">--</option>
               <option value="TRUE">PAGO</option>
               <option value="FALSE">NÃO PAGO</option>
             </select>
           </div>
-          
+
           <div class="form-group">
             <label for="numeroRemota">NÚMERO REMOTA</label>
-            <input 
-              type="text" 
-              id="numeroRemota" 
-              v-model="form.numeroRemota" 
+            <input
+              type="text"
+              id="numeroRemota"
+              v-model="form.numeroRemota"
               class="form-control"
               placeholder="Número da assistência remota"
               :disabled="form.tipoFatura !== 'REMOTA'"
-            >
+            />
             <small v-if="form.tipoFatura !== 'REMOTA'" class="field-help">
               Disponível apenas para faturas do tipo "Remota"
             </small>
           </div>
-          
+
           <div class="form-group">
             <label for="numeroPresencial">NÚMERO PRESENCIAL</label>
-            <input 
-              type="text" 
-              id="numeroPresencial" 
-              v-model="form.numeroPresencial" 
+            <input
+              type="text"
+              id="numeroPresencial"
+              v-model="form.numeroPresencial"
               class="form-control"
               placeholder="Número da assistência presencial"
               :disabled="form.tipoFatura !== 'PRESENCIAL'"
-            >
+            />
             <small v-if="form.tipoFatura !== 'PRESENCIAL'" class="field-help">
               Disponível apenas para faturas do tipo "Presencial"
             </small>
           </div>
-          
+
           <div class="form-group full-width">
             <label for="motivoObs">MOTIVO/OBSERVAÇÕES</label>
-            <textarea 
-              id="motivoObs" 
-              v-model="form.motivoObs" 
+            <textarea
+              id="motivoObs"
+              v-model="form.motivoObs"
               class="form-control"
               rows="3"
               placeholder="Descreva o motivo do serviço, observações ou detalhes relevantes..."
@@ -199,19 +186,10 @@
 
       <!-- Action buttons -->
       <div class="form-actions">
-        <button 
-          type="button" 
-          @click="handleCancel" 
-          class="btn btn-cancel"
-          :disabled="loading"
-        >
+        <button type="button" @click="handleCancel" class="btn btn-cancel" :disabled="loading">
           Cancelar
         </button>
-        <button 
-          type="submit" 
-          class="btn btn-primary"
-          :disabled="loading || !isFormValid"
-        >
+        <button type="submit" class="btn btn-primary" :disabled="loading || !isFormValid">
           <span v-if="loading" class="btn-spinner"></span>
           {{ isEditing ? 'Atualizar' : 'Criar' }} Registo
         </button>
@@ -221,31 +199,31 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
-import { useContaCorrenteStore } from '@/stores/conta-corrente.js'
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
+import { useContaCorrenteStore } from '@/stores/conta-corrente.js';
 
 // Router
-const router = useRouter()
-const route = useRoute()
+const router = useRouter();
+const route = useRoute();
 
 // Store
-const store = useContaCorrenteStore()
-const { loading, error } = storeToRefs(store)
-const { 
-  createContaCorrente, 
-  updateContaCorrente, 
-  fetchContaCorrenteById, 
+const store = useContaCorrenteStore();
+const { loading, error } = storeToRefs(store);
+const {
+  createContaCorrente,
+  updateContaCorrente,
+  fetchContaCorrenteById,
   clearError,
-  getYearFromDate 
-} = store
+  getYearFromDate,
+} = store;
 
 // Form state
-const isEditing = ref(false)
-const contaCorrenteYear = ref(null)
-const contaCorrenteId = ref(null)
+const isEditing = ref(false);
+const contaCorrenteYear = ref(null);
+const contaCorrenteId = ref(null);
 
 // Form data
 const form = ref({
@@ -260,92 +238,98 @@ const form = ref({
   horasGastas: '',
   numeroRemota: '',
   pago: '',
-  numeroPresencial: ''
-})
+  numeroPresencial: '',
+});
 
 // Computed
 const isFormValid = computed(() => {
-  return form.value.nomeCliente.trim() && form.value.tipoFatura.trim()
-})
+  return form.value.nomeCliente.trim() && form.value.tipoFatura.trim();
+});
 
 const cancelRoute = computed(() => {
-  const from = route.query.from
+  const from = route.query.from;
   if (from === 'detail' && contaCorrenteYear.value && contaCorrenteId.value) {
-    return `/conta-corrente/${contaCorrenteYear.value}/${contaCorrenteId.value}`
+    return `/conta-corrente/${contaCorrenteYear.value}/${contaCorrenteId.value}`;
   } else if (from === 'list') {
-    return '/conta-corrente/list'
+    return '/conta-corrente/list';
   } else {
-    return '/conta-corrente'
+    return '/conta-corrente';
   }
-})
+});
 
 // Methods
 const handleSubmit = async () => {
-  if (!isFormValid.value) return
+  if (!isFormValid.value) return;
 
   try {
-    let year = contaCorrenteYear.value
-    
+    let year = contaCorrenteYear.value;
+
     // If creating new, determine year from dates or use current year
     if (!isEditing.value) {
       if (form.value.dataFaturaGerada) {
-        year = getYearFromDate(form.value.dataFaturaGerada)
+        year = getYearFromDate(form.value.dataFaturaGerada);
       } else if (form.value.dataVencimentoFatura) {
-        year = getYearFromDate(form.value.dataVencimentoFatura)
+        year = getYearFromDate(form.value.dataVencimentoFatura);
       } else {
-        year = new Date().getFullYear().toString()
+        year = new Date().getFullYear().toString();
       }
     }
-    
+
     if (isEditing.value) {
-      await updateContaCorrente(contaCorrenteYear.value, contaCorrenteId.value, form.value)
-      router.push(`/conta-corrente/${contaCorrenteYear.value}/${contaCorrenteId.value}`)
+      await updateContaCorrente(contaCorrenteYear.value, contaCorrenteId.value, form.value);
+      router.push(`/conta-corrente/${contaCorrenteYear.value}/${contaCorrenteId.value}`);
     } else {
-      const newContaCorrente = await createContaCorrente(year, form.value)
-      router.push(`/conta-corrente/${year}/${newContaCorrente.id}`)
+      const newContaCorrente = await createContaCorrente(year, form.value);
+      router.push(`/conta-corrente/${year}/${newContaCorrente.id}`);
     }
   } catch (err) {
-    console.error('Error saving conta corrente:', err)
+    console.error('Error saving conta corrente:', err);
   }
-}
+};
 
 const handleCancel = () => {
-  router.push(cancelRoute.value)
-}
+  router.push(cancelRoute.value);
+};
 
 const loadContaCorrenteForEditing = async () => {
   if (contaCorrenteYear.value && contaCorrenteId.value) {
     try {
-      const contaCorrente = await fetchContaCorrenteById(contaCorrenteYear.value, contaCorrenteId.value)
+      const contaCorrente = await fetchContaCorrenteById(
+        contaCorrenteYear.value,
+        contaCorrenteId.value
+      );
       if (contaCorrente) {
-        form.value = { ...contaCorrente }
+        form.value = { ...contaCorrente };
       }
     } catch (err) {
-      console.error('Error loading conta corrente:', err)
+      console.error('Error loading conta corrente:', err);
     }
   }
-}
+};
 
 // Watch for changes in tipo fatura to reset related fields
-watch(() => form.value.tipoFatura, (newType) => {
-  if (newType !== 'REMOTA') {
-    form.value.numeroRemota = ''
+watch(
+  () => form.value.tipoFatura,
+  newType => {
+    if (newType !== 'REMOTA') {
+      form.value.numeroRemota = '';
+    }
+    if (newType !== 'PRESENCIAL') {
+      form.value.numeroPresencial = '';
+    }
   }
-  if (newType !== 'PRESENCIAL') {
-    form.value.numeroPresencial = ''
-  }
-})
+);
 
 // Lifecycle
 onMounted(async () => {
   // Check if we're editing
   if (route.params.year && route.params.id) {
-    isEditing.value = true
-    contaCorrenteYear.value = route.params.year
-    contaCorrenteId.value = route.params.id
-    await loadContaCorrenteForEditing()
+    isEditing.value = true;
+    contaCorrenteYear.value = route.params.year;
+    contaCorrenteId.value = route.params.id;
+    await loadContaCorrenteForEditing();
   }
-})
+});
 </script>
 
 <style scoped>
@@ -557,8 +541,12 @@ onMounted(async () => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Mobile responsiveness */
@@ -566,50 +554,50 @@ onMounted(async () => {
   .conta-corrente-form-container {
     padding: 0.5rem;
   }
-  
+
   .form-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .form-header h1 {
     font-size: 1.3rem;
   }
-  
+
   .form-section {
     padding: 1rem;
     margin-bottom: 1rem;
   }
-  
+
   .form-section h2 {
     font-size: 1rem;
     margin-bottom: 0.75rem;
   }
-  
+
   .form-grid {
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
-  
+
   .form-group {
     min-height: auto;
   }
-  
+
   .form-group label {
     font-size: 0.85rem;
   }
-  
+
   .form-control {
     padding: 0.65rem;
     font-size: 0.9rem;
   }
-  
+
   .form-actions {
     flex-direction: column;
     gap: 0.75rem;
   }
-  
+
   .btn {
     width: 100%;
     padding: 0.75rem;
@@ -620,24 +608,24 @@ onMounted(async () => {
   .conta-corrente-form-container {
     padding: 0.25rem;
   }
-  
+
   .form-section {
     padding: 0.75rem;
   }
-  
+
   .form-section h2 {
     font-size: 0.9rem;
   }
-  
+
   .form-group label {
     font-size: 0.8rem;
   }
-  
+
   .form-control {
     padding: 0.6rem;
     font-size: 0.85rem;
   }
-  
+
   .form-header h1 {
     font-size: 1.2rem;
   }

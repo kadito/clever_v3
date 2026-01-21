@@ -27,7 +27,7 @@ const initializeApp = async () => {
 
     // Initialize Clerk with domain configuration for Workers deployment
     const clerk = new Clerk(clerkPublishableKey);
-    
+
     // Configure Clerk options based on environment
     const clerkOptions: any = {
       appearance: {
@@ -56,25 +56,25 @@ const initializeApp = async () => {
       clerkOptions.signUpUrl = '/sign-up';
       clerkOptions.afterSignInUrl = '/';
       clerkOptions.afterSignUpUrl = '/';
-      
+
       // Allow current origin for redirects
       clerkOptions.allowedRedirectOrigins = [window.location.origin];
     }
 
     await clerk.load(clerkOptions);
-    
+
     // Make Clerk available globally
     window.Clerk = clerk;
-    
+
     // Initialize auth store with Clerk state
     const { useAuthStore } = await import('@/stores/auth');
     const authStore = useAuthStore();
-    
+
     // Set initial auth state
     const updateAuthState = () => {
       const user = clerk.user;
       const isSignedIn = !!user;
-      
+
       if (user && isSignedIn) {
         const userContext = {
           userId: user.id,
@@ -96,14 +96,13 @@ const initializeApp = async () => {
 
     // Listen for Clerk state changes
     clerk.addListener(updateAuthState);
-    
+
     // Install router and mount app
     app.use(router);
     app.mount('#app');
-    
   } catch (error) {
     console.error('Failed to initialize app:', error);
-    
+
     // Create a minimal app to show error state
     const app = createApp(App);
     app.use(createPinia());

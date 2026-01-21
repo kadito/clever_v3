@@ -9,15 +9,11 @@
       <div class="controls-left">
         <h2>Contratos {{ selectedYear }} ({{ displayedContratos.length }})</h2>
       </div>
-      
+
       <div class="controls-right">
         <!-- Year selector -->
-        <YearSelector 
-          v-model="selectedYear" 
-          :years="availableYears"
-          @change="handleYearChange"
-        />
-        
+        <YearSelector v-model="selectedYear" :years="availableYears" @change="handleYearChange" />
+
         <button @click="refreshData" :disabled="loading" class="btn btn-refresh">
           🔄 Atualizar
         </button>
@@ -27,21 +23,21 @@
     <!-- Search -->
     <div class="search-section">
       <div class="search-container">
-        <input 
-          type="text" 
-          v-model="searchQuery" 
+        <input
+          type="text"
+          v-model="searchQuery"
           @input="handleSearch"
-          placeholder="Pesquisar por nome do cliente..." 
+          placeholder="Pesquisar por nome do cliente..."
           class="search-input"
-        >
+        />
         <span class="search-icon">🔍</span>
       </div>
-      
+
       <div class="month-filter-container">
         <label for="month-filter" class="month-filter-label">Filtrar por mês de expiração:</label>
-        <select 
+        <select
           id="month-filter"
-          v-model="selectedMonth" 
+          v-model="selectedMonth"
           @change="handleMonthChange"
           class="month-filter-select"
         >
@@ -64,22 +60,27 @@
       <button @click="clearError" class="close-btn">×</button>
     </div>
 
-
-
     <!-- Contratos List -->
     <div v-if="!loading && displayedContratos.length > 0" class="contratos-list">
-      <div 
-        v-for="contrato in displayedContratos" 
+      <div
+        v-for="contrato in displayedContratos"
         :key="contrato.id"
         class="contrato-item"
         @click="navigateToDetail(contrato)"
       >
         <div class="contrato-main">
           <div class="contrato-header">
-            <h3>{{ contrato.clienteName || contrato.nomeComercial || contrato.nome || 'Cliente não especificado' }}</h3>
+            <h3>
+              {{
+                contrato.clienteName ||
+                contrato.nomeComercial ||
+                contrato.nome ||
+                'Cliente não especificado'
+              }}
+            </h3>
             <span class="contrato-id">{{ `CT${String(contrato.id).slice(0, 8)}` }}</span>
           </div>
-          
+
           <div class="contrato-info">
             <div class="info-row">
               <span class="info-label">Tipo:</span>
@@ -87,7 +88,7 @@
                 {{ getTipoContrato(contrato) }}
               </span>
             </div>
-            
+
             <div class="info-row">
               <span class="info-label">Validade:</span>
               <div class="info-value expiration-dates">
@@ -95,10 +96,19 @@
                   <span class="expiration-label">CPA:</span>
                   <span :class="getExpirationClassForDate(getCPAExpirationDate(contrato))">
                     {{ formatExpirationDate(getCPAExpirationDate(contrato)) }}
-                    <span v-if="getExpirationMonthForDate(getCPAExpirationDate(contrato))" class="month-indicator">
-                      ({{ getMonthName(getExpirationMonthForDate(getCPAExpirationDate(contrato))) }})
+                    <span
+                      v-if="getExpirationMonthForDate(getCPAExpirationDate(contrato))"
+                      class="month-indicator"
+                    >
+                      ({{
+                        getMonthName(getExpirationMonthForDate(getCPAExpirationDate(contrato)))
+                      }})
                     </span>
-                    <span v-if="!contrato.fimContratoCPA && contrato.inicioContratoCPA" class="calculated-badge" title="Calculado a partir da data de início">
+                    <span
+                      v-if="!contrato.fimContratoCPA && contrato.inicioContratoCPA"
+                      class="calculated-badge"
+                      title="Calculado a partir da data de início"
+                    >
                       *
                     </span>
                   </span>
@@ -107,20 +117,30 @@
                   <span class="expiration-label">S&H:</span>
                   <span :class="getExpirationClassForDate(getSHExpirationDate(contrato))">
                     {{ formatExpirationDate(getSHExpirationDate(contrato)) }}
-                    <span v-if="getExpirationMonthForDate(getSHExpirationDate(contrato))" class="month-indicator">
+                    <span
+                      v-if="getExpirationMonthForDate(getSHExpirationDate(contrato))"
+                      class="month-indicator"
+                    >
                       ({{ getMonthName(getExpirationMonthForDate(getSHExpirationDate(contrato))) }})
                     </span>
-                    <span v-if="!contrato.fimContratoSH && contrato.inicioContratoSH" class="calculated-badge" title="Calculado a partir da data de início">
+                    <span
+                      v-if="!contrato.fimContratoSH && contrato.inicioContratoSH"
+                      class="calculated-badge"
+                      title="Calculado a partir da data de início"
+                    >
                       *
                     </span>
                   </span>
                 </div>
-                <div v-if="!hasCPAContract(contrato) && !hasSHContract(contrato)" class="expiration-date-item">
+                <div
+                  v-if="!hasCPAContract(contrato) && !hasSHContract(contrato)"
+                  class="expiration-date-item"
+                >
                   <span class="no-date">Sem data de validade</span>
                 </div>
               </div>
             </div>
-            
+
             <div class="info-row" v-if="getFrequenciaPagamento(contrato)">
               <span class="info-label">Pagamento:</span>
               <span class="info-value">{{ getFrequenciaPagamento(contrato) }}</span>
@@ -128,9 +148,7 @@
           </div>
         </div>
         <div class="contrato-actions">
-          <button class="action-btn" @click.stop="showActions(contrato)">
-            ⋮
-          </button>
+          <button class="action-btn" @click.stop="showActions(contrato)">⋮</button>
         </div>
       </div>
     </div>
@@ -138,12 +156,8 @@
     <!-- Empty State -->
     <div v-if="!loading && displayedContratos.length === 0" class="empty-state">
       <h3>Nenhum contrato encontrado</h3>
-      <p v-if="searchQuery">
-        Não foram encontrados contratos com o termo "{{ searchQuery }}".
-      </p>
-      <p v-else>
-        Não há contratos para o ano {{ selectedYear }}.
-      </p>
+      <p v-if="searchQuery">Não foram encontrados contratos com o termo "{{ searchQuery }}".</p>
+      <p v-else>Não há contratos para o ano {{ selectedYear }}.</p>
     </div>
 
     <!-- Search Results Info -->
@@ -162,57 +176,49 @@
       <div class="actions-modal" @click.stop>
         <h3>{{ selectedContratoForActions?.clienteName || 'Cliente não especificado' }}</h3>
         <div class="modal-actions">
-          <button @click="viewContrato" class="modal-btn view-btn">
-            📋 Ver Detalhes
-          </button>
-          <button @click="editContrato" class="modal-btn edit-btn">
-            ✏️ Editar
-          </button>
-          <button @click="deleteContrato" class="modal-btn delete-btn">
-            🗑️ Eliminar
-          </button>
+          <button @click="viewContrato" class="modal-btn view-btn">📋 Ver Detalhes</button>
+          <button @click="editContrato" class="modal-btn edit-btn">✏️ Editar</button>
+          <button @click="deleteContrato" class="modal-btn delete-btn">🗑️ Eliminar</button>
         </div>
       </div>
     </div>
 
     <!-- Floating Action Button -->
-    <button @click="navigateToCreate" class="fab">
-      ➕
-    </button>
+    <button @click="navigateToCreate" class="fab">➕</button>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
-import YearSelector from '@/components/YearSelector.vue'
-import { useContratosStore } from '@/stores/contratos.js'
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
+import YearSelector from '@/components/YearSelector.vue';
+import { useContratosStore } from '@/stores/contratos.js';
 
 // Router
-const router = useRouter()
+const router = useRouter();
 
 // Store
-const store = useContratosStore()
-const { contratos, currentYear, availableYears, loading, error } = storeToRefs(store)
-const { 
-  fetchContratosForYear, 
-  fetchAvailableYears, 
-  searchContratos, 
-  clearError, 
+const store = useContratosStore();
+const { contratos, currentYear, availableYears, loading, error } = storeToRefs(store);
+const {
+  fetchContratosForYear,
+  fetchAvailableYears,
+  searchContratos,
+  clearError,
   setCurrentYear,
-  deleteContrato: deleteContratoFromStore 
-} = store
+  deleteContrato: deleteContratoFromStore,
+} = store;
 
 // Local state
-const searchQuery = ref('')
-const searchResults = ref(null)
-const selectedYear = ref(currentYear.value)
-const searchYear = ref(null)
-const selectedMonth = ref('')
-const showActionsModal = ref(false)
-const selectedContratoForActions = ref(null)
+const searchQuery = ref('');
+const searchResults = ref(null);
+const selectedYear = ref(currentYear.value);
+const searchYear = ref(null);
+const selectedMonth = ref('');
+const showActionsModal = ref(false);
+const selectedContratoForActions = ref(null);
 
 // Months for filter
 const months = [
@@ -227,265 +233,271 @@ const months = [
   { value: '9', label: 'Setembro' },
   { value: '10', label: 'Outubro' },
   { value: '11', label: 'Novembro' },
-  { value: '12', label: 'Dezembro' }
-]
+  { value: '12', label: 'Dezembro' },
+];
 
 // Computed
 const displayedContratos = computed(() => {
   if (searchResults.value && (searchQuery.value || selectedMonth.value)) {
-    return searchResults.value.results || []
+    return searchResults.value.results || [];
   }
-  return contratos.value
-})
+  return contratos.value;
+});
 
 // Methods
 const handleYearChange = async () => {
-  setCurrentYear(selectedYear.value)
-  searchResults.value = null
-  searchQuery.value = ''
-  selectedMonth.value = ''
-  await fetchContratosForYear(selectedYear.value)
-}
+  setCurrentYear(selectedYear.value);
+  searchResults.value = null;
+  searchQuery.value = '';
+  selectedMonth.value = '';
+  await fetchContratosForYear(selectedYear.value);
+};
 
 const refreshData = async () => {
-  searchResults.value = null
-  searchQuery.value = ''
-  selectedMonth.value = ''
-  await Promise.all([
-    fetchAvailableYears(),
-    fetchContratosForYear(selectedYear.value)
-  ])
-}
+  searchResults.value = null;
+  searchQuery.value = '';
+  selectedMonth.value = '';
+  await Promise.all([fetchAvailableYears(), fetchContratosForYear(selectedYear.value)]);
+};
 
-let searchTimeout = null
+let searchTimeout = null;
 const handleSearch = async () => {
   if (searchTimeout) {
-    clearTimeout(searchTimeout)
+    clearTimeout(searchTimeout);
   }
-  
+
   searchTimeout = setTimeout(async () => {
-    await performSearch()
-  }, 300)
-}
+    await performSearch();
+  }, 300);
+};
 
 const handleMonthChange = async () => {
-  await performSearch()
-}
+  await performSearch();
+};
 
 const performSearch = async () => {
   if (searchQuery.value.trim() || selectedMonth.value) {
-    const month = selectedMonth.value ? parseInt(selectedMonth.value) : null
+    const month = selectedMonth.value ? parseInt(selectedMonth.value) : null;
     const results = await searchContratos(
-      searchQuery.value.trim() || null, 
-      selectedYear.value, 
+      searchQuery.value.trim() || null,
+      selectedYear.value,
       month
-    )
-    searchResults.value = results
-    searchYear.value = selectedYear.value
+    );
+    searchResults.value = results;
+    searchYear.value = selectedYear.value;
   } else {
-    searchResults.value = null
-    searchYear.value = null
+    searchResults.value = null;
+    searchYear.value = null;
   }
-}
+};
 
 // Helper functions for card display
-const getTipoContrato = (contrato) => {
-  const tipos = []
+const getTipoContrato = contrato => {
+  const tipos = [];
   if (contrato.hasCPAContract || contrato.temCPA) {
-    tipos.push('CPA')
+    tipos.push('CPA');
   }
   if (contrato.hasSHContract || contrato.temPSO) {
-    tipos.push('S&H')
+    tipos.push('S&H');
   }
-  return tipos.length > 0 ? tipos.join(' + ') : (contrato.planoContrato || 'N/A')
-}
+  return tipos.length > 0 ? tipos.join(' + ') : contrato.planoContrato || 'N/A';
+};
 
-const getTipoClass = (contrato) => {
-  if (contrato.hasCPAContract && contrato.hasSHContract) return 'tipo-both'
-  if (contrato.hasCPAContract || contrato.temCPA) return 'tipo-cpa'
-  if (contrato.hasSHContract || contrato.temPSO) return 'tipo-sh'
-  return 'tipo-default'
-}
+const getTipoClass = contrato => {
+  if (contrato.hasCPAContract && contrato.hasSHContract) return 'tipo-both';
+  if (contrato.hasCPAContract || contrato.temCPA) return 'tipo-cpa';
+  if (contrato.hasSHContract || contrato.temPSO) return 'tipo-sh';
+  return 'tipo-default';
+};
 
-const hasCPAContract = (contrato) => {
-  return (contrato.hasCPAContract || contrato.temCPA) && (contrato.fimContratoCPA || contrato.inicioContratoCPA)
-}
+const hasCPAContract = contrato => {
+  return (
+    (contrato.hasCPAContract || contrato.temCPA) &&
+    (contrato.fimContratoCPA || contrato.inicioContratoCPA)
+  );
+};
 
-const hasSHContract = (contrato) => {
-  return (contrato.hasSHContract || contrato.temPSO) && (contrato.fimContratoSH || contrato.inicioContratoSH)
-}
+const hasSHContract = contrato => {
+  return (
+    (contrato.hasSHContract || contrato.temPSO) &&
+    (contrato.fimContratoSH || contrato.inicioContratoSH)
+  );
+};
 
 // Helper function to calculate expiration date from start date and payment frequency
 const calculateExpirationFromStart = (startDateString, modalidadePagamento) => {
-  if (!startDateString) return null
-  
+  if (!startDateString) return null;
+
   try {
-    const startDate = new Date(startDateString)
-    if (isNaN(startDate.getTime())) return null
-    
-    const expiration = new Date(startDate)
-    
+    const startDate = new Date(startDateString);
+    if (isNaN(startDate.getTime())) return null;
+
+    const expiration = new Date(startDate);
+
     switch (modalidadePagamento?.toUpperCase()) {
       case 'MENSAL':
-        expiration.setMonth(expiration.getMonth() + 1)
-        break
+        expiration.setMonth(expiration.getMonth() + 1);
+        break;
       case 'TRIMESTRAL':
-        expiration.setMonth(expiration.getMonth() + 3)
-        break
+        expiration.setMonth(expiration.getMonth() + 3);
+        break;
       case 'ANUAL':
-        expiration.setFullYear(expiration.getFullYear() + 1)
-        break
+        expiration.setFullYear(expiration.getFullYear() + 1);
+        break;
       default:
         // Default to 1 year if payment frequency is not specified
-        expiration.setFullYear(expiration.getFullYear() + 1)
+        expiration.setFullYear(expiration.getFullYear() + 1);
     }
-    
-    return expiration
+
+    return expiration;
   } catch {
-    return null
+    return null;
   }
-}
+};
 
 // Get expiration date for CPA contract (fimContratoCPA or calculated from inicioContratoCPA)
-const getCPAExpirationDate = (contrato) => {
+const getCPAExpirationDate = contrato => {
   if (contrato.fimContratoCPA) {
-    return new Date(contrato.fimContratoCPA)
+    return new Date(contrato.fimContratoCPA);
   } else if (contrato.inicioContratoCPA) {
-    return calculateExpirationFromStart(contrato.inicioContratoCPA, contrato.modalidadePagamentoCPA)
+    return calculateExpirationFromStart(
+      contrato.inicioContratoCPA,
+      contrato.modalidadePagamentoCPA
+    );
   }
-  return null
-}
+  return null;
+};
 
 // Get expiration date for S&H contract (fimContratoSH or calculated from inicioContratoSH)
-const getSHExpirationDate = (contrato) => {
+const getSHExpirationDate = contrato => {
   if (contrato.fimContratoSH) {
-    return new Date(contrato.fimContratoSH)
+    return new Date(contrato.fimContratoSH);
   } else if (contrato.inicioContratoSH) {
-    return calculateExpirationFromStart(contrato.inicioContratoSH, contrato.modalidadePagamentoSH)
+    return calculateExpirationFromStart(contrato.inicioContratoSH, contrato.modalidadePagamentoSH);
   }
-  return null
-}
+  return null;
+};
 
-const formatExpirationDate = (date) => {
-  if (!date || isNaN(date.getTime())) return 'Sem data'
-  
+const formatExpirationDate = date => {
+  if (!date || isNaN(date.getTime())) return 'Sem data';
+
   try {
     return date.toLocaleDateString('pt-PT', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric'
-    })
+      year: 'numeric',
+    });
   } catch {
-    return 'Data inválida'
+    return 'Data inválida';
   }
-}
+};
 
-const getExpirationMonthForDate = (date) => {
-  if (!date || isNaN(date.getTime())) return null
-  return date.getMonth() + 1
-}
+const getExpirationMonthForDate = date => {
+  if (!date || isNaN(date.getTime())) return null;
+  return date.getMonth() + 1;
+};
 
-const getExpirationClassForDate = (date) => {
-  if (!date || isNaN(date.getTime())) return ''
-  
-  const month = date.getMonth() + 1
-  const year = date.getFullYear()
-  const now = new Date()
-  const currentMonth = now.getMonth() + 1
-  const currentYear = now.getFullYear()
-  
+const getExpirationClassForDate = date => {
+  if (!date || isNaN(date.getTime())) return '';
+
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  const now = new Date();
+  const currentMonth = now.getMonth() + 1;
+  const currentYear = now.getFullYear();
+
   if (year < currentYear || (year === currentYear && month < currentMonth)) {
-    return 'expired'
+    return 'expired';
   } else if (year === currentYear && month === currentMonth) {
-    return 'expiring-this-month'
+    return 'expiring-this-month';
   } else if (year === currentYear && month === currentMonth + 1) {
-    return 'expiring-next-month'
+    return 'expiring-next-month';
   }
-  return ''
-}
+  return '';
+};
 
-const getFrequenciaPagamento = (contrato) => {
-  const frequencias = []
+const getFrequenciaPagamento = contrato => {
+  const frequencias = [];
   if (contrato.modalidadePagamentoCPA) {
-    frequencias.push(contrato.modalidadePagamentoCPA)
+    frequencias.push(contrato.modalidadePagamentoCPA);
   }
   if (contrato.modalidadePagamentoSH) {
-    frequencias.push(contrato.modalidadePagamentoSH)
+    frequencias.push(contrato.modalidadePagamentoSH);
   }
-  return frequencias.length > 0 ? frequencias.join(' / ') : ''
-}
+  return frequencias.length > 0 ? frequencias.join(' / ') : '';
+};
 
-const getMonthName = (monthNum) => {
-  const month = months.find(m => parseInt(m.value) === monthNum)
-  return month ? month.label : ''
-}
+const getMonthName = monthNum => {
+  const month = months.find(m => parseInt(m.value) === monthNum);
+  return month ? month.label : '';
+};
 
-const navigateToDetail = (contrato) => {
-  const year = contrato.year || selectedYear.value
-  router.push(`/contratos/${contrato.id}?year=${year}`)
-}
+const navigateToDetail = contrato => {
+  const year = contrato.year || selectedYear.value;
+  router.push(`/contratos/${contrato.id}?year=${year}`);
+};
 
-const showActions = (contrato) => {
-  selectedContratoForActions.value = contrato
-  showActionsModal.value = true
-}
+const showActions = contrato => {
+  selectedContratoForActions.value = contrato;
+  showActionsModal.value = true;
+};
 
 const closeActions = () => {
-  showActionsModal.value = false
-  selectedContratoForActions.value = null
-}
+  showActionsModal.value = false;
+  selectedContratoForActions.value = null;
+};
 
 const viewContrato = () => {
   if (selectedContratoForActions.value) {
-    navigateToDetail(selectedContratoForActions.value)
+    navigateToDetail(selectedContratoForActions.value);
   }
-  closeActions()
-}
+  closeActions();
+};
 
 const editContrato = () => {
   if (selectedContratoForActions.value) {
-    const year = selectedContratoForActions.value.year || selectedYear.value
-    router.push(`/contratos/${selectedContratoForActions.value.id}/edit?year=${year}`)
+    const year = selectedContratoForActions.value.year || selectedYear.value;
+    router.push(`/contratos/${selectedContratoForActions.value.id}/edit?year=${year}`);
   }
-  closeActions()
-}
+  closeActions();
+};
 
 const deleteContrato = async () => {
-  if (selectedContratoForActions.value && confirm('Tem certeza que deseja eliminar este contrato?')) {
+  if (
+    selectedContratoForActions.value &&
+    confirm('Tem certeza que deseja eliminar este contrato?')
+  ) {
     try {
-      const year = selectedContratoForActions.value.year || selectedYear.value
-      await deleteContratoFromStore(year, selectedContratoForActions.value.id)
-      closeActions()
+      const year = selectedContratoForActions.value.year || selectedYear.value;
+      await deleteContratoFromStore(year, selectedContratoForActions.value.id);
+      closeActions();
       // Refresh data after deletion
-      await refreshData()
+      await refreshData();
     } catch (err) {
-      console.error('Error deleting contrato:', err)
+      console.error('Error deleting contrato:', err);
       // Error is already handled by the store
     }
   }
-}
+};
 
-const formatDate = (dateString) => {
-  if (!dateString) return ''
-  return new Date(dateString).toLocaleDateString('pt-PT')
-}
+const formatDate = dateString => {
+  if (!dateString) return '';
+  return new Date(dateString).toLocaleDateString('pt-PT');
+};
 
 const navigateToCreate = () => {
-  router.push('/gestor-contratos/new?from=list')
-}
+  router.push('/gestor-contratos/new?from=list');
+};
 
 // Lifecycle
 onMounted(async () => {
-  await Promise.all([
-    fetchAvailableYears(),
-    fetchContratosForYear(selectedYear.value)
-  ])
-})
+  await Promise.all([fetchAvailableYears(), fetchContratosForYear(selectedYear.value)]);
+});
 
 // Watchers
-watch(currentYear, (newYear) => {
-  selectedYear.value = newYear
-})
+watch(currentYear, newYear => {
+  selectedYear.value = newYear;
+});
 </script>
 
 <style scoped>
@@ -511,8 +523,6 @@ watch(currentYear, (newYear) => {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
-
 
 .form-control {
   padding: 0.5rem;
@@ -1047,4 +1057,4 @@ watch(currentYear, (newYear) => {
     font-size: 1.3rem;
   }
 }
-</style> 
+</style>

@@ -28,7 +28,12 @@
             :disabled="editingSoftwareId !== null"
           >
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
             </svg>
             Adicionar Software
           </button>
@@ -40,7 +45,7 @@
             v-for="(software, index) in formData.softwares"
             :key="software.id"
             class="software-card"
-            :class="{ 'editing': isSoftwareEditing(software.id) }"
+            :class="{ editing: isSoftwareEditing(software.id) }"
           >
             <div class="software-header">
               <h3 class="software-title">
@@ -94,7 +99,9 @@
               <div class="form-grid">
                 <!-- Software Selection -->
                 <div class="form-group">
-                  <label :for="`software-${software.id}`" class="form-label required">Software</label>
+                  <label :for="`software-${software.id}`" class="form-label required"
+                    >Software</label
+                  >
                   <select
                     :id="`software-${software.id}`"
                     v-model="software.name"
@@ -175,7 +182,14 @@
                 </div>
 
                 <!-- Zon Soft Version -->
-                <div v-if="software.name === 'Zon Soft' && software.product && software.product !== 'ZSFACT'" class="form-group">
+                <div
+                  v-if="
+                    software.name === 'Zon Soft' &&
+                    software.product &&
+                    software.product !== 'ZSFACT'
+                  "
+                  class="form-group"
+                >
                   <label :for="`zonsoft-version-${software.id}`" class="form-label">Versão</label>
                   <select
                     :id="`zonsoft-version-${software.id}`"
@@ -192,7 +206,9 @@
 
                 <!-- Pt CERT License Type -->
                 <div v-if="software.name === 'Pt CERT'" class="form-group">
-                  <label :for="`ptcert-license-${software.id}`" class="form-label">Tipo de Licença</label>
+                  <label :for="`ptcert-license-${software.id}`" class="form-label"
+                    >Tipo de Licença</label
+                  >
                   <select
                     :id="`ptcert-license-${software.id}`"
                     v-model="software.licenseType"
@@ -207,7 +223,10 @@
               </div>
 
               <!-- Pix Modules -->
-              <div v-if="software.name === 'Pix' && pixHasModules(software.product)" class="form-group full-width mt-4">
+              <div
+                v-if="software.name === 'Pix' && pixHasModules(software.product)"
+                class="form-group full-width mt-4"
+              >
                 <label class="form-label">Módulos</label>
                 <div class="modules-checkboxes">
                   <label class="module-checkbox">
@@ -216,7 +235,7 @@
                       value="Modulo 1"
                       v-model="software.modules"
                       :disabled="!isSoftwareEditing(software.id)"
-                    >
+                    />
                     Módulo 1
                   </label>
                   <label class="module-checkbox">
@@ -225,7 +244,7 @@
                       value="Modulo 2"
                       v-model="software.modules"
                       :disabled="!isSoftwareEditing(software.id)"
-                    >
+                    />
                     Módulo 2
                   </label>
                   <label class="module-checkbox">
@@ -234,7 +253,7 @@
                       value="Modulo 3"
                       v-model="software.modules"
                       :disabled="!isSoftwareEditing(software.id)"
-                    >
+                    />
                     Módulo 3
                   </label>
                   <label class="module-checkbox">
@@ -243,7 +262,7 @@
                       value="Posto adicional"
                       v-model="software.modules"
                       :disabled="!isSoftwareEditing(software.id)"
-                    >
+                    />
                     Posto adicional
                   </label>
                 </div>
@@ -255,7 +274,9 @@
                   <!-- Vectron Fields -->
                   <template v-if="software.name === 'Vectron'">
                     <div class="form-group">
-                      <label :for="`n-equipamento-${software.id}`" class="form-label">Nº Equipamento</label>
+                      <label :for="`n-equipamento-${software.id}`" class="form-label"
+                        >Nº Equipamento</label
+                      >
                       <input
                         type="text"
                         :id="`n-equipamento-${software.id}`"
@@ -263,10 +284,12 @@
                         class="form-input"
                         :disabled="!isSoftwareEditing(software.id)"
                         placeholder="Nº do equipamento"
-                      >
+                      />
                     </div>
                     <div class="form-group">
-                      <label :for="`versao-software-${software.id}`" class="form-label">Versão do Software</label>
+                      <label :for="`versao-software-${software.id}`" class="form-label"
+                        >Versão do Software</label
+                      >
                       <input
                         type="text"
                         :id="`versao-software-${software.id}`"
@@ -274,14 +297,16 @@
                         class="form-input"
                         :disabled="!isSoftwareEditing(software.id)"
                         placeholder="Ex: 1.2.3"
-                      >
+                      />
                     </div>
                   </template>
 
                   <!-- Common Fields (for all except Vectron) -->
                   <template v-else>
                     <div class="form-group">
-                      <label :for="`numero-serie-${software.id}`" class="form-label">Número Série</label>
+                      <label :for="`numero-serie-${software.id}`" class="form-label"
+                        >Número Série</label
+                      >
                       <input
                         type="text"
                         :id="`numero-serie-${software.id}`"
@@ -289,10 +314,12 @@
                         class="form-input"
                         :disabled="!isSoftwareEditing(software.id)"
                         placeholder="Nº de série"
-                      >
+                      />
                     </div>
                     <div class="form-group">
-                      <label :for="`versao-software-${software.id}`" class="form-label">Versão Software</label>
+                      <label :for="`versao-software-${software.id}`" class="form-label"
+                        >Versão Software</label
+                      >
                       <input
                         type="text"
                         :id="`versao-software-${software.id}`"
@@ -300,10 +327,12 @@
                         class="form-input"
                         :disabled="!isSoftwareEditing(software.id)"
                         placeholder="Ex: 1.2.3"
-                      >
+                      />
                     </div>
                     <div class="form-group">
-                      <label :for="`versao-licenca-${software.id}`" class="form-label">Versão Licença</label>
+                      <label :for="`versao-licenca-${software.id}`" class="form-label"
+                        >Versão Licença</label
+                      >
                       <input
                         type="text"
                         :id="`versao-licenca-${software.id}`"
@@ -311,7 +340,7 @@
                         class="form-input"
                         :disabled="!isSoftwareEditing(software.id)"
                         placeholder="Versão da licença"
-                      >
+                      />
                     </div>
                   </template>
                 </div>
@@ -335,9 +364,13 @@
       <!-- Audit Information Section (Read-only) -->
       <div class="form-section">
         <div class="bg-white rounded-touch border border-gray-200">
-          <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+          <div
+            class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+          >
             <h2 class="text-lg font-semibold text-gray-900">Informação de Auditoria</h2>
-            <p class="text-sm text-gray-600 mt-1">Informações sobre criação e modificação (apenas leitura)</p>
+            <p class="text-sm text-gray-600 mt-1">
+              Informações sobre criação e modificação (apenas leitura)
+            </p>
           </div>
           <div class="p-4 sm:p-6">
             <div class="audit-info-grid">
@@ -407,20 +440,18 @@ const disabledFields = ['uuid', 'createdAt', 'createdBy', 'version'];
 // Fields that should be read-only (shown but not editable)
 const readOnlyFields: string[] = [];
 
-
-
 // Software management functions
 const addSoftware = (formData: any) => {
   if (!formData.softwares) {
     formData.softwares = [];
   }
-  
+
   const newSoftware: ClientSoftware = {
     id: nextSoftwareId.value++,
     name: '' as any,
-    modules: []
+    modules: [],
   };
-  
+
   formData.softwares.push(newSoftware);
   editingSoftwareId.value = newSoftware.id;
 };
@@ -463,7 +494,7 @@ const pixHasModules = (product: string): boolean => {
 // Utility functions
 const formatDateTime = (dateString?: string): string => {
   if (!dateString) return '-';
-  
+
   const date = new Date(dateString);
   return date.toLocaleString('pt-PT', {
     year: 'numeric',
@@ -477,7 +508,7 @@ const formatDateTime = (dateString?: string): string => {
 // Validation function
 const validateUpdateForm = (data: Record<string, any>): Record<string, string> => {
   const errors: Record<string, string> = {};
-  
+
   try {
     // Convert selectedServices array to individual boolean fields
     const selectedServices = data.selectedServices || [];
@@ -487,9 +518,9 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
       manutencao24: selectedServices.includes('manutencao24'),
       dumps: selectedServices.includes('dumps'),
       atcud: selectedServices.includes('atcud'),
-      vectronConnect: selectedServices.includes('vectronConnect')
+      vectronConnect: selectedServices.includes('vectronConnect'),
     };
-    
+
     // Prepare partial client data for validation
     const clientData: Partial<ClientData> = {
       nomeEmpresa: data.nomeEmpresa,
@@ -511,14 +542,14 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
       atUsername: data.atUsername,
       atPassword: data.atPassword,
       vectronAddress: data.vectronAddress,
-      observacoes: data.observacoes
+      observacoes: data.observacoes,
     };
-    
+
     // Use shared validation for updates
     const validationErrors = validateClientUpdate(clientData);
-    
+
     // Convert validation errors to form errors
-    validationErrors.forEach((errorMessage) => {
+    validationErrors.forEach(errorMessage => {
       // Map error messages to field keys (simplified approach)
       if (errorMessage.includes('Nome da empresa')) {
         errors.nomeEmpresa = errorMessage;
@@ -540,18 +571,18 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
   } catch (err) {
     errors.general = 'Erro na validação dos dados';
   }
-  
+
   return errors;
 };
 
 // Event handlers
 const handleUpdate = async (formData: Record<string, any>) => {
   if (!client.value) return;
-  
+
   try {
     isSaving.value = true;
     clearError();
-    
+
     // Convert selectedServices array to individual boolean fields
     const selectedServices = formData.selectedServices || [];
     const serviceFlags = {
@@ -560,9 +591,9 @@ const handleUpdate = async (formData: Record<string, any>) => {
       manutencao24: selectedServices.includes('manutencao24'),
       dumps: selectedServices.includes('dumps'),
       atcud: selectedServices.includes('atcud'),
-      vectronConnect: selectedServices.includes('vectronConnect')
+      vectronConnect: selectedServices.includes('vectronConnect'),
     };
-    
+
     // Prepare the update data (only the fields that changed)
     const updateData: Partial<ClientData> = {
       nomeEmpresa: formData.nomeEmpresa,
@@ -584,11 +615,11 @@ const handleUpdate = async (formData: Record<string, any>) => {
       atUsername: formData.atUsername,
       atPassword: formData.atPassword,
       vectronAddress: formData.vectronAddress,
-      observacoes: formData.observacoes
+      observacoes: formData.observacoes,
     };
-    
+
     const response = await api.update(client.value.uuid, { data: updateData } as any);
-    
+
     if (response) {
       // Navigate to the updated client's detail page
       router.push(`/clients/${client.value!.uuid}`);
@@ -614,21 +645,21 @@ const handleCancel = () => {
 // Data loading
 const loadClient = async () => {
   const clientId = route.params.uuid as string;
-  
+
   if (!clientId) {
     error.value = 'ID do cliente não fornecido';
     return;
   }
-  
+
   try {
     isLoading.value = true;
     clearError();
-    
+
     await api.fetchById(clientId);
-    
+
     if (api.currentItem.value) {
       client.value = api.currentItem.value;
-      
+
       // Ensure softwares array exists and has proper IDs
       if (client.value.data.softwares) {
         client.value.data.softwares.forEach((software, index) => {
@@ -641,14 +672,14 @@ const loadClient = async () => {
             software.modules = [];
           }
         });
-        
+
         // Update next ID to avoid conflicts
         const maxId = Math.max(...client.value.data.softwares.map(s => Number(s.id)));
         nextSoftwareId.value = Math.max(nextSoftwareId.value, maxId + 1);
       } else {
         client.value.data.softwares = [];
       }
-      
+
       // Convert individual service flags to selectedServices array for multiselect
       const selectedServices: string[] = [];
       if (client.value.data.temAnydesk) selectedServices.push('temAnydesk');
@@ -657,7 +688,7 @@ const loadClient = async () => {
       if (client.value.data.dumps) selectedServices.push('dumps');
       if (client.value.data.atcud) selectedServices.push('atcud');
       if (client.value.data.vectronConnect) selectedServices.push('vectronConnect');
-      
+
       // Add selectedServices to the client data for the form
       client.value.data.selectedServices = selectedServices;
     } else {
@@ -735,7 +766,7 @@ onMounted(() => {
   @apply flex items-center space-x-2 text-sm;
 }
 
-.module-checkbox input[type="checkbox"] {
+.module-checkbox input[type='checkbox'] {
   @apply rounded border-gray-300 text-primary-600 focus:ring-primary-500;
 }
 
@@ -819,15 +850,15 @@ onMounted(() => {
   .software-actions {
     @apply space-x-1;
   }
-  
+
   .btn-icon-action {
     @apply p-1.5;
   }
-  
+
   .modules-checkboxes {
     @apply grid-cols-1;
   }
-  
+
   .audit-info-grid {
     @apply grid-cols-1;
   }

@@ -2,10 +2,7 @@
   <div class="work-sheet-create-container">
     <!-- Header -->
     <div class="create-header">
-      <BackButton
-        to="/work-sheets"
-        variant="inline"
-      />
+      <BackButton to="/work-sheets" variant="inline" />
       <h1>Nova Folha de Obra</h1>
     </div>
 
@@ -24,13 +21,10 @@
         <ClientSearchInput
           :model-value="formData?.clientId || ''"
           :has-error="!!error"
-          @update:model-value="(value) => updateFieldValue('clientId', value)"
+          @update:model-value="value => updateFieldValue('clientId', value)"
           @client-selected="handleClientSelected"
         />
-        <p
-          v-if="error"
-          class="form-error text-red-600 text-sm mt-1"
-        >
+        <p v-if="error" class="form-error text-red-600 text-sm mt-1">
           {{ error }}
         </p>
       </template>
@@ -44,13 +38,10 @@
           maxlength="5"
           class="form-input"
           :class="{ 'border-red-500': !!error }"
-          @input="(e) => handleTimeInput(e, 'arrivalTime', updateFieldValue)"
-          @blur="(e) => handleTimeBlur(e, 'arrivalTime', updateFieldValue)"
+          @input="e => handleTimeInput(e, 'arrivalTime', updateFieldValue)"
+          @blur="e => handleTimeBlur(e, 'arrivalTime', updateFieldValue)"
         />
-        <p
-          v-if="error"
-          class="form-error text-red-600 text-sm mt-1"
-        >
+        <p v-if="error" class="form-error text-red-600 text-sm mt-1">
           {{ error }}
         </p>
       </template>
@@ -63,13 +54,10 @@
           maxlength="5"
           class="form-input"
           :class="{ 'border-red-500': !!error }"
-          @input="(e) => handleTimeInput(e, 'departureTime', updateFieldValue)"
-          @blur="(e) => handleTimeBlur(e, 'departureTime', updateFieldValue)"
+          @input="e => handleTimeInput(e, 'departureTime', updateFieldValue)"
+          @blur="e => handleTimeBlur(e, 'departureTime', updateFieldValue)"
         />
-        <p
-          v-if="error"
-          class="form-error text-red-600 text-sm mt-1"
-        >
+        <p v-if="error" class="form-error text-red-600 text-sm mt-1">
           {{ error }}
         </p>
       </template>
@@ -79,21 +67,21 @@
           <label class="displacement-label">Deslocação</label>
           <div class="radio-group">
             <label :class="['radio-label', formData?.hasDisplacement === true ? 'selected' : '']">
-              <input 
-                type="radio" 
+              <input
+                type="radio"
                 :checked="formData?.hasDisplacement === true"
                 name="displacement"
                 @change="updateFieldValue('hasDisplacement', true)"
-              >
+              />
               <span>SIM</span>
             </label>
             <label :class="['radio-label', formData?.hasDisplacement === false ? 'selected' : '']">
-              <input 
-                type="radio" 
+              <input
+                type="radio"
                 :checked="formData?.hasDisplacement === false"
                 name="displacement"
                 @change="updateFieldValue('hasDisplacement', false)"
-              >
+              />
               <span>NÃO</span>
             </label>
           </div>
@@ -104,25 +92,25 @@
         <div class="payment-method-selector">
           <label class="payment-label">Método de Pagamento</label>
           <div class="payment-options">
-            <label 
-              v-for="method in paymentMethods" 
+            <label
+              v-for="method in paymentMethods"
               :key="method.value"
-              :class="['payment-option', formData?.paymentMethod === method.value ? 'selected' : '']"
+              :class="[
+                'payment-option',
+                formData?.paymentMethod === method.value ? 'selected' : '',
+              ]"
             >
-              <input 
-                type="radio" 
+              <input
+                type="radio"
                 :value="method.value"
                 :checked="formData?.paymentMethod === method.value"
                 name="paymentMethod"
                 @change="updateFieldValue('paymentMethod', method.value)"
-              >
+              />
               <span>{{ method.label }}</span>
             </label>
           </div>
-          <p
-            v-if="error"
-            class="form-error text-red-600 text-sm mt-1"
-          >
+          <p v-if="error" class="form-error text-red-600 text-sm mt-1">
             {{ error }}
           </p>
         </div>
@@ -130,31 +118,38 @@
 
       <!-- Pricing display section (only shown when displacement is enabled) -->
       <template #after-section-displacement="{ formData: slotFormData }">
-        <div
-          v-if="slotFormData?.hasDisplacement"
-          class="pricing-section"
-        >
+        <div v-if="slotFormData?.hasDisplacement" class="pricing-section">
           <h3>Cálculo de Preços <span class="vat-note">(sem IVA)</span></h3>
           <div class="pricing-table">
             <div class="pricing-row">
               <span class="pricing-label">Taxa Deslocação:</span>
-              <span class="pricing-value">{{ getDisplacementRate() }}€ <span class="vat-indicator">sem IVA</span></span>
+              <span class="pricing-value"
+                >{{ getDisplacementRate() }}€ <span class="vat-indicator">sem IVA</span></span
+              >
             </div>
             <div class="pricing-row">
               <span class="pricing-label">Preço KMs:</span>
-              <span class="pricing-value">{{ getKmsPrice() }}€ <span class="vat-indicator">sem IVA</span></span>
+              <span class="pricing-value"
+                >{{ getKmsPrice() }}€ <span class="vat-indicator">sem IVA</span></span
+              >
             </div>
             <div class="pricing-row">
               <span class="pricing-label">Valor Hora:</span>
-              <span class="pricing-value">{{ getHourlyRate() }}€ <span class="vat-indicator">sem IVA</span></span>
+              <span class="pricing-value"
+                >{{ getHourlyRate() }}€ <span class="vat-indicator">sem IVA</span></span
+              >
             </div>
             <div class="pricing-row">
               <span class="pricing-label">Preço Mão Obra:</span>
-              <span class="pricing-value">{{ getLaborPrice() }}€ <span class="vat-indicator">sem IVA</span></span>
+              <span class="pricing-value"
+                >{{ getLaborPrice() }}€ <span class="vat-indicator">sem IVA</span></span
+              >
             </div>
             <div class="pricing-row total">
               <span class="pricing-label">PREÇO TOTAL:</span>
-              <span class="pricing-value">{{ getTotalPrice() }}€ <span class="vat-indicator">sem IVA</span></span>
+              <span class="pricing-value"
+                >{{ getTotalPrice() }}€ <span class="vat-indicator">sem IVA</span></span
+              >
             </div>
           </div>
         </div>
@@ -198,7 +193,7 @@ const paymentMethods = [
   { value: 'CARTÃO MB', label: 'CARTÃO MB' },
   { value: 'DINHEIRO', label: 'DINHEIRO' },
   { value: 'TRANSFERÊNCIA BANCÁRIA', label: 'TRANSFERÊNCIA BANCÁRIA' },
-  { value: 'CONTRATO', label: 'CONTRATO' }
+  { value: 'CONTRATO', label: 'CONTRATO' },
 ];
 
 // Selected client for additional information
@@ -215,28 +210,36 @@ const handleClientSelected = (client: Client | null) => {
 const formatTimeInput = (value: string): string => {
   // Remove all non-digits
   const digits = value.replace(/\D/g, '');
-  
+
   if (digits.length === 0) return '';
   if (digits.length <= 2) return digits;
   if (digits.length <= 4) {
     return `${digits.slice(0, 2)}:${digits.slice(2)}`;
   }
-  
+
   // Limit to 4 digits (HHMM)
   return `${digits.slice(0, 2)}:${digits.slice(2, 4)}`;
 };
 
-const handleTimeInput = (event: Event, fieldKey: string, updateFieldValue: (key: string, value: any) => void) => {
+const handleTimeInput = (
+  event: Event,
+  fieldKey: string,
+  updateFieldValue: (key: string, value: any) => void
+) => {
   const target = event.target as HTMLInputElement;
   const formatted = formatTimeInput(target.value);
   target.value = formatted;
   updateFieldValue(fieldKey, formatted);
 };
 
-const handleTimeBlur = (event: Event, fieldKey: string, updateFieldValue: (key: string, value: any) => void) => {
+const handleTimeBlur = (
+  event: Event,
+  fieldKey: string,
+  updateFieldValue: (key: string, value: any) => void
+) => {
   const target = event.target as HTMLInputElement;
   const value = target.value;
-  
+
   // Validate time format on blur
   if (value && !/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(value)) {
     // If invalid format, try to fix common issues
@@ -253,7 +256,7 @@ const handleTimeBlur = (event: Event, fieldKey: string, updateFieldValue: (key: 
 
 const validateCreateForm = (data: Record<string, any>): Record<string, string> => {
   console.log('Validating work sheet creation data:', JSON.stringify(data, null, 2));
-  
+
   try {
     // Transform form data to WorkSheetCreationData format
     const workSheetData: WorkSheetCreationData = {
@@ -265,14 +268,14 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
         reason: data.reason || '',
         arrivalTime: data.arrivalTime || '',
         departureTime: data.departureTime || '',
-        totalHours: data.totalHours || '0:00'
+        totalHours: data.totalHours || '0:00',
       },
       displacement: {
         hasDisplacement: data.hasDisplacement || false,
         weekendHoliday: data.weekendHoliday || false,
         oneWayKms: data.oneWayKms || 0,
         totalKms: data.totalKms || 0,
-        paymentMethod: data.paymentMethod || 'PENDENTE'
+        paymentMethod: data.paymentMethod || 'PENDENTE',
       },
       otherData: {
         serviceType: data.serviceType || '',
@@ -292,20 +295,23 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
         remoteAccessCheck: data.remoteAccessCheck || false,
         anydesk: data.anydesk || false,
         serviceReport: data.serviceReport || '',
-        clientSignature: data.clientSignature || ''
-      }
+        clientSignature: data.clientSignature || '',
+      },
     };
-    
-    console.log('Transformed work sheet data for validation:', JSON.stringify(workSheetData, null, 2));
-    
+
+    console.log(
+      'Transformed work sheet data for validation:',
+      JSON.stringify(workSheetData, null, 2)
+    );
+
     // Use the comprehensive validation from shared package
     const errors = validateWorkSheetCreation(workSheetData);
     console.log('Validation errors:', errors);
-    
+
     // Convert array of error messages to field-specific errors
     const fieldErrors: Record<string, string> = {};
-    
-    errors.forEach((errorMessage) => {
+
+    errors.forEach(errorMessage => {
       if (errorMessage.includes('Cliente é obrigatório')) {
         fieldErrors.clientId = errorMessage;
       } else if (errorMessage.includes('Data da assistência é obrigatória')) {
@@ -330,14 +336,16 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
         fieldErrors.materialDetails = errorMessage;
       } else if (errorMessage.includes('Descrição dos equipamentos é obrigatória')) {
         fieldErrors.equipmentDetails = errorMessage;
-      } else if (errorMessage.includes('Observações sobre problemas não resolvidos são obrigatórias')) {
+      } else if (
+        errorMessage.includes('Observações sobre problemas não resolvidos são obrigatórias')
+      ) {
         fieldErrors.resolutionIssues = errorMessage;
       } else {
         // Generic error
         fieldErrors.general = errorMessage;
       }
     });
-    
+
     console.log('Field errors:', JSON.stringify(fieldErrors, null, 2));
     console.log('Form validation result - has errors:', Object.keys(fieldErrors).length > 0);
     return fieldErrors;
@@ -349,13 +357,13 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
 
 const handleCreateSuccess = async (formData: Record<string, any>) => {
   console.log('🚀 handleCreateSuccess called with form data:', JSON.stringify(formData, null, 2));
-  
+
   try {
     isSaving.value = true;
     clearError();
-    
+
     console.log('Creating work sheet with form data:', JSON.stringify(formData, null, 2));
-    
+
     // Transform form data to WorkSheetCreationData format
     const workSheetData: WorkSheetCreationData = {
       clientId: formData.clientId || '',
@@ -366,14 +374,14 @@ const handleCreateSuccess = async (formData: Record<string, any>) => {
         reason: formData.reason || '',
         arrivalTime: formData.arrivalTime || '',
         departureTime: formData.departureTime || '',
-        totalHours: formData.totalHours || '0:00'
+        totalHours: formData.totalHours || '0:00',
       },
       displacement: {
         hasDisplacement: formData.hasDisplacement || false,
         weekendHoliday: formData.weekendHoliday || false,
         oneWayKms: formData.oneWayKms || 0,
         totalKms: formData.totalKms || 0,
-        paymentMethod: formData.paymentMethod || 'PENDENTE'
+        paymentMethod: formData.paymentMethod || 'PENDENTE',
       },
       otherData: {
         serviceType: formData.serviceType || '',
@@ -393,14 +401,14 @@ const handleCreateSuccess = async (formData: Record<string, any>) => {
         remoteAccessCheck: formData.remoteAccessCheck || false,
         anydesk: formData.anydesk || false,
         serviceReport: formData.serviceReport || '',
-        clientSignature: formData.clientSignature || ''
-      }
+        clientSignature: formData.clientSignature || '',
+      },
     };
-    
+
     console.log('Transformed work sheet data:', JSON.stringify(workSheetData, null, 2));
-    
+
     const response = await api.create({ data: workSheetData } as any);
-    
+
     if (response) {
       console.log('Work sheet created successfully:', JSON.stringify(response, null, 2));
       // Navigate to the created work sheet's detail page
@@ -441,28 +449,28 @@ const getKmsPrice = (): number => {
 const getLaborPrice = (): number => {
   const currentFormData = formData.value;
   if (!currentFormData?.hasDisplacement) return 0;
-  
+
   const arrivalTime = currentFormData?.arrivalTime;
   const departureTime = currentFormData?.departureTime;
-  
+
   if (!arrivalTime || !departureTime) return 0;
-  
+
   try {
     const [arrivalHours, arrivalMinutes] = arrivalTime.split(':').map(Number);
     const [departureHours, departureMinutes] = departureTime.split(':').map(Number);
-    
+
     const arrivalTotalMinutes = arrivalHours * 60 + arrivalMinutes;
     const departureTotalMinutes = departureHours * 60 + departureMinutes;
-    
+
     let diffMinutes = departureTotalMinutes - arrivalTotalMinutes;
     if (diffMinutes < 0) {
       diffMinutes += 24 * 60; // Handle next day
     }
-    
+
     const totalHours = diffMinutes / 60;
     const chargeableHours = totalHours < 1 ? 1 : totalHours; // Minimum 1 hour
     const hourlyRate = getHourlyRate();
-    
+
     return Math.round(chargeableHours * hourlyRate * 100) / 100;
   } catch {
     return 0;
@@ -472,83 +480,108 @@ const getLaborPrice = (): number => {
 const getTotalPrice = (): number => {
   const currentFormData = formData.value;
   if (!currentFormData?.hasDisplacement) return 0;
-  
+
   const displacementRate = getDisplacementRate();
   const kmsPrice = getKmsPrice();
   const laborPrice = getLaborPrice();
-  
+
   return Math.round((displacementRate + kmsPrice + laborPrice) * 100) / 100;
 };
 
 // Watchers for automatic calculations
-watch(() => formData.value?.oneWayKms, (newValue) => {
-  if (newValue !== undefined && newValue !== null && formData.value?.hasDisplacement) {
-    const totalKms = newValue * 2;
-    updateFieldValue('totalKms', totalKms);
-  }
-});
-
-watch(() => [formData.value?.arrivalTime, formData.value?.departureTime], ([arrivalTime, departureTime]) => {
-  if (arrivalTime && departureTime) {
-    try {
-      const arrivalMatch = arrivalTime.match(/^(\d{1,2}):(\d{1,2})$/);
-      const departureMatch = departureTime.match(/^(\d{1,2}):(\d{1,2})$/);
-      
-      if (arrivalMatch && departureMatch) {
-        const arrivalHours = parseInt(arrivalMatch[1]);
-        const arrivalMinutes = parseInt(arrivalMatch[2]);
-        const departureHours = parseInt(departureMatch[1]);
-        const departureMinutes = parseInt(departureMatch[2]);
-        
-        const arrival = new Date(2000, 0, 1, arrivalHours, arrivalMinutes);
-        const departure = new Date(2000, 0, 1, departureHours, departureMinutes);
-        
-        if (departure >= arrival) {
-          const diff = departure.getTime() - arrival.getTime();
-          const hours = Math.floor(diff / 3600000).toString().padStart(2, '0');
-          const minutes = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-          updateFieldValue('totalHours', `${hours}:${minutes}`);
-        }
-      }
-    } catch (error) {
-      console.error('Error calculating total hours:', error);
+watch(
+  () => formData.value?.oneWayKms,
+  newValue => {
+    if (newValue !== undefined && newValue !== null && formData.value?.hasDisplacement) {
+      const totalKms = newValue * 2;
+      updateFieldValue('totalKms', totalKms);
     }
   }
-});
+);
+
+watch(
+  () => [formData.value?.arrivalTime, formData.value?.departureTime],
+  ([arrivalTime, departureTime]) => {
+    if (arrivalTime && departureTime) {
+      try {
+        const arrivalMatch = arrivalTime.match(/^(\d{1,2}):(\d{1,2})$/);
+        const departureMatch = departureTime.match(/^(\d{1,2}):(\d{1,2})$/);
+
+        if (arrivalMatch && departureMatch) {
+          const arrivalHours = parseInt(arrivalMatch[1]);
+          const arrivalMinutes = parseInt(arrivalMatch[2]);
+          const departureHours = parseInt(departureMatch[1]);
+          const departureMinutes = parseInt(departureMatch[2]);
+
+          const arrival = new Date(2000, 0, 1, arrivalHours, arrivalMinutes);
+          const departure = new Date(2000, 0, 1, departureHours, departureMinutes);
+
+          if (departure >= arrival) {
+            const diff = departure.getTime() - arrival.getTime();
+            const hours = Math.floor(diff / 3600000)
+              .toString()
+              .padStart(2, '0');
+            const minutes = Math.floor((diff % 3600000) / 60000)
+              .toString()
+              .padStart(2, '0');
+            updateFieldValue('totalHours', `${hours}:${minutes}`);
+          }
+        }
+      } catch (error) {
+        console.error('Error calculating total hours:', error);
+      }
+    }
+  }
+);
 
 // Clear conditional fields when dependencies change
-watch(() => formData.value?.paymentMethod, (newValue) => {
-  if (newValue !== 'CONTRATO') {
-    updateFieldValue('warranty', false);
-    updateFieldValue('contract', false);
-    updateFieldValue('contractYear', new Date().getFullYear().toString());
+watch(
+  () => formData.value?.paymentMethod,
+  newValue => {
+    if (newValue !== 'CONTRATO') {
+      updateFieldValue('warranty', false);
+      updateFieldValue('contract', false);
+      updateFieldValue('contractYear', new Date().getFullYear().toString());
+    }
   }
-});
+);
 
-watch(() => formData.value?.materialUsed, (newValue) => {
-  if (!newValue) {
-    updateFieldValue('materialDetails', '');
+watch(
+  () => formData.value?.materialUsed,
+  newValue => {
+    if (!newValue) {
+      updateFieldValue('materialDetails', '');
+    }
   }
-});
+);
 
-watch(() => formData.value?.equipment, (newValue) => {
-  if (!newValue) {
-    updateFieldValue('equipmentDetails', '');
+watch(
+  () => formData.value?.equipment,
+  newValue => {
+    if (!newValue) {
+      updateFieldValue('equipmentDetails', '');
+    }
   }
-});
+);
 
-watch(() => formData.value?.totallyResolved, (newValue) => {
-  if (newValue) {
-    updateFieldValue('resolutionIssues', '');
+watch(
+  () => formData.value?.totallyResolved,
+  newValue => {
+    if (newValue) {
+      updateFieldValue('resolutionIssues', '');
+    }
   }
-});
+);
 
-watch(() => formData.value?.hasDisplacement, (newValue) => {
-  if (!newValue) {
-    updateFieldValue('oneWayKms', 0);
-    updateFieldValue('totalKms', 0);
+watch(
+  () => formData.value?.hasDisplacement,
+  newValue => {
+    if (!newValue) {
+      updateFieldValue('oneWayKms', 0);
+      updateFieldValue('totalKms', 0);
+    }
   }
-});
+);
 </script>
 
 <style scoped>
@@ -624,19 +657,19 @@ watch(() => formData.value?.hasDisplacement, (newValue) => {
   border-right: 1px solid #ddd;
 }
 
-.radio-label input[type="radio"] {
+.radio-label input[type='radio'] {
   position: absolute;
   opacity: 0;
 }
 
-.radio-label input[type="radio"]:checked + span {
+.radio-label input[type='radio']:checked + span {
   color: #333;
   font-weight: 600;
 }
 
 .radio-label.selected {
   background-color: #fff;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Payment method styling */
@@ -675,19 +708,19 @@ watch(() => formData.value?.hasDisplacement, (newValue) => {
   justify-content: center;
 }
 
-.payment-option input[type="radio"] {
+.payment-option input[type='radio'] {
   position: absolute;
   opacity: 0;
 }
 
 .payment-option:hover {
-  border-color: #75AE93;
+  border-color: #75ae93;
   background-color: rgba(117, 174, 147, 0.05);
 }
 
 .payment-option.selected {
-  border-color: #75AE93;
-  background-color: #75AE93;
+  border-color: #75ae93;
+  background-color: #75ae93;
   color: white;
   font-weight: 600;
 }
@@ -703,7 +736,7 @@ watch(() => formData.value?.hasDisplacement, (newValue) => {
   padding: 1rem;
   background: #f8f9fa;
   border-radius: 8px;
-  border-left: 4px solid #75AE93;
+  border-left: 4px solid #75ae93;
 }
 
 .pricing-section h3 {
@@ -739,7 +772,7 @@ watch(() => formData.value?.hasDisplacement, (newValue) => {
 }
 
 .pricing-row.total {
-  background: #75AE93;
+  background: #75ae93;
   color: white;
   margin: 0.5rem -1rem -1rem -1rem;
   padding: 1rem;
@@ -785,39 +818,39 @@ watch(() => formData.value?.hasDisplacement, (newValue) => {
   .work-sheet-create-container {
     padding: 0.5rem;
   }
-  
+
   .create-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .create-header h1 {
     font-size: 1.3rem;
   }
-  
+
   .payment-options {
     flex-direction: column;
   }
-  
+
   .payment-option {
     min-width: auto;
   }
-  
+
   .pricing-section {
     padding: 0.75rem;
   }
-  
+
   .pricing-section h3 {
     font-size: 0.9rem;
   }
-  
+
   .pricing-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.25rem;
   }
-  
+
   .pricing-value {
     width: 100%;
   }
@@ -827,11 +860,11 @@ watch(() => formData.value?.hasDisplacement, (newValue) => {
   .work-sheet-create-container {
     padding: 0.25rem;
   }
-  
+
   .create-header {
     padding: 0.75rem;
   }
-  
+
   .create-header h1 {
     font-size: 1.2rem;
   }

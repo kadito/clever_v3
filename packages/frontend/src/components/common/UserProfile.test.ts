@@ -45,7 +45,7 @@ describe('UserProfile', () => {
   beforeEach(() => {
     // Reset all mocks
     vi.clearAllMocks();
-    
+
     // Set default mock values for Admin user
     mockUserTypeDisplayName.mockReturnValue('Administrador');
     mockUserType.mockReturnValue('Admin');
@@ -82,25 +82,25 @@ describe('UserProfile', () => {
 
   it('renders user information correctly', async () => {
     const wrapper = createWrapper();
-    
+
     // Check that user name is displayed
     expect(wrapper.text()).toContain('João Silva');
-    
+
     // Click to open dropdown to see email
     const button = wrapper.find('button');
     await button.trigger('click');
-    
+
     // Now email should be visible in the dropdown
     expect(wrapper.text()).toContain('test@example.com');
   });
 
   it('displays correct user type in Portuguese', async () => {
     const wrapper = createWrapper();
-    
+
     // Click to open dropdown to see user type
     const button = wrapper.find('button');
     await button.trigger('click');
-    
+
     // Admin should show as "Administrador"
     expect(wrapper.text()).toContain('Administrador');
   });
@@ -112,49 +112,49 @@ describe('UserProfile', () => {
     mockIsAdmin.mockReturnValue(false);
     mockIsUser.mockReturnValue(true);
     mockCanAccessAdminFeatures.mockReturnValue(false);
-    
+
     const userTypeUser: UserContext = {
       ...mockUser,
       userType: 'User',
     };
-    
+
     const wrapper = createWrapper({ user: userTypeUser });
-    
+
     // Click to open dropdown to see user type
     const button = wrapper.find('button');
     await button.trigger('click');
-    
+
     // User should show as "Utilizador"
     expect(wrapper.text()).toContain('Utilizador');
   });
 
   it('shows sign out button', async () => {
     const wrapper = createWrapper();
-    
+
     // Click to open dropdown to see sign out button
     const button = wrapper.find('button');
     await button.trigger('click');
-    
+
     expect(wrapper.text()).toContain('Sair');
   });
 
   it('handles mobile layout correctly', () => {
     const wrapper = createWrapper({ isMobile: true });
-    
+
     // Should render mobile-specific elements
     expect(wrapper.find('.touch-target').exists()).toBe(true);
   });
 
   it('toggles dropdown when clicked', async () => {
     const wrapper = createWrapper();
-    
+
     // Initially dropdown should be closed
     expect(wrapper.vm.isDropdownOpen).toBe(false);
-    
+
     // Click the button to open dropdown
     const button = wrapper.find('button');
     await button.trigger('click');
-    
+
     expect(wrapper.vm.isDropdownOpen).toBe(true);
   });
 
@@ -164,9 +164,9 @@ describe('UserProfile', () => {
       firstName: '',
       lastName: '',
     };
-    
+
     const wrapper = createWrapper({ user: userWithoutName });
-    
+
     // Should display email as the name
     expect(wrapper.text()).toContain('test@example.com');
   });

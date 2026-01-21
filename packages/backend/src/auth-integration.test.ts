@@ -20,7 +20,7 @@ describe('Authentication Integration', () => {
       for (const endpoint of protectedEndpoints) {
         const response = await app.request(endpoint);
         expect(response.status).toBe(401);
-        
+
         const body = await response.json();
         expect(body.success).toBe(false);
         expect(body.error).toContain('Authentication');
@@ -37,7 +37,7 @@ describe('Authentication Integration', () => {
       });
 
       expect(response.status).toBe(401);
-      
+
       const body = await response.json();
       expect(body.success).toBe(false);
       expect(body.error).toContain('Authentication');
@@ -53,7 +53,7 @@ describe('Authentication Integration', () => {
       });
 
       expect(response.status).toBe(401);
-      
+
       const body = await response.json();
       expect(body.success).toBe(false);
       expect(body.error).toContain('Authentication');
@@ -65,7 +65,7 @@ describe('Authentication Integration', () => {
       });
 
       expect(response.status).toBe(401);
-      
+
       const body = await response.json();
       expect(body.success).toBe(false);
       expect(body.error).toContain('Authentication');
@@ -76,13 +76,13 @@ describe('Authentication Integration', () => {
     it('should allow access to health check endpoints without authentication', async () => {
       const healthResponse = await app.request('/health');
       expect(healthResponse.status).toBe(200);
-      
+
       const healthBody = await healthResponse.json();
       expect(healthBody.status).toBe('ok');
 
       const apiHealthResponse = await app.request('/api/health');
       expect(apiHealthResponse.status).toBe(200);
-      
+
       const apiHealthBody = await apiHealthResponse.json();
       expect(apiHealthBody.status).toBe('ok');
     });

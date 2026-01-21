@@ -2,7 +2,12 @@
 
 ## Overview
 
-This implementation plan converts the Clerk authentication design into discrete coding tasks. The approach follows an incremental development strategy, building authentication capabilities from backend foundation through frontend integration, with comprehensive testing at each stage. Authentication types are shared between frontend and backend packages through the `@clever/shared` package to ensure type consistency.
+This implementation plan converts the Clerk authentication design into discrete
+coding tasks. The approach follows an incremental development strategy, building
+authentication capabilities from backend foundation through frontend
+integration, with comprehensive testing at each stage. Authentication types are
+shared between frontend and backend packages through the `@clever/shared`
+package to ensure type consistency.
 
 ## Tasks
 
@@ -14,11 +19,11 @@ This implementation plan converts the Clerk authentication design into discrete 
   - Create backend-specific ClerkBindings interface
   - _Requirements: 3.1, 3.2, 3.4_
 
-- [ ]* 1.1 Write property test for token verification
+- [ ]\* 1.1 Write property test for token verification
   - **Property 8: Token Verification**
   - **Validates: Requirements 3.1**
 
-- [ ]* 1.2 Write property test for user context creation
+- [ ]\* 1.2 Write property test for user context creation
   - **Property 9: User Context Creation**
   - **Validates: Requirements 3.2**
 
@@ -33,15 +38,15 @@ This implementation plan converts the Clerk authentication design into discrete 
   - Ensure user context is available to all protected endpoints
   - _Requirements: 3.3, 3.5, 5.4, 5.5_
 
-- [ ]* 2.1 Write property test for invalid token handling
+- [ ]\* 2.1 Write property test for invalid token handling
   - **Property 10: Invalid Token Handling**
   - **Validates: Requirements 3.3, 5.5**
 
-- [ ]* 2.2 Write property test for user context availability
+- [ ]\* 2.2 Write property test for user context availability
   - **Property 12: User Context Availability**
   - **Validates: Requirements 3.5**
 
-- [ ]* 2.3 Write property test for backend endpoint protection
+- [ ]\* 2.3 Write property test for backend endpoint protection
   - **Property 17: Backend Endpoint Protection**
   - **Validates: Requirements 5.4**
 
@@ -55,7 +60,7 @@ This implementation plan converts the Clerk authentication design into discrete 
   - Create basic authentication state management using shared UserContext types
   - _Requirements: 4.1, 4.2, 4.3_
 
-- [ ]* 4.1 Write property test for authentication state management
+- [ ]\* 4.1 Write property test for authentication state management
   - **Property 13: Authentication State Management**
   - **Validates: Requirements 4.2, 4.3**
 
@@ -66,19 +71,19 @@ This implementation plan converts the Clerk authentication design into discrete 
   - Create user information display components
   - _Requirements: 1.2, 1.3, 4.4, 4.5_
 
-- [ ]* 5.1 Write property test for valid authentication flow
+- [ ]\* 5.1 Write property test for valid authentication flow
   - **Property 2: Valid Authentication Flow**
   - **Validates: Requirements 1.2**
 
-- [ ]* 5.2 Write property test for invalid authentication handling
+- [ ]\* 5.2 Write property test for invalid authentication handling
   - **Property 3: Invalid Authentication Handling**
   - **Validates: Requirements 1.3**
 
-- [ ]* 5.3 Write property test for sign-out flow
+- [ ]\* 5.3 Write property test for sign-out flow
   - **Property 14: Sign-out Flow**
   - **Validates: Requirements 4.4**
 
-- [ ]* 5.4 Write property test for user information access
+- [ ]\* 5.4 Write property test for user information access
   - **Property 15: User Information Access**
   - **Validates: Requirements 4.5**
 
@@ -89,19 +94,19 @@ This implementation plan converts the Clerk authentication design into discrete 
   - Add session persistence across browser refreshes
   - _Requirements: 1.1, 1.4, 5.1, 5.2, 5.3, 1.5_
 
-- [ ]* 6.1 Write property test for unauthenticated route protection
+- [ ]\* 6.1 Write property test for unauthenticated route protection
   - **Property 1: Unauthenticated Route Protection**
   - **Validates: Requirements 1.1, 5.2**
 
-- [ ]* 6.2 Write property test for authenticated route access
+- [ ]\* 6.2 Write property test for authenticated route access
   - **Property 4: Authenticated Route Access**
   - **Validates: Requirements 1.4, 5.3**
 
-- [ ]* 6.3 Write property test for frontend route protection
+- [ ]\* 6.3 Write property test for frontend route protection
   - **Property 16: Frontend Route Protection**
   - **Validates: Requirements 5.1**
 
-- [ ]* 6.4 Write property test for session persistence
+- [ ]\* 6.4 Write property test for session persistence
   - **Property 5: Session Persistence**
   - **Validates: Requirements 1.5**
 
@@ -111,11 +116,11 @@ This implementation plan converts the Clerk authentication design into discrete 
   - Create helper functions for accessing user type information
   - _Requirements: 2.1, 2.2, 2.4_
 
-- [ ]* 7.1 Write property test for user type assignment
+- [ ]\* 7.1 Write property test for user type assignment
   - **Property 6: User Type Assignment**
   - **Validates: Requirements 2.1, 2.2**
 
-- [ ]* 7.2 Write property test for user type availability
+- [ ]\* 7.2 Write property test for user type availability
   - **Property 7: User Type Availability**
   - **Validates: Requirements 2.4**
 
@@ -126,15 +131,17 @@ This implementation plan converts the Clerk authentication design into discrete 
   - Ensure proper integration with existing application structure
   - _Requirements: All requirements integration_
 
-- [ ]* 8.1 Write integration tests for complete authentication flow
+- [ ]\* 8.1 Write integration tests for complete authentication flow
   - Test end-to-end authentication scenarios
   - Verify frontend-backend integration
   - _Requirements: All requirements integration_
 
 - [x] 9. Final checkpoint - Complete authentication system
   - Ensure all tests pass, ask the user if questions arise.
-  - ✅ **COMPLETED**: All backend tests now pass (64/82 passing, 18 skipped E2E tests)
-  - ✅ Authentication system is working correctly - 401 responses confirm security is functioning
+  - ✅ **COMPLETED**: All backend tests now pass (64/82 passing, 18 skipped E2E
+    tests)
+  - ✅ Authentication system is working correctly - 401 responses confirm
+    security is functioning
   - ✅ CORS OPTIONS test fixed (changed expected status from 200 to 204)
 
 ## Notes
@@ -144,5 +151,7 @@ This implementation plan converts the Clerk authentication design into discrete 
 - Checkpoints ensure incremental validation
 - Property tests validate universal correctness properties
 - Unit tests validate specific examples and edge cases
-- Backend authentication is implemented first to provide foundation for frontend integration
-- User type management is implemented after basic authentication to maintain simplicity
+- Backend authentication is implemented first to provide foundation for frontend
+  integration
+- User type management is implemented after basic authentication to maintain
+  simplicity

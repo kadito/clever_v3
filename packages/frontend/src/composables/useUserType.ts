@@ -37,12 +37,12 @@ export function useUserType() {
     // User type information
     userType,
     userTypeDisplayName,
-    
+
     // Type checking functions
     isAdmin,
     isUser,
     hasUserType,
-    
+
     // Access control
     canAccessAdminFeatures,
   };

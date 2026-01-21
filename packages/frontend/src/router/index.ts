@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/auth';
 // Content types based on the CLEVER system modules (English for API, Portuguese for UI)
 const contentTypes = [
   'clients',
-  'contracts', 
+  'contracts',
   'licenses',
   'work-sheets',
   'daily-records',
@@ -57,7 +57,12 @@ const generateContentRoutes = (): RouteRecordRaw[] => {
       .join('');
 
     // Check if specific components exist, otherwise fall back to generic
-    const hasSpecificComponents = contentType === 'clients' || contentType === 'licenses' || contentType === 'contracts' || contentType === 'work-sheets'; // Clients, licenses, contracts, and work-sheets have specific components
+    const hasSpecificComponents =
+      contentType === 'clients' ||
+      contentType === 'licenses' ||
+      contentType === 'contracts' ||
+      contentType === 'work-sheets' ||
+      contentType === 'remote-assistance'; // Clients, licenses, contracts, work-sheets, and remote-assistance have specific components
 
     if (hasSpecificComponents) {
       // Use specific components for implemented content types
@@ -198,11 +203,11 @@ const router = createRouter({
     // Redirect old English routes to Portuguese routes for better UX
     {
       path: '/clients/create',
-      redirect: '/clients/criar'
+      redirect: '/clients/criar',
     },
     {
       path: '/clients/:uuid/update',
-      redirect: to => `/clients/${to.params.uuid}/editar`
+      redirect: to => `/clients/${to.params.uuid}/editar`,
     },
 
     // Catch-all route for 404 handling
@@ -254,12 +259,12 @@ router.beforeEach(async (to, from, next) => {
     // Wait for auth to be loaded (with timeout)
     let attempts = 0;
     const maxAttempts = 50; // 5 seconds max wait
-    
+
     while (!authStore.isLoaded && attempts < maxAttempts) {
       await new Promise(resolve => setTimeout(resolve, 100));
       attempts++;
     }
-    
+
     // If still not loaded after timeout, proceed anyway
     if (!authStore.isLoaded) {
       console.warn('Auth state not loaded after timeout, proceeding with navigation');
@@ -268,7 +273,7 @@ router.beforeEach(async (to, from, next) => {
 
   // Check if route requires authentication
   const requiresAuth = to.meta.requiresAuth !== false; // Default to true unless explicitly false
-  
+
   // If route doesn't require auth (like SignIn page), allow access
   if (!requiresAuth) {
     // If user is already authenticated and trying to access SignIn, redirect to home
@@ -284,11 +289,11 @@ router.beforeEach(async (to, from, next) => {
   if (!authStore.isAuthenticated) {
     // Store the intended destination for redirect after login
     const redirectPath = to.fullPath !== '/entrar' ? to.fullPath : '/';
-    
+
     // Redirect to SignIn page with return path
     next({
       name: 'signin',
-      query: { redirect: redirectPath }
+      query: { redirect: redirectPath },
     });
     return;
   }

@@ -2,20 +2,15 @@
   <div class="sh-equipment-card">
     <div class="equipment-header">
       <h5>EQUIPAMENTO S&H {{ equipmentNumber }}</h5>
-      <button 
-        v-if="equipmentNumber > 1"
-        type="button"
-        class="remove-btn"
-        @click="$emit('remove')"
-      >
+      <button v-if="equipmentNumber > 1" type="button" class="remove-btn" @click="$emit('remove')">
         ✕
       </button>
     </div>
-    
+
     <div class="equipment-fields">
       <div class="form-field">
         <label class="form-label">MODELO</label>
-        <input 
+        <input
           v-model="localEquipment.modelo"
           type="text"
           class="form-input"
@@ -23,10 +18,10 @@
           @input="updateEquipment"
         />
       </div>
-      
+
       <div class="form-field">
         <label class="form-label">Nº SÉRIE</label>
-        <input 
+        <input
           v-model="localEquipment.numeroSerie"
           type="text"
           class="form-input"
@@ -34,10 +29,10 @@
           @input="updateEquipment"
         />
       </div>
-      
+
       <div class="form-field">
         <label class="form-label">SOFTWARE</label>
-        <input 
+        <input
           v-model="localEquipment.software"
           type="text"
           class="form-input"
@@ -46,10 +41,10 @@
         />
       </div>
     </div>
-    
+
     <div class="form-field">
       <label class="form-label">OBSERVAÇÕES</label>
-      <textarea 
+      <textarea
         v-model="localEquipment.observacoes"
         class="form-textarea"
         rows="3"
@@ -61,39 +56,43 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch } from 'vue';
 
 interface SHEquipment {
-  id: string
-  modelo: string
-  numeroSerie: string
-  software: string
-  observacoes: string
+  id: string;
+  modelo: string;
+  numeroSerie: string;
+  software: string;
+  observacoes: string;
 }
 
 interface Props {
-  equipment: SHEquipment
-  equipmentNumber: number
+  equipment: SHEquipment;
+  equipmentNumber: number;
 }
 
 interface Emits {
-  (e: 'update', equipment: SHEquipment): void
-  (e: 'remove'): void
+  (e: 'update', equipment: SHEquipment): void;
+  (e: 'remove'): void;
 }
 
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
 
-const localEquipment = ref<SHEquipment>({ ...props.equipment })
+const localEquipment = ref<SHEquipment>({ ...props.equipment });
 
 // Watch for external changes to equipment prop
-watch(() => props.equipment, (newEquipment) => {
-  localEquipment.value = { ...newEquipment }
-}, { deep: true })
+watch(
+  () => props.equipment,
+  newEquipment => {
+    localEquipment.value = { ...newEquipment };
+  },
+  { deep: true }
+);
 
 const updateEquipment = () => {
-  emit('update', { ...localEquipment.value })
-}
+  emit('update', { ...localEquipment.value });
+};
 </script>
 
 <style scoped>
@@ -159,11 +158,11 @@ const updateEquipment = () => {
   .sh-equipment-card {
     @apply p-3;
   }
-  
+
   .equipment-fields {
     @apply gap-3;
   }
-  
+
   .form-input,
   .form-textarea {
     @apply py-3;

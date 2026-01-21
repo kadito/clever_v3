@@ -17,7 +17,7 @@
         <span class="action-label">CONSULTAR</span>
         <span class="action-description">Ver lista de registos de atividades</span>
       </button>
-      
+
       <button @click="navigateToCreate" class="action-btn secondary">
         <span class="action-icon">➕</span>
         <span class="action-label">NOVO REGISTO</span>
@@ -28,18 +28,18 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
-import BackButton from '@/components/BackButton.vue'
+import { useRouter } from 'vue-router';
+import BackButton from '@/components/BackButton.vue';
 
-const router = useRouter()
+const router = useRouter();
 
 const navigateToList = () => {
-  router.push('/registo-diario-atividade/list')
-}
+  router.push('/registo-diario-atividade/list');
+};
 
 const navigateToCreate = () => {
-  router.push('/registo-diario-atividade/new?from=module')
-}
+  router.push('/registo-diario-atividade/new?from=module');
+};
 </script>
 
 <style scoped>
@@ -157,30 +157,30 @@ const navigateToCreate = () => {
   .registo-diario-module {
     padding: 1rem 0.5rem;
   }
-  
+
   .module-info {
     flex-direction: column;
     text-align: center;
     gap: 1rem;
   }
-  
+
   .module-content h1 {
     font-size: 1.75rem;
   }
-  
+
   .action-btn {
     padding: 1.25rem;
     gap: 0.75rem;
   }
-  
+
   .action-icon {
     font-size: 1.25rem;
   }
-  
+
   .action-label {
     font-size: 0.9rem;
   }
-  
+
   .action-description {
     font-size: 0.8rem;
   }
@@ -192,11 +192,11 @@ const navigateToCreate = () => {
     height: 60px;
     font-size: 2rem;
   }
-  
+
   .module-content h1 {
     font-size: 1.5rem;
   }
-  
+
   .action-btn {
     padding: 1rem;
   }

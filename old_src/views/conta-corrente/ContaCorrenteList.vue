@@ -10,7 +10,7 @@
         </h1>
         <p class="page-subtitle">Lista de todos os registos de conta corrente</p>
       </div>
-      
+
       <div class="header-actions">
         <router-link to="/conta-corrente/new" class="btn btn-primary">
           <span class="btn-icon">+</span>
@@ -22,12 +22,8 @@
     <!-- Controls -->
     <div class="list-controls">
       <div class="controls-left">
-        <YearSelector 
-          v-model="selectedYear" 
-          :years="availableYears"
-          @change="handleYearChange"
-        />
-        
+        <YearSelector v-model="selectedYear" :years="availableYears" @change="handleYearChange" />
+
         <div class="search-container">
           <input
             v-model="searchQuery"
@@ -35,13 +31,8 @@
             placeholder="Pesquisar por cliente, número fatura..."
             class="search-input"
             @input="handleSearch"
-          >
-          <button 
-            v-if="searchQuery" 
-            @click="clearSearch"
-            class="search-clear"
-            type="button"
-          >
+          />
+          <button v-if="searchQuery" @click="clearSearch" class="search-clear" type="button">
             ✕
           </button>
         </div>
@@ -123,7 +114,9 @@
             <td class="client-cell">
               <div class="client-info">
                 <div class="client-name">{{ item.nomeCliente }}</div>
-                <div v-if="item.motivoObs" class="client-obs">{{ truncateText(item.motivoObs, 50) }}</div>
+                <div v-if="item.motivoObs" class="client-obs">
+                  {{ truncateText(item.motivoObs, 50) }}
+                </div>
               </div>
             </td>
             <td>
@@ -160,25 +153,21 @@
             </td>
             <td>
               <div class="action-buttons">
-                <router-link 
+                <router-link
                   :to="`/conta-corrente/${getYearFromDate(item.dataFaturaGerada || item.dataVencimentoFatura)}/${item.id}`"
                   class="btn btn-sm btn-secondary"
                   title="Ver detalhes"
                 >
                   👁️
                 </router-link>
-                <router-link 
+                <router-link
                   :to="`/conta-corrente/${getYearFromDate(item.dataFaturaGerada || item.dataVencimentoFatura)}/${item.id}/edit`"
                   class="btn btn-sm btn-outline"
                   title="Editar"
                 >
                   ✏️
                 </router-link>
-                <button 
-                  @click="confirmDelete(item)"
-                  class="btn btn-sm btn-danger"
-                  title="Eliminar"
-                >
+                <button @click="confirmDelete(item)" class="btn btn-sm btn-danger" title="Eliminar">
                   🗑️
                 </button>
               </div>
@@ -197,44 +186,46 @@
             {{ item.tipoFatura }}
           </span>
         </div>
-        
+
         <div class="card-content">
           <div class="card-row" v-if="item.numeroFatura">
             <span class="label">Nº Fatura:</span>
             <span class="value">{{ item.numeroFatura }}</span>
           </div>
-          
+
           <div class="card-row" v-if="item.valorFatura">
             <span class="label">Valor:</span>
             <span class="value currency">{{ formatCurrency(item.valorFatura) }}</span>
           </div>
-          
+
           <div class="card-row" v-if="item.dataVencimentoFatura">
             <span class="label">Vencimento:</span>
-            <span class="value" :class="getDueDateClass(item)">{{ formatDate(item.dataVencimentoFatura) }}</span>
+            <span class="value" :class="getDueDateClass(item)">{{
+              formatDate(item.dataVencimentoFatura)
+            }}</span>
           </div>
-          
+
           <div class="card-row">
             <span class="label">Estado:</span>
             <span class="status-badge" :class="getInvoiceStatus(item)">
               {{ getStatusLabel(item) }}
             </span>
           </div>
-          
+
           <div v-if="item.motivoObs" class="card-row">
             <span class="label">Observações:</span>
             <span class="value">{{ truncateText(item.motivoObs, 100) }}</span>
           </div>
         </div>
-        
+
         <div class="card-actions">
-          <router-link 
+          <router-link
             :to="`/conta-corrente/${getYearFromDate(item.dataFaturaGerada || item.dataVencimentoFatura)}/${item.id}`"
             class="btn btn-sm btn-secondary"
           >
             Ver Detalhes
           </router-link>
-          <router-link 
+          <router-link
             :to="`/conta-corrente/${getYearFromDate(item.dataFaturaGerada || item.dataVencimentoFatura)}/${item.id}/edit`"
             class="btn btn-sm btn-outline"
           >
@@ -246,35 +237,19 @@
 
     <!-- Pagination -->
     <div v-if="totalPages > 1" class="pagination">
-      <button 
-        @click="currentPage = 1" 
-        :disabled="currentPage === 1"
-        class="btn btn-sm"
-      >
-        ⏪
-      </button>
-      <button 
-        @click="currentPage--" 
-        :disabled="currentPage === 1"
-        class="btn btn-sm"
-      >
-        ⬅️
-      </button>
-      
+      <button @click="currentPage = 1" :disabled="currentPage === 1" class="btn btn-sm">⏪</button>
+      <button @click="currentPage--" :disabled="currentPage === 1" class="btn btn-sm">⬅️</button>
+
       <span class="pagination-info">
-        Página {{ currentPage }} de {{ totalPages }}
-        ({{ startIndex + 1 }}-{{ endIndex }} de {{ filteredItems.length }})
+        Página {{ currentPage }} de {{ totalPages }} ({{ startIndex + 1 }}-{{ endIndex }} de
+        {{ filteredItems.length }})
       </span>
-      
-      <button 
-        @click="currentPage++" 
-        :disabled="currentPage === totalPages"
-        class="btn btn-sm"
-      >
+
+      <button @click="currentPage++" :disabled="currentPage === totalPages" class="btn btn-sm">
         ➡️
       </button>
-      <button 
-        @click="currentPage = totalPages" 
+      <button
+        @click="currentPage = totalPages"
         :disabled="currentPage === totalPages"
         class="btn btn-sm"
       >
@@ -288,9 +263,7 @@
       <h3>Nenhum registo encontrado</h3>
       <p v-if="hasFilters">Tente ajustar os filtros ou termos de pesquisa.</p>
       <p v-else>Comece por adicionar o primeiro registo de conta corrente.</p>
-      <router-link to="/conta-corrente/new" class="btn btn-primary">
-        Novo Registo
-      </router-link>
+      <router-link to="/conta-corrente/new" class="btn btn-primary"> Novo Registo </router-link>
     </div>
 
     <!-- Loading State -->
@@ -309,9 +282,11 @@
           <p>Tem certeza que deseja eliminar este registo?</p>
           <div class="delete-item-info">
             <strong>{{ itemToDelete.nomeCliente }}</strong>
-            <br>
+            <br />
             <span v-if="itemToDelete.numeroFatura">Fatura: {{ itemToDelete.numeroFatura }}</span>
-            <span v-if="itemToDelete.valorFatura"> - {{ formatCurrency(itemToDelete.valorFatura) }}</span>
+            <span v-if="itemToDelete.valorFatura">
+              - {{ formatCurrency(itemToDelete.valorFatura) }}</span
+            >
           </div>
           <p class="warning-text">Esta ação não pode ser desfeita.</p>
         </div>
@@ -332,41 +307,39 @@
         <button @click="clearError" class="error-close">✕</button>
       </div>
     </div>
-    
+
     <!-- Floating Action Button -->
-    <button @click="navigateToCreate" class="fab">
-      ➕
-    </button>
+    <button @click="navigateToCreate" class="fab">➕</button>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useContaCorrenteStore } from '@/stores/conta-corrente'
-import YearSelector from '@/components/YearSelector.vue'
-import BackButton from '@/components/BackButton.vue'
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useContaCorrenteStore } from '@/stores/conta-corrente';
+import YearSelector from '@/components/YearSelector.vue';
+import BackButton from '@/components/BackButton.vue';
 
-const route = useRoute()
-const router = useRouter()
-const store = useContaCorrenteStore()
+const route = useRoute();
+const router = useRouter();
+const store = useContaCorrenteStore();
 
 const navigateToCreate = () => {
-  router.push('/conta-corrente/new?from=list')
-}
+  router.push('/conta-corrente/new?from=list');
+};
 
 // Local state
-const selectedYear = ref(new Date().getFullYear().toString())
-const searchQuery = ref('')
-const statusFilter = ref('')
-const typeFilter = ref('')
-const currentPage = ref(1)
-const itemsPerPage = ref(20)
-const itemToDelete = ref(null)
+const selectedYear = ref(new Date().getFullYear().toString());
+const searchQuery = ref('');
+const statusFilter = ref('');
+const typeFilter = ref('');
+const currentPage = ref(1);
+const itemsPerPage = ref(20);
+const itemToDelete = ref(null);
 
 // Sorting state
-const sortField = ref('dataFaturaGerada')
-const sortDirection = ref('desc')
+const sortField = ref('dataFaturaGerada');
+const sortDirection = ref('desc');
 
 // Computed properties from store
 const {
@@ -380,196 +353,193 @@ const {
   getYearFromDate,
   isInvoiceOverdue,
   isInvoiceDueToday,
-  clearError
-} = store
+  clearError,
+} = store;
 
 // Computed properties
 const filteredItems = computed(() => {
-  let items = [...contaCorrente.value]
+  let items = [...contaCorrente.value];
 
   // Apply search filter
   if (searchQuery.value.trim()) {
-    const query = searchQuery.value.toLowerCase().trim()
-    items = items.filter(item => 
-      item.nomeCliente?.toLowerCase().includes(query) ||
-      item.tipoFatura?.toLowerCase().includes(query) ||
-      item.numeroFatura?.toString().includes(query) ||
-      item.formaPagamento?.toLowerCase().includes(query) ||
-      item.motivoObs?.toLowerCase().includes(query) ||
-      item.numeroRemota?.toString().includes(query) ||
-      item.numeroPresencial?.toString().includes(query)
-    )
+    const query = searchQuery.value.toLowerCase().trim();
+    items = items.filter(
+      item =>
+        item.nomeCliente?.toLowerCase().includes(query) ||
+        item.tipoFatura?.toLowerCase().includes(query) ||
+        item.numeroFatura?.toString().includes(query) ||
+        item.formaPagamento?.toLowerCase().includes(query) ||
+        item.motivoObs?.toLowerCase().includes(query) ||
+        item.numeroRemota?.toString().includes(query) ||
+        item.numeroPresencial?.toString().includes(query)
+    );
   }
 
   // Apply status filter
   if (statusFilter.value) {
-    items = items.filter(item => getInvoiceStatus(item) === statusFilter.value)
+    items = items.filter(item => getInvoiceStatus(item) === statusFilter.value);
   }
 
   // Apply type filter
   if (typeFilter.value) {
-    items = items.filter(item => item.tipoFatura === typeFilter.value)
+    items = items.filter(item => item.tipoFatura === typeFilter.value);
   }
 
   // Apply sorting
   items.sort((a, b) => {
-    let aVal = a[sortField.value]
-    let bVal = b[sortField.value]
+    let aVal = a[sortField.value];
+    let bVal = b[sortField.value];
 
     // Handle different data types
     if (sortField.value.includes('data')) {
-      aVal = aVal ? new Date(aVal) : new Date(0)
-      bVal = bVal ? new Date(bVal) : new Date(0)
+      aVal = aVal ? new Date(aVal) : new Date(0);
+      bVal = bVal ? new Date(bVal) : new Date(0);
     } else if (sortField.value === 'valorFatura') {
-      aVal = parseFloat(aVal) || 0
-      bVal = parseFloat(bVal) || 0
+      aVal = parseFloat(aVal) || 0;
+      bVal = parseFloat(bVal) || 0;
     } else {
-      aVal = (aVal || '').toString().toLowerCase()
-      bVal = (bVal || '').toString().toLowerCase()
+      aVal = (aVal || '').toString().toLowerCase();
+      bVal = (bVal || '').toString().toLowerCase();
     }
 
-    if (aVal < bVal) return sortDirection.value === 'asc' ? -1 : 1
-    if (aVal > bVal) return sortDirection.value === 'asc' ? 1 : -1
-    return 0
-  })
+    if (aVal < bVal) return sortDirection.value === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortDirection.value === 'asc' ? 1 : -1;
+    return 0;
+  });
 
-  return items
-})
+  return items;
+});
 
-const totalPages = computed(() => Math.ceil(filteredItems.value.length / itemsPerPage.value))
-const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage.value)
-const endIndex = computed(() => Math.min(startIndex.value + itemsPerPage.value, filteredItems.value.length))
+const totalPages = computed(() => Math.ceil(filteredItems.value.length / itemsPerPage.value));
+const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage.value);
+const endIndex = computed(() =>
+  Math.min(startIndex.value + itemsPerPage.value, filteredItems.value.length)
+);
 
-const paginatedItems = computed(() => 
-  filteredItems.value.slice(startIndex.value, endIndex.value)
-)
+const paginatedItems = computed(() => filteredItems.value.slice(startIndex.value, endIndex.value));
 
-const hasFilters = computed(() => 
-  searchQuery.value.trim() || statusFilter.value || typeFilter.value
-)
+const hasFilters = computed(
+  () => searchQuery.value.trim() || statusFilter.value || typeFilter.value
+);
 
-const totalValue = computed(() => 
+const totalValue = computed(() =>
   filteredItems.value.reduce((sum, item) => {
-    const value = parseFloat(item.valorFatura) || 0
-    return sum + value
+    const value = parseFloat(item.valorFatura) || 0;
+    return sum + value;
   }, 0)
-)
+);
 
-const pendingCount = computed(() => 
-  filteredItems.value.filter(item => 
-    item.pago !== 'TRUE' && item.pago !== 'true'
-  ).length
-)
+const pendingCount = computed(
+  () => filteredItems.value.filter(item => item.pago !== 'TRUE' && item.pago !== 'true').length
+);
 
-const overdueCount = computed(() => 
-  filteredItems.value.filter(item => 
-    isInvoiceOverdue(item)
-  ).length
-)
+const overdueCount = computed(
+  () => filteredItems.value.filter(item => isInvoiceOverdue(item)).length
+);
 
 // Methods
 async function handleYearChange(year) {
-  selectedYear.value = year
-  currentPage.value = 1
-  await store.fetchContaCorrenteForYear(year)
+  selectedYear.value = year;
+  currentPage.value = 1;
+  await store.fetchContaCorrenteForYear(year);
 }
 
 function handleSearch() {
-  currentPage.value = 1
+  currentPage.value = 1;
 }
 
 function clearSearch() {
-  searchQuery.value = ''
-  currentPage.value = 1
+  searchQuery.value = '';
+  currentPage.value = 1;
 }
 
 function applyFilters() {
-  currentPage.value = 1
+  currentPage.value = 1;
 }
 
 function sortBy(field) {
   if (sortField.value === field) {
-    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
   } else {
-    sortField.value = field
-    sortDirection.value = 'asc'
+    sortField.value = field;
+    sortDirection.value = 'asc';
   }
-  currentPage.value = 1
+  currentPage.value = 1;
 }
 
 function getSortClass(field) {
-  if (sortField.value !== field) return ''
-  return sortDirection.value === 'asc' ? 'sort-asc' : 'sort-desc'
+  if (sortField.value !== field) return '';
+  return sortDirection.value === 'asc' ? 'sort-asc' : 'sort-desc';
 }
 
 function getStatusLabel(item) {
-  const status = getInvoiceStatus(item)
+  const status = getInvoiceStatus(item);
   const labels = {
     paid: 'Pago',
     overdue: 'Vencido',
     due_today: 'Vence Hoje',
     due_soon: 'Vence em Breve',
-    pending: 'Pendente'
-  }
-  return labels[status] || 'Desconhecido'
+    pending: 'Pendente',
+  };
+  return labels[status] || 'Desconhecido';
 }
 
 function getDueDateClass(item) {
-  if (item.pago === 'TRUE' || item.pago === 'true') return ''
-  if (isInvoiceOverdue(item)) return 'overdue'
-  if (isInvoiceDueToday(item)) return 'due-today'
-  return ''
+  if (item.pago === 'TRUE' || item.pago === 'true') return '';
+  if (isInvoiceOverdue(item)) return 'overdue';
+  if (isInvoiceDueToday(item)) return 'due-today';
+  return '';
 }
 
 function truncateText(text, maxLength) {
-  if (!text) return ''
-  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text
+  if (!text) return '';
+  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 }
 
 function confirmDelete(item) {
-  itemToDelete.value = item
+  itemToDelete.value = item;
 }
 
 function cancelDelete() {
-  itemToDelete.value = null
+  itemToDelete.value = null;
 }
 
 async function deleteItem() {
-  if (!itemToDelete.value) return
+  if (!itemToDelete.value) return;
 
   try {
     const year = getYearFromDate(
       itemToDelete.value.dataFaturaGerada || itemToDelete.value.dataVencimentoFatura
-    )
-    await store.deleteContaCorrente(year, itemToDelete.value.id)
-    itemToDelete.value = null
+    );
+    await store.deleteContaCorrente(year, itemToDelete.value.id);
+    itemToDelete.value = null;
   } catch (err) {
-    console.error('Error deleting item:', err)
+    console.error('Error deleting item:', err);
   }
 }
 
 // Lifecycle
 onMounted(async () => {
   // Check for filter parameter in route
-  const filterParam = route.query.filter
+  const filterParam = route.query.filter;
   if (filterParam) {
-    statusFilter.value = filterParam
+    statusFilter.value = filterParam;
   }
 
   try {
     await Promise.all([
       store.fetchAvailableYears(),
-      store.fetchContaCorrenteForYear(selectedYear.value)
-    ])
+      store.fetchContaCorrenteForYear(selectedYear.value),
+    ]);
   } catch (err) {
-    console.error('Error loading initial data:', err)
+    console.error('Error loading initial data:', err);
   }
-})
+});
 
 // Watch for pagination reset when items change
 watch([searchQuery, statusFilter, typeFilter], () => {
-  currentPage.value = 1
-})
+  currentPage.value = 1;
+});
 </script>
 
 <style scoped>
@@ -949,8 +919,12 @@ watch([searchQuery, statusFilter, typeFilter], () => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .modal-overlay {
@@ -1075,43 +1049,43 @@ watch([searchQuery, statusFilter, typeFilter], () => {
     height: 50px;
     font-size: 1.25rem;
   }
-  
+
   .conta-corrente-list {
     padding: 1rem;
   }
-  
+
   .page-header {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .list-controls {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .controls-left {
     justify-content: space-between;
   }
-  
+
   .search-input {
     width: 100%;
     min-width: 200px;
   }
-  
+
   .summary-stats {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .desktop-table {
     display: none;
   }
-  
+
   .mobile-cards {
     display: block;
   }
-  
+
   .conta-corrente-card {
     background: var(--color-background-elevated);
     border: 1px solid var(--color-border);
@@ -1119,46 +1093,46 @@ watch([searchQuery, statusFilter, typeFilter], () => {
     padding: 1rem;
     margin-bottom: 1rem;
   }
-  
+
   .card-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 1rem;
   }
-  
+
   .card-title {
     font-weight: 600;
     color: var(--color-text);
     flex: 1;
   }
-  
+
   .card-content {
     margin-bottom: 1rem;
   }
-  
+
   .card-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0.5rem;
   }
-  
+
   .card-row .label {
     color: var(--color-text-muted);
     font-size: 0.875rem;
   }
-  
+
   .card-row .value {
     color: var(--color-text);
     font-weight: 500;
   }
-  
+
   .card-actions {
     display: flex;
     gap: 0.5rem;
   }
-  
+
   .card-actions .btn {
     flex: 1;
     justify-content: center;

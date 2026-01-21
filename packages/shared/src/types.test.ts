@@ -490,7 +490,7 @@ describe('USER_TYPE_DISPLAY_NAMES constant', () => {
 
   it('should have entries for all user types', () => {
     const userTypes: UserType[] = ['Admin', 'User'];
-    
+
     userTypes.forEach(type => {
       expect(USER_TYPE_DISPLAY_NAMES[type]).toBeDefined();
       expect(typeof USER_TYPE_DISPLAY_NAMES[type]).toBe('string');

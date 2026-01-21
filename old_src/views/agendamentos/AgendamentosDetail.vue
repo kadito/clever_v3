@@ -1,7 +1,7 @@
 <template>
   <div class="agendamentos-detail">
     <BackButton />
-    
+
     <!-- Loading State -->
     <div v-if="loading" class="loading-container">
       <div class="loading-spinner"></div>
@@ -24,14 +24,18 @@
         <div class="header-info">
           <h1>📅 {{ agendamento.nomeCliente }}</h1>
           <div class="header-meta">
-            <span 
+            <span
               class="status-badge"
               :class="{
-                'completed': agendamento.tarefaConcluida,
-                'postponed': agendamento.houveAdiamento && !agendamento.tarefaConcluida,
-                'overdue': isTaskOverdue(agendamento) && !agendamento.tarefaConcluida,
+                completed: agendamento.tarefaConcluida,
+                postponed: agendamento.houveAdiamento && !agendamento.tarefaConcluida,
+                overdue: isTaskOverdue(agendamento) && !agendamento.tarefaConcluida,
                 'due-today': isTaskDueToday(agendamento) && !agendamento.tarefaConcluida,
-                'pending': !agendamento.tarefaConcluida && !agendamento.houveAdiamento && !isTaskOverdue(agendamento) && !isTaskDueToday(agendamento)
+                pending:
+                  !agendamento.tarefaConcluida &&
+                  !agendamento.houveAdiamento &&
+                  !isTaskOverdue(agendamento) &&
+                  !isTaskDueToday(agendamento),
               }"
             >
               <span v-if="agendamento.tarefaConcluida">✅ Concluída</span>
@@ -44,15 +48,13 @@
           </div>
         </div>
         <div class="header-actions">
-          <router-link 
+          <router-link
             :to="{ name: 'agendamentos-edit', params: { id: agendamento.id, year: currentYear } }"
             class="btn primary"
           >
             ✏️ Editar
           </router-link>
-          <button @click="confirmDelete" class="btn danger">
-            🗑️ Eliminar
-          </button>
+          <button @click="confirmDelete" class="btn danger">🗑️ Eliminar</button>
         </div>
       </div>
 
@@ -85,10 +87,10 @@
             <div class="info-grid">
               <div class="info-item">
                 <label>DATA PREVISTA PARA ASSISTÊNCIA</label>
-                <span 
-                  :class="{ 
+                <span
+                  :class="{
                     'text-danger': isTaskOverdue(agendamento) && !agendamento.tarefaConcluida,
-                    'text-warning': isTaskDueToday(agendamento) && !agendamento.tarefaConcluida
+                    'text-warning': isTaskDueToday(agendamento) && !agendamento.tarefaConcluida,
                   }"
                 >
                   {{ formatDateTime(agendamento.dataPrevistaAssistencia) || 'N/A' }}
@@ -106,12 +108,15 @@
                 <label>ASSUNTO</label>
                 <span>{{ agendamento.assunto || 'N/A' }}</span>
               </div>
-              <div class="info-item" v-if="agendamento.dataPrevistaAssistencia && !agendamento.tarefaConcluida">
+              <div
+                class="info-item"
+                v-if="agendamento.dataPrevistaAssistencia && !agendamento.tarefaConcluida"
+              >
                 <label>TEMPO RESTANTE</label>
-                <span 
-                  :class="{ 
+                <span
+                  :class="{
                     'text-danger': isTaskOverdue(agendamento),
-                    'text-warning': isTaskDueToday(agendamento)
+                    'text-warning': isTaskDueToday(agendamento),
                   }"
                 >
                   {{ calculateTimeRemaining(agendamento.dataPrevistaAssistencia) }}
@@ -128,19 +133,34 @@
             <div class="info-grid">
               <div class="info-item">
                 <label>INSTALAÇÃO</label>
-                <span :class="{ 'text-success': agendamento.instalacao, 'text-muted': !agendamento.instalacao }">
+                <span
+                  :class="{
+                    'text-success': agendamento.instalacao,
+                    'text-muted': !agendamento.instalacao,
+                  }"
+                >
                   {{ agendamento.instalacao ? '✅ Sim' : '❌ Não' }}
                 </span>
               </div>
               <div class="info-item">
                 <label>HOUVE ADIAMENTO</label>
-                <span :class="{ 'text-warning': agendamento.houveAdiamento, 'text-muted': !agendamento.houveAdiamento }">
+                <span
+                  :class="{
+                    'text-warning': agendamento.houveAdiamento,
+                    'text-muted': !agendamento.houveAdiamento,
+                  }"
+                >
                   {{ agendamento.houveAdiamento ? '📅 Sim' : '❌ Não' }}
                 </span>
               </div>
               <div class="info-item">
                 <label>TAREFA CONCLUÍDA</label>
-                <span :class="{ 'text-success': agendamento.tarefaConcluida, 'text-muted': !agendamento.tarefaConcluida }">
+                <span
+                  :class="{
+                    'text-success': agendamento.tarefaConcluida,
+                    'text-muted': !agendamento.tarefaConcluida,
+                  }"
+                >
                   {{ agendamento.tarefaConcluida ? '✅ Sim' : '❌ Não' }}
                 </span>
               </div>
@@ -233,7 +253,11 @@
     <div v-if="showDeleteModal" class="modal-overlay" @click="cancelDelete">
       <div class="modal" @click.stop>
         <h3>Confirmar Eliminação</h3>
-        <p>Tem a certeza que pretende eliminar o agendamento de <strong>{{ agendamento?.nomeCliente }}</strong>?</p>
+        <p>
+          Tem a certeza que pretende eliminar o agendamento de
+          <strong>{{ agendamento?.nomeCliente }}</strong
+          >?
+        </p>
         <p class="warning">Esta ação não pode ser desfeita.</p>
         <div class="modal-actions">
           <button @click="cancelDelete" class="btn secondary">Cancelar</button>
@@ -247,188 +271,192 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useAgendamentosStore } from '@/stores/agendamentos.js'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useAgendamentosStore } from '@/stores/agendamentos.js';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
 
 // Router
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
 // Store
-const agendamentosStore = useAgendamentosStore()
-const { selectedAgendamento: agendamento, loading, error } = storeToRefs(agendamentosStore)
+const agendamentosStore = useAgendamentosStore();
+const { selectedAgendamento: agendamento, loading, error } = storeToRefs(agendamentosStore);
 const {
   fetchAgendamentoById,
   deleteAgendamento: deleteFromStore,
   clearError,
   clearSelectedAgendamento,
   isTaskOverdue,
-  isTaskDueToday
-} = agendamentosStore
+  isTaskDueToday,
+} = agendamentosStore;
 
 // Local state
-const showDeleteModal = ref(false)
-const deleting = ref(false)
+const showDeleteModal = ref(false);
+const deleting = ref(false);
 
 // Auto-retry state
-const autoRetryCountdown = ref(0)
-const userInteractionCancelled = ref(false)
-const retryTimeoutId = ref(null)
+const autoRetryCountdown = ref(0);
+const userInteractionCancelled = ref(false);
+const retryTimeoutId = ref(null);
 
 // Computed
-const currentYear = computed(() => route.params.year)
-const agendamentoId = computed(() => route.params.id)
+const currentYear = computed(() => route.params.year);
+const agendamentoId = computed(() => route.params.id);
 
 // Methods
 const loadAgendamento = async () => {
-  clearError()
-  clearSelectedAgendamento()
-  
+  clearError();
+  clearSelectedAgendamento();
+
   try {
-    await fetchAgendamentoById(currentYear.value, agendamentoId.value)
+    await fetchAgendamentoById(currentYear.value, agendamentoId.value);
     // If successful, cancel any pending retries
-    cancelAutoRetry()
+    cancelAutoRetry();
   } catch (err) {
-    console.error('Error loading agendamento:', err)
+    console.error('Error loading agendamento:', err);
     // Check if it's a 404 or "not found" error
-    const isNotFound = err.message?.toLowerCase().includes('not found') || 
-                       error.value?.toLowerCase().includes('not found')
-    
+    const isNotFound =
+      err.message?.toLowerCase().includes('not found') ||
+      error.value?.toLowerCase().includes('not found');
+
     if (isNotFound && !userInteractionCancelled.value) {
       // Start auto-retry countdown
-      startAutoRetry()
+      startAutoRetry();
     }
   }
-}
+};
 
 const retryLoad = () => {
-  userInteractionCancelled.value = true
-  cancelAutoRetry()
-  loadAgendamento()
-}
+  userInteractionCancelled.value = true;
+  cancelAutoRetry();
+  loadAgendamento();
+};
 
 const startAutoRetry = () => {
-  cancelAutoRetry()
-  autoRetryCountdown.value = 10
-  
+  cancelAutoRetry();
+  autoRetryCountdown.value = 10;
+
   const updateCountdown = () => {
     if (autoRetryCountdown.value > 0 && !userInteractionCancelled.value) {
-      autoRetryCountdown.value--
-      retryTimeoutId.value = setTimeout(updateCountdown, 1000)
+      autoRetryCountdown.value--;
+      retryTimeoutId.value = setTimeout(updateCountdown, 1000);
     } else if (autoRetryCountdown.value === 0 && !userInteractionCancelled.value) {
       // Auto-retry after countdown
-      loadAgendamento()
+      loadAgendamento();
     }
-  }
-  
-  retryTimeoutId.value = setTimeout(updateCountdown, 1000)
-}
+  };
+
+  retryTimeoutId.value = setTimeout(updateCountdown, 1000);
+};
 
 const cancelAutoRetry = () => {
   if (retryTimeoutId.value) {
-    clearTimeout(retryTimeoutId.value)
-    retryTimeoutId.value = null
+    clearTimeout(retryTimeoutId.value);
+    retryTimeoutId.value = null;
   }
-  autoRetryCountdown.value = 0
-}
+  autoRetryCountdown.value = 0;
+};
 
 const handleUserInteraction = () => {
-  userInteractionCancelled.value = true
-  cancelAutoRetry()
-}
+  userInteractionCancelled.value = true;
+  cancelAutoRetry();
+};
 
 // Watch for successful data load to cancel retries
-watch(() => agendamento.value?.id, (newId) => {
-  if (newId) {
-    cancelAutoRetry()
-    userInteractionCancelled.value = false
+watch(
+  () => agendamento.value?.id,
+  newId => {
+    if (newId) {
+      cancelAutoRetry();
+      userInteractionCancelled.value = false;
+    }
   }
-})
+);
 
 const confirmDelete = () => {
-  showDeleteModal.value = true
-}
+  showDeleteModal.value = true;
+};
 
 const cancelDelete = () => {
-  showDeleteModal.value = false
-}
+  showDeleteModal.value = false;
+};
 
 const deleteAgendamento = async () => {
-  if (!agendamento.value) return
-  
-  deleting.value = true
+  if (!agendamento.value) return;
+
+  deleting.value = true;
   try {
-    await deleteFromStore(currentYear.value, agendamento.value.id)
-    router.push({ name: 'agendamentos' })
+    await deleteFromStore(currentYear.value, agendamento.value.id);
+    router.push({ name: 'agendamentos' });
   } catch (err) {
-    console.error('Error deleting agendamento:', err)
+    console.error('Error deleting agendamento:', err);
     // Error is already handled by the store
   } finally {
-    deleting.value = false
-    showDeleteModal.value = false
+    deleting.value = false;
+    showDeleteModal.value = false;
   }
-}
+};
 
-const formatDate = (dateString) => {
-  if (!dateString) return ''
+const formatDate = dateString => {
+  if (!dateString) return '';
   try {
-    return new Date(dateString).toLocaleDateString('pt-PT')
+    return new Date(dateString).toLocaleDateString('pt-PT');
   } catch {
-    return dateString
+    return dateString;
   }
-}
+};
 
-const formatDateTime = (dateString) => {
-  if (!dateString) return ''
+const formatDateTime = dateString => {
+  if (!dateString) return '';
   try {
-    return new Date(dateString).toLocaleString('pt-PT')
+    return new Date(dateString).toLocaleString('pt-PT');
   } catch {
-    return dateString
+    return dateString;
   }
-}
+};
 
-const calculateTimeRemaining = (targetDate) => {
-  if (!targetDate) return 'N/A'
-  
+const calculateTimeRemaining = targetDate => {
+  if (!targetDate) return 'N/A';
+
   try {
-    const target = new Date(targetDate)
-    const now = new Date()
-    const diffTime = target.getTime() - now.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    
+    const target = new Date(targetDate);
+    const now = new Date();
+    const diffTime = target.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
     if (diffDays < 0) {
-      return `Atrasado há ${Math.abs(diffDays)} dias`
+      return `Atrasado há ${Math.abs(diffDays)} dias`;
     } else if (diffDays === 0) {
-      return 'Hoje'
+      return 'Hoje';
     } else if (diffDays === 1) {
-      return 'Amanhã'
+      return 'Amanhã';
     } else {
-      return `${diffDays} dias restantes`
+      return `${diffDays} dias restantes`;
     }
   } catch {
-    return 'N/A'
+    return 'N/A';
   }
-}
+};
 
 // Lifecycle
 onMounted(() => {
   // Add event listeners for user interaction
-  window.addEventListener('click', handleUserInteraction)
-  window.addEventListener('scroll', handleUserInteraction)
-  window.addEventListener('keydown', handleUserInteraction)
-  
-  loadAgendamento()
-})
+  window.addEventListener('click', handleUserInteraction);
+  window.addEventListener('scroll', handleUserInteraction);
+  window.addEventListener('keydown', handleUserInteraction);
+
+  loadAgendamento();
+});
 
 onBeforeUnmount(() => {
-  cancelAutoRetry()
-  window.removeEventListener('click', handleUserInteraction)
-  window.removeEventListener('scroll', handleUserInteraction)
-  window.removeEventListener('keydown', handleUserInteraction)
-})
+  cancelAutoRetry();
+  window.removeEventListener('click', handleUserInteraction);
+  window.removeEventListener('scroll', handleUserInteraction);
+  window.removeEventListener('keydown', handleUserInteraction);
+});
 </script>
 
 <style scoped>
@@ -454,8 +482,12 @@ onBeforeUnmount(() => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .error-container {
@@ -791,60 +823,60 @@ onBeforeUnmount(() => {
   .agendamentos-detail {
     padding: 0.5rem;
   }
-  
+
   .agendamento-header {
     padding: 1.5rem;
     flex-direction: column;
     align-items: stretch;
     text-align: center;
   }
-  
+
   .header-info h1 {
     font-size: 1.75rem;
     margin-bottom: 1rem;
   }
-  
+
   .header-meta {
     justify-content: center;
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .header-actions {
     justify-content: center;
     margin-top: 1rem;
   }
-  
+
   .agendamento-sections {
     padding: 1rem;
   }
-  
+
   .section {
     margin-bottom: 2rem;
   }
-  
+
   .section h3 {
     font-size: 1.1rem;
   }
-  
+
   .section-content {
     padding: 1rem;
   }
-  
+
   .info-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .modal {
     padding: 1.5rem;
   }
-  
+
   .modal-actions {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .error-actions {
     flex-direction: column;
     align-items: stretch;
@@ -855,16 +887,16 @@ onBeforeUnmount(() => {
   .agendamento-header {
     padding: 1rem;
   }
-  
+
   .header-info h1 {
     font-size: 1.5rem;
   }
-  
+
   .btn {
     padding: 0.75rem 1rem;
     font-size: 0.8rem;
   }
-  
+
   .header-actions {
     flex-direction: column;
     gap: 0.5rem;

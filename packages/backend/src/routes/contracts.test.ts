@@ -30,7 +30,7 @@ class MockStorageBucket {
     const data = this.storage.get(key);
     if (!data) return null;
     return {
-      json: async () => JSON.parse(data)
+      json: async () => JSON.parse(data),
     };
   }
 
@@ -53,7 +53,7 @@ describe('Contracts API Routes', () => {
     mockBucket = new MockStorageBucket();
     mockEnv = { R2_BUCKET: mockBucket };
     vi.clearAllMocks();
-    
+
     // Mount the contracts router
     app.route('/api/content/contracts', contractsRouter);
   });
@@ -77,8 +77,8 @@ describe('Contracts API Routes', () => {
             modelo: 'Test Model',
             numeroSerie: 'TEST123',
             desconto: 0,
-            observacoes: 'Test equipment'
-          }
+            observacoes: 'Test equipment',
+          },
         ],
         modeloCPA: 'Test Model',
         numeroSerieCPA: 'TEST123',
@@ -99,19 +99,23 @@ describe('Contracts API Routes', () => {
         metodoPagamento: 'TRANSFERENCIA_BANCARIA',
         planoContrato: 'CPA Básico',
         temCPA: true,
-        temPSO: false
+        temPSO: false,
       };
 
-      const response = await app.request('/api/content/contracts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await app.request(
+        '/api/content/contracts',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ data: contractData }),
         },
-        body: JSON.stringify({ data: contractData }),
-      }, mockEnv);
+        mockEnv
+      );
 
       const result = await response.json();
-      
+
       expect(response.status).toBe(201);
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
@@ -126,13 +130,17 @@ describe('Contracts API Routes', () => {
         hasSHContract: false, // No contract types selected
       };
 
-      const response = await app.request('/api/content/contracts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await app.request(
+        '/api/content/contracts',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ data: invalidData }),
         },
-        body: JSON.stringify({ data: invalidData }),
-      }, mockEnv);
+        mockEnv
+      );
 
       expect(response.status).toBe(400);
       const result = await response.json();
@@ -160,8 +168,8 @@ describe('Contracts API Routes', () => {
             modelo: 'Modelo XYZ',
             numeroSerie: 'XYZ789',
             desconto: 0,
-            observacoes: ''
-          }
+            observacoes: '',
+          },
         ],
         modeloCPA: 'Modelo XYZ',
         numeroSerieCPA: 'XYZ789',
@@ -182,20 +190,24 @@ describe('Contracts API Routes', () => {
         metodoPagamento: 'DEBITO_DIRETO',
         planoContrato: 'CPA Premium + S&H Standard',
         temCPA: true,
-        temPSO: true
+        temPSO: true,
       };
 
-      const response = await app.request('/api/content/contracts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await app.request(
+        '/api/content/contracts',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ data: contractData }),
         },
-        body: JSON.stringify({ data: contractData }),
-      }, mockEnv);
+        mockEnv
+      );
 
       expect(response.status).toBe(201);
       const result = await response.json();
-      
+
       // Verify the contract was created with proper indexing
       expect(result.success).toBe(true);
       expect(result.data.data.clienteName).toBe('Empresa ABC Lda');
@@ -221,13 +233,17 @@ describe('Contracts API Routes', () => {
         manutencoesPorAno: 0,
       };
 
-      const response = await app.request('/api/content/contracts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await app.request(
+        '/api/content/contracts',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ data: invalidCPAData }),
         },
-        body: JSON.stringify({ data: invalidCPAData }),
-      }, mockEnv);
+        mockEnv
+      );
 
       expect(response.status).toBe(400);
       const result = await response.json();
@@ -249,13 +265,17 @@ describe('Contracts API Routes', () => {
         manutencoesPorAno: 0,
       };
 
-      const response = await app.request('/api/content/contracts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await app.request(
+        '/api/content/contracts',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ data: invalidSHData }),
         },
-        body: JSON.stringify({ data: invalidSHData }),
-      }, mockEnv);
+        mockEnv
+      );
 
       expect(response.status).toBe(400);
       const result = await response.json();

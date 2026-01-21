@@ -1,38 +1,46 @@
 <template>
   <div class="home">
     <div class="modules-grid">
-      <div 
-        v-for="module in modules" 
+      <div
+        v-for="module in modules"
         :key="module.id"
-        :class="['module-card', { 'module-incomplete': module.status === 'incomplete' || module.status === 'disabled' }]" 
+        :class="[
+          'module-card',
+          { 'module-incomplete': module.status === 'incomplete' || module.status === 'disabled' },
+        ]"
         @click="navigateToModule(module)"
       >
         <div class="module-icon">{{ module.icon }}</div>
         <h3>{{ module.name }}</h3>
-        <div v-if="module.status === 'incomplete' || module.status === 'disabled'" class="incomplete-badge">Em breve</div>
+        <div
+          v-if="module.status === 'incomplete' || module.status === 'disabled'"
+          class="incomplete-badge"
+        >
+          Em breve
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
-import modulesConfig from '@/config/modules.json'
+import { useRouter } from 'vue-router';
+import modulesConfig from '@/config/modules.json';
 
 // Router
-const router = useRouter()
+const router = useRouter();
 
 // Reactive data
-const modules = modulesConfig.modules
+const modules = modulesConfig.modules;
 
 // Methods
-const navigateToModule = (module) => {
+const navigateToModule = module => {
   // Only navigate if module is complete
   if (module.status === 'complete') {
-    router.push(module.path)
+    router.push(module.path);
   }
   // Do nothing if module is incomplete (already visually disabled)
-}
+};
 </script>
 
 <style scoped>
@@ -160,30 +168,30 @@ const navigateToModule = (module) => {
   .home {
     padding: 0.5rem;
   }
-  
+
   .header-section {
     padding: 1.5rem 1rem;
     margin-bottom: 1.5rem;
   }
-  
+
   .header-section h1 {
     font-size: 2rem;
   }
-  
+
   .modules-grid {
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 1rem;
   }
-  
+
   .module-card {
     padding: 1.5rem 1rem;
     min-height: 130px;
   }
-  
+
   .module-icon {
     font-size: 2rem;
   }
-  
+
   .module-card h3 {
     font-size: 0.9rem;
   }
@@ -193,22 +201,22 @@ const navigateToModule = (module) => {
   .header-section h1 {
     font-size: 1.75rem;
   }
-  
+
   .modules-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
   }
-  
+
   .module-card {
     padding: 1rem 0.75rem;
     min-height: 120px;
     gap: 0.75rem;
   }
-  
+
   .module-icon {
     font-size: 1.75rem;
   }
-  
+
   .module-card h3 {
     font-size: 0.85rem;
     line-height: 1.2;
@@ -221,7 +229,7 @@ const navigateToModule = (module) => {
     min-height: 120px;
     padding: 1.25rem 1rem;
   }
-  
+
   .module-card:active {
     background-color: #f8f9fa;
   }
@@ -233,16 +241,16 @@ const navigateToModule = (module) => {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.5rem;
   }
-  
+
   .module-card {
     padding: 0.75rem 0.5rem;
     min-height: 100px;
   }
-  
+
   .module-icon {
     font-size: 1.5rem;
   }
-  
+
   .module-card h3 {
     font-size: 0.8rem;
   }
@@ -258,4 +266,4 @@ const navigateToModule = (module) => {
   outline: 2px solid var(--primary-color);
   outline-offset: 2px;
 }
-</style> 
+</style>

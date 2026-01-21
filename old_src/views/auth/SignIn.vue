@@ -11,9 +11,9 @@
           <h2>Bem-vindo de volta</h2>
           <p>Entre na sua conta para continuar</p>
         </div>
-        
+
         <div class="clerk-signin">
-          <SignIn 
+          <SignIn
             :appearance="{
               elements: {
                 formButtonPrimary: 'clever-btn-primary',
@@ -23,7 +23,7 @@
                 socialButtonsBlockButton: 'clever-social-btn',
                 formFieldInput: 'clever-input',
                 footerActionLink: 'clever-link',
-                footerAction: 'clever-footer-hidden'
+                footerAction: 'clever-footer-hidden',
               },
               variables: {
                 colorPrimary: '#75ae93',
@@ -31,25 +31,24 @@
                 colorText: '#2c3e50',
                 colorTextSecondary: '#6c757d',
                 borderRadius: '8px',
-                fontFamily: 'system-ui, sans-serif'
-              }
+                fontFamily: 'system-ui, sans-serif',
+              },
             }"
             :redirectUrl="'/'"
           />
         </div>
-        
+
         <div class="security-notice">
           <div class="security-icon">🔒</div>
           <p>Acesso seguro e protegido</p>
         </div>
-        
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { SignIn } from '@clerk/vue'
+import { SignIn } from '@clerk/vue';
 </script>
 
 <style scoped>
@@ -271,23 +270,23 @@ import { SignIn } from '@clerk/vue'
   .auth-wrapper {
     max-width: 400px;
   }
-  
+
   .auth-card {
     padding: 2rem 1.5rem;
   }
-  
+
   .brand-title h1 {
     font-size: 2rem;
   }
-  
+
   .brand-title p {
     font-size: 0.9rem;
   }
-  
+
   .auth-header h2 {
     font-size: 1.5rem;
   }
-  
+
   .clerk-signin {
     margin: 1.5rem 0 1rem 0;
     padding: 0;
@@ -298,14 +297,13 @@ import { SignIn } from '@clerk/vue'
   .auth-container {
     padding: 0.5rem;
   }
-  
+
   .auth-wrapper {
     border-radius: 12px;
   }
-  
+
   .auth-card {
     padding: 1.5rem 1rem;
   }
 }
 </style>
-

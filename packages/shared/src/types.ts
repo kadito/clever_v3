@@ -102,7 +102,7 @@ export type UpdateContentRequest<T extends BaseContent> = Partial<Pick<T, 'data'
 /**
  * Represents successfully resolved relation data
  * Contains the UUID, content type, and basic fields from the related content
- * 
+ *
  * Requirements: 2.5, 7.3, 7.4, 8.1
  */
 export interface ResolvedRelation {
@@ -117,7 +117,7 @@ export interface ResolvedRelation {
 /**
  * Represents a relation resolution error
  * Used when referenced content cannot be found or accessed
- * 
+ *
  * Requirements: 2.5, 8.1, 8.2
  */
 export interface RelationError {
@@ -132,7 +132,7 @@ export interface RelationError {
 /**
  * Union type representing either a successfully resolved relation or an error
  * Used in the relations field of ContentWithRelations
- * 
+ *
  * Requirements: 2.5, 8.1, 8.2
  */
 export type RelationResult = ResolvedRelation | RelationError;
@@ -140,13 +140,13 @@ export type RelationResult = ResolvedRelation | RelationError;
 /**
  * Enhanced content interface that includes resolved relations
  * All API responses use this structure to provide relation data alongside content
- * 
+ *
  * Requirements: 2.1, 2.2, 2.3, 2.5, 7.3, 7.4
  */
 export interface ContentWithRelations<T extends Record<string, any> = any> extends BaseContent {
   /** The content-specific data */
   data: T;
-  /** 
+  /**
    * Resolved relations keyed by relation name (e.g., 'client' for clientId)
    * Each relation is either successfully resolved data or an error object
    */
@@ -162,7 +162,7 @@ export {
   getRelationFieldNames,
   validateBackwardCompatibility,
   CONTENT_RELATION_CONFIGS,
-  type RelationFieldConfig
+  type RelationFieldConfig,
 } from './relation-validation.js';
 
 // Re-export content type modules
@@ -170,28 +170,7 @@ export * from './types/clients';
 export * from './types/licenses';
 export * from './types/contracts';
 export * from './types/work-sheets';
+export * from './types/remote-assistance';
 
-// Re-export generic content validation utilities
-export {
-  validateGenericContentCreation,
-  validateGenericContentUpdate,
-  sanitizeGenericContentData,
-  validateContractCreation,
-  validateContractUpdate,
-  sanitizeContractData,
-  validateWorkSheetCreation,
-  validateWorkSheetUpdate,
-  sanitizeWorkSheetData,
-  validateRemoteAssistanceCreation,
-  validateRemoteAssistanceUpdate,
-  sanitizeRemoteAssistanceData,
-  validateDailyRecordCreation,
-  validateDailyRecordUpdate,
-  sanitizeDailyRecordData,
-  validateReminderCreation,
-  validateReminderUpdate,
-  sanitizeReminderData,
-  validatePendingCreation,
-  validatePendingUpdate,
-  sanitizePendingData
-} from './content-validation.js';
+// Validation functions are now exported from their specific modules
+// e.g., from './types/clients/validation', './types/contracts/validation', etc.

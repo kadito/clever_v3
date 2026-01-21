@@ -9,15 +9,15 @@
       <div class="controls-left">
         <h2>Agendamentos {{ selectedYear || 'Todos' }} ({{ currentCount }})</h2>
       </div>
-      
+
       <div class="controls-right">
-        <YearSelector 
+        <YearSelector
           v-model="selectedYear"
           :years="availableYears"
           :show-all-option="true"
           @change="handleYearChange"
         />
-        
+
         <button @click="refreshData" :disabled="loading" class="btn btn-refresh">
           🔄 Atualizar
         </button>
@@ -26,13 +26,13 @@
 
     <!-- Search -->
     <div class="search-container">
-      <input 
-        type="text" 
-        v-model="searchQuery" 
+      <input
+        type="text"
+        v-model="searchQuery"
         @input="handleSearch"
-        placeholder="Pesquisar agendamentos..." 
+        placeholder="Pesquisar agendamentos..."
         class="search-input"
-      >
+      />
       <span class="search-icon">🔍</span>
     </div>
 
@@ -50,8 +50,8 @@
 
     <!-- Agendamentos List -->
     <div v-if="!loading && currentCount > 0" class="agendamentos-list">
-      <div 
-        v-for="agendamento in currentAgendamentos" 
+      <div
+        v-for="agendamento in currentAgendamentos"
         :key="`${agendamento.year || selectedYear}-${agendamento.id}`"
         class="agendamento-item"
         @click="viewAgendamento(agendamento)"
@@ -60,21 +60,31 @@
           <h3>{{ agendamento.nomeCliente }}</h3>
           <div class="agendamento-meta">
             <span class="agendamento-motivo">{{ agendamento.motivo }}</span>
-            <span class="agendamento-date">{{ formatDate(agendamento.dataPrevistaAssistencia) || 'Sem data' }}</span>
+            <span class="agendamento-date">{{
+              formatDate(agendamento.dataPrevistaAssistencia) || 'Sem data'
+            }}</span>
           </div>
           <div class="agendamento-details" v-if="agendamento.tecnico || agendamento.assunto">
-            <span v-if="agendamento.tecnico" class="agendamento-technician">👨‍🔧 {{ agendamento.tecnico }}</span>
-            <span v-if="agendamento.assunto" class="agendamento-subject">📋 {{ agendamento.assunto }}</span>
+            <span v-if="agendamento.tecnico" class="agendamento-technician"
+              >👨‍🔧 {{ agendamento.tecnico }}</span
+            >
+            <span v-if="agendamento.assunto" class="agendamento-subject"
+              >📋 {{ agendamento.assunto }}</span
+            >
           </div>
           <div class="agendamento-status">
-            <span 
+            <span
               class="status-badge"
               :class="{
-                'completed': agendamento.tarefaConcluida,
-                'postponed': agendamento.houveAdiamento && !agendamento.tarefaConcluida,
-                'overdue': isTaskOverdue(agendamento) && !agendamento.tarefaConcluida,
+                completed: agendamento.tarefaConcluida,
+                postponed: agendamento.houveAdiamento && !agendamento.tarefaConcluida,
+                overdue: isTaskOverdue(agendamento) && !agendamento.tarefaConcluida,
                 'due-today': isTaskDueToday(agendamento) && !agendamento.tarefaConcluida,
-                'pending': !agendamento.tarefaConcluida && !agendamento.houveAdiamento && !isTaskOverdue(agendamento) && !isTaskDueToday(agendamento)
+                pending:
+                  !agendamento.tarefaConcluida &&
+                  !agendamento.houveAdiamento &&
+                  !isTaskOverdue(agendamento) &&
+                  !isTaskDueToday(agendamento),
               }"
             >
               <span v-if="agendamento.tarefaConcluida">Concluída</span>
@@ -89,9 +99,7 @@
           </div>
         </div>
         <div class="agendamento-actions">
-          <button class="action-btn" @click.stop="showActions(agendamento)">
-            ⋮
-          </button>
+          <button class="action-btn" @click.stop="showActions(agendamento)">⋮</button>
         </div>
       </div>
     </div>
@@ -99,15 +107,9 @@
     <!-- Empty State -->
     <div v-if="!loading && currentCount === 0" class="empty-state">
       <h3>Nenhum agendamento encontrado</h3>
-      <p v-if="searchResults">
-        Nenhum agendamento encontrado com o termo "{{ searchQuery }}".
-      </p>
-      <p v-else-if="selectedYear">
-        Não há agendamentos para o ano {{ selectedYear }}.
-      </p>
-      <p v-else>
-        Não há agendamentos cadastrados no sistema.
-      </p>
+      <p v-if="searchResults">Nenhum agendamento encontrado com o termo "{{ searchQuery }}".</p>
+      <p v-else-if="selectedYear">Não há agendamentos para o ano {{ selectedYear }}.</p>
+      <p v-else>Não há agendamentos cadastrados no sistema.</p>
     </div>
 
     <!-- Search Results Info -->
@@ -123,19 +125,26 @@
       <div class="actions-modal" @click.stop>
         <h3>{{ selectedAgendamentoForActions?.nomeCliente }}</h3>
         <div class="modal-actions">
-          <button @click="viewAgendamento(selectedAgendamentoForActions)" class="modal-btn view-btn">
+          <button
+            @click="viewAgendamento(selectedAgendamentoForActions)"
+            class="modal-btn view-btn"
+          >
             📋 Ver Detalhes
           </button>
-          <button @click="editAgendamento(selectedAgendamentoForActions)" class="modal-btn edit-btn">
+          <button
+            @click="editAgendamento(selectedAgendamentoForActions)"
+            class="modal-btn edit-btn"
+          >
             ✏️ Editar
           </button>
-          <button @click="confirmDelete(selectedAgendamentoForActions)" class="modal-btn delete-btn">
+          <button
+            @click="confirmDelete(selectedAgendamentoForActions)"
+            class="modal-btn delete-btn"
+          >
             🗑️ Eliminar
           </button>
         </div>
-        <button @click="closeActions" class="modal-btn cancel-btn">
-          Cancelar
-        </button>
+        <button @click="closeActions" class="modal-btn cancel-btn">Cancelar</button>
       </div>
     </div>
 
@@ -143,7 +152,11 @@
     <div v-if="agendamentoToDelete" class="modal-overlay" @click="cancelDelete">
       <div class="modal" @click.stop>
         <h3>Confirmar Eliminação</h3>
-        <p>Tem a certeza que pretende eliminar o agendamento de <strong>{{ agendamentoToDelete.nomeCliente }}</strong>?</p>
+        <p>
+          Tem a certeza que pretende eliminar o agendamento de
+          <strong>{{ agendamentoToDelete.nomeCliente }}</strong
+          >?
+        </p>
         <p class="warning">Esta ação não pode ser desfeita.</p>
         <div class="modal-actions">
           <button @click="cancelDelete" class="btn secondary">Cancelar</button>
@@ -155,34 +168,32 @@
     </div>
 
     <!-- Floating Action Button -->
-    <button @click="navigateToCreate" class="fab">
-      ➕
-    </button>
+    <button @click="navigateToCreate" class="fab">➕</button>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAgendamentosStore } from '@/stores/agendamentos.js'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
-import YearSelector from '@/components/YearSelector.vue'
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAgendamentosStore } from '@/stores/agendamentos.js';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
+import YearSelector from '@/components/YearSelector.vue';
 
 // Router
-const router = useRouter()
+const router = useRouter();
 
 // Store
-const agendamentosStore = useAgendamentosStore()
-const { 
-  agendamentos, 
-  availableYears, 
-  currentYear, 
-  loading, 
-  error, 
-  agendamentosCount, 
-  hasAgendamentos 
-} = storeToRefs(agendamentosStore)
+const agendamentosStore = useAgendamentosStore();
+const {
+  agendamentos,
+  availableYears,
+  currentYear,
+  loading,
+  error,
+  agendamentosCount,
+  hasAgendamentos,
+} = storeToRefs(agendamentosStore);
 
 const {
   fetchAgendamentosForYear,
@@ -192,152 +203,152 @@ const {
   setCurrentYear,
   clearError,
   isTaskOverdue,
-  isTaskDueToday
-} = agendamentosStore
+  isTaskDueToday,
+} = agendamentosStore;
 
 // Local state
-const selectedYear = ref('')
-const searchQuery = ref('')
-const searchResults = ref(null)
-const agendamentoToDelete = ref(null)
-const showActionsModal = ref(false)
-const selectedAgendamentoForActions = ref(null)
+const selectedYear = ref('');
+const searchQuery = ref('');
+const searchResults = ref(null);
+const agendamentoToDelete = ref(null);
+const showActionsModal = ref(false);
+const selectedAgendamentoForActions = ref(null);
 
 // Computed properties
 const currentAgendamentos = computed(() => {
-  return searchResults.value ? searchResults.value.results : agendamentos.value
-})
+  return searchResults.value ? searchResults.value.results : agendamentos.value;
+});
 
 const currentCount = computed(() => {
-  return searchResults.value ? searchResults.value.count : agendamentosCount.value
-})
+  return searchResults.value ? searchResults.value.count : agendamentosCount.value;
+});
 
 // Methods
-const handleYearChange = async (year) => {
-  selectedYear.value = year
-  searchQuery.value = ''
-  searchResults.value = null
-  clearError()
-  
+const handleYearChange = async year => {
+  selectedYear.value = year;
+  searchQuery.value = '';
+  searchResults.value = null;
+  clearError();
+
   if (year) {
-    setCurrentYear(year)
-    await fetchAgendamentosForYear(year)
+    setCurrentYear(year);
+    await fetchAgendamentosForYear(year);
   } else {
     // For "all years", we could fetch all or show empty state
-    agendamentos.value = []
+    agendamentos.value = [];
   }
-}
+};
 
 const handleSearch = async () => {
   if (searchQuery.value.trim().length >= 2) {
-    const results = await searchAgendamentos(searchQuery.value.trim(), selectedYear.value || null)
-    searchResults.value = results
+    const results = await searchAgendamentos(searchQuery.value.trim(), selectedYear.value || null);
+    searchResults.value = results;
   } else if (searchQuery.value.trim().length === 0) {
-    searchResults.value = null
+    searchResults.value = null;
   }
-}
+};
 
 const clearSearch = () => {
-  searchQuery.value = ''
-  searchResults.value = null
-}
+  searchQuery.value = '';
+  searchResults.value = null;
+};
 
-const viewAgendamento = (agendamento) => {
-  const year = agendamento.year || selectedYear.value || currentYear.value
-  router.push({ 
-    name: 'agendamentos-detail', 
-    params: { id: agendamento.id, year } 
-  })
-}
+const viewAgendamento = agendamento => {
+  const year = agendamento.year || selectedYear.value || currentYear.value;
+  router.push({
+    name: 'agendamentos-detail',
+    params: { id: agendamento.id, year },
+  });
+};
 
-const editAgendamento = (agendamento) => {
-  const year = agendamento.year || selectedYear.value || currentYear.value
-  router.push({ 
-    name: 'agendamentos-edit', 
-    params: { id: agendamento.id, year } 
-  })
-}
+const editAgendamento = agendamento => {
+  const year = agendamento.year || selectedYear.value || currentYear.value;
+  router.push({
+    name: 'agendamentos-edit',
+    params: { id: agendamento.id, year },
+  });
+};
 
-const showActions = (agendamento) => {
-  selectedAgendamentoForActions.value = agendamento
-  showActionsModal.value = true
-}
+const showActions = agendamento => {
+  selectedAgendamentoForActions.value = agendamento;
+  showActionsModal.value = true;
+};
 
 const closeActions = () => {
-  showActionsModal.value = false
-  selectedAgendamentoForActions.value = null
-}
+  showActionsModal.value = false;
+  selectedAgendamentoForActions.value = null;
+};
 
-const confirmDelete = (agendamento) => {
-  agendamentoToDelete.value = agendamento
-  closeActions()
-}
+const confirmDelete = agendamento => {
+  agendamentoToDelete.value = agendamento;
+  closeActions();
+};
 
 const cancelDelete = () => {
-  agendamentoToDelete.value = null
-}
+  agendamentoToDelete.value = null;
+};
 
 const deleteAgendamento = async () => {
-  if (!agendamentoToDelete.value) return
-  
+  if (!agendamentoToDelete.value) return;
+
   try {
-    const year = agendamentoToDelete.value.year || selectedYear.value || currentYear.value
-    await deleteFromStore(year, agendamentoToDelete.value.id)
-    agendamentoToDelete.value = null
-    
+    const year = agendamentoToDelete.value.year || selectedYear.value || currentYear.value;
+    await deleteFromStore(year, agendamentoToDelete.value.id);
+    agendamentoToDelete.value = null;
+
     // If we were searching, refresh search results
     if (searchResults.value) {
-      await handleSearch()
+      await handleSearch();
     }
   } catch (error) {
-    console.error('Error deleting agendamento:', error)
+    console.error('Error deleting agendamento:', error);
     // Error is already handled by the store
   }
-}
+};
 
 const refreshData = async () => {
-  clearError()
-  await fetchAvailableYears()
+  clearError();
+  await fetchAvailableYears();
   if (selectedYear.value) {
-    await fetchAgendamentosForYear(selectedYear.value)
+    await fetchAgendamentosForYear(selectedYear.value);
   }
-}
+};
 
-const formatDate = (dateString) => {
-  if (!dateString) return ''
+const formatDate = dateString => {
+  if (!dateString) return '';
   try {
-    return new Date(dateString).toLocaleDateString('pt-PT')
+    return new Date(dateString).toLocaleDateString('pt-PT');
   } catch {
-    return dateString
+    return dateString;
   }
-}
+};
 
 const navigateToCreate = () => {
-  router.push({ name: 'agendamentos-new' })
-}
+  router.push({ name: 'agendamentos-new' });
+};
 
 // Lifecycle
 onMounted(async () => {
-  await fetchAvailableYears()
-  
+  await fetchAvailableYears();
+
   // Set initial year to current year if available
   if (availableYears.value.includes(currentYear.value)) {
-    selectedYear.value = currentYear.value
-    await fetchAgendamentosForYear(currentYear.value)
+    selectedYear.value = currentYear.value;
+    await fetchAgendamentosForYear(currentYear.value);
   } else if (availableYears.value.length > 0) {
     // Otherwise set to most recent year
-    const mostRecentYear = Math.max(...availableYears.value.map(y => parseInt(y))).toString()
-    selectedYear.value = mostRecentYear
-    await fetchAgendamentosForYear(mostRecentYear)
+    const mostRecentYear = Math.max(...availableYears.value.map(y => parseInt(y))).toString();
+    selectedYear.value = mostRecentYear;
+    await fetchAgendamentosForYear(mostRecentYear);
   }
-})
+});
 
 // Watch for year changes
-watch(currentYear, (newYear) => {
+watch(currentYear, newYear => {
   if (newYear && newYear !== selectedYear.value) {
-    selectedYear.value = newYear
+    selectedYear.value = newYear;
   }
-})
+});
 </script>
 
 <style scoped>
@@ -575,8 +586,12 @@ watch(currentYear, (newYear) => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .error-container {
@@ -973,18 +988,18 @@ watch(currentYear, (newYear) => {
   .agendamentos-list {
     padding: 0.5rem;
   }
-  
+
   .list-header h1 {
     font-size: 2rem;
   }
-  
+
   .list-controls {
     /* Enhanced stacking context for mobile dropdowns */
     position: relative;
     z-index: 1;
     isolation: isolate;
   }
-  
+
   .controls-row {
     flex-direction: column;
     align-items: stretch;
@@ -992,42 +1007,42 @@ watch(currentYear, (newYear) => {
     /* Ensure proper positioning context */
     position: relative;
   }
-  
+
   .search-container {
     min-width: auto;
     /* Enhanced positioning */
     position: relative;
     z-index: 1;
   }
-  
+
   .table-wrapper {
     font-size: 0.8rem;
   }
-  
+
   .agendamentos-table th,
   .agendamentos-table td {
     padding: 0.5rem;
   }
-  
+
   .action-buttons {
     flex-direction: column;
     gap: 0.25rem;
   }
-  
+
   .btn.small {
     padding: 0.5rem;
     font-size: 0.7rem;
   }
-  
+
   .modal {
     padding: 1.5rem;
   }
-  
+
   .modal-actions {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .motivo-cell {
     max-width: 150px;
   }
@@ -1037,20 +1052,20 @@ watch(currentYear, (newYear) => {
   .list-header h1 {
     font-size: 1.75rem;
   }
-  
+
   .list-controls {
     padding: 1rem;
   }
-  
+
   .table-wrapper {
     font-size: 0.7rem;
   }
-  
+
   .agendamentos-table th,
   .agendamentos-table td {
     padding: 0.375rem;
   }
-  
+
   .motivo-cell {
     max-width: 120px;
   }

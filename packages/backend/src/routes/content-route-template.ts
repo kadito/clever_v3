@@ -65,15 +65,19 @@ class ConfigurableContentStorageService<T extends BaseContent> extends ContentSt
           const bText = b.searchableText || b.name || '';
           return aText.localeCompare(bText, 'pt-PT');
         });
-      
+
       case 'date-asc':
         // Sort by creation date (oldest first)
-        return items.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-      
+        return items.sort(
+          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+
       case 'date-desc':
       default:
         // Sort by creation date (most recent first) - default behavior
-        return items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        return items.sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
     }
   }
 
@@ -102,9 +106,7 @@ class ConfigurableContentStorageService<T extends BaseContent> extends ContentSt
  * Create generic CRUD routes for a content type
  * Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 10.1, 10.4
  */
-export function createContentRoutes<T extends BaseContent>(
-  config: ContentRouteConfig<T>
-): Hono {
+export function createContentRoutes<T extends BaseContent>(config: ContentRouteConfig<T>): Hono {
   const router = new Hono();
 
   // Authentication is now applied at the API level, no need to apply here
@@ -118,7 +120,7 @@ export function createContentRoutes<T extends BaseContent>(
     try {
       const user = requireUserContext(c);
       const r2Bucket = c.env?.R2_BUCKET as StorageBucket; // Cast to generic interface
-      
+
       if (!r2Bucket) {
         const response: ApiResponse = {
           success: false,
@@ -207,7 +209,8 @@ export function createContentRoutes<T extends BaseContent>(
       }
 
       // Validate UUID format
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      const uuidRegex =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
       if (!uuidRegex.test(uuid)) {
         const response: ApiResponse = {
           success: false,
@@ -224,7 +227,7 @@ export function createContentRoutes<T extends BaseContent>(
       );
 
       const item = await storage.get(uuid);
-      
+
       if (!item) {
         const response: ApiResponse = {
           success: false,
@@ -348,7 +351,8 @@ export function createContentRoutes<T extends BaseContent>(
       }
 
       // Validate UUID format
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      const uuidRegex =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
       if (!uuidRegex.test(uuid)) {
         const response: ApiResponse = {
           success: false,
@@ -379,7 +383,7 @@ export function createContentRoutes<T extends BaseContent>(
             config.contentType,
             config
           );
-          
+
           let existingContent: T | undefined;
           try {
             const contentWithRelations = await storage.get(uuid);
@@ -388,7 +392,7 @@ export function createContentRoutes<T extends BaseContent>(
             // If content doesn't exist, validation will handle it
             existingContent = undefined;
           }
-          
+
           await config.validateUpdate(requestData, existingContent);
         } catch (validationError) {
           const response: ApiResponse = {
@@ -464,7 +468,8 @@ export function createContentRoutes<T extends BaseContent>(
       }
 
       // Validate UUID format
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      const uuidRegex =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
       if (!uuidRegex.test(uuid)) {
         const response: ApiResponse = {
           success: false,
@@ -571,7 +576,7 @@ export const contentErrorHandler = async (c: Context, next: () => Promise<void>)
     await next();
   } catch (error) {
     console.error('Content route error:', error);
-    
+
     // Handle authentication errors
     if (error instanceof Error && error.message.includes('authentication required')) {
       const response: ApiResponse = {
@@ -581,7 +586,7 @@ export const contentErrorHandler = async (c: Context, next: () => Promise<void>)
       };
       return c.json(response, 401);
     }
-    
+
     // Handle validation errors
     if (error instanceof Error && error.message.includes('validation')) {
       const response: ApiResponse = {
@@ -591,7 +596,7 @@ export const contentErrorHandler = async (c: Context, next: () => Promise<void>)
       };
       return c.json(response, 400);
     }
-    
+
     // Handle not found errors
     if (error instanceof Error && error.message.includes('not found')) {
       const response: ApiResponse = {
@@ -601,7 +606,7 @@ export const contentErrorHandler = async (c: Context, next: () => Promise<void>)
       };
       return c.json(response, 404);
     }
-    
+
     // Generic server error
     const response: ApiResponse = {
       success: false,

@@ -8,10 +8,10 @@ export function useSharedFormData(formKey: string) {
   const initializeFormData = (initialData: Record<string, any>, formSections: any[]) => {
     // Create a new object
     const newFormData: Record<string, any> = {};
-    
+
     // Start with initial data
     Object.assign(newFormData, initialData);
-    
+
     // Ensure all form fields have keys
     for (const section of formSections || []) {
       for (const field of section.fields || []) {
@@ -31,7 +31,7 @@ export function useSharedFormData(formKey: string) {
         }
       }
     }
-    
+
     // Replace the global form data
     globalFormData.value = newFormData;
   };
@@ -40,9 +40,9 @@ export function useSharedFormData(formKey: string) {
     if (!globalFormData.value) {
       globalFormData.value = {};
     }
-    
+
     globalFormData.value[fieldKey] = value;
-    
+
     // Clear validation error for this field
     delete globalValidationErrors[fieldKey];
   };
@@ -64,6 +64,6 @@ export function useSharedFormData(formKey: string) {
     initializeFormData,
     updateFieldValue,
     getFormData,
-    clearFormData
+    clearFormData,
   };
 }

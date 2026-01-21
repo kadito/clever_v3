@@ -17,7 +17,10 @@
     </div>
 
     <!-- Not found state -->
-    <div v-if="!loading && (!contrato || (error && error.toLowerCase().includes('not found')))" class="not-found-state">
+    <div
+      v-if="!loading && (!contrato || (error && error.toLowerCase().includes('not found')))"
+      class="not-found-state"
+    >
       <h2>Contrato não encontrado</h2>
       <p>O contrato pode ainda não estar disponível no sistema. Tentar novamente?</p>
       <div class="retry-actions">
@@ -36,12 +39,7 @@
       <!-- Header with actions -->
       <div class="detail-actions">
         <h2>{{ clienteData?.nomeComercial || 'Contrato' }}</h2>
-        <button 
-          @click="navigateToEdit" 
-          class="btn btn-edit"
-        >
-          ✏️ Editar
-        </button>
+        <button @click="navigateToEdit" class="btn btn-edit">✏️ Editar</button>
       </div>
 
       <!-- Basic Information Section -->
@@ -89,11 +87,15 @@
       <!-- Contract Plan Section -->
       <section class="detail-section">
         <h3>PLANOS DE CONTRATO</h3>
-        
+
         <!-- CPA Contract -->
         <div v-if="contrato.hasCPAContract" class="contract-plan-subsection">
           <h4 class="contract-subsection-title">
-            {{ contrato.cpaContractType === 'CPA_1500' ? 'CPA - Cashlogy (1500)' : 'CPA - Cashlogy (2023)' }}
+            {{
+              contrato.cpaContractType === 'CPA_1500'
+                ? 'CPA - Cashlogy (1500)'
+                : 'CPA - Cashlogy (2023)'
+            }}
           </h4>
           <div class="detail-grid">
             <div class="detail-item">
@@ -102,19 +104,30 @@
             </div>
             <div class="detail-item" v-if="contrato.modalidadePagamentoCPA">
               <label>MODALIDADE DE PAGAMENTO:</label>
-              <span class="payment-method">{{ formatPaymentMethod(contrato.modalidadePagamentoCPA) }}</span>
+              <span class="payment-method">{{
+                formatPaymentMethod(contrato.modalidadePagamentoCPA)
+              }}</span>
             </div>
             <div class="detail-item" v-if="contrato.distanceCPA">
               <label>DISTÂNCIA:</label>
-              <span>{{ contrato.distanceCPA === 'under180km' ? 'Menos de 180 km' : 'Mais de 180 km' }}</span>
+              <span>{{
+                contrato.distanceCPA === 'under180km' ? 'Menos de 180 km' : 'Mais de 180 km'
+              }}</span>
             </div>
             <div class="detail-item full-width" v-if="contrato.planoCPA">
               <label>DESCRIÇÃO:</label>
               <div class="contract-plan">{{ contrato.planoCPA }}</div>
             </div>
-            
+
             <!-- POS Package (only for CPA_1500 PREMIUM) -->
-            <div class="detail-item full-width" v-if="contrato.hasPOSPackage && contrato.cpaContractType === 'CPA_1500' && contrato.planIdCPA === 'cpa_1500_premium'">
+            <div
+              class="detail-item full-width"
+              v-if="
+                contrato.hasPOSPackage &&
+                contrato.cpaContractType === 'CPA_1500' &&
+                contrato.planIdCPA === 'cpa_1500_premium'
+              "
+            >
               <label>PACK ADICIONAL:</label>
               <div class="pos-package-badge">
                 <span class="package-icon">📦</span>
@@ -122,15 +135,15 @@
               </div>
             </div>
           </div>
-          
+
           <!-- CPA Equipment Info -->
           <div v-if="hasAnyCPAEquipment" class="equipment-subsection">
             <h5>Equipamentos CPA</h5>
-            
+
             <!-- New format: Multiple equipments -->
             <div v-if="contrato.cpaEquipments && contrato.cpaEquipments.length > 0">
-              <div 
-                v-for="(equipment, index) in contrato.cpaEquipments" 
+              <div
+                v-for="(equipment, index) in contrato.cpaEquipments"
                 :key="equipment.id || index"
                 class="equipment-detail-card"
               >
@@ -156,9 +169,12 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Old format: Single equipment (for backward compatibility) -->
-            <div v-else-if="contrato.modeloCPA || contrato.numeroSerieCPA" class="equipment-detail-card">
+            <div
+              v-else-if="contrato.modeloCPA || contrato.numeroSerieCPA"
+              class="equipment-detail-card"
+            >
               <h6 class="equipment-title">Equipamento</h6>
               <div class="detail-grid">
                 <div class="detail-item" v-if="contrato.modeloCPA">
@@ -172,9 +188,12 @@
               </div>
             </div>
           </div>
-          
+
           <!-- CPA Contract Dates -->
-          <div v-if="contrato.inicioContratoCPA || contrato.fimContratoCPA" class="equipment-subsection">
+          <div
+            v-if="contrato.inicioContratoCPA || contrato.fimContratoCPA"
+            class="equipment-subsection"
+          >
             <h5>Datas do Contrato</h5>
             <div class="detail-grid">
               <div class="detail-item" v-if="contrato.inicioContratoCPA">
@@ -188,7 +207,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- S&H Contract -->
         <div v-if="contrato.hasSHContract" class="contract-plan-subsection">
           <h4 class="contract-subsection-title">S&H - Software e Hardware</h4>
@@ -199,16 +218,21 @@
             </div>
             <div class="detail-item" v-if="contrato.modalidadePagamentoSH">
               <label>MODALIDADE DE PAGAMENTO:</label>
-              <span class="payment-method">{{ formatPaymentMethod(contrato.modalidadePagamentoSH) }}</span>
+              <span class="payment-method">{{
+                formatPaymentMethod(contrato.modalidadePagamentoSH)
+              }}</span>
             </div>
             <div class="detail-item full-width" v-if="contrato.planoSH">
               <label>DESCRIÇÃO:</label>
               <div class="contract-plan">{{ contrato.planoSH }}</div>
             </div>
           </div>
-          
+
           <!-- S&H Equipment Info -->
-          <div v-if="contrato.modeloPSO || contrato.numeroSeriePSO || contrato.softwarePSO" class="equipment-subsection">
+          <div
+            v-if="contrato.modeloPSO || contrato.numeroSeriePSO || contrato.softwarePSO"
+            class="equipment-subsection"
+          >
             <h5>Informação do Equipamento</h5>
             <div class="detail-grid">
               <div class="detail-item" v-if="contrato.modeloPSO">
@@ -225,9 +249,12 @@
               </div>
             </div>
           </div>
-          
+
           <!-- S&H Contract Dates -->
-          <div v-if="contrato.inicioContratoSH || contrato.fimContratoSH" class="equipment-subsection">
+          <div
+            v-if="contrato.inicioContratoSH || contrato.fimContratoSH"
+            class="equipment-subsection"
+          >
             <h5>Datas do Contrato</h5>
             <div class="detail-grid">
               <div class="detail-item" v-if="contrato.inicioContratoSH">
@@ -241,17 +268,23 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Legacy support for old contracts -->
-        <div v-if="!contrato.hasCPAContract && !contrato.hasSHContract && contrato.planoContrato" class="detail-grid">
+        <div
+          v-if="!contrato.hasCPAContract && !contrato.hasSHContract && contrato.planoContrato"
+          class="detail-grid"
+        >
           <div class="detail-item full-width">
             <label>DESCRIÇÃO DO PLANO (LEGADO):</label>
             <div class="contract-plan">{{ contrato.planoContrato }}</div>
           </div>
         </div>
-        
+
         <!-- No contracts -->
-        <div v-if="!contrato.hasCPAContract && !contrato.hasSHContract && !contrato.planoContrato" class="no-contracts-message">
+        <div
+          v-if="!contrato.hasCPAContract && !contrato.hasSHContract && !contrato.planoContrato"
+          class="no-contracts-message"
+        >
           Nenhum plano de contrato definido
         </div>
       </section>
@@ -281,7 +314,9 @@
         <div class="detail-grid">
           <div class="detail-item">
             <label>MÉTODO DE PAGAMENTO:</label>
-            <span class="payment-method">{{ formatPaymentMethodFull(contrato.metodoPagamento) }}</span>
+            <span class="payment-method">{{
+              formatPaymentMethodFull(contrato.metodoPagamento)
+            }}</span>
           </div>
         </div>
       </section>
@@ -309,256 +344,269 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
-import { useContratosStore } from '@/stores/contratos.js'
-import { useClientesStore } from '@/stores/clientes.js'
-import contractPlans from '@/config/contract-plans.json'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
+import { useContratosStore } from '@/stores/contratos.js';
+import { useClientesStore } from '@/stores/clientes.js';
+import contractPlans from '@/config/contract-plans.json';
 
 // Router
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
 // Stores
-const store = useContratosStore()
-const { loading, error, selectedContrato, currentYear } = storeToRefs(store)
-const { fetchContratoById, clearError } = store
+const store = useContratosStore();
+const { loading, error, selectedContrato, currentYear } = storeToRefs(store);
+const { fetchContratoById, clearError } = store;
 
-const clientesStore = useClientesStore()
-const { fetchClienteById } = clientesStore
+const clientesStore = useClientesStore();
+const { fetchClienteById } = clientesStore;
 
 // Local refs
-const contrato = computed(() => selectedContrato.value)
-const clienteData = ref(null)
+const contrato = computed(() => selectedContrato.value);
+const clienteData = ref(null);
 
 // Auto-retry state
-const autoRetryCountdown = ref(0)
-const userInteractionCancelled = ref(false)
-const retryTimeoutId = ref(null)
+const autoRetryCountdown = ref(0);
+const userInteractionCancelled = ref(false);
+const retryTimeoutId = ref(null);
 
 // Computed properties
 const hasAdditionalInfo = computed(() => {
-  return contrato.value && (
-    contrato.value.planoContratoSoftHard ||
-    contrato.value.modelo180 ||
-    contrato.value.modeloSoftware
-  )
-})
+  return (
+    contrato.value &&
+    (contrato.value.planoContratoSoftHard ||
+      contrato.value.modelo180 ||
+      contrato.value.modeloSoftware)
+  );
+});
 
 const hasAnyCPAEquipment = computed(() => {
-  if (!contrato.value) return false
-  
+  if (!contrato.value) return false;
+
   // Check new format (array of equipments)
   if (contrato.value.cpaEquipments && contrato.value.cpaEquipments.length > 0) {
-    return true
+    return true;
   }
-  
+
   // Check old format (single equipment fields)
-  return !!(contrato.value.modeloCPA || contrato.value.numeroSerieCPA)
-})
+  return !!(contrato.value.modeloCPA || contrato.value.numeroSerieCPA);
+});
 
 // Methods
 const navigateToEdit = () => {
-  const year = route.query.year || currentYear.value
-  router.push(`/contratos/${contrato.value.id}/edit?year=${year}`)
-}
+  const year = route.query.year || currentYear.value;
+  router.push(`/contratos/${contrato.value.id}/edit?year=${year}`);
+};
 
-const getCPAPlanName = (planId) => {
-  if (!planId) return 'N/A'
-  
+const getCPAPlanName = planId => {
+  if (!planId) return 'N/A';
+
   // Check which contract type this is
-  const contractType = contrato.value?.cpaContractType || 'CPA'
-  const plans = contractPlans[contractType]?.plans || []
-  const plan = plans.find(p => p.id === planId)
-  return plan?.name || 'N/A'
-}
+  const contractType = contrato.value?.cpaContractType || 'CPA';
+  const plans = contractPlans[contractType]?.plans || [];
+  const plan = plans.find(p => p.id === planId);
+  return plan?.name || 'N/A';
+};
 
-const getSHPlanName = (planId) => {
-  if (!planId) return 'N/A'
-  const plans = contractPlans['S&H']?.plans || []
-  const plan = plans.find(p => p.id === planId)
-  return plan?.name || 'N/A'
-}
+const getSHPlanName = planId => {
+  if (!planId) return 'N/A';
+  const plans = contractPlans['S&H']?.plans || [];
+  const plan = plans.find(p => p.id === planId);
+  return plan?.name || 'N/A';
+};
 
-const formatPaymentMethod = (method) => {
+const formatPaymentMethod = method => {
   const methods = {
-    'MENSAL': 'Mensal',
-    'TRIMESTRAL': 'Trimestral',
-    'SEMESTRAL': 'Semestral',
-    'ANUAL': 'Anual'
-  }
-  return methods[method] || method
-}
+    MENSAL: 'Mensal',
+    TRIMESTRAL: 'Trimestral',
+    SEMESTRAL: 'Semestral',
+    ANUAL: 'Anual',
+  };
+  return methods[method] || method;
+};
 
-const formatPaymentMethodFull = (method) => {
+const formatPaymentMethodFull = method => {
   const methods = {
-    'TRANSFERENCIA_BANCARIA': 'Transferência Bancária',
-    'DEBITO_DIRETO': 'Débito Direto',
-    'MULTIBANCO': 'Multibanco',
-    'CHEQUE': 'Cheque',
-    'NUMERARIO': 'Numerário',
-    'MB_WAY': 'MB WAY'
-  }
-  return methods[method] || method
-}
+    TRANSFERENCIA_BANCARIA: 'Transferência Bancária',
+    DEBITO_DIRETO: 'Débito Direto',
+    MULTIBANCO: 'Multibanco',
+    CHEQUE: 'Cheque',
+    NUMERARIO: 'Numerário',
+    MB_WAY: 'MB WAY',
+  };
+  return methods[method] || method;
+};
 
-const formatDate = (dateString) => {
-  if (!dateString) return ''
-  return new Date(dateString).toLocaleDateString('pt-PT')
-}
+const formatDate = dateString => {
+  if (!dateString) return '';
+  return new Date(dateString).toLocaleDateString('pt-PT');
+};
 
-const formatDateTime = (dateTimeString) => {
-  if (!dateTimeString) return ''
-  return new Date(dateTimeString).toLocaleString('pt-PT')
-}
+const formatDateTime = dateTimeString => {
+  if (!dateTimeString) return '';
+  return new Date(dateTimeString).toLocaleString('pt-PT');
+};
 
 // Lifecycle
 onMounted(async () => {
   // Add event listeners for user interaction after a delay
   // This prevents navigation events from cancelling the retry
   setTimeout(() => {
-    window.addEventListener('click', handleUserInteraction)
-    window.addEventListener('scroll', handleUserInteraction)
-    window.addEventListener('keydown', handleUserInteraction)
-  }, 500)
-  
-  await loadContrato()
-})
+    window.addEventListener('click', handleUserInteraction);
+    window.addEventListener('scroll', handleUserInteraction);
+    window.addEventListener('keydown', handleUserInteraction);
+  }, 500);
+
+  await loadContrato();
+});
 
 onBeforeUnmount(() => {
-  cancelAutoRetry()
-  window.removeEventListener('click', handleUserInteraction)
-  window.removeEventListener('scroll', handleUserInteraction)
-  window.removeEventListener('keydown', handleUserInteraction)
-})
+  cancelAutoRetry();
+  window.removeEventListener('click', handleUserInteraction);
+  window.removeEventListener('scroll', handleUserInteraction);
+  window.removeEventListener('keydown', handleUserInteraction);
+});
 
 // Methods
 const loadContrato = async () => {
-  const year = route.query.year || currentYear.value
-  const id = route.params.id
-  
-  console.log('Loading contrato detail:', { id, year })
-  
+  const year = route.query.year || currentYear.value;
+  const id = route.params.id;
+
+  console.log('Loading contrato detail:', { id, year });
+
   try {
-    clearError()
-    await fetchContratoById(year, id)
+    clearError();
+    await fetchContratoById(year, id);
     // If successful, cancel any pending retries
-    cancelAutoRetry()
-    userInteractionCancelled.value = false
-    
+    cancelAutoRetry();
+    userInteractionCancelled.value = false;
+
     // Fetch client data if contrato has clienteId
     if (contrato.value && contrato.value.clienteId) {
-      console.log('Fetching client data for clienteId:', contrato.value.clienteId)
+      console.log('Fetching client data for clienteId:', contrato.value.clienteId);
       try {
-        clienteData.value = await fetchClienteById(contrato.value.clienteId)
-        console.log('Client data loaded:', clienteData.value)
+        clienteData.value = await fetchClienteById(contrato.value.clienteId);
+        console.log('Client data loaded:', clienteData.value);
       } catch (clientErr) {
-        console.error('Error loading client data:', clientErr)
+        console.error('Error loading client data:', clientErr);
         // Continue anyway - contrato data is loaded
       }
     }
   } catch (err) {
-    console.error('Error loading contrato:', err)
-    
+    console.error('Error loading contrato:', err);
+
     // Wait a bit for error to be set in store
-    await new Promise(resolve => setTimeout(resolve, 50))
-    
+    await new Promise(resolve => setTimeout(resolve, 50));
+
     // Check if it's a 404 or "not found" error
-    const errorMessage = err.message || error.value || ''
-    const isNotFound = errorMessage.toLowerCase().includes('not found')
-    
+    const errorMessage = err.message || error.value || '';
+    const isNotFound = errorMessage.toLowerCase().includes('not found');
+
     if (isNotFound && !userInteractionCancelled.value) {
       // Only start retry if not already running
       if (autoRetryCountdown.value === 0 && !retryTimeoutId.value) {
-        console.log('Not found error detected in loadContrato, starting auto-retry')
+        console.log('Not found error detected in loadContrato, starting auto-retry');
         // Start auto-retry countdown
-        startAutoRetry()
+        startAutoRetry();
       }
     }
   }
-}
+};
 
 const retryLoad = () => {
-  userInteractionCancelled.value = true
-  cancelAutoRetry()
-  loadContrato()
-}
+  userInteractionCancelled.value = true;
+  cancelAutoRetry();
+  loadContrato();
+};
 
 const startAutoRetry = () => {
-  cancelAutoRetry()
-  userInteractionCancelled.value = false
-  autoRetryCountdown.value = 10
-  
-  console.log('Starting auto-retry countdown:', autoRetryCountdown.value)
-  
+  cancelAutoRetry();
+  userInteractionCancelled.value = false;
+  autoRetryCountdown.value = 10;
+
+  console.log('Starting auto-retry countdown:', autoRetryCountdown.value);
+
   const updateCountdown = () => {
     if (userInteractionCancelled.value) {
-      console.log('Auto-retry cancelled by user interaction')
-      return
+      console.log('Auto-retry cancelled by user interaction');
+      return;
     }
-    
+
     if (autoRetryCountdown.value > 0) {
-      autoRetryCountdown.value--
-      console.log('Auto-retry countdown:', autoRetryCountdown.value)
-      retryTimeoutId.value = setTimeout(updateCountdown, 1000)
+      autoRetryCountdown.value--;
+      console.log('Auto-retry countdown:', autoRetryCountdown.value);
+      retryTimeoutId.value = setTimeout(updateCountdown, 1000);
     } else {
       // Auto-retry after countdown reaches 0
-      console.log('Auto-retry countdown finished, loading contrato...')
-      retryTimeoutId.value = null // Clear the timeout ID
-      loadContrato()
+      console.log('Auto-retry countdown finished, loading contrato...');
+      retryTimeoutId.value = null; // Clear the timeout ID
+      loadContrato();
     }
-  }
-  
-  retryTimeoutId.value = setTimeout(updateCountdown, 1000)
-}
+  };
+
+  retryTimeoutId.value = setTimeout(updateCountdown, 1000);
+};
 
 const cancelAutoRetry = () => {
   if (retryTimeoutId.value) {
-    console.log('Cancelling auto-retry timeout:', retryTimeoutId.value)
-    clearTimeout(retryTimeoutId.value)
-    retryTimeoutId.value = null
+    console.log('Cancelling auto-retry timeout:', retryTimeoutId.value);
+    clearTimeout(retryTimeoutId.value);
+    retryTimeoutId.value = null;
   }
   if (autoRetryCountdown.value > 0) {
-    console.log('Resetting auto-retry countdown from', autoRetryCountdown.value, 'to 0')
+    console.log('Resetting auto-retry countdown from', autoRetryCountdown.value, 'to 0');
   }
-  autoRetryCountdown.value = 0
-}
+  autoRetryCountdown.value = 0;
+};
 
 const handleUserInteraction = () => {
-  userInteractionCancelled.value = true
-  cancelAutoRetry()
-}
+  userInteractionCancelled.value = true;
+  cancelAutoRetry();
+};
 
 // Watch for successful data load to cancel retries
-watch(() => contrato.value?.id, (newId) => {
-  if (newId) {
-    cancelAutoRetry()
-    userInteractionCancelled.value = false
-  }
-})
-
-// Watch for "not found" state to start retry
-watch([loading, error, () => contrato.value], ([isLoading, err, contratoData]) => {
-  // If loading finished, no contrato, and we have a route param (meaning we're expecting data)
-  if (!isLoading && !contratoData && route.params.id && !userInteractionCancelled.value) {
-    const errorMessage = err || ''
-    const isNotFound = errorMessage.toLowerCase().includes('not found') || errorMessage === ''
-    
-    // Start retry if we have a "not found" error or if loading finished without data
-    // Only start if retry isn't already running (countdown is 0 and no timeout is set)
-    if (isNotFound && autoRetryCountdown.value === 0 && !retryTimeoutId.value) {
-      console.log('Watch detected not found state, starting auto-retry')
-      // Use setTimeout to ensure error state is fully updated
-      setTimeout(() => {
-        if (!userInteractionCancelled.value && autoRetryCountdown.value === 0 && !contrato.value && !retryTimeoutId.value) {
-          startAutoRetry()
-        }
-      }, 100)
+watch(
+  () => contrato.value?.id,
+  newId => {
+    if (newId) {
+      cancelAutoRetry();
+      userInteractionCancelled.value = false;
     }
   }
-}, { immediate: false })
+);
+
+// Watch for "not found" state to start retry
+watch(
+  [loading, error, () => contrato.value],
+  ([isLoading, err, contratoData]) => {
+    // If loading finished, no contrato, and we have a route param (meaning we're expecting data)
+    if (!isLoading && !contratoData && route.params.id && !userInteractionCancelled.value) {
+      const errorMessage = err || '';
+      const isNotFound = errorMessage.toLowerCase().includes('not found') || errorMessage === '';
+
+      // Start retry if we have a "not found" error or if loading finished without data
+      // Only start if retry isn't already running (countdown is 0 and no timeout is set)
+      if (isNotFound && autoRetryCountdown.value === 0 && !retryTimeoutId.value) {
+        console.log('Watch detected not found state, starting auto-retry');
+        // Use setTimeout to ensure error state is fully updated
+        setTimeout(() => {
+          if (
+            !userInteractionCancelled.value &&
+            autoRetryCountdown.value === 0 &&
+            !contrato.value &&
+            !retryTimeoutId.value
+          ) {
+            startAutoRetry();
+          }
+        }, 100);
+      }
+    }
+  },
+  { immediate: false }
+);
 </script>
 
 <style scoped>
@@ -1051,4 +1099,4 @@ watch([loading, error, () => contrato.value], ([isLoading, err, contratoData]) =
     font-size: 1rem;
   }
 }
-</style> 
+</style>

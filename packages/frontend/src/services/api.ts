@@ -61,7 +61,7 @@ class ApiService {
     }
 
     const url = `${this.baseUrl}${endpoint}`;
-    
+
     const requestOptions: RequestInit = {
       ...fetchOptions,
       signal: controller.signal,
@@ -237,7 +237,7 @@ class ApiService {
     options: RequestOptions = {}
   ): Promise<ApiResponse<T>> {
     const endpoint = `/content/${contentType}`;
-    
+
     return this.request<ApiResponse<T>>(endpoint, {
       method: 'POST',
       body: JSON.stringify(data),

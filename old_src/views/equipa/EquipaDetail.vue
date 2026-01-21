@@ -7,9 +7,7 @@
         <h1>{{ collaborator?.name || 'Colaborador' }}</h1>
       </div>
       <div class="header-actions">
-        <button @click="navigateToEdit" class="btn btn-edit">
-          ✏️ Editar
-        </button>
+        <button @click="navigateToEdit" class="btn btn-edit">✏️ Editar</button>
       </div>
     </div>
 
@@ -63,145 +61,145 @@
 
     <!-- Action Buttons -->
     <div v-if="!loading && collaborator" class="action-buttons">
-      <button @click="navigateToEdit" class="btn btn-primary">
-        ✏️ Editar Colaborador
-      </button>
-      <button @click="navigateToList" class="btn btn-secondary">
-        📋 Lista de Colaboradores
-      </button>
+      <button @click="navigateToEdit" class="btn btn-primary">✏️ Editar Colaborador</button>
+      <button @click="navigateToList" class="btn btn-secondary">📋 Lista de Colaboradores</button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
-import { useEquipaStore } from '@/stores/equipa.js'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
+import { useEquipaStore } from '@/stores/equipa.js';
 
 // Router
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
 // Store
-const store = useEquipaStore()
-const { loading, error, selectedCollaborator } = storeToRefs(store)
-const { fetchCollaboratorById, clearError } = store
+const store = useEquipaStore();
+const { loading, error, selectedCollaborator } = storeToRefs(store);
+const { fetchCollaboratorById, clearError } = store;
 
 // Computed
-const collaborator = computed(() => selectedCollaborator.value)
+const collaborator = computed(() => selectedCollaborator.value);
 
 // Auto-retry state
-const autoRetryCountdown = ref(0)
-const userInteractionCancelled = ref(false)
-const retryTimeoutId = ref(null)
+const autoRetryCountdown = ref(0);
+const userInteractionCancelled = ref(false);
+const retryTimeoutId = ref(null);
 
 // Methods
-const formatDate = (dateString) => {
-  if (!dateString) return null
+const formatDate = dateString => {
+  if (!dateString) return null;
   return new Date(dateString).toLocaleDateString('pt-PT', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
-  })
-}
+    minute: '2-digit',
+  });
+};
 
 const navigateToEdit = () => {
-  router.push(`/equipa/${route.params.id}/edit`)
-}
+  router.push(`/equipa/${route.params.id}/edit`);
+};
 
 const navigateToList = () => {
-  router.push('/equipa/list')
-}
+  router.push('/equipa/list');
+};
 
 const retryLoad = () => {
-  userInteractionCancelled.value = true
-  cancelAutoRetry()
-  loadCollaborator()
-}
+  userInteractionCancelled.value = true;
+  cancelAutoRetry();
+  loadCollaborator();
+};
 
 const startAutoRetry = () => {
-  cancelAutoRetry()
-  autoRetryCountdown.value = 10
-  
+  cancelAutoRetry();
+  autoRetryCountdown.value = 10;
+
   const updateCountdown = () => {
     if (autoRetryCountdown.value > 0 && !userInteractionCancelled.value) {
-      autoRetryCountdown.value--
-      retryTimeoutId.value = setTimeout(updateCountdown, 1000)
+      autoRetryCountdown.value--;
+      retryTimeoutId.value = setTimeout(updateCountdown, 1000);
     } else if (autoRetryCountdown.value === 0 && !userInteractionCancelled.value) {
       // Auto-retry after countdown
-      loadCollaborator()
+      loadCollaborator();
     }
-  }
-  
-  retryTimeoutId.value = setTimeout(updateCountdown, 1000)
-}
+  };
+
+  retryTimeoutId.value = setTimeout(updateCountdown, 1000);
+};
 
 const cancelAutoRetry = () => {
   if (retryTimeoutId.value) {
-    clearTimeout(retryTimeoutId.value)
-    retryTimeoutId.value = null
+    clearTimeout(retryTimeoutId.value);
+    retryTimeoutId.value = null;
   }
-  autoRetryCountdown.value = 0
-}
+  autoRetryCountdown.value = 0;
+};
 
 const handleUserInteraction = () => {
-  userInteractionCancelled.value = true
-  cancelAutoRetry()
-}
+  userInteractionCancelled.value = true;
+  cancelAutoRetry();
+};
 
 const loadCollaborator = async () => {
-  const id = route.params.id
+  const id = route.params.id;
   if (!id) {
-    router.push('/equipa/list')
-    return
+    router.push('/equipa/list');
+    return;
   }
-  
+
   try {
-    clearError()
-    await fetchCollaboratorById(id)
+    clearError();
+    await fetchCollaboratorById(id);
     // If successful, cancel any pending retries
-    cancelAutoRetry()
+    cancelAutoRetry();
   } catch (err) {
-    console.error('Error loading collaborator:', err)
+    console.error('Error loading collaborator:', err);
     // Check if it's a 404 or "not found" error
-    const isNotFound = err.message?.toLowerCase().includes('not found') || 
-                       error.value?.toLowerCase().includes('not found')
-    
+    const isNotFound =
+      err.message?.toLowerCase().includes('not found') ||
+      error.value?.toLowerCase().includes('not found');
+
     if (isNotFound && !userInteractionCancelled.value) {
       // Start auto-retry countdown
-      startAutoRetry()
+      startAutoRetry();
     }
   }
-}
+};
 
 // Watch for successful data load to cancel retries
-watch(() => collaborator.value?.id, (newId) => {
-  if (newId) {
-    cancelAutoRetry()
-    userInteractionCancelled.value = false
+watch(
+  () => collaborator.value?.id,
+  newId => {
+    if (newId) {
+      cancelAutoRetry();
+      userInteractionCancelled.value = false;
+    }
   }
-})
+);
 
 // Lifecycle
 onMounted(async () => {
   // Add event listeners for user interaction
-  window.addEventListener('click', handleUserInteraction)
-  window.addEventListener('scroll', handleUserInteraction)
-  window.addEventListener('keydown', handleUserInteraction)
-  
-  await loadCollaborator()
-})
+  window.addEventListener('click', handleUserInteraction);
+  window.addEventListener('scroll', handleUserInteraction);
+  window.addEventListener('keydown', handleUserInteraction);
+
+  await loadCollaborator();
+});
 
 onBeforeUnmount(() => {
-  cancelAutoRetry()
-  window.removeEventListener('click', handleUserInteraction)
-  window.removeEventListener('scroll', handleUserInteraction)
-  window.removeEventListener('keydown', handleUserInteraction)
-})
+  cancelAutoRetry();
+  window.removeEventListener('click', handleUserInteraction);
+  window.removeEventListener('scroll', handleUserInteraction);
+  window.removeEventListener('keydown', handleUserInteraction);
+});
 </script>
 
 <style scoped>
@@ -433,4 +431,3 @@ onBeforeUnmount(() => {
   }
 }
 </style>
-

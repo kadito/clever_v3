@@ -1,17 +1,17 @@
 <template>
   <div class="display-toggle-container">
-    <div class="toggle-item" :class="{ 'inactive': !isActive }">
+    <div class="toggle-item" :class="{ inactive: !isActive }">
       <h3 class="toggle-title">{{ title }}</h3>
       <button
         type="button"
         class="toggle-switch"
-        :class="{ 'active': isActive, 'disabled': disabled }"
+        :class="{ active: isActive, disabled: disabled }"
         :disabled="disabled"
         :aria-pressed="isActive"
         :aria-label="`${isActive ? 'Desativar' : 'Ativar'} ${title}`"
         @click="handleToggle"
       >
-        <span class="toggle-slider" :class="{ 'active': isActive }"></span>
+        <span class="toggle-slider" :class="{ active: isActive }"></span>
       </button>
     </div>
   </div>
@@ -19,23 +19,23 @@
 
 <script setup lang="ts">
 interface Props {
-  title: string
-  isActive: boolean
-  disabled?: boolean
+  title: string;
+  isActive: boolean;
+  disabled?: boolean;
 }
 
 interface Emits {
-  (e: 'toggle', active: boolean): void
+  (e: 'toggle', active: boolean): void;
 }
 
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
 
 const handleToggle = () => {
   if (!props.disabled) {
-    emit('toggle', !props.isActive)
+    emit('toggle', !props.isActive);
   }
-}
+};
 </script>
 
 <style scoped>
@@ -117,11 +117,11 @@ const handleToggle = () => {
   .toggle-switch:active:not(:disabled) {
     @apply scale-95;
   }
-  
+
   .toggle-switch:active:not(:disabled):not(.active) {
     @apply bg-gray-400;
   }
-  
+
   .toggle-switch:active:not(:disabled).active {
     @apply bg-primary-600;
   }
@@ -132,21 +132,21 @@ const handleToggle = () => {
   .toggle-item {
     @apply p-3;
   }
-  
+
   .toggle-title {
     @apply text-sm;
   }
-  
+
   .toggle-switch {
     width: 44px;
     height: 22px;
   }
-  
+
   .toggle-slider {
     width: 18px;
     height: 18px;
   }
-  
+
   .toggle-slider.active {
     transform: translateX(22px);
   }

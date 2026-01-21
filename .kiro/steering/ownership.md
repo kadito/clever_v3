@@ -9,16 +9,19 @@ Kiro is responsible for:
 - BaseContent interface evolution
 - Content relations system implementation and maintenance
 - Relation detection patterns and basic data extraction logic
-- Structured error handling for relation resolution failures (404/500 error objects)
+- Structured error handling for relation resolution failures (404/500 error
+  objects)
 - R2 storage patterns and index maintenance
 - API endpoint consistency with automatic relation resolution
-- Frontend component patterns including RelationInfoDisplay with error state handling
+- Frontend component patterns including RelationInfoDisplay with error state
+  handling
 - Relation component integration patterns and mobile-first responsive design
 - Type guard utilities and safe relation handling patterns
 
 Kiro must:
 
-- **NOT write or run automated tests during development** - focus on rapid implementation
+- **NOT write or run automated tests during development** - focus on rapid
+  implementation
 - Explain breaking changes before applying them
 - Prefer refactors over patches
 - Flag technical debt early
@@ -26,7 +29,8 @@ Kiro must:
 - Ensure all content types follow BaseContent patterns
 - Ensure consistent relation resolution across all content types
 - Handle relation resolution failures with structured error objects
-- Allow content creation without validating relation IDs (display-time validation only)
+- Allow content creation without validating relation IDs (display-time
+  validation only)
 - Keep search indexes synchronized with content changes
 - Follow established R2 key patterns
 - Maintain relation field naming conventions ({relationType}Id)

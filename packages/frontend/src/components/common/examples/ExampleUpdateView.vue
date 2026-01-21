@@ -150,26 +150,26 @@ const updateFormSections = computed((): FormSection[] => [
 // Custom validation for updates (more lenient than creation)
 const validateExampleUpdate = (data: Record<string, any>): Record<string, string> => {
   const errors: Record<string, string> = {};
-  
+
   // Custom business rules for updates
   if (data.name && data.name.length < 3) {
     errors.name = 'Nome deve ter pelo menos 3 caracteres';
   }
-  
+
   // Phone validation is more lenient on updates - allow empty
   if (data.phone && data.phone.length > 0 && data.phone.length < 9) {
     errors.phone = 'Telefone deve ter pelo menos 9 dígitos';
   }
-  
+
   // Don't validate email since it's readonly
-  
+
   return errors;
 };
 
 // Utility functions
 const formatDate = (dateString?: string): string => {
   if (!dateString) return '-';
-  
+
   const date = new Date(dateString);
   return date.toLocaleString('pt-PT', {
     year: 'numeric',
@@ -185,13 +185,12 @@ const handleUpdate = async (data: Record<string, any>) => {
   try {
     isSaving.value = true;
     error.value = null;
-    
+
     // Simulate API call
 
-    
     // Simulate delay
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     // Navigate back to detail view
     router.push(`/examples/${props.item?.uuid}`);
   } catch (err) {

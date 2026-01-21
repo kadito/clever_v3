@@ -2,9 +2,14 @@
 
 ## Overview
 
-The CI/CD deployment system uses two simple GitHub Actions workflows to deploy the CLEVER dashboard to Cloudflare Workers. The system handles the pnpm monorepo structure by building packages in correct dependency order (shared first, then frontend and backend) and deploys to environment-specific Cloudflare resources based on Git branch triggers.
+The CI/CD deployment system uses two simple GitHub Actions workflows to deploy
+the CLEVER dashboard to Cloudflare Workers. The system handles the pnpm monorepo
+structure by building packages in correct dependency order (shared first, then
+frontend and backend) and deploys to environment-specific Cloudflare resources
+based on Git branch triggers.
 
-The design focuses on simplicity with just two workflows: `deploy-test.yml` and `deploy-prod.yml`, eliminating complexity while ensuring reliable deployments.
+The design focuses on simplicity with just two workflows: `deploy-test.yml` and
+`deploy-prod.yml`, eliminating complexity while ensuring reliable deployments.
 
 ## Architecture
 
@@ -18,10 +23,10 @@ graph TD
     B -->|test| C[deploy-test.yml]
     B -->|prod| D[deploy-prod.yml]
     B -->|other| E[No Action]
-    
+
     C --> F[Build Packages]
     D --> F
-    
+
     F --> G[@clever/shared]
     G --> H[@clever/frontend]
     G --> I[@clever/backend]
@@ -48,22 +53,24 @@ graph TD
 
 ### Environment Configuration
 
-| Environment | Worker Name | R2 Bucket | Branch Trigger | Workflow File |
-|-------------|-------------|-----------|----------------|---------------|
-| Test | clever-dashboard-test | clever-documents-test | test | deploy-test.yml |
-| Production | clever-dashboard-prod | clever-documents-prod | prod | deploy-prod.yml |
+| Environment | Worker Name           | R2 Bucket             | Branch Trigger | Workflow File   |
+| ----------- | --------------------- | --------------------- | -------------- | --------------- |
+| Test        | clever-dashboard-test | clever-documents-test | test           | deploy-test.yml |
+| Production  | clever-dashboard-prod | clever-documents-prod | prod           | deploy-prod.yml |
 
 ## Components and Interfaces
 
 ### GitHub Actions Workflows
 
 #### Test Deployment Workflow (.github/workflows/deploy-test.yml)
+
 - Triggers on pushes to `test` branch
 - Builds all packages in correct order
 - Deploys to test environment
 - Verifies deployment success
 
 #### Production Deployment Workflow (.github/workflows/deploy-prod.yml)
+
 - Triggers on pushes to `prod` branch
 - Builds all packages in correct order
 - Deploys to production environment
@@ -74,10 +81,12 @@ graph TD
 The system uses the existing wrangler.toml with environment-specific overrides:
 
 #### Base Configuration (wrangler.toml)
+
 - Contains test environment configuration (default)
 - Includes shared settings and test resource bindings
 
 #### Production Environment
+
 - Uses `--env production` flag with wrangler
 - Overrides test settings with production resources
 - Defined in `[env.production]` section of wrangler.toml
@@ -90,8 +99,8 @@ Required secrets for Cloudflare deployment:
 
 ```typescript
 interface GitHubSecrets {
-  CLOUDFLARE_API_TOKEN: string;           // Cloudflare API token
-  CLOUDFLARE_ACCOUNT_ID: string;          // Account identifier
+  CLOUDFLARE_API_TOKEN: string; // Cloudflare API token
+  CLOUDFLARE_ACCOUNT_ID: string; // Account identifier
 }
 ```
 
@@ -106,61 +115,82 @@ interface BuildProcess {
     'pnpm --filter @clever/shared build',
     'pnpm --filter @clever/frontend build',
     'pnpm --filter @clever/backend build',
-    'wrangler deploy [--env production]'
+    'wrangler deploy [--env production]',
   ];
 }
 ```
 
 ## Correctness Properties
 
-*A property is a characteristic or behavior that should hold true across all valid executions of a system-essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees.*
+_A property is a characteristic or behavior that should hold true across all
+valid executions of a system-essentially, a formal statement about what the
+system should do. Properties serve as the bridge between human-readable
+specifications and machine-verifiable correctness guarantees._
 
 Let me analyze the acceptance criteria to determine testable properties:
 
-<function_calls>
-<invoke name="prework">
+<function_calls> <invoke name="prework">
 <parameter name="featureName">cicd-deployment
 
 ## Correctness Properties
 
-*A property is a characteristic or behavior that should hold true across all valid executions of a system-essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees.*
+_A property is a characteristic or behavior that should hold true across all
+valid executions of a system-essentially, a formal statement about what the
+system should do. Properties serve as the bridge between human-readable
+specifications and machine-verifiable correctness guarantees._
 
 ### Property 1: Branch-Based Deployment Triggers
-*For any* push to test or prod branch, the corresponding deployment workflow should trigger and complete the build and deployment process
-**Validates: Requirements 1.1, 1.2**
+
+_For any_ push to test or prod branch, the corresponding deployment workflow
+should trigger and complete the build and deployment process **Validates:
+Requirements 1.1, 1.2**
 
 ### Property 2: Package Build Order
-*For any* deployment workflow execution, @clever/shared should build first, followed by @clever/frontend and @clever/backend packages
-**Validates: Requirements 1.4, 1.5**
+
+_For any_ deployment workflow execution, @clever/shared should build first,
+followed by @clever/frontend and @clever/backend packages **Validates:
+Requirements 1.4, 1.5**
 
 ### Property 3: Environment-Specific Resource Usage
-*For any* deployment, the workflow should use the correct Cloudflare resources (worker name and R2 bucket) for the target environment
-**Validates: Requirements 2.1, 2.2, 3.1, 3.2, 3.3, 3.4**
+
+_For any_ deployment, the workflow should use the correct Cloudflare resources
+(worker name and R2 bucket) for the target environment **Validates: Requirements
+2.1, 2.2, 3.1, 3.2, 3.3, 3.4**
 
 ### Property 4: Asset and Worker Deployment
-*For any* successful build, the workflow should upload Vue static assets and deploy the unified worker with proper bindings
-**Validates: Requirements 2.3, 2.4**
+
+_For any_ successful build, the workflow should upload Vue static assets and
+deploy the unified worker with proper bindings **Validates: Requirements 2.3,
+2.4**
 
 ### Property 5: Deployment Verification
-*For any* completed deployment, the workflow should verify the worker deployment was successful
-**Validates: Requirements 2.5**
+
+_For any_ completed deployment, the workflow should verify the worker deployment
+was successful **Validates: Requirements 2.5**
 
 ### Property 6: Secure Credential Handling
-*For any* Cloudflare API access, the workflow should use encrypted GitHub secrets without exposing credentials in logs
-**Validates: Requirements 4.1, 4.2, 4.3**
+
+_For any_ Cloudflare API access, the workflow should use encrypted GitHub
+secrets without exposing credentials in logs **Validates: Requirements 4.1, 4.2,
+4.3**
 
 ### Property 7: Build Failure Handling
-*For any* failed build step, the workflow should stop execution and provide clear error reporting
-**Validates: Requirements 1.7, 4.4**
+
+_For any_ failed build step, the workflow should stop execution and provide
+clear error reporting **Validates: Requirements 1.7, 4.4**
 
 ## Error Handling
 
 ### Build Failures
-- **Dependency Installation Failures**: Clear error messages about pnpm installation issues
-- **Package Build Errors**: Specific build failure messages with package identification
+
+- **Dependency Installation Failures**: Clear error messages about pnpm
+  installation issues
+- **Package Build Errors**: Specific build failure messages with package
+  identification
 - **Deployment Failures**: Wrangler error output with context
 
 ### Configuration Errors
+
 - **Missing Secrets**: Clear guidance on required GitHub secrets
 - **Invalid Wrangler Config**: Configuration validation error messages
 - **Environment Mismatch**: Branch and environment alignment issues
@@ -168,29 +198,36 @@ Let me analyze the acceptance criteria to determine testable properties:
 ## Testing Strategy
 
 ### Unit Testing Approach
+
 The CI/CD system will be tested using workflow validation and integration tests:
 
 **Workflow Tests:**
+
 - GitHub Actions workflow syntax validation
 - Wrangler configuration validation
 - Build script execution verification
 - Environment variable handling
 
 **Integration Tests:**
+
 - End-to-end deployment simulation in test environment
 - Package build order verification
 - Security credential handling verification
 
 ### Property-Based Testing Configuration
-Property-based tests will use GitHub Actions testing framework with minimum 100 iterations per property test. Each test will be tagged with:
+
+Property-based tests will use GitHub Actions testing framework with minimum 100
+iterations per property test. Each test will be tagged with:
 
 **Feature: cicd-deployment, Property {number}: {property_text}**
 
 **Testing Libraries:**
+
 - **GitHub Actions Testing**: Native GitHub Actions workflow testing
 - **Wrangler CLI Testing**: Cloudflare Wrangler command validation
 
 ### Deployment Verification Tests
+
 Each deployment will include automated verification:
 
 ```bash
@@ -198,4 +235,5 @@ Each deployment will include automated verification:
 curl -f https://${WORKER_URL}/ || echo "Worker deployment verification failed"
 ```
 
-The testing strategy ensures reliable deployments while maintaining simplicity and fast feedback loops.
+The testing strategy ensures reliable deployments while maintaining simplicity
+and fast feedback loops.

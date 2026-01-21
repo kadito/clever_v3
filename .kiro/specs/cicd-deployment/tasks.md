@@ -2,7 +2,10 @@
 
 ## Overview
 
-This implementation plan creates two simple GitHub Actions workflows to deploy the CLEVER dashboard to Cloudflare Workers. The system builds the pnpm monorepo packages in correct dependency order (shared first, then frontend and backend) and deploys to environment-specific Cloudflare resources.
+This implementation plan creates two simple GitHub Actions workflows to deploy
+the CLEVER dashboard to Cloudflare Workers. The system builds the pnpm monorepo
+packages in correct dependency order (shared first, then frontend and backend)
+and deploys to environment-specific Cloudflare resources.
 
 ## Tasks
 
@@ -12,7 +15,7 @@ This implementation plan creates two simple GitHub Actions workflows to deploy t
   - Configure Node.js environment
   - _Requirements: 1.1, 1.3_
 
-- [ ]* 1.1 Write property test for branch-based deployment triggers
+- [ ]\* 1.1 Write property test for branch-based deployment triggers
   - **Property 1: Branch-Based Deployment Triggers**
   - **Validates: Requirements 1.1, 1.2**
 
@@ -22,7 +25,7 @@ This implementation plan creates two simple GitHub Actions workflows to deploy t
   - Ensure proper dependency order and error handling
   - _Requirements: 1.4, 1.5, 1.7_
 
-- [ ]* 2.1 Write property test for package build order
+- [ ]\* 2.1 Write property test for package build order
   - **Property 2: Package Build Order**
   - **Validates: Requirements 1.4, 1.5**
 
@@ -32,7 +35,7 @@ This implementation plan creates two simple GitHub Actions workflows to deploy t
   - Configure test-specific resource bindings
   - _Requirements: 2.1, 3.1, 3.2, 4.1, 4.2_
 
-- [ ]* 3.1 Write property test for environment-specific resource usage
+- [ ]\* 3.1 Write property test for environment-specific resource usage
   - **Property 3: Environment-Specific Resource Usage**
   - **Validates: Requirements 2.1, 2.2, 3.1, 3.2, 3.3, 3.4**
 
@@ -41,7 +44,7 @@ This implementation plan creates two simple GitHub Actions workflows to deploy t
   - Include basic deployment status check after deployment
   - _Requirements: 2.5_
 
-- [ ]* 4.1 Write property test for deployment verification
+- [ ]\* 4.1 Write property test for deployment verification
   - **Property 5: Deployment Verification**
   - **Validates: Requirements 2.5**
 
@@ -57,7 +60,7 @@ This implementation plan creates two simple GitHub Actions workflows to deploy t
   - Add production-specific verification steps
   - _Requirements: 2.2, 3.3, 3.4_
 
-- [ ]* 6.1 Write property test for asset and worker deployment
+- [ ]\* 6.1 Write property test for asset and worker deployment
   - **Property 4: Asset and Worker Deployment**
   - **Validates: Requirements 2.3, 2.4**
 
@@ -67,7 +70,7 @@ This implementation plan creates two simple GitHub Actions workflows to deploy t
   - Validate required secrets are available
   - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-- [ ]* 7.1 Write property test for secure credential handling
+- [ ]\* 7.1 Write property test for secure credential handling
   - **Property 6: Secure Credential Handling**
   - **Validates: Requirements 4.1, 4.2, 4.3**
 
@@ -77,7 +80,7 @@ This implementation plan creates two simple GitHub Actions workflows to deploy t
   - Include context information in error messages
   - _Requirements: 1.7, 4.4_
 
-- [ ]* 8.1 Write property test for build failure handling
+- [ ]\* 8.1 Write property test for build failure handling
   - **Property 7: Build Failure Handling**
   - **Validates: Requirements 1.7, 4.4**
 
@@ -87,7 +90,7 @@ This implementation plan creates two simple GitHub Actions workflows to deploy t
   - Ensure proper environment separation
   - _Requirements: All_
 
-- [ ]* 9.1 Write integration tests for end-to-end deployment
+- [ ]\* 9.1 Write integration tests for end-to-end deployment
   - Test complete deployment flow from push to verification
   - Test both test and production workflows
   - _Requirements: All_
@@ -100,5 +103,6 @@ This implementation plan creates two simple GitHub Actions workflows to deploy t
 - Tasks marked with `*` are optional and can be skipped for faster MVP
 - Each task references specific requirements for traceability
 - The system focuses on simplicity with just two deployment workflows
-- Build order is critical: @clever/shared must build before @clever/frontend and @clever/backend
+- Build order is critical: @clever/shared must build before @clever/frontend and
+  @clever/backend
 - Both workflows use the same build process but deploy to different environments

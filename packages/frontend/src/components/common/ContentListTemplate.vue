@@ -9,7 +9,10 @@
             <div>
               <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
                 {{ displayName }}
-                <span v-if="!isLoading && totalCount !== null" class="text-lg text-gray-500 font-normal">
+                <span
+                  v-if="!isLoading && totalCount !== null"
+                  class="text-lg text-gray-500 font-normal"
+                >
                   ({{ totalCount }})
                 </span>
               </h1>
@@ -53,11 +56,7 @@
       </div>
 
       <!-- Error state -->
-      <ErrorComponent 
-        v-else-if="error" 
-        :error="error" 
-        @close="clearError" 
-      />
+      <ErrorComponent v-else-if="error" :error="error" @close="clearError" />
 
       <!-- Empty state -->
       <div v-else-if="displayedItems.length === 0" class="empty-state">
@@ -87,8 +86,8 @@
 
       <!-- Content list -->
       <div v-else class="content-list">
-        <div 
-          v-for="item in displayedItems" 
+        <div
+          v-for="item in displayedItems"
           :key="item.uuid"
           class="content-list-item"
           @click="handleItemClick(item)"
@@ -101,7 +100,7 @@
                 <div v-if="$slots.itemIcon" class="flex-shrink-0 mt-1">
                   <slot name="itemIcon" :item="item" />
                 </div>
-                
+
                 <div class="flex-1 min-w-0">
                   <!-- Title -->
                   <h3 class="text-base font-semibold text-gray-900 truncate">
@@ -109,14 +108,14 @@
                       {{ getItemTitle(item) }}
                     </slot>
                   </h3>
-                  
+
                   <!-- Subtitle -->
                   <p v-if="getItemSubtitle(item)" class="text-sm text-gray-600 truncate mt-1">
                     <slot name="itemSubtitle" :item="item">
                       {{ getItemSubtitle(item) }}
                     </slot>
                   </p>
-                  
+
                   <!-- Meta information -->
                   <div class="flex flex-wrap items-center gap-2 mt-2 text-xs text-gray-500">
                     <slot name="itemMeta" :item="item">
@@ -168,7 +167,10 @@
       </div>
 
       <!-- Pagination (if needed) -->
-      <div v-if="showPagination && totalPages > 1" class="flex items-center justify-between pt-6 border-t border-gray-200 mt-6">
+      <div
+        v-if="showPagination && totalPages > 1"
+        class="flex items-center justify-between pt-6 border-t border-gray-200 mt-6"
+      >
         <div class="text-sm text-gray-700">
           Mostrando {{ startItem }} a {{ endItem }} de {{ totalCount }} resultados
         </div>
@@ -221,12 +223,7 @@
       :aria-label="createButtonText"
     >
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M12 4v16m8-8H4"
-        />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
       </svg>
     </button>
   </div>
@@ -244,32 +241,32 @@ interface Props {
   items: BaseContent[];
   isLoading?: boolean;
   error?: string | null;
-  
+
   // Display configuration
   displayName: string;
   description?: string;
   backRoute?: string;
-  
+
   // Search configuration
   searchQuery?: string;
   searchPlaceholder?: string;
-  
+
   // Pagination
   currentPage?: number;
   totalPages?: number;
   totalCount?: number | null;
   showPagination?: boolean;
-  
+
   // Create button
   showCreateButton?: boolean;
   createButtonText?: string;
-  
+
   // Empty state
   emptyIcon?: string;
   emptyTitle?: string;
   emptyMessage?: string;
   emptySearchMessage?: string;
-  
+
   // Item display functions
   getItemTitle?: (item: BaseContent) => string;
   getItemSubtitle?: (item: BaseContent) => string;
@@ -293,7 +290,8 @@ const props = withDefaults(defineProps<Props>(), {
   emptyTitle: 'Nenhum item encontrado',
   emptyMessage: 'Não há itens cadastrados no sistema.',
   emptySearchMessage: 'Tente ajustar os termos de pesquisa.',
-  getItemTitle: (item: BaseContent) => item.data.name || item.data.title || `Item #${item.uuid.slice(0, 8)}`,
+  getItemTitle: (item: BaseContent) =>
+    item.data.name || item.data.title || `Item #${item.uuid.slice(0, 8)}`,
   getItemSubtitle: (item: BaseContent) => item.data.subtitle || item.data.description || '',
   getItemMeta1: (item: BaseContent) => {
     const date = new Date(item.createdAt);
@@ -306,15 +304,15 @@ const emit = defineEmits<{
   // Search events
   search: [query: string];
   clearSearch: [];
-  
+
   // Navigation events
   itemClick: [item: BaseContent];
   create: [];
   edit: [item: BaseContent];
-  
+
   // Pagination events
   pageChange: [page: number];
-  
+
   // Error handling
   clearError: [];
 }>();
@@ -339,7 +337,7 @@ const endItem = computed(() => {
 // Watch for external search query changes
 watch(
   () => props.searchQuery,
-  (newValue) => {
+  newValue => {
     localSearchQuery.value = newValue;
   }
 );
@@ -409,7 +407,7 @@ const clearError = () => {
   .content-list-item:hover {
     @apply transform-none border-gray-200;
   }
-  
+
   .content-list-item:active {
     @apply bg-gray-50;
   }
@@ -436,7 +434,7 @@ const clearError = () => {
   .content-list-container {
     padding-bottom: 2rem;
   }
-  
+
   .content-list {
     @apply grid grid-cols-1 gap-4;
   }

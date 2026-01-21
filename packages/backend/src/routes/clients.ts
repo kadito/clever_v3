@@ -5,13 +5,17 @@
  */
 
 import { Hono } from 'hono';
-import { createContentRoutes, createClientContentConfig, contentErrorHandler } from './content-route-template';
+import {
+  createContentRoutes,
+  createClientContentConfig,
+  contentErrorHandler,
+} from './content-route-template';
 import type { Client, ClientData } from '@clever/shared';
-import { 
-  validateClientCreation, 
-  validateClientUpdate, 
+import {
+  validateClientCreation,
+  validateClientUpdate,
   sanitizeClientData,
-  createClientSearchText 
+  createClientSearchText,
 } from '@clever/shared';
 
 /**
@@ -22,13 +26,13 @@ import {
 function validateClientCreate(requestData: any): void {
   // Extract the actual client data from the request
   const clientData = requestData.data || requestData;
-  
+
   // Sanitize the data first
   const sanitizedData = sanitizeClientData(clientData as ClientData);
-  
+
   // Use the comprehensive validation from shared package
   const errors = validateClientCreation(sanitizedData);
-  
+
   if (errors.length > 0) {
     throw new Error(errors[0]); // Return first error for API response
   }
@@ -42,10 +46,10 @@ function validateClientCreate(requestData: any): void {
 function validateClientUpdateData(requestData: any): void {
   // Extract the actual client data from the request
   const clientData = requestData.data || requestData;
-  
+
   // Use the update validation from shared package
   const errors = validateClientUpdate(clientData as Partial<ClientData>);
-  
+
   if (errors.length > 0) {
     throw new Error(errors[0]); // Return first error for API response
   }
@@ -80,7 +84,7 @@ clientConfig.extractIndexFields = (content: Client) => {
     telefoneContato: data.telefoneContato || '',
     email: data.email || '',
     emailContato: data.emailContato || '',
-    
+
     // Service flags for filtering
     temAnydesk: data.temAnydesk || false,
     manutencao: data.manutencao || false,
@@ -88,7 +92,7 @@ clientConfig.extractIndexFields = (content: Client) => {
     atcud: data.atcud || false,
     dumps: data.dumps || false,
     vectronConnect: data.vectronConnect || false,
-    
+
     // Software information for search
     softwareNames: data.softwares?.map(s => s.name) || [],
     softwareProducts: data.softwares?.map(s => s.product).filter(Boolean) || [],

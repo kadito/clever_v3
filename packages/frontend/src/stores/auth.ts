@@ -43,12 +43,12 @@ export const useAuthStore = defineStore('auth', () => {
     isLoaded,
     isSignedIn,
     user,
-    
+
     // Getters
     isAuthenticated,
     userType,
     userName,
-    
+
     // Actions
     setAuthState,
     clearAuthState,

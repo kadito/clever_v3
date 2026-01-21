@@ -2,13 +2,20 @@
 
 ## Overview
 
-This design document outlines the architecture for refactoring the contracts form to implement a **UI display toggle system**, where users can switch between viewing CPA and S&H configuration sections while both contract types can be configured for the same client. The design focuses on clean state management, conditional rendering, and contract-specific user interfaces.
+This design document outlines the architecture for refactoring the contracts
+form to implement a **UI display toggle system**, where users can switch between
+viewing CPA and S&H configuration sections while both contract types can be
+configured for the same client. The design focuses on clean state management,
+conditional rendering, and contract-specific user interfaces.
 
 ## Architecture Overview
 
 ### Core Design Principle: UI Display Toggle System
 
-The fundamental design principle is that users can toggle between viewing CPA and S&H contract sections, but both contract types can be configured simultaneously. This provides a clean, focused interface while maintaining full functionality.
+The fundamental design principle is that users can toggle between viewing CPA
+and S&H contract sections, but both contract types can be configured
+simultaneously. This provides a clean, focused interface while maintaining full
+functionality.
 
 ```
 Contract State Management:
@@ -57,22 +64,28 @@ ContractsCreateView
       <h2>PLANOS DE CONTRATO</h2>
       <div class="info-note">
         <span class="info-icon">ℹ️</span>
-        <span>O cliente pode ter um ou ambos os tipos de contrato (CPA e/ou S&H)</span>
+        <span
+          >O cliente pode ter um ou ambos os tipos de contrato (CPA e/ou
+          S&H)</span
+        >
       </div>
     </div>
-    
+
     <div class="contract-toggles">
       <div class="contract-toggle-item">
         <h3>CPA - CASHLOGY</h3>
-        <ToggleSwitch 
+        <ToggleSwitch
           :model-value="displaySection === 'CPA'"
           @update:model-value="handleCPADisplayToggle"
         />
       </div>
-      
-      <div class="contract-toggle-item" :class="{ 'inactive': displaySection !== 'S&H' }">
+
+      <div
+        class="contract-toggle-item"
+        :class="{ inactive: displaySection !== 'S&H' }"
+      >
         <h3>S&H - SOFTWARE E HARDWARE</h3>
-        <ToggleSwitch 
+        <ToggleSwitch
           :model-value="displaySection === 'S&H'"
           @update:model-value="handleSHDisplayToggle"
         />
@@ -83,28 +96,28 @@ ContractsCreateView
 
 <script setup lang="ts">
 interface Props {
-  displaySection: 'CPA' | 'S&H' | null
+  displaySection: 'CPA' | 'S&H' | null;
 }
 
 interface Emits {
-  (e: 'update:displaySection', section: 'CPA' | 'S&H' | null): void
+  (e: 'update:displaySection', section: 'CPA' | 'S&H' | null): void;
 }
 
 const handleCPADisplayToggle = (active: boolean) => {
   if (active) {
-    emit('update:displaySection', 'CPA')
+    emit('update:displaySection', 'CPA');
   } else {
-    emit('update:displaySection', null)
+    emit('update:displaySection', null);
   }
-}
+};
 
 const handleSHDisplayToggle = (active: boolean) => {
   if (active) {
-    emit('update:displaySection', 'S&H')
+    emit('update:displaySection', 'S&H');
   } else {
-    emit('update:displaySection', null)
+    emit('update:displaySection', null);
   }
-}
+};
 </script>
 ```
 
@@ -118,7 +131,7 @@ const handleSHDisplayToggle = (active: boolean) => {
     <!-- CPA Type Selection -->
     <div class="form-field">
       <label class="form-label required">TIPO DE CONTRATO CPA</label>
-      <select 
+      <select
         v-model="contractData.cpaContractType"
         class="form-select"
         required
@@ -133,20 +146,19 @@ const handleSHDisplayToggle = (active: boolean) => {
     <div class="equipment-section">
       <div class="equipment-header">
         <h4>EQUIPAMENTOS CPA</h4>
-        <button 
-          type="button" 
-          class="add-equipment-btn"
-          @click="addEquipment"
-        >
+        <button type="button" class="add-equipment-btn" @click="addEquipment">
           + ADICIONAR EQUIPAMENTO
         </button>
       </div>
-      
+
       <div class="equipment-info-callout">
         <span class="info-icon">ℹ️</span>
-        <span>O desconto aplica-se apenas aos equipamentos adicionais (2º, 3º, etc.). O primeiro equipamento não tem desconto.</span>
+        <span
+          >O desconto aplica-se apenas aos equipamentos adicionais (2º, 3º,
+          etc.). O primeiro equipamento não tem desconto.</span
+        >
       </div>
-      
+
       <div class="equipment-list">
         <EquipmentCard
           v-for="(equipment, index) in contractData.equipment"
@@ -179,11 +191,7 @@ const handleSHDisplayToggle = (active: boolean) => {
     <!-- S&H Plan Selection -->
     <div class="form-field">
       <label class="form-label required">PLANO S&H</label>
-      <select 
-        v-model="contractData.shPlan"
-        class="form-select"
-        required
-      >
+      <select v-model="contractData.shPlan" class="form-select" required>
         <option value="">Selecione o plano...</option>
         <option value="simple">SIMPLE</option>
         <option value="brass">BRASS</option>
@@ -200,27 +208,27 @@ const handleSHDisplayToggle = (active: boolean) => {
       <div class="equipment-fields">
         <div class="form-field">
           <label class="form-label">MODELO</label>
-          <input 
+          <input
             v-model="contractData.equipment.model"
             type="text"
             class="form-input"
             placeholder="Ex: Dell Optiplex 7090"
           />
         </div>
-        
+
         <div class="form-field">
           <label class="form-label">Nº SÉRIE</label>
-          <input 
+          <input
             v-model="contractData.equipment.serialNumber"
             type="text"
             class="form-input"
             placeholder="Ex: ABC123456"
           />
         </div>
-        
+
         <div class="form-field">
           <label class="form-label">SOFTWARE</label>
-          <input 
+          <input
             v-model="contractData.equipment.software"
             type="text"
             class="form-input"
@@ -241,14 +249,15 @@ const handleSHDisplayToggle = (active: boolean) => {
 
 ### 4. EquipmentCard Component (CPA-specific)
 
-**Purpose**: Individual equipment card for CPA contracts with numbering and discount logic.
+**Purpose**: Individual equipment card for CPA contracts with numbering and
+discount logic.
 
 ```vue
 <template>
   <div class="equipment-card">
     <div class="equipment-header">
       <h5>EQUIPAMENTO {{ equipmentNumber }}</h5>
-      <button 
+      <button
         v-if="equipmentNumber > 1"
         type="button"
         class="remove-btn"
@@ -257,11 +266,11 @@ const handleSHDisplayToggle = (active: boolean) => {
         ✕
       </button>
     </div>
-    
+
     <div class="equipment-fields">
       <div class="form-field">
         <label class="form-label">MODELO</label>
-        <input 
+        <input
           v-model="localEquipment.model"
           type="text"
           class="form-input"
@@ -269,10 +278,10 @@ const handleSHDisplayToggle = (active: boolean) => {
           @input="updateEquipment"
         />
       </div>
-      
+
       <div class="form-field">
         <label class="form-label">Nº SÉRIE</label>
-        <input 
+        <input
           v-model="localEquipment.serialNumber"
           type="text"
           class="form-input"
@@ -280,10 +289,10 @@ const handleSHDisplayToggle = (active: boolean) => {
           @input="updateEquipment"
         />
       </div>
-      
+
       <div v-if="showDiscount" class="form-field">
         <label class="form-label">DESCONTO (%)</label>
-        <input 
+        <input
           v-model.number="localEquipment.discount"
           type="number"
           class="form-input"
@@ -294,10 +303,10 @@ const handleSHDisplayToggle = (active: boolean) => {
         />
       </div>
     </div>
-    
+
     <div class="form-field">
       <label class="form-label">OBSERVAÇÕES</label>
-      <textarea 
+      <textarea
         v-model="localEquipment.observations"
         class="form-textarea"
         rows="3"
@@ -319,7 +328,7 @@ const handleSHDisplayToggle = (active: boolean) => {
     <h2>INFORMAÇÃO ADICIONAL</h2>
     <div class="form-field">
       <label class="form-label">MÉTODO DE PAGAMENTO</label>
-      <select 
+      <select
         v-model="paymentMethod"
         class="form-select"
         @change="$emit('update:paymentMethod', $event.target.value)"
@@ -344,42 +353,42 @@ const handleSHDisplayToggle = (active: boolean) => {
 ```typescript
 interface ContractFormData {
   // Client information
-  clientId: string
-  clientName: string
-  
+  clientId: string;
+  clientName: string;
+
   // Display control (UI only)
-  displaySection: 'CPA' | 'S&H' | null
-  
+  displaySection: 'CPA' | 'S&H' | null;
+
   // CPA-specific data (persists regardless of display)
   cpaData: {
-    contractType: 'CPA' | 'CPA_1500' | ''
-    equipment: CPAEquipment[]
-    startDate: string
-    endDate: string
-  } | null
-  
+    contractType: 'CPA' | 'CPA_1500' | '';
+    equipment: CPAEquipment[];
+    startDate: string;
+    endDate: string;
+  } | null;
+
   // S&H-specific data (persists regardless of display)
   shData: {
-    plan: string
+    plan: string;
     equipment: {
-      model: string
-      serialNumber: string
-      software: string
-    }
-    startDate: string
-    endDate: string
-  } | null
-  
+      model: string;
+      serialNumber: string;
+      software: string;
+    };
+    startDate: string;
+    endDate: string;
+  } | null;
+
   // Unified payment method
-  paymentMethod: string
+  paymentMethod: string;
 }
 
 interface CPAEquipment {
-  id: string
-  model: string
-  serialNumber: string
-  discount: number // 0 for first equipment
-  observations: string
+  id: string;
+  model: string;
+  serialNumber: string;
+  discount: number; // 0 for first equipment
+  observations: string;
 }
 ```
 
@@ -393,34 +402,34 @@ const formState = reactive<ContractFormData>({
   displaySection: null,
   cpaData: null,
   shData: null,
-  paymentMethod: ''
-})
+  paymentMethod: '',
+});
 
 // Handle display section switching (preserves data)
 const switchDisplaySection = (newSection: 'CPA' | 'S&H' | null) => {
-  formState.displaySection = newSection
-  
+  formState.displaySection = newSection;
+
   // Initialize data structures if they don't exist
   if (newSection === 'CPA' && !formState.cpaData) {
     formState.cpaData = {
       contractType: '',
       equipment: [],
       startDate: '',
-      endDate: ''
-    }
+      endDate: '',
+    };
   } else if (newSection === 'S&H' && !formState.shData) {
     formState.shData = {
       plan: '',
       equipment: {
         model: '',
         serialNumber: '',
-        software: ''
+        software: '',
       },
       startDate: '',
-      endDate: ''
-    }
+      endDate: '',
+    };
   }
-}
+};
 ```
 
 ## Styling Guidelines
@@ -436,16 +445,16 @@ const switchDisplaySection = (newSection: 'CPA' | 'S&H' | null) => {
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
   margin-bottom: 0.75rem;
-  
+
   &.inactive {
     opacity: 0.5;
     background-color: #f9fafb;
-    
+
     h3 {
       color: #9ca3af;
     }
   }
-  
+
   h3 {
     margin: 0;
     font-size: 1rem;
@@ -464,13 +473,13 @@ const switchDisplaySection = (newSection: 'CPA' | 'S&H' | null) => {
   padding: 1rem;
   margin-bottom: 1rem;
   background: white;
-  
+
   .equipment-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
-    
+
     h5 {
       margin: 0;
       font-size: 0.875rem;
@@ -478,13 +487,13 @@ const switchDisplaySection = (newSection: 'CPA' | 'S&H' | null) => {
       color: #374151;
     }
   }
-  
+
   .equipment-fields {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
     margin-bottom: 1rem;
-    
+
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
     }
@@ -503,12 +512,12 @@ const switchDisplaySection = (newSection: 'CPA' | 'S&H' | null) => {
   border: 1px solid #93c5fd;
   border-radius: 0.375rem;
   margin-bottom: 1rem;
-  
+
   .info-icon {
     margin-right: 0.5rem;
     font-size: 1rem;
   }
-  
+
   span {
     font-size: 0.875rem;
     color: #1e40af;
@@ -523,48 +532,50 @@ const switchDisplaySection = (newSection: 'CPA' | 'S&H' | null) => {
 
 ```typescript
 const validateContract = (formData: ContractFormData): ValidationErrors => {
-  const errors: ValidationErrors = {}
-  
+  const errors: ValidationErrors = {};
+
   // Client validation
   if (!formData.clientId) {
-    errors.clientId = 'Cliente é obrigatório'
+    errors.clientId = 'Cliente é obrigatório';
   }
-  
+
   // CPA-specific validation (if CPA data exists)
   if (formData.cpaData && formData.cpaData.contractType) {
     if (!formData.cpaData.contractType) {
-      errors.cpaContractType = 'Tipo de contrato CPA é obrigatório'
+      errors.cpaContractType = 'Tipo de contrato CPA é obrigatório';
     }
-    
+
     if (formData.cpaData.equipment.length === 0) {
-      errors.cpaEquipment = 'Pelo menos um equipamento CPA é obrigatório'
+      errors.cpaEquipment = 'Pelo menos um equipamento CPA é obrigatório';
     }
-    
+
     // Validate each equipment
     formData.cpaData.equipment.forEach((equipment, index) => {
       if (!equipment.model.trim()) {
-        errors[`cpaEquipment${index}Model`] = 'Modelo do equipamento é obrigatório'
+        errors[`cpaEquipment${index}Model`] =
+          'Modelo do equipamento é obrigatório';
       }
-    })
+    });
   }
-  
+
   // S&H-specific validation (if S&H data exists)
   if (formData.shData && formData.shData.plan) {
     if (!formData.shData.plan) {
-      errors.shPlan = 'Plano S&H é obrigatório'
+      errors.shPlan = 'Plano S&H é obrigatório';
     }
   }
-  
+
   // At least one contract type should be configured
-  const hasCPAData = formData.cpaData && formData.cpaData.contractType
-  const hasSHData = formData.shData && formData.shData.plan
-  
+  const hasCPAData = formData.cpaData && formData.cpaData.contractType;
+  const hasSHData = formData.shData && formData.shData.plan;
+
   if (!hasCPAData && !hasSHData) {
-    errors.contractType = 'Configure pelo menos um tipo de contrato (CPA ou S&H)'
+    errors.contractType =
+      'Configure pelo menos um tipo de contrato (CPA ou S&H)';
   }
-  
-  return errors
-}
+
+  return errors;
+};
 ```
 
 ## Mobile Responsiveness
@@ -582,22 +593,22 @@ const validateContract = (formData: ContractFormData): ValidationErrors => {
 // Mobile-first approach
 .contract-form {
   padding: 1rem;
-  
+
   @media (min-width: 768px) {
     padding: 2rem;
     max-width: 800px;
     margin: 0 auto;
   }
-  
+
   .equipment-fields {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
-    
+
     @media (min-width: 640px) {
       grid-template-columns: 1fr 1fr;
     }
-    
+
     @media (min-width: 768px) {
       grid-template-columns: 1fr 1fr 1fr;
     }
@@ -618,8 +629,11 @@ const validateContract = (formData: ContractFormData): ValidationErrors => {
 ### Integration Testing
 
 1. **Form submission**: Test complete workflow for both contract types
-2. **Data persistence**: Ensure form data persists correctly across display switches
+2. **Data persistence**: Ensure form data persists correctly across display
+   switches
 3. **Error handling**: Test error states and recovery
 4. **Mobile interaction**: Test touch interactions and responsive behavior
 
-This design provides a clean, focused approach to contract management with display toggles, proper data persistence, and a user-friendly interface that matches the reference images.
+This design provides a clean, focused approach to contract management with
+display toggles, proper data persistence, and a user-friendly interface that
+matches the reference images.

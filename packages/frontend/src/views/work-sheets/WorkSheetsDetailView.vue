@@ -29,7 +29,9 @@
         <!-- Request Information Section -->
         <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Informação do Pedido</h2>
             </div>
             <div class="p-4 sm:p-6">
@@ -44,7 +46,9 @@
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Data da Assistência</label>
-                  <div class="detail-value">{{ formatDate(item.data.request?.assistanceDate) }}</div>
+                  <div class="detail-value">
+                    {{ formatDate(item.data.request?.assistanceDate) }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Motivo do Pedido</label>
@@ -58,7 +62,9 @@
         <!-- Time Tracking Section -->
         <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Controlo de Tempo</h2>
             </div>
             <div class="p-4 sm:p-6">
@@ -83,7 +89,9 @@
         <!-- Service Information Section -->
         <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Informação do Serviço</h2>
             </div>
             <div class="p-4 sm:p-6">
@@ -96,7 +104,10 @@
                   <label class="detail-label">Técnico Responsável</label>
                   <div class="detail-value">{{ item.data.otherData?.technician || '-' }}</div>
                 </div>
-                <div v-if="item.data.otherData?.serviceObservations" class="detail-item col-span-full">
+                <div
+                  v-if="item.data.otherData?.serviceObservations"
+                  class="detail-item col-span-full"
+                >
                   <label class="detail-label">Observações do Serviço</label>
                   <div class="detail-value">{{ item.data.otherData.serviceObservations }}</div>
                 </div>
@@ -108,18 +119,24 @@
         <!-- Displacement Section -->
         <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Deslocação</h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
                 <div class="detail-item">
                   <label class="detail-label">Deslocação</label>
-                  <div class="detail-value">{{ item.data.displacement?.hasDisplacement ? 'Sim' : 'Não' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.displacement?.hasDisplacement ? 'Sim' : 'Não' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Final Semana - Feriado</label>
-                  <div class="detail-value">{{ item.data.displacement?.weekendHoliday ? 'Sim' : 'Não' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.displacement?.weekendHoliday ? 'Sim' : 'Não' }}
+                  </div>
                 </div>
                 <div v-if="item.data.displacement?.hasDisplacement" class="detail-item">
                   <label class="detail-label">KMs (Ida)</label>
@@ -131,7 +148,9 @@
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Método de Pagamento</label>
-                  <div class="detail-value">{{ item.data.displacement?.paymentMethod || 'PENDENTE' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.displacement?.paymentMethod || 'PENDENTE' }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -141,30 +160,47 @@
         <!-- Pricing Section (only if displacement is enabled) -->
         <div v-if="item.data.displacement?.hasDisplacement" class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-              <h2 class="text-lg font-semibold text-gray-900">Cálculo de Preços <span class="text-sm font-normal text-gray-600">(sem IVA)</span></h2>
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
+              <h2 class="text-lg font-semibold text-gray-900">
+                Cálculo de Preços <span class="text-sm font-normal text-gray-600">(sem IVA)</span>
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="pricing-table bg-gray-50 rounded-lg p-4 border-l-4 border-primary-500">
                 <div class="pricing-row">
                   <span class="pricing-label">Taxa Deslocação:</span>
-                  <span class="pricing-value">{{ getDisplacementRate() }}€ <span class="text-xs text-red-600">sem IVA</span></span>
+                  <span class="pricing-value"
+                    >{{ getDisplacementRate() }}€
+                    <span class="text-xs text-red-600">sem IVA</span></span
+                  >
                 </div>
                 <div class="pricing-row">
                   <span class="pricing-label">Preço KMs:</span>
-                  <span class="pricing-value">{{ getKmsPrice() }}€ <span class="text-xs text-red-600">sem IVA</span></span>
+                  <span class="pricing-value"
+                    >{{ getKmsPrice() }}€ <span class="text-xs text-red-600">sem IVA</span></span
+                  >
                 </div>
                 <div class="pricing-row">
                   <span class="pricing-label">Valor Hora:</span>
-                  <span class="pricing-value">{{ getHourlyRate() }}€ <span class="text-xs text-red-600">sem IVA</span></span>
+                  <span class="pricing-value"
+                    >{{ getHourlyRate() }}€ <span class="text-xs text-red-600">sem IVA</span></span
+                  >
                 </div>
                 <div class="pricing-row">
                   <span class="pricing-label">Preço Mão Obra:</span>
-                  <span class="pricing-value">{{ getLaborPrice() }}€ <span class="text-xs text-red-600">sem IVA</span></span>
+                  <span class="pricing-value"
+                    >{{ getLaborPrice() }}€ <span class="text-xs text-red-600">sem IVA</span></span
+                  >
                 </div>
-                <div class="pricing-row total bg-primary-600 text-white -mx-4 -mb-4 px-4 py-3 rounded-b-lg font-bold">
+                <div
+                  class="pricing-row total bg-primary-600 text-white -mx-4 -mb-4 px-4 py-3 rounded-b-lg font-bold"
+                >
                   <span class="pricing-label text-white">PREÇO TOTAL:</span>
-                  <span class="pricing-value text-white text-lg">{{ getTotalPrice() }}€ <span class="text-xs opacity-90">sem IVA</span></span>
+                  <span class="pricing-value text-white text-lg"
+                    >{{ getTotalPrice() }}€ <span class="text-xs opacity-90">sem IVA</span></span
+                  >
                 </div>
               </div>
             </div>
@@ -174,18 +210,24 @@
         <!-- Contract Information Section (only if payment method is CONTRATO) -->
         <div v-if="item.data.displacement?.paymentMethod === 'CONTRATO'" class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Garantia e Contrato</h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
                 <div class="detail-item">
                   <label class="detail-label">Garantia</label>
-                  <div class="detail-value">{{ item.data.otherData?.warranty ? 'Sim' : 'Não' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.otherData?.warranty ? 'Sim' : 'Não' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Contrato</label>
-                  <div class="detail-value">{{ item.data.otherData?.contract ? 'Sim' : 'Não' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.otherData?.contract ? 'Sim' : 'Não' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Ano de Contrato</label>
@@ -199,24 +241,36 @@
         <!-- Material and Equipment Section -->
         <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Material e Equipamentos</h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
                 <div class="detail-item">
                   <label class="detail-label">Material Utilizado</label>
-                  <div class="detail-value">{{ item.data.otherData?.materialUsed ? 'Sim' : 'Não' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.otherData?.materialUsed ? 'Sim' : 'Não' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Equipamentos</label>
-                  <div class="detail-value">{{ item.data.otherData?.equipment ? 'Sim' : 'Não' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.otherData?.equipment ? 'Sim' : 'Não' }}
+                  </div>
                 </div>
-                <div v-if="item.data.otherData?.materialUsed && item.data.otherData?.materialDetails" class="detail-item col-span-full">
+                <div
+                  v-if="item.data.otherData?.materialUsed && item.data.otherData?.materialDetails"
+                  class="detail-item col-span-full"
+                >
                   <label class="detail-label">Descrição do Material Utilizado</label>
                   <div class="detail-value">{{ item.data.otherData.materialDetails }}</div>
                 </div>
-                <div v-if="item.data.otherData?.equipment && item.data.otherData?.equipmentDetails" class="detail-item col-span-full">
+                <div
+                  v-if="item.data.otherData?.equipment && item.data.otherData?.equipmentDetails"
+                  class="detail-item col-span-full"
+                >
                   <label class="detail-label">Descrição dos Equipamentos</label>
                   <div class="detail-value">{{ item.data.otherData.equipmentDetails }}</div>
                 </div>
@@ -228,18 +282,26 @@
         <!-- Service Status and Technical Operations Section -->
         <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-              <h2 class="text-lg font-semibold text-gray-900">Estado do Serviço e Operações Técnicas</h2>
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
+              <h2 class="text-lg font-semibold text-gray-900">
+                Estado do Serviço e Operações Técnicas
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
                 <div class="detail-item">
                   <label class="detail-label">Totalmente Resolvido</label>
-                  <div class="detail-value">{{ item.data.otherData?.totallyResolved ? 'Sim' : 'Não' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.otherData?.totallyResolved ? 'Sim' : 'Não' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Leitura de Dump</label>
-                  <div class="detail-value">{{ item.data.otherData?.dumpReading ? 'Sim' : 'Não' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.otherData?.dumpReading ? 'Sim' : 'Não' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Cópia de Segurança</label>
@@ -247,13 +309,20 @@
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Verificação do Acesso Remoto</label>
-                  <div class="detail-value">{{ item.data.otherData?.remoteAccessCheck ? 'Sim' : 'Não' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.otherData?.remoteAccessCheck ? 'Sim' : 'Não' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">AnyDesk</label>
                   <div class="detail-value">{{ item.data.otherData?.anydesk ? 'Sim' : 'Não' }}</div>
                 </div>
-                <div v-if="!item.data.otherData?.totallyResolved && item.data.otherData?.resolutionIssues" class="detail-item col-span-full">
+                <div
+                  v-if="
+                    !item.data.otherData?.totallyResolved && item.data.otherData?.resolutionIssues
+                  "
+                  class="detail-item col-span-full"
+                >
                   <label class="detail-label">Observações sobre Problemas Não Resolvidos</label>
                   <div class="detail-value">{{ item.data.otherData.resolutionIssues }}</div>
                 </div>
@@ -265,7 +334,9 @@
         <!-- Service Report Section -->
         <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Relatório de Serviço</h2>
             </div>
             <div class="p-4 sm:p-6">
@@ -280,7 +351,9 @@
         <!-- Client Signature Section -->
         <div v-if="item.data.otherData?.clientSignature" class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Assinatura do Cliente</h2>
             </div>
             <div class="p-4 sm:p-6">
@@ -289,7 +362,7 @@
                   :src="item.data.otherData.clientSignature"
                   alt="Assinatura do Cliente"
                   class="max-w-full max-h-48 border-2 border-gray-200 rounded bg-white"
-                >
+                />
               </div>
             </div>
           </div>
@@ -323,7 +396,13 @@ import { useApi } from '@/composables/useApi';
 
 const route = useRoute();
 const router = useRouter();
-const { fetchById, currentItem, loading: apiLoading, error: apiError, remove } = useApi<ContentWithRelations<WorkSheetData>>('work-sheets');
+const {
+  fetchById,
+  currentItem,
+  loading: apiLoading,
+  error: apiError,
+  remove,
+} = useApi<ContentWithRelations<WorkSheetData>>('work-sheets');
 
 // State
 const workSheet = ref<ContentWithRelations<WorkSheetData> | null>(null);
@@ -340,13 +419,20 @@ const confirmDeleteMessage = ref('');
 const getWorkSheetTitle = (item: BaseContent | null): string => {
   if (!item?.data) return 'Folha de Obra';
   const workSheetItem = item as ContentWithRelations<WorkSheetData>;
-  
+
   // Try to get client name from relations first, then fallback to data
   let clientName = 'Cliente não especificado';
-  if (workSheetItem.relations?.client && typeof workSheetItem.relations.client === 'object' && 'nomeEmpresa' in workSheetItem.relations.client) {
-    clientName = workSheetItem.relations.client.nomeComercial || workSheetItem.relations.client.nomeEmpresa || clientName;
+  if (
+    workSheetItem.relations?.client &&
+    typeof workSheetItem.relations.client === 'object' &&
+    'nomeEmpresa' in workSheetItem.relations.client
+  ) {
+    clientName =
+      workSheetItem.relations.client.nomeComercial ||
+      workSheetItem.relations.client.nomeEmpresa ||
+      clientName;
   }
-  
+
   const serviceType = workSheetItem.data.otherData?.serviceType || 'Folha de Obra';
   return `${serviceType} - ${clientName}`;
 };
@@ -388,51 +474,65 @@ const handleBack = () => {
 // Delete handlers
 const getDeleteConfirmationMessage = (): string => {
   if (!workSheet.value) return 'Tem a certeza que pretende eliminar esta folha de obra?';
-  
-  const clientName = workSheet.value.relations?.client && typeof workSheet.value.relations.client === 'object' && 'nomeEmpresa' in workSheet.value.relations.client
-    ? workSheet.value.relations.client.nomeComercial || workSheet.value.relations.client.nomeEmpresa
-    : 'Cliente não especificado';
-  
+
+  const clientName =
+    workSheet.value.relations?.client &&
+    typeof workSheet.value.relations.client === 'object' &&
+    'nomeEmpresa' in workSheet.value.relations.client
+      ? workSheet.value.relations.client.nomeComercial ||
+        workSheet.value.relations.client.nomeEmpresa
+      : 'Cliente não especificado';
+
   const serviceType = workSheet.value.data.otherData?.serviceType || 'Folha de Obra';
-  const assistanceDate = workSheet.value.data.request?.assistanceDate 
+  const assistanceDate = workSheet.value.data.request?.assistanceDate
     ? formatDate(workSheet.value.data.request.assistanceDate)
     : '';
-  
-  const identifier = assistanceDate 
+
+  const identifier = assistanceDate
     ? `${serviceType} - ${clientName} (${assistanceDate})`
     : `${serviceType} - ${clientName}`;
-  
+
   return `Tem a certeza que pretende eliminar "${identifier}"?`;
 };
 
 const handleDelete = () => {
   if (!workSheet.value) return;
-  
+
   confirmDeleteMessage.value = getDeleteConfirmationMessage();
   showDeleteConfirm.value = true;
 };
 
 const confirmDelete = async () => {
   if (!workSheet.value) return;
-  
+
   try {
     isDeleting.value = true;
-    
-    console.log('Attempting to delete work sheet:', JSON.stringify({
-      uuid: workSheet.value.uuid,
-      serviceType: workSheet.value.data.otherData?.serviceType,
-      assistanceDate: workSheet.value.data.request?.assistanceDate
-    }, null, 2));
-    
+
+    console.log(
+      'Attempting to delete work sheet:',
+      JSON.stringify(
+        {
+          uuid: workSheet.value.uuid,
+          serviceType: workSheet.value.data.otherData?.serviceType,
+          assistanceDate: workSheet.value.data.request?.assistanceDate,
+        },
+        null,
+        2
+      )
+    );
+
     const success = await remove(workSheet.value.uuid);
-    
+
     if (apiError.value) {
-      console.error('Delete operation failed with API error:', JSON.stringify(apiError.value, null, 2));
+      console.error(
+        'Delete operation failed with API error:',
+        JSON.stringify(apiError.value, null, 2)
+      );
       // Error is handled by the useApi composable and displayed in the template
       showDeleteConfirm.value = false;
       return;
     }
-    
+
     if (success) {
       console.log('Work sheet deleted successfully, navigating to /work-sheets');
       router.push('/work-sheets');
@@ -470,7 +570,7 @@ const loadWorkSheet = async () => {
   }
 
   await fetchById(uuid);
-  
+
   if (currentItem.value) {
     workSheet.value = currentItem.value as ContentWithRelations<WorkSheetData>;
   }
@@ -507,28 +607,28 @@ const getKmsPrice = (): number => {
 
 const getLaborPrice = (): number => {
   if (!workSheet.value?.data?.displacement?.hasDisplacement) return 0;
-  
+
   const arrivalTime = workSheet.value.data.request?.arrivalTime;
   const departureTime = workSheet.value.data.request?.departureTime;
-  
+
   if (!arrivalTime || !departureTime) return 0;
-  
+
   try {
     const [arrivalHours, arrivalMinutes] = arrivalTime.split(':').map(Number);
     const [departureHours, departureMinutes] = departureTime.split(':').map(Number);
-    
+
     const arrivalTotalMinutes = arrivalHours * 60 + arrivalMinutes;
     const departureTotalMinutes = departureHours * 60 + departureMinutes;
-    
+
     let diffMinutes = departureTotalMinutes - arrivalTotalMinutes;
     if (diffMinutes < 0) {
       diffMinutes += 24 * 60; // Handle next day
     }
-    
+
     const totalHours = diffMinutes / 60;
     const chargeableHours = totalHours < 1 ? 1 : totalHours; // Minimum 1 hour
     const hourlyRate = getHourlyRate();
-    
+
     return Math.round(chargeableHours * hourlyRate * 100) / 100;
   } catch {
     return 0;
@@ -537,11 +637,11 @@ const getLaborPrice = (): number => {
 
 const getTotalPrice = (): number => {
   if (!workSheet.value?.data?.displacement?.hasDisplacement) return 0;
-  
+
   const displacementRate = getDisplacementRate();
   const kmsPrice = getKmsPrice();
   const laborPrice = getLaborPrice();
-  
+
   return Math.round((displacementRate + kmsPrice + laborPrice) * 100) / 100;
 };
 
@@ -599,7 +699,7 @@ onMounted(() => {
     align-items: flex-start;
     gap: 0.25rem;
   }
-  
+
   .pricing-value {
     width: 100%;
   }

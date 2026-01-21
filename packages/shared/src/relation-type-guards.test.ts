@@ -8,7 +8,7 @@ import {
   hasRelationErrors,
   getResolvedRelations,
   getRelationErrors,
-  getRelationSummary
+  getRelationSummary,
 } from './relation-type-guards.js';
 import type { ContentWithRelations, ResolvedRelation, RelationError } from './types.js';
 
@@ -17,13 +17,13 @@ describe('Relation Type Guards', () => {
     uuid: 'client-123',
     contentType: 'clients',
     nomeEmpresa: 'Test Company',
-    contribuinte: '123456789'
+    contribuinte: '123456789',
   };
 
   const mockRelationError: RelationError = {
     type: 'error',
     code: 404,
-    message: 'Not found'
+    message: 'Not found',
   };
 
   const mockContentWithRelations: ContentWithRelations<{ clientId: string }> = {
@@ -37,8 +37,8 @@ describe('Relation Type Guards', () => {
     isDeleted: false,
     data: { clientId: 'client-123' },
     relations: {
-      client: mockResolvedRelation
-    }
+      client: mockResolvedRelation,
+    },
   };
 
   describe('isRelationError', () => {
@@ -114,8 +114,8 @@ describe('Relation Type Guards', () => {
       const contentWithErrors: ContentWithRelations<{ clientId: string }> = {
         ...mockContentWithRelations,
         relations: {
-          client: mockRelationError
-        }
+          client: mockRelationError,
+        },
       };
       expect(hasResolvedRelations(contentWithErrors)).toBe(false);
     });
@@ -123,7 +123,7 @@ describe('Relation Type Guards', () => {
     it('should return false when content has no relations', () => {
       const contentWithoutRelations: ContentWithRelations<{ clientId: string }> = {
         ...mockContentWithRelations,
-        relations: {}
+        relations: {},
       };
       expect(hasResolvedRelations(contentWithoutRelations)).toBe(false);
     });
@@ -134,8 +134,8 @@ describe('Relation Type Guards', () => {
       const contentWithErrors: ContentWithRelations<{ clientId: string }> = {
         ...mockContentWithRelations,
         relations: {
-          client: mockRelationError
-        }
+          client: mockRelationError,
+        },
       };
       expect(hasRelationErrors(contentWithErrors)).toBe(true);
     });
@@ -147,7 +147,7 @@ describe('Relation Type Guards', () => {
     it('should return false when content has no relations', () => {
       const contentWithoutRelations: ContentWithRelations<{ clientId: string }> = {
         ...mockContentWithRelations,
-        relations: {}
+        relations: {},
       };
       expect(hasRelationErrors(contentWithoutRelations)).toBe(false);
     });
@@ -160,13 +160,13 @@ describe('Relation Type Guards', () => {
         data: { clientId: 'client-123', contractId: 'contract-456' },
         relations: {
           client: mockResolvedRelation,
-          contract: mockRelationError
-        }
+          contract: mockRelationError,
+        },
       };
 
       const result = getResolvedRelations(contentWithMixed);
       expect(result).toEqual({
-        client: mockResolvedRelation
+        client: mockResolvedRelation,
       });
     });
 
@@ -174,8 +174,8 @@ describe('Relation Type Guards', () => {
       const contentWithErrors: ContentWithRelations<{ clientId: string }> = {
         ...mockContentWithRelations,
         relations: {
-          client: mockRelationError
-        }
+          client: mockRelationError,
+        },
       };
 
       const result = getResolvedRelations(contentWithErrors);
@@ -190,13 +190,13 @@ describe('Relation Type Guards', () => {
         data: { clientId: 'client-123', contractId: 'contract-456' },
         relations: {
           client: mockResolvedRelation,
-          contract: mockRelationError
-        }
+          contract: mockRelationError,
+        },
       };
 
       const result = getRelationErrors(contentWithMixed);
       expect(result).toEqual({
-        contract: mockRelationError
+        contract: mockRelationError,
       });
     });
 
@@ -211,17 +211,21 @@ describe('Relation Type Guards', () => {
       const serverError: RelationError = {
         type: 'error',
         code: 500,
-        message: 'Internal Server Error'
+        message: 'Internal Server Error',
       };
 
-      const contentWithMixed: ContentWithRelations<{ clientId: string; contractId: string; licenseId: string }> = {
+      const contentWithMixed: ContentWithRelations<{
+        clientId: string;
+        contractId: string;
+        licenseId: string;
+      }> = {
         ...mockContentWithRelations,
         data: { clientId: 'client-123', contractId: 'contract-456', licenseId: 'license-789' },
         relations: {
           client: mockResolvedRelation,
           contract: mockRelationError,
-          license: serverError
-        }
+          license: serverError,
+        },
       };
 
       const result = getRelationSummary(contentWithMixed);
@@ -231,15 +235,15 @@ describe('Relation Type Guards', () => {
         errors: 2,
         errorCodes: {
           404: 1,
-          500: 1
-        }
+          500: 1,
+        },
       });
     });
 
     it('should handle content with no relations', () => {
       const contentWithoutRelations: ContentWithRelations<{ clientId: string }> = {
         ...mockContentWithRelations,
-        relations: {}
+        relations: {},
       };
 
       const result = getRelationSummary(contentWithoutRelations);
@@ -247,7 +251,7 @@ describe('Relation Type Guards', () => {
         total: 0,
         resolved: 0,
         errors: 0,
-        errorCodes: {}
+        errorCodes: {},
       });
     });
 
@@ -257,7 +261,7 @@ describe('Relation Type Guards', () => {
         total: 1,
         resolved: 1,
         errors: 0,
-        errorCodes: {}
+        errorCodes: {},
       });
     });
   });

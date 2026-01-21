@@ -1,6 +1,6 @@
 /**
  * Contracts Types and Validation
- * 
+ *
  * This module provides TypeScript interfaces and validation functions for the contracts content type.
  * Based on analysis of legacy components:
  * - old_src/views/contratos/ContratoDetail.vue
@@ -17,7 +17,7 @@ export type {
   ContractDisplayData,
   ContractSearchFilters,
   ContractPlan,
-  ContractPlanConfig
+  ContractPlanConfig,
 } from './types';
 
 // Export all validation functions
@@ -27,7 +27,7 @@ export {
   validateContractUpdate,
   validateContractForDisplay,
   hasActiveContract,
-  getContractSummary
+  getContractSummary,
 } from './validation';
 
 // Content type constant

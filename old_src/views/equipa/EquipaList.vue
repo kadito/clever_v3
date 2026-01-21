@@ -9,10 +9,8 @@
       <div class="controls-left">
         <h2>Colaboradores ({{ collaborators.length }})</h2>
       </div>
-      
-      <button @click="refreshData" :disabled="loading" class="btn btn-refresh">
-        🔄 Atualizar
-      </button>
+
+      <button @click="refreshData" :disabled="loading" class="btn btn-refresh">🔄 Atualizar</button>
     </div>
 
     <!-- Loading State -->
@@ -28,8 +26,8 @@
 
     <!-- Collaborators List -->
     <div v-if="!loading && collaborators.length > 0" class="collaborators-list">
-      <div 
-        v-for="collaborator in collaborators" 
+      <div
+        v-for="collaborator in collaborators"
         :key="collaborator.id"
         class="collaborator-item"
         @click="navigateToDetail(collaborator)"
@@ -38,9 +36,7 @@
           <h3>{{ collaborator.name }}</h3>
         </div>
         <div class="collaborator-actions">
-          <button class="action-btn" @click.stop="showActions(collaborator)">
-            ⋮
-          </button>
+          <button class="action-btn" @click.stop="showActions(collaborator)">⋮</button>
         </div>
       </div>
     </div>
@@ -56,12 +52,8 @@
       <div class="actions-modal" @click.stop>
         <h3>{{ selectedCollaboratorForActions?.name }}</h3>
         <div class="modal-actions">
-          <button @click="viewCollaborator" class="modal-btn view-btn">
-            📋 Ver Detalhes
-          </button>
-          <button @click="editCollaborator" class="modal-btn edit-btn">
-            ✏️ Editar
-          </button>
+          <button @click="viewCollaborator" class="modal-btn view-btn">📋 Ver Detalhes</button>
+          <button @click="editCollaborator" class="modal-btn edit-btn">✏️ Editar</button>
           <button @click="deleteCollaboratorAction" class="modal-btn delete-btn">
             🗑️ Eliminar
           </button>
@@ -70,88 +62,85 @@
     </div>
 
     <!-- Floating Action Button -->
-    <button @click="navigateToCreate" class="fab">
-      ➕
-    </button>
+    <button @click="navigateToCreate" class="fab">➕</button>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
-import { useEquipaStore } from '@/stores/equipa.js'
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
+import { useEquipaStore } from '@/stores/equipa.js';
 
 // Router
-const router = useRouter()
+const router = useRouter();
 
 // Store
-const store = useEquipaStore()
-const { collaborators, loading, error } = storeToRefs(store)
-const { 
-  fetchCollaborators, 
-  clearError, 
-  deleteCollaborator: deleteCollaboratorFromStore 
-} = store
+const store = useEquipaStore();
+const { collaborators, loading, error } = storeToRefs(store);
+const { fetchCollaborators, clearError, deleteCollaborator: deleteCollaboratorFromStore } = store;
 
 // Local state
-const showActionsModal = ref(false)
-const selectedCollaboratorForActions = ref(null)
+const showActionsModal = ref(false);
+const selectedCollaboratorForActions = ref(null);
 
 // Methods
 const refreshData = async () => {
-  await fetchCollaborators()
-}
+  await fetchCollaborators();
+};
 
-const navigateToDetail = (collaborator) => {
-  router.push(`/equipa/${collaborator.id}`)
-}
+const navigateToDetail = collaborator => {
+  router.push(`/equipa/${collaborator.id}`);
+};
 
 const navigateToCreate = () => {
-  router.push('/equipa/new?from=list')
-}
+  router.push('/equipa/new?from=list');
+};
 
-const showActions = (collaborator) => {
-  selectedCollaboratorForActions.value = collaborator
-  showActionsModal.value = true
-}
+const showActions = collaborator => {
+  selectedCollaboratorForActions.value = collaborator;
+  showActionsModal.value = true;
+};
 
 const closeActions = () => {
-  showActionsModal.value = false
-  selectedCollaboratorForActions.value = null
-}
+  showActionsModal.value = false;
+  selectedCollaboratorForActions.value = null;
+};
 
 const viewCollaborator = () => {
   if (selectedCollaboratorForActions.value) {
-    navigateToDetail(selectedCollaboratorForActions.value)
+    navigateToDetail(selectedCollaboratorForActions.value);
   }
-  closeActions()
-}
+  closeActions();
+};
 
 const editCollaborator = () => {
   if (selectedCollaboratorForActions.value) {
-    router.push(`/equipa/${selectedCollaboratorForActions.value.id}/edit`)
+    router.push(`/equipa/${selectedCollaboratorForActions.value.id}/edit`);
   }
-  closeActions()
-}
+  closeActions();
+};
 
 const deleteCollaboratorAction = async () => {
-  if (selectedCollaboratorForActions.value && confirm('Tem certeza que deseja eliminar este colaborador?')) {
+  if (
+    selectedCollaboratorForActions.value &&
+    confirm('Tem certeza que deseja eliminar este colaborador?')
+  ) {
     try {
-      await deleteCollaboratorFromStore(selectedCollaboratorForActions.value.id)
-      closeActions()
+      await deleteCollaboratorFromStore(selectedCollaboratorForActions.value.id);
+      closeActions();
     } catch (err) {
-      console.error('Error deleting collaborator:', err)
+      console.error('Error deleting collaborator:', err);
       // Error is already handled by the store
     }
   }
-}
+};
 
 // Lifecycle
 onMounted(async () => {
-  await fetchCollaborators()
-})
+  await fetchCollaborators();
+});
 </script>
 
 <style scoped>
@@ -468,4 +457,3 @@ onMounted(async () => {
   }
 }
 </style>
-

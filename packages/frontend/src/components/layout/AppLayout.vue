@@ -58,10 +58,10 @@
                 Dashboard
               </router-link>
             </nav>
-            
+
             <!-- User profile for authenticated users -->
             <UserProfile v-if="isAuthenticated && user" :user="user" :is-mobile="false" />
-            
+
             <!-- Sign in link for unauthenticated users -->
             <router-link
               v-else-if="isLoaded && !isAuthenticated"
@@ -78,12 +78,12 @@
       <div class="md:hidden" :class="{ block: isMobileMenuOpen, hidden: !isMobileMenuOpen }">
         <div class="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-gray-200">
           <AppNavigation :is-mobile="true" @navigate="closeMobileMenu" />
-          
+
           <!-- Mobile user profile -->
           <div v-if="isAuthenticated && user" class="border-t border-gray-200 pt-3 mt-3">
             <UserProfile :user="user" :is-mobile="true" />
           </div>
-          
+
           <!-- Mobile sign in link -->
           <div v-else-if="isLoaded && !isAuthenticated" class="border-t border-gray-200 pt-3 mt-3">
             <router-link
@@ -92,7 +92,12 @@
               @click="closeMobileMenu"
             >
               <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m0 0v3a2 2 0 01-2 2H6m12-6V4a2 2 0 00-2-2H9.5a2 2 0 00-2 2v12a2 2 0 002 2H16a2 2 0 002-2V9a2 2 0 00-2-2h-3z" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 16l-4-4m0 0l4-4m0 0v3a2 2 0 01-2 2H6m12-6V4a2 2 0 00-2-2H9.5a2 2 0 00-2 2v12a2 2 0 002 2H16a2 2 0 002-2V9a2 2 0 00-2-2h-3z"
+                />
               </svg>
               Entrar
             </router-link>

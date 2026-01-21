@@ -1,9 +1,9 @@
 /**
  * End-to-End License Relation System Integration Test (Task 10)
- * 
+ *
  * This test simulates real-world usage scenarios of the license relation system
  * to verify the complete user experience from creation to error handling.
- * 
+ *
  * Requirements: 8.1, 8.2, 8.3, 8.4, 8.5
  */
 
@@ -11,44 +11,48 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { Hono } from 'hono';
 import type { StorageBucket } from '@clever/shared';
 import { createContentRoutes, createStandardContentConfig } from './routes/content-route-template';
-import { validateLicenseCreation, validateLicenseUpdate, sanitizeLicenseData } from '@clever/shared';
+import {
+  validateLicenseCreation,
+  validateLicenseUpdate,
+  sanitizeLicenseData,
+} from '@clever/shared';
 import type { BaseContent, UserContext } from '@clever/shared';
 
 // Mock storage bucket for testing
 function createMockStorageBucket(): StorageBucket {
   const storage = new Map<string, string>();
-  
+
   return {
     async get(key: string) {
       const data = storage.get(key);
       if (!data) return null;
-      
+
       return {
         async json() {
           return JSON.parse(data);
-        }
+        },
       };
     },
-    
+
     async put(key: string, value: string) {
       storage.set(key, value);
       return {
         async json() {
           return JSON.parse(value);
-        }
+        },
       };
     },
-    
+
     async delete(key: string) {
       storage.delete(key);
-    }
+    },
   };
 }
 
 describe('End-to-End License Relation System Integration (Task 10)', () => {
   let app: Hono;
   let mockBucket: StorageBucket;
-  
+
   const mockUserContext: UserContext = {
     userId: 'test-user-123',
     email: 'test@example.com',
@@ -56,15 +60,15 @@ describe('End-to-End License Relation System Integration (Task 10)', () => {
     lastName: 'User',
     userType: 'Admin',
     sessionId: 'test-session-123',
-    isAuthenticated: true
+    isAuthenticated: true,
   };
 
   beforeEach(() => {
     mockBucket = createMockStorageBucket();
-    
+
     // Create a test app with license routes
     app = new Hono();
-    
+
     // Mock the environment and user context
     app.use('*', async (c, next) => {
       c.env = { R2_BUCKET: mockBucket };
@@ -116,14 +120,11 @@ describe('End-to-End License Relation System Integration (Task 10)', () => {
           nomeEmpresa: 'Empresa Completa Lda',
           nomeComercial: 'Completa',
           contribuinte: '123456789',
-          localidade: 'Lisboa'
-        }
+          localidade: 'Lisboa',
+        },
       };
 
-      await mockBucket.put(
-        `content/clients/${clientUuid}.json`,
-        JSON.stringify(clientContent)
-      );
+      await mockBucket.put(`content/clients/${clientUuid}.json`, JSON.stringify(clientContent));
 
       // Step 2: Create license with client relation
       const licenseData = {
@@ -132,21 +133,21 @@ describe('End-to-End License Relation System Integration (Task 10)', () => {
         numeroSerie: 'COMPLETE-001',
         software: {
           name: ['Vectron'],
-          model: 'Vectron Wide 14"'
+          model: 'Vectron Wide 14"',
         },
-        invoices: []
+        invoices: [],
       };
 
       const createResponse = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       expect(createResponse.status).toBe(201);
       const createResult = await createResponse.json();
       expect(createResult.success).toBe(true);
-      
+
       const licenseUuid = createResult.data.uuid;
 
       // Verify creation response includes resolved client
@@ -156,7 +157,7 @@ describe('End-to-End License Relation System Integration (Task 10)', () => {
       // Step 3: Retrieve license and verify relation is still resolved
       const getResponse = await app.request(`/api/content/licenses/${licenseUuid}`);
       expect(getResponse.status).toBe(200);
-      
+
       const getResult = await getResponse.json();
       expect(getResult.data.relations.client.nomeEmpresa).toBe('Empresa Completa Lda');
       expect(getResult.data.relations.client.contribuinte).toBe('123456789');
@@ -175,8 +176,8 @@ describe('End-to-End License Relation System Integration (Task 10)', () => {
         data: {
           nomeEmpresa: 'Empresa Nova Lda',
           contribuinte: '987654321',
-          localidade: 'Porto'
-        }
+          localidade: 'Porto',
+        },
       };
 
       await mockBucket.put(
@@ -186,18 +187,18 @@ describe('End-to-End License Relation System Integration (Task 10)', () => {
 
       const updateData = {
         clientId: newClientUuid,
-        versao: '2025'
+        versao: '2025',
       };
 
       const updateResponse = await app.request(`/api/content/licenses/${licenseUuid}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateData)
+        body: JSON.stringify(updateData),
       });
 
       expect(updateResponse.status).toBe(200);
       const updateResult = await updateResponse.json();
-      
+
       // Verify update response includes new resolved client
       expect(updateResult.data.data.versao).toBe('2025');
       expect(updateResult.data.relations.client.nomeEmpresa).toBe('Empresa Nova Lda');
@@ -206,10 +207,10 @@ describe('End-to-End License Relation System Integration (Task 10)', () => {
       // Step 5: List licenses and verify relations are included
       const listResponse = await app.request('/api/content/licenses');
       expect(listResponse.status).toBe(200);
-      
+
       const listResult = await listResponse.json();
       expect(listResult.data).toHaveLength(1);
-      
+
       const listedLicense = listResult.data[0];
       expect(listedLicense.relations.client.nomeEmpresa).toBe('Empresa Nova Lda');
     });
@@ -217,18 +218,18 @@ describe('End-to-End License Relation System Integration (Task 10)', () => {
     it('should handle license creation before client exists (eventual consistency)', async () => {
       // Step 1: Create license with future client ID
       const futureClientId = '550e8400-e29b-41d4-a716-446655440200';
-      
+
       const licenseData = {
         clientId: futureClientId,
         versao: '2024',
         software: { name: ['Pix'] },
-        invoices: []
+        invoices: [],
       };
 
       const createResponse = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       expect(createResponse.status).toBe(201);
@@ -251,19 +252,16 @@ describe('End-to-End License Relation System Integration (Task 10)', () => {
         isDeleted: false,
         data: {
           nomeEmpresa: 'Empresa Futura Lda',
-          contribuinte: '555666777'
-        }
+          contribuinte: '555666777',
+        },
       };
 
-      await mockBucket.put(
-        `content/clients/${futureClientId}.json`,
-        JSON.stringify(clientContent)
-      );
+      await mockBucket.put(`content/clients/${futureClientId}.json`, JSON.stringify(clientContent));
 
       // Step 3: Verify license now resolves client correctly
       const getResponse = await app.request(`/api/content/licenses/${licenseUuid}`);
       const getResult = await getResponse.json();
-      
+
       expect(getResult.data.relations.client.nomeEmpresa).toBe('Empresa Futura Lda');
       expect(getResult.data.relations.client.contribuinte).toBe('555666777');
     });
@@ -282,26 +280,23 @@ describe('End-to-End License Relation System Integration (Task 10)', () => {
         isDeleted: false,
         data: {
           nomeEmpresa: 'Empresa Para Deletar Lda',
-          contribuinte: '111222333'
-        }
+          contribuinte: '111222333',
+        },
       };
 
-      await mockBucket.put(
-        `content/clients/${clientUuid}.json`,
-        JSON.stringify(clientContent)
-      );
+      await mockBucket.put(`content/clients/${clientUuid}.json`, JSON.stringify(clientContent));
 
       const licenseData = {
         clientId: clientUuid,
         versao: '2024',
         software: { name: ['Zon Soft'] },
-        invoices: []
+        invoices: [],
       };
 
       const createResponse = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       const createResult = await createResponse.json();
@@ -315,7 +310,7 @@ describe('End-to-End License Relation System Integration (Task 10)', () => {
         ...clientContent,
         isDeleted: true,
         deletedAt: '2024-01-10T15:00:00Z',
-        deletedBy: 'test-user-123'
+        deletedBy: 'test-user-123',
       };
 
       await mockBucket.put(
@@ -326,7 +321,7 @@ describe('End-to-End License Relation System Integration (Task 10)', () => {
       // Step 3: Verify license now shows error for deleted client
       const getResponse = await app.request(`/api/content/licenses/${licenseUuid}`);
       const getResult = await getResponse.json();
-      
+
       expect(getResult.data.relations.client.type).toBe('error');
       expect(getResult.data.relations.client.code).toBe(404);
       expect(getResult.data.relations.client.message).toBe('Not found');
@@ -350,8 +345,8 @@ describe('End-to-End License Relation System Integration (Task 10)', () => {
         isDeleted: false,
         data: {
           nomeEmpresa: 'Cliente Válido Múltiplo',
-          contribuinte: '444555666'
-        }
+          contribuinte: '444555666',
+        },
       };
 
       await mockBucket.put(
@@ -367,8 +362,8 @@ describe('End-to-End License Relation System Integration (Task 10)', () => {
             clientId: validClientUuid,
             versao: '2024',
             software: { name: ['Vectron'] },
-            invoices: []
-          }
+            invoices: [],
+          },
         },
         {
           name: 'Invalid Client License',
@@ -376,17 +371,17 @@ describe('End-to-End License Relation System Integration (Task 10)', () => {
             clientId: '550e8400-e29b-41d4-a716-446655440999',
             versao: '2024',
             software: { name: ['Pix'] },
-            invoices: []
-          }
+            invoices: [],
+          },
         },
         {
           name: 'No Client License',
           data: {
             versao: '2024',
             software: { name: ['Zon Soft'] },
-            invoices: []
-          }
-        }
+            invoices: [],
+          },
+        },
       ];
 
       const createdLicenses = [];
@@ -394,15 +389,15 @@ describe('End-to-End License Relation System Integration (Task 10)', () => {
         const response = await app.request('/api/content/licenses', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(license.data)
+          body: JSON.stringify(license.data),
         });
-        
+
         expect(response.status).toBe(201);
         const result = await response.json();
         createdLicenses.push({
           name: license.name,
           uuid: result.data.uuid,
-          relations: result.data.relations
+          relations: result.data.relations,
         });
       }
 
@@ -415,14 +410,16 @@ describe('End-to-End License Relation System Integration (Task 10)', () => {
       // Verify list endpoint returns all licenses with correct relations
       const listResponse = await app.request('/api/content/licenses');
       const listResult = await listResponse.json();
-      
+
       expect(listResult.data).toHaveLength(3);
-      
+
       // Find each license in the list and verify relations
       const validLicense = listResult.data.find((l: any) => l.data.clientId === validClientUuid);
       expect(validLicense.relations.client.nomeEmpresa).toBe('Cliente Válido Múltiplo');
 
-      const errorLicense = listResult.data.find((l: any) => l.data.clientId === '550e8400-e29b-41d4-a716-446655440999');
+      const errorLicense = listResult.data.find(
+        (l: any) => l.data.clientId === '550e8400-e29b-41d4-a716-446655440999'
+      );
       expect(errorLicense.relations.client.type).toBe('error');
 
       const noClientLicense = listResult.data.find((l: any) => !l.data.clientId);
@@ -445,15 +442,12 @@ describe('End-to-End License Relation System Integration (Task 10)', () => {
           isDeleted: false,
           data: {
             nomeEmpresa: `Empresa Performance ${i + 1}`,
-            contribuinte: `${i + 1}23456789`
-          }
+            contribuinte: `${i + 1}23456789`,
+          },
         };
 
-        await mockBucket.put(
-          `content/clients/${clientUuid}.json`,
-          JSON.stringify(clientContent)
-        );
-        
+        await mockBucket.put(`content/clients/${clientUuid}.json`, JSON.stringify(clientContent));
+
         clients.push(clientUuid);
       }
 
@@ -465,13 +459,13 @@ describe('End-to-End License Relation System Integration (Task 10)', () => {
           versao: '2024',
           numeroSerie: `PERF-${i + 1}`,
           software: { name: ['Vectron'] },
-          invoices: []
+          invoices: [],
         };
 
         const response = await app.request('/api/content/licenses', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(licenseData)
+          body: JSON.stringify(licenseData),
         });
 
         expect(response.status).toBe(201);
@@ -483,12 +477,12 @@ describe('End-to-End License Relation System Integration (Task 10)', () => {
       const startTime = Date.now();
       const listResponse = await app.request('/api/content/licenses');
       const endTime = Date.now();
-      
+
       expect(listResponse.status).toBe(200);
       const listResult = await listResponse.json();
-      
+
       expect(listResult.data).toHaveLength(5);
-      
+
       // Verify all relations are resolved
       for (let i = 0; i < 5; i++) {
         const license = listResult.data.find((l: any) => l.data.numeroSerie === `PERF-${i + 1}`);

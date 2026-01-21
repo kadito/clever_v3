@@ -96,10 +96,7 @@
           <div class="text-6xl mb-4">⚠️</div>
           <h3 class="text-lg font-medium text-red-900 mb-2">Erro ao carregar dados</h3>
           <p class="text-red-600 mb-6">{{ error }}</p>
-          <button
-            @click="refresh"
-            class="btn-primary inline-flex items-center"
-          >
+          <button @click="refresh" class="btn-primary inline-flex items-center">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
@@ -249,7 +246,10 @@ const {
 const displayItems = computed(() => {
   return paginatedItems.value.map(item => ({
     id: item.uuid,
-    title: item.data.name || item.data.title || `${displayName.value.slice(0, -1)} #${item.uuid.slice(0, 8)}`,
+    title:
+      item.data.name ||
+      item.data.title ||
+      `${displayName.value.slice(0, -1)} #${item.uuid.slice(0, 8)}`,
     subtitle: item.data.subtitle || item.data.description || '',
     description: item.data.description || '',
     status: item.data.status || 'active',
@@ -281,7 +281,6 @@ const handleSearch = (query: string) => {
 
 const handleFilter = (updatedFilters: any[]) => {
   // Filter logic will be implemented when needed
-
 };
 
 const navigateToDetail = (id: string) => {

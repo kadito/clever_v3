@@ -9,7 +9,10 @@ export * from './relation-type-guards';
 
 // Content type exports
 export * from './types/clients';
+export * from './types/contracts';
 export * from './types/licenses';
+export * from './types/work-sheets';
+export * from './types/remote-assistance';
 
 // Re-export specific utilities for convenience
 export { resolveContentRelations, type ContentFetcher } from './utils';
@@ -21,7 +24,7 @@ export {
   extractBasicFields,
   RELATION_TYPE_MAPPING,
   BASIC_FIELD_DEFINITIONS,
-  COMMON_FALLBACK_FIELDS
+  COMMON_FALLBACK_FIELDS,
 } from './utils';
 
 // Re-export relation validation utilities for explicit access
@@ -33,7 +36,7 @@ export {
   getRelationFieldNames,
   validateBackwardCompatibility,
   CONTENT_RELATION_CONFIGS,
-  type RelationFieldConfig
+  type RelationFieldConfig,
 } from './relation-validation';
 
 // Re-export relation type guards for type safety
@@ -46,5 +49,5 @@ export {
   hasRelationErrors,
   getResolvedRelations,
   getRelationErrors,
-  getRelationSummary
+  getRelationSummary,
 } from './relation-type-guards';

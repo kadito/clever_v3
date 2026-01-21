@@ -9,67 +9,128 @@
         :disabled="disabled"
         :readonly="readonly"
         class="form-input pr-10"
-        :class="{ 
+        :class="{
           'bg-gray-100 cursor-not-allowed': disabled || readonly,
-          'border-red-300': hasError 
+          'border-red-300': hasError,
         }"
         @input="onSearchInput"
         @focus="onFocus"
         @blur="onBlur"
         @keydown="onKeyDown"
-      >
-      
+      />
+
       <!-- Search Icon -->
       <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-        <svg v-if="isLoading" class="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        <svg
+          v-if="isLoading"
+          class="animate-spin h-4 w-4 text-gray-400"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"
+          ></circle>
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          ></path>
         </svg>
-        <svg v-else class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        <svg
+          v-else
+          class="h-4 w-4 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          />
         </svg>
       </div>
 
       <!-- Dropdown Results - positioned relative to this input container -->
-      <div 
-        v-if="!readonly && !disabled && showDropdown"
-        class="search-dropdown"
-      >
+      <div v-if="!readonly && !disabled && showDropdown" class="search-dropdown">
         <!-- Loading State -->
         <div v-if="isLoading" class="search-option loading">
           <div class="flex items-center">
             <svg class="animate-spin h-4 w-4 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
             </svg>
             <span class="text-gray-600">Pesquisando clientes...</span>
           </div>
         </div>
 
         <!-- No Results -->
-        <div v-else-if="searchQuery && searchQuery.length >= 1 && searchResults.length === 0" class="search-option no-results">
+        <div
+          v-else-if="searchQuery && searchQuery.length >= 1 && searchResults.length === 0"
+          class="search-option no-results"
+        >
           <div class="flex items-center justify-center py-2">
-            <svg class="h-5 w-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            <svg
+              class="h-5 w-5 text-gray-400 mr-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
             </svg>
             <span class="text-gray-500">Nenhum cliente encontrado</span>
           </div>
         </div>
 
         <!-- Empty state when no query and no results -->
-        <div v-else-if="!searchQuery && searchResults.length === 0 && !isLoading" class="search-option instruction">
+        <div
+          v-else-if="!searchQuery && searchResults.length === 0 && !isLoading"
+          class="search-option instruction"
+        >
           <div class="flex items-center justify-center py-2">
-            <svg class="h-5 w-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            <svg
+              class="h-5 w-5 text-gray-400 mr-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
             </svg>
             <span class="text-gray-500">Digite para pesquisar clientes</span>
           </div>
         </div>
 
         <!-- Results -->
-        <div 
+        <div
           v-else
-          v-for="client in searchResults" 
+          v-for="client in searchResults"
           :key="client.uuid"
           class="search-option"
           @click="selectClient(client)"
@@ -77,8 +138,12 @@
           <div class="client-info">
             <div class="client-name">{{ client.data.nomeEmpresa }}</div>
             <div class="client-details">
-              <span v-if="client.data.nomeComercial" class="detail">{{ client.data.nomeComercial }}</span>
-              <span v-if="client.data.contribuinte" class="detail">NIF: {{ client.data.contribuinte }}</span>
+              <span v-if="client.data.nomeComercial" class="detail">{{
+                client.data.nomeComercial
+              }}</span>
+              <span v-if="client.data.contribuinte" class="detail"
+                >NIF: {{ client.data.contribuinte }}</span
+              >
               <span v-if="client.data.localidade" class="detail">{{ client.data.localidade }}</span>
             </div>
           </div>
@@ -91,7 +156,9 @@
       <div class="client-card">
         <div class="client-header">
           <h3 class="client-title">{{ selectedClient.data.nomeEmpresa }}</h3>
-          <span v-if="selectedClient.data.contribuinte" class="client-nif">NIF: {{ selectedClient.data.contribuinte }}</span>
+          <span v-if="selectedClient.data.contribuinte" class="client-nif"
+            >NIF: {{ selectedClient.data.contribuinte }}</span
+          >
         </div>
         <div class="client-details-grid">
           <div v-if="selectedClient.data.nomeComercial" class="detail-item">
@@ -171,7 +238,7 @@ const props = withDefaults(defineProps<Props>(), {
   placeholder: 'Pesquisar cliente...',
   disabled: false,
   readonly: false,
-  hasError: false
+  hasError: false,
 });
 
 // Emits
@@ -199,11 +266,10 @@ const searchTimeout = ref<number | null>(null);
 const searchClients = async (query: string) => {
   // Always make the API call, but use search parameter only if query has 1+ characters
   // This ensures we always get results, even when deleting characters
-  const searchParams = query && query.length >= 1 
-    ? { search: query, limit: 10 }
-    : { limit: 10 }; // No search parameter = get recent clients
+  const searchParams = query && query.length >= 1 ? { search: query, limit: 10 } : { limit: 10 }; // No search parameter = get recent clients
 
-  await clientsApi.fetchList(searchParams)
+  await clientsApi
+    .fetchList(searchParams)
     .then(() => {
       if (clientsApi.items.value) {
         searchResults.value = clientsApi.items.value;
@@ -211,7 +277,7 @@ const searchClients = async (query: string) => {
         searchResults.value = [];
       }
     })
-    .catch((error) => {
+    .catch(error => {
       console.error('Error searching clients:', JSON.stringify(error, null, 2));
       searchResults.value = [];
     })
@@ -236,7 +302,7 @@ const onSearchInput = () => {
     selectedClient.value = null;
     emit('update:modelValue', '');
     emit('clientSelected', null);
-    
+
     // If dropdown is open (user is focused), show recent clients
     if (showDropdown.value) {
       isLoading.value = true;
@@ -262,7 +328,7 @@ const onSearchInput = () => {
 const onFocus = () => {
   if (!props.readonly && !props.disabled) {
     showDropdown.value = true;
-    
+
     // Always make a search request on focus to show recent clients
     // If there's an existing query with 1+ characters, search with it
     // Otherwise, search without query to get recent clients
@@ -295,11 +361,11 @@ const selectClient = (client: Client) => {
   if (props.readonly || props.disabled) {
     return;
   }
-  
+
   selectedClient.value = client;
   searchQuery.value = client.data.nomeEmpresa;
   showDropdown.value = false;
-  
+
   // Emit the clientId and client object
   emit('update:modelValue', client.uuid);
   emit('clientSelected', client);
@@ -314,7 +380,7 @@ const loadClientById = async (clientId: string) => {
 
   try {
     await clientsApi.fetchById(clientId);
-    
+
     if (clientsApi.currentItem.value) {
       selectedClient.value = clientsApi.currentItem.value;
       searchQuery.value = clientsApi.currentItem.value.data.nomeEmpresa;
@@ -328,30 +394,37 @@ const loadClientById = async (clientId: string) => {
 };
 
 // Watch for external changes to modelValue
-watch(() => props.modelValue, (newClientId) => {
-  if (newClientId && newClientId !== selectedClient.value?.uuid) {
-    loadClientById(newClientId);
-  } else if (!newClientId) {
-    selectedClient.value = null;
-    // Only clear search query if not readonly (to preserve display)
-    if (!props.readonly) {
-      searchQuery.value = '';
+watch(
+  () => props.modelValue,
+  newClientId => {
+    if (newClientId && newClientId !== selectedClient.value?.uuid) {
+      loadClientById(newClientId);
+    } else if (!newClientId) {
+      selectedClient.value = null;
+      // Only clear search query if not readonly (to preserve display)
+      if (!props.readonly) {
+        searchQuery.value = '';
+      }
     }
-  }
-}, { immediate: true });
+  },
+  { immediate: true }
+);
 
 // Watch for readonly prop changes to prevent input modifications
-watch(() => props.readonly, (isReadonly) => {
-  if (isReadonly) {
-    // When switching to readonly, close dropdown and stop any pending searches
-    showDropdown.value = false;
-    if (searchTimeout.value) {
-      clearTimeout(searchTimeout.value);
-      searchTimeout.value = null;
+watch(
+  () => props.readonly,
+  isReadonly => {
+    if (isReadonly) {
+      // When switching to readonly, close dropdown and stop any pending searches
+      showDropdown.value = false;
+      if (searchTimeout.value) {
+        clearTimeout(searchTimeout.value);
+        searchTimeout.value = null;
+      }
+      isLoading.value = false;
     }
-    isLoading.value = false;
   }
-});
+);
 
 // Click outside to close dropdown
 const handleClickOutside = (event: Event) => {
@@ -391,7 +464,9 @@ onBeforeUnmount(() => {
   @apply absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-touch shadow-xl max-h-60 overflow-y-auto;
   z-index: 99999 !important;
   /* Ensure dropdown is visible above all other content */
-  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 10px 25px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .search-option {
@@ -476,11 +551,11 @@ onBeforeUnmount(() => {
   .client-details {
     @apply flex-col gap-1;
   }
-  
+
   .client-header {
     @apply flex-col items-start space-y-2;
   }
-  
+
   .client-details-grid {
     @apply grid-cols-1;
   }

@@ -24,33 +24,24 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="name">NOME *</label>
-            <input 
-              type="text" 
-              id="name" 
-              v-model="formData.name" 
+            <input
+              type="text"
+              id="name"
+              v-model="formData.name"
               class="form-control"
               required
               placeholder="Nome do colaborador"
-            >
+            />
           </div>
         </div>
       </section>
 
       <!-- Action buttons -->
       <div class="form-actions">
-        <button 
-          type="button" 
-          @click="handleCancel" 
-          class="btn btn-cancel"
-          :disabled="loading"
-        >
+        <button type="button" @click="handleCancel" class="btn btn-cancel" :disabled="loading">
           Cancelar
         </button>
-        <button 
-          type="submit" 
-          class="btn btn-primary"
-          :disabled="loading || !isFormValid"
-        >
+        <button type="submit" class="btn btn-primary" :disabled="loading || !isFormValid">
           <span v-if="loading" class="btn-spinner"></span>
           {{ isEditing ? 'Atualizar' : 'Criar' }} Colaborador
         </button>
@@ -60,96 +51,91 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
-import { useEquipaStore } from '@/stores/equipa.js'
+import { ref, computed, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
+import { useEquipaStore } from '@/stores/equipa.js';
 
 // Router
-const router = useRouter()
-const route = useRoute()
+const router = useRouter();
+const route = useRoute();
 
 // Store
-const store = useEquipaStore()
-const { loading, error } = storeToRefs(store)
-const { 
-  createCollaborator, 
-  updateCollaborator, 
-  fetchCollaboratorById, 
-  clearError
-} = store
+const store = useEquipaStore();
+const { loading, error } = storeToRefs(store);
+const { createCollaborator, updateCollaborator, fetchCollaboratorById, clearError } = store;
 
 // Form state
-const isEditing = ref(false)
-const collaboratorId = ref(null)
+const isEditing = ref(false);
+const collaboratorId = ref(null);
 
 // Form data
 const formData = ref({
-  name: ''
-})
+  name: '',
+});
 
 // Computed
 const isFormValid = computed(() => {
-  return formData.value.name.trim().length > 0
-})
+  return formData.value.name.trim().length > 0;
+});
 
 const cancelRoute = computed(() => {
-  const from = route.query.from
+  const from = route.query.from;
   if (from === 'detail' && collaboratorId.value) {
-    return `/equipa/${collaboratorId.value}`
+    return `/equipa/${collaboratorId.value}`;
   } else if (from === 'list') {
-    return '/equipa/list'
+    return '/equipa/list';
   } else {
-    return '/equipa'
+    return '/equipa';
   }
-})
+});
 
 // Methods
 const handleSubmit = async () => {
-  if (!isFormValid.value) return
+  if (!isFormValid.value) return;
 
   try {
     if (isEditing.value) {
-      await updateCollaborator(collaboratorId.value, formData.value)
-      router.push(`/equipa/${collaboratorId.value}`)
+      await updateCollaborator(collaboratorId.value, formData.value);
+      router.push(`/equipa/${collaboratorId.value}`);
     } else {
-      const newCollaborator = await createCollaborator(formData.value)
-      router.push(`/equipa/${newCollaborator.id}`)
+      const newCollaborator = await createCollaborator(formData.value);
+      router.push(`/equipa/${newCollaborator.id}`);
     }
   } catch (err) {
-    console.error('Error saving collaborator:', err)
+    console.error('Error saving collaborator:', err);
   }
-}
+};
 
 const handleCancel = () => {
-  router.push(cancelRoute.value)
-}
+  router.push(cancelRoute.value);
+};
 
 const loadCollaboratorForEditing = async () => {
   if (collaboratorId.value) {
     try {
-      const collaborator = await fetchCollaboratorById(collaboratorId.value)
+      const collaborator = await fetchCollaboratorById(collaboratorId.value);
       if (collaborator) {
         formData.value = {
-          name: collaborator.name
-        }
+          name: collaborator.name,
+        };
       }
     } catch (err) {
-      console.error('Error loading collaborator:', err)
+      console.error('Error loading collaborator:', err);
     }
   }
-}
+};
 
 // Lifecycle
 onMounted(async () => {
   // Check if we're editing
   if (route.params.id) {
-    isEditing.value = true
-    collaboratorId.value = route.params.id
-    await loadCollaboratorForEditing()
+    isEditing.value = true;
+    collaboratorId.value = route.params.id;
+    await loadCollaboratorForEditing();
   }
-})
+});
 </script>
 
 <style scoped>
@@ -328,7 +314,9 @@ onMounted(async () => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 768px) {
@@ -350,4 +338,3 @@ onMounted(async () => {
   }
 }
 </style>
-

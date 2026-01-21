@@ -1,10 +1,15 @@
 # API Response Documentation with Relations
 
-This document describes the enhanced API response structure that includes automatic relation resolution and error handling for the CLEVER dashboard content relations system.
+This document describes the enhanced API response structure that includes
+automatic relation resolution and error handling for the CLEVER dashboard
+content relations system.
 
 ## Overview
 
-All content API endpoints automatically resolve relations and include them in the response under a `relations` field. Relations are resolved at display-time, not storage-time, allowing for flexible content creation and eventual consistency.
+All content API endpoints automatically resolve relations and include them in
+the response under a `relations` field. Relations are resolved at display-time,
+not storage-time, allowing for flexible content creation and eventual
+consistency.
 
 ## Enhanced Response Structure
 
@@ -56,11 +61,13 @@ interface RelationError {
 Retrieves a single content item with resolved relations.
 
 **Example Request:**
+
 ```
 GET /api/content/licenses/550e8400-e29b-41d4-a716-446655440000
 ```
 
 **Example Response (Success):**
+
 ```json
 {
   "uuid": "550e8400-e29b-41d4-a716-446655440000",
@@ -91,6 +98,7 @@ GET /api/content/licenses/550e8400-e29b-41d4-a716-446655440000
 ```
 
 **Example Response (Client Not Found):**
+
 ```json
 {
   "uuid": "550e8400-e29b-41d4-a716-446655440000",
@@ -118,6 +126,7 @@ GET /api/content/licenses/550e8400-e29b-41d4-a716-446655440000
 ```
 
 **Example Response (Server Error):**
+
 ```json
 {
   "uuid": "550e8400-e29b-41d4-a716-446655440000",
@@ -149,11 +158,13 @@ GET /api/content/licenses/550e8400-e29b-41d4-a716-446655440000
 Retrieves a list of content items with resolved relations.
 
 **Example Request:**
+
 ```
 GET /api/content/licenses?page=1&limit=10
 ```
 
 **Example Response:**
+
 ```json
 {
   "items": [
@@ -198,6 +209,7 @@ GET /api/content/licenses?page=1&limit=10
 Creates new content and returns it with resolved relations.
 
 **Example Request:**
+
 ```
 POST /api/content/licenses
 Content-Type: application/json
@@ -211,6 +223,7 @@ Content-Type: application/json
 ```
 
 **Example Response:**
+
 ```json
 {
   "uuid": "new-license-uuid",
@@ -245,6 +258,7 @@ Content-Type: application/json
 Updates existing content and returns it with resolved relations.
 
 **Example Request:**
+
 ```
 PUT /api/content/licenses/550e8400-e29b-41d4-a716-446655440000
 Content-Type: application/json
@@ -256,6 +270,7 @@ Content-Type: application/json
 ```
 
 **Example Response:**
+
 ```json
 {
   "uuid": "550e8400-e29b-41d4-a716-446655440000",
@@ -317,7 +332,8 @@ Content-Type: application/json
 ### Error Types
 
 1. **404 Not Found**: Referenced content does not exist
-2. **500 Internal Server Error**: Network or system error during relation resolution
+2. **500 Internal Server Error**: Network or system error during relation
+   resolution
 
 ### Error Response Structure
 
@@ -331,10 +347,14 @@ interface RelationError {
 
 ### Error Handling Behavior
 
-- **Partial Failures**: If one relation fails to resolve, other relations continue processing
-- **Non-blocking**: Relation resolution errors do not prevent the main content from being returned
-- **Structured Errors**: All errors include type, code, and message for consistent handling
-- **Logging**: Relation resolution failures are logged for debugging but don't interrupt the response
+- **Partial Failures**: If one relation fails to resolve, other relations
+  continue processing
+- **Non-blocking**: Relation resolution errors do not prevent the main content
+  from being returned
+- **Structured Errors**: All errors include type, code, and message for
+  consistent handling
+- **Logging**: Relation resolution failures are logged for debugging but don't
+  interrupt the response
 
 ## Frontend Integration
 
@@ -343,7 +363,12 @@ interface RelationError {
 Use the provided TypeScript interfaces for type-safe relation handling:
 
 ```typescript
-import type { ContentWithRelations, RelationResult, ResolvedRelation, RelationError } from '@clever/shared';
+import type {
+  ContentWithRelations,
+  RelationResult,
+  ResolvedRelation,
+  RelationError,
+} from '@clever/shared';
 
 // Type guard for checking if relation is resolved or error
 function isRelationError(relation: RelationResult): relation is RelationError {
@@ -392,7 +417,8 @@ Relations are resolved sequentially (one by one) for simplicity and reliability:
 
 - **Pros**: Simple implementation, reliable error handling, no race conditions
 - **Cons**: Slightly slower than parallel resolution for multiple relations
-- **Trade-off**: Prioritizes reliability and maintainability over maximum performance
+- **Trade-off**: Prioritizes reliability and maintainability over maximum
+  performance
 
 ### No Caching
 
@@ -428,4 +454,5 @@ Only basic fields are included in resolved relations to minimize response size:
 
 - Frontend components can gradually adopt relation display features
 - No breaking changes to existing API contracts
-- Relation resolution can be disabled per endpoint if needed (future enhancement)
+- Relation resolution can be disabled per endpoint if needed (future
+  enhancement)

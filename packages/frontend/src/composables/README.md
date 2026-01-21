@@ -2,7 +2,8 @@
 
 ## useAuth
 
-The `useAuth` composable provides authentication state management using Clerk and shared UserContext types.
+The `useAuth` composable provides authentication state management using Clerk
+and shared UserContext types.
 
 ### Usage
 
@@ -18,7 +19,7 @@ export default {
       isAuthenticated,
       userType,
       userName,
-      signOut
+      signOut,
     } = useAuth();
 
     return {
@@ -28,9 +29,9 @@ export default {
       isAuthenticated,
       userType,
       userName,
-      signOut
+      signOut,
     };
-  }
+  },
 };
 ```
 
@@ -50,5 +51,6 @@ export default {
 ### Requirements
 
 This composable satisfies requirements:
+
 - 4.2: Authentication state management
 - 4.3: User information storage in application state

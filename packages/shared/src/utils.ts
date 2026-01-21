@@ -61,7 +61,13 @@ export const BASIC_FIELD_DEFINITIONS: Record<string, string[]> = {
  * These are generic fields that might exist across different content types
  */
 export const COMMON_FALLBACK_FIELDS = [
-  'name', 'title', 'description', 'numero', 'data', 'dataInicio', 'dataFim'
+  'name',
+  'title',
+  'description',
+  'numero',
+  'data',
+  'dataInicio',
+  'dataFim',
 ] as const;
 
 /**
@@ -80,29 +86,29 @@ export function extractBasicFields(
 
   // Get the basic field definitions for this content type
   const basicFields = BASIC_FIELD_DEFINITIONS[contentType];
-  
+
   if (basicFields) {
     // Extract only the defined basic fields for this content type
     const extracted: Record<string, any> = {};
-    
+
     for (const field of basicFields) {
       if (contentData[field] !== undefined && contentData[field] !== null) {
         extracted[field] = contentData[field];
       }
     }
-    
+
     return extracted;
   }
 
   // Fallback for unknown content types - use common fields
   const extracted: Record<string, any> = {};
-  
+
   for (const field of COMMON_FALLBACK_FIELDS) {
     if (contentData[field] !== undefined && contentData[field] !== null) {
       extracted[field] = contentData[field];
     }
   }
-  
+
   return extracted;
 }
 
@@ -124,61 +130,61 @@ export async function resolveContentRelations<T extends BaseContent>(
   fetchContent: ContentFetcher
 ): Promise<T & { relations: Record<string, any> }> {
   const relations: Record<string, any> = {};
-  
+
   // Detect relation fields in the content data
   const relationFields = detectRelationFields(content.data);
-  
+
   // Resolve each relation sequentially (simple approach)
   for (const relationField of relationFields) {
     const relationId = content.data[relationField];
     const targetContentType = getContentTypeFromRelation(relationField);
-    
+
     if (!targetContentType) {
       // Log warning for unknown relation field but continue processing
       console.warn(`Unknown relation field: ${relationField}`);
       continue;
     }
-    
+
     // Create relation key by removing 'Id' suffix (e.g., 'clientId' -> 'client')
     const relationKey = relationField.replace(/Id$/, '');
-    
+
     try {
       // Fetch the related content
       const relatedContent = await fetchContent(targetContentType, relationId);
-      
+
       if (relatedContent && relatedContent.data) {
         // Extract basic fields from the related content
         const basicData = extractBasicFields(relatedContent.data, targetContentType);
-        
+
         // Create resolved relation object
         relations[relationKey] = {
           uuid: relatedContent.uuid,
           contentType: relatedContent.contentType,
-          ...basicData
+          ...basicData,
         };
       } else {
         // Related content not found - return 404 error
         relations[relationKey] = {
           type: 'error',
           code: 404,
-          message: 'Not found'
+          message: 'Not found',
         };
       }
     } catch (error) {
       // Log the error for debugging but continue processing other relations
       console.warn(`Failed to resolve relation ${relationField} (${relationId}):`, error);
-      
+
       // Return structured error information
       relations[relationKey] = {
         type: 'error',
         code: 500,
-        message: 'Internal Server Error'
+        message: 'Internal Server Error',
       };
     }
   }
-  
+
   return {
     ...content,
-    relations
+    relations,
   };
 }

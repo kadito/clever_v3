@@ -18,11 +18,7 @@
 
           <!-- Desktop save button -->
           <div class="hidden sm:flex items-center space-x-2">
-            <button
-              type="button"
-              @click="handleCancel"
-              class="btn-secondary-consistent text-sm"
-            >
+            <button type="button" @click="handleCancel" class="btn-secondary-consistent text-sm">
               Cancelar
             </button>
             <button
@@ -53,7 +49,7 @@
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 />
               </svg>
-              {{ isSaving ? 'A guardar...' : (isEditing ? 'Atualizar' : 'Criar') }}
+              {{ isSaving ? 'A guardar...' : isEditing ? 'Atualizar' : 'Criar' }}
             </button>
           </div>
         </div>
@@ -84,19 +80,16 @@
     <!-- Form content (always visible when not loading) -->
     <main v-if="!isLoading" class="p-4 sm:p-6 pb-24">
       <div class="max-w-4xl mx-auto">
-        <form
-          id="content-form"
-          @submit.prevent="handleSubmit()"
-          class="space-y-6"
-          novalidate
-        >
+        <form id="content-form" @submit.prevent="handleSubmit()" class="space-y-6" novalidate>
           <!-- Form sections -->
           <div class="space-y-6">
             <slot name="form" :form-data="formData" :errors="validationErrors">
               <!-- Default form sections -->
               <div v-for="section in formSections" :key="section.key" class="form-section">
                 <div class="bg-white rounded-touch border border-gray-200">
-                  <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+                  <div
+                    class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+                  >
                     <h2 class="text-lg font-semibold text-gray-900">{{ section.title }}</h2>
                     <p v-if="section.description" class="text-sm text-gray-600 mt-1">
                       {{ section.description }}
@@ -114,7 +107,7 @@
                         <label
                           :for="field.key"
                           class="form-label"
-                          :class="{ 'required': field.required }"
+                          :class="{ required: field.required }"
                         >
                           {{ field.label }}
                           <span v-if="field.required" class="text-red-500 ml-1">*</span>
@@ -124,7 +117,13 @@
                         <div class="relative">
                           <!-- Text input -->
                           <input
-                            v-if="field.type === 'text' || field.type === 'email' || field.type === 'tel' || field.type === 'url' || field.type === 'password'"
+                            v-if="
+                              field.type === 'text' ||
+                              field.type === 'email' ||
+                              field.type === 'tel' ||
+                              field.type === 'url' ||
+                              field.type === 'password'
+                            "
                             :id="field.key"
                             :value="formData?.[field.key] || ''"
                             :type="field.type"
@@ -135,7 +134,12 @@
                             class="form-input"
                             :class="{ 'border-red-500': validationErrors[field.key] }"
                             @blur="validateField(field.key)"
-                            @input="(e) => { updateFieldValue(field.key, (e.target as HTMLInputElement).value); clearFieldError(field.key); }"
+                            @input="
+                              e => {
+                                updateFieldValue(field.key, (e.target as HTMLInputElement).value);
+                                clearFieldError(field.key);
+                              }
+                            "
                           />
 
                           <!-- Number input -->
@@ -153,7 +157,15 @@
                             class="form-input"
                             :class="{ 'border-red-500': validationErrors[field.key] }"
                             @blur="validateField(field.key)"
-                            @input="(e) => { updateFieldValue(field.key, Number((e.target as HTMLInputElement).value)); clearFieldError(field.key); }"
+                            @input="
+                              e => {
+                                updateFieldValue(
+                                  field.key,
+                                  Number((e.target as HTMLInputElement).value)
+                                );
+                                clearFieldError(field.key);
+                              }
+                            "
                           />
 
                           <!-- Textarea -->
@@ -169,7 +181,15 @@
                             class="form-textarea"
                             :class="{ 'border-red-500': validationErrors[field.key] }"
                             @blur="validateField(field.key)"
-                            @input="(e) => { updateFieldValue(field.key, (e.target as HTMLTextAreaElement).value); clearFieldError(field.key); }"
+                            @input="
+                              e => {
+                                updateFieldValue(
+                                  field.key,
+                                  (e.target as HTMLTextAreaElement).value
+                                );
+                                clearFieldError(field.key);
+                              }
+                            "
                           />
 
                           <!-- Select -->
@@ -182,9 +202,16 @@
                             class="form-select"
                             :class="{ 'border-red-500': validationErrors[field.key] }"
                             @blur="validateField(field.key)"
-                            @change="(e) => { updateFieldValue(field.key, (e.target as HTMLSelectElement).value); clearFieldError(field.key); }"
+                            @change="
+                              e => {
+                                updateFieldValue(field.key, (e.target as HTMLSelectElement).value);
+                                clearFieldError(field.key);
+                              }
+                            "
                           >
-                            <option value="" disabled>{{ field.placeholder || 'Selecionar...' }}</option>
+                            <option value="" disabled>
+                              {{ field.placeholder || 'Selecionar...' }}
+                            </option>
                             <option
                               v-for="option in field.options"
                               :key="option.value"
@@ -195,13 +222,19 @@
                           </select>
 
                           <!-- Multi-select -->
-                          <div v-else-if="field.type === 'multiselect'" class="multiselect-container">
+                          <div
+                            v-else-if="field.type === 'multiselect'"
+                            class="multiselect-container"
+                          >
                             <div
                               class="multiselect-input"
                               :class="{ 'border-red-500': validationErrors[field.key] }"
                               @click="toggleMultiselect(field.key)"
                             >
-                              <div v-if="getSelectedOptions(field, formData?.[field.key]).length === 0" class="multiselect-placeholder">
+                              <div
+                                v-if="getSelectedOptions(field, formData?.[field.key]).length === 0"
+                                class="multiselect-placeholder"
+                              >
                                 {{ field.placeholder || 'Selecionar...' }}
                               </div>
                               <div v-else class="multiselect-selected">
@@ -220,11 +253,21 @@
                                   </button>
                                 </span>
                               </div>
-                              <svg class="multiselect-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                              <svg
+                                class="multiselect-arrow"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M19 9l-7 7-7-7"
+                                />
                               </svg>
                             </div>
-                            
+
                             <div
                               v-if="openMultiselects[field.key]"
                               class="multiselect-dropdown"
@@ -234,7 +277,7 @@
                                 v-for="option in field.options"
                                 :key="option.value"
                                 class="multiselect-option"
-                                :class="{ 'selected': isOptionSelected(field.key, option.value) }"
+                                :class="{ selected: isOptionSelected(field.key, option.value) }"
                                 @click="toggleOption(field.key, option.value)"
                               >
                                 <input
@@ -242,7 +285,7 @@
                                   :checked="isOptionSelected(field.key, option.value)"
                                   class="multiselect-checkbox"
                                   readonly
-                                >
+                                />
                                 <span>{{ option.label }}</span>
                               </div>
                             </div>
@@ -256,7 +299,15 @@
                               type="checkbox"
                               :disabled="field.disabled"
                               class="form-checkbox"
-                              @change="(e) => { updateFieldValue(field.key, (e.target as HTMLInputElement).checked); clearFieldError(field.key); }"
+                              @change="
+                                e => {
+                                  updateFieldValue(
+                                    field.key,
+                                    (e.target as HTMLInputElement).checked
+                                  );
+                                  clearFieldError(field.key);
+                                }
+                              "
                             />
                             <label :for="field.key" class="ml-2 text-sm text-gray-700">
                               {{ field.checkboxLabel || field.label }}
@@ -264,7 +315,10 @@
                           </div>
 
                           <!-- Switch -->
-                          <div v-else-if="field.type === 'switch'" class="flex items-center justify-between">
+                          <div
+                            v-else-if="field.type === 'switch'"
+                            class="flex items-center justify-between"
+                          >
                             <label :for="field.key" class="text-sm font-medium text-gray-700">
                               {{ field.switchLabel || field.label }}
                             </label>
@@ -275,12 +329,26 @@
                                 type="checkbox"
                                 :disabled="field.disabled"
                                 class="sr-only"
-                                @change="(e) => { updateFieldValue(field.key, (e.target as HTMLInputElement).checked); clearFieldError(field.key); }"
+                                @change="
+                                  e => {
+                                    updateFieldValue(
+                                      field.key,
+                                      (e.target as HTMLInputElement).checked
+                                    );
+                                    clearFieldError(field.key);
+                                  }
+                                "
                               />
                               <div
                                 class="switch-track"
-                                :class="{ 'switch-track-active': formData?.[field.key] || false, 'switch-track-disabled': field.disabled }"
-                                @click="!field.disabled && updateFieldValue(field.key, !(formData?.[field.key] || false))"
+                                :class="{
+                                  'switch-track-active': formData?.[field.key] || false,
+                                  'switch-track-disabled': field.disabled,
+                                }"
+                                @click="
+                                  !field.disabled &&
+                                  updateFieldValue(field.key, !(formData?.[field.key] || false))
+                                "
                               >
                                 <div
                                   class="switch-thumb"
@@ -303,7 +371,12 @@
                             class="form-input"
                             :class="{ 'border-red-500': validationErrors[field.key] }"
                             @blur="validateField(field.key)"
-                            @change="(e) => { updateFieldValue(field.key, (e.target as HTMLInputElement).value); clearFieldError(field.key); }"
+                            @change="
+                              e => {
+                                updateFieldValue(field.key, (e.target as HTMLInputElement).value);
+                                clearFieldError(field.key);
+                              }
+                            "
                           />
 
                           <!-- Custom field slot -->
@@ -314,8 +387,13 @@
                               :disabled="field.disabled"
                               :readonly="field.readonly"
                               :has-error="!!validationErrors[field.key]"
-                              @update:model-value="(value) => { updateFieldValue(field.key, value); clearFieldError(field.key); }"
-                              @client-selected="(client) => handleClientSelected(client)"
+                              @update:model-value="
+                                value => {
+                                  updateFieldValue(field.key, value);
+                                  clearFieldError(field.key);
+                                }
+                              "
+                              @client-selected="client => handleClientSelected(client)"
                             />
                           </div>
 
@@ -346,25 +424,47 @@
                     </div>
                   </div>
                 </div>
-                
+
                 <!-- After-section slot for additional content -->
-                <slot :name="`after-section-${section.key}`" :form-data="formData" :errors="validationErrors" :update-field-value="updateFieldValue" />
+                <slot
+                  :name="`after-section-${section.key}`"
+                  :form-data="formData"
+                  :errors="validationErrors"
+                  :update-field-value="updateFieldValue"
+                />
               </div>
             </slot>
           </div>
 
           <!-- Custom form sections -->
-          <slot name="customSections" :form-data="formData" :errors="validationErrors" :update-field-value="updateFieldValue" />
+          <slot
+            name="customSections"
+            :form-data="formData"
+            :errors="validationErrors"
+            :update-field-value="updateFieldValue"
+          />
 
           <!-- Validation errors summary (shown at bottom of form when there are errors) -->
           <div v-if="Object.keys(validationErrors).length > 0 && hasValidated" class="mt-6">
             <div class="bg-red-50 border border-red-200 rounded-lg p-4">
               <div class="flex">
-                <svg class="w-5 h-5 text-red-400 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  class="w-5 h-5 text-red-400 mr-2 flex-shrink-0 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 <div class="flex-1">
-                  <h3 class="text-sm font-medium text-red-800 mb-2">Por favor corrija os seguintes erros:</h3>
+                  <h3 class="text-sm font-medium text-red-800 mb-2">
+                    Por favor corrija os seguintes erros:
+                  </h3>
                   <ul class="text-sm text-red-700 list-disc list-inside space-y-1">
                     <li v-for="(errorMsg, field) in validationErrors" :key="field">
                       {{ errorMsg }}
@@ -402,12 +502,7 @@
           class="btn-primary-consistent flex-1 justify-center"
           :class="{ 'btn-loading': isSaving }"
         >
-          <svg
-            v-if="isSaving"
-            class="w-4 h-4 mr-2 animate-spin"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
+          <svg v-if="isSaving" class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle
               class="opacity-25"
               cx="12"
@@ -422,7 +517,7 @@
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             />
           </svg>
-          {{ isSaving ? 'A guardar...' : (isEditing ? 'Atualizar' : 'Criar') }}
+          {{ isSaving ? 'A guardar...' : isEditing ? 'Atualizar' : 'Criar' }}
         </button>
       </div>
     </div>
@@ -444,17 +539,17 @@ interface Props {
   isLoading?: boolean;
   isSaving?: boolean;
   error?: string | null;
-  
+
   // Form configuration
   isEditing?: boolean;
   createTitle?: string;
   editTitle?: string;
   subtitle?: string;
   cancelRoute?: string;
-  
+
   // Form structure
   formSections?: FormSection[];
-  
+
   // Validation
   validateOnSubmit?: boolean;
   customValidator?: (data: Record<string, any>) => Record<string, string>;
@@ -483,12 +578,12 @@ const emit = defineEmits<{
 
 // Form state - use shared form data to handle component recreation
 const formKey = 'content-form'; // Could be made dynamic if needed
-const { 
-  formData, 
-  validationErrors, 
-  initializeFormData: initSharedFormData, 
+const {
+  formData,
+  validationErrors,
+  initializeFormData: initSharedFormData,
   updateFieldValue: updateSharedFieldValue,
-  getFormData
+  getFormData,
 } = useSharedFormData(formKey);
 
 // Initialize form data with all field keys first
@@ -500,12 +595,15 @@ const initializeFormData = () => {
 initializeFormData();
 
 // Helper function to get visible fields based on conditional logic
-const getVisibleFields = (fields: FormField[], formData: Record<string, any> | null): FormField[] => {
+const getVisibleFields = (
+  fields: FormField[],
+  formData: Record<string, any> | null
+): FormField[] => {
   if (!formData) return fields.filter(field => !field.conditional);
-  
+
   return fields.filter(field => {
     if (!field.conditional) return true;
-    
+
     const dependentValue = formData[field.conditional.dependsOn];
     return field.conditional.showWhen(dependentValue);
   });
@@ -517,14 +615,14 @@ const isFormValidSimple = computed(() => {
   if (!formData.value) {
     return false;
   }
-  
+
   const currentFormData = formData.value;
-  
+
   // Check validation errors first
   if (Object.keys(validationErrors).length > 0) {
     return false;
   }
-  
+
   // Check required fields (only for visible fields)
   for (const section of props.formSections) {
     const visibleFields = getVisibleFields(section.fields, currentFormData);
@@ -532,14 +630,14 @@ const isFormValidSimple = computed(() => {
       if (field.required) {
         const value = currentFormData[field.key];
         const isEmpty = !value || (typeof value === 'string' && value.trim() === '');
-        
+
         if (isEmpty) {
           return false;
         }
       }
     }
   }
-  
+
   return true;
 });
 
@@ -556,7 +654,7 @@ const hasValidated = ref(false);
 // Watch for form data changes
 watch(
   () => formData.value,
-  (newFormData) => {
+  newFormData => {
     // Form validity is now handled by the computed property
   },
   { deep: true, immediate: true }
@@ -565,10 +663,13 @@ watch(
 // Watch for initial data changes
 watch(
   () => props.initialData,
-  (newData) => {
+  newData => {
     console.log('🔧 ContentFormTemplate: Initial data changed:', JSON.stringify(newData, null, 2));
     Object.assign(formData.value, newData);
-    console.log('🔧 ContentFormTemplate: Form data after initial data change:', JSON.stringify(formData.value, null, 2));
+    console.log(
+      '🔧 ContentFormTemplate: Form data after initial data change:',
+      JSON.stringify(formData.value, null, 2)
+    );
   },
   { deep: true }
 );
@@ -577,11 +678,18 @@ watch(
 watch(
   () => props.formSections,
   (newSections, oldSections) => {
-    console.log('🔧 ContentFormTemplate: Form sections changed:', JSON.stringify({
-      newSectionsCount: newSections?.length,
-      oldSectionsCount: oldSections?.length
-    }, null, 2));
-    
+    console.log(
+      '🔧 ContentFormTemplate: Form sections changed:',
+      JSON.stringify(
+        {
+          newSectionsCount: newSections?.length,
+          oldSectionsCount: oldSections?.length,
+        },
+        null,
+        2
+      )
+    );
+
     // Only reinitialize if this is the first time sections are loaded
     if (!oldSections || oldSections.length === 0) {
       console.log('🔧 ContentFormTemplate: Reinitializing form data due to sections change');
@@ -595,30 +703,30 @@ watch(
 const validateField = (fieldKey: string) => {
   const field = findField(fieldKey);
   if (!field) return;
-  
+
   const currentFormData = getFormData();
   const value = currentFormData[fieldKey];
-  
+
   // Clear existing error
   delete validationErrors[fieldKey];
-  
+
   // Check if field should be visible based on conditional logic
   if (field.conditional) {
     const dependentValue = currentFormData[field.conditional.dependsOn];
     const shouldShow = field.conditional.showWhen(dependentValue);
-    
+
     // If field is not visible, don't validate it
     if (!shouldShow) {
       return;
     }
   }
-  
+
   // Required validation (only for visible fields)
   if (field.required && (!value || (typeof value === 'string' && value.trim() === ''))) {
     validationErrors[fieldKey] = `${field.label} é obrigatório`;
     return;
   }
-  
+
   // Type-specific validation
   if (value) {
     switch (field.type) {
@@ -636,7 +744,8 @@ const validateField = (fieldKey: string) => {
         try {
           new URL(value);
         } catch {
-          validationErrors[fieldKey] = 'Por favor, introduza um URL válido (ex: https://exemplo.com)';
+          validationErrors[fieldKey] =
+            'Por favor, introduza um URL válido (ex: https://exemplo.com)';
         }
         break;
       case 'number':
@@ -649,7 +758,7 @@ const validateField = (fieldKey: string) => {
         break;
     }
   }
-  
+
   // Custom validation
   if (field.validator && value) {
     const customError = field.validator(value);
@@ -661,15 +770,15 @@ const validateField = (fieldKey: string) => {
 
 const validateForm = () => {
   hasValidated.value = true;
-  
+
   // Clear all errors
   Object.keys(validationErrors).forEach(key => {
     delete validationErrors[key];
   });
-  
+
   // Get current form data for conditional checks
   const currentFormData = getFormData();
-  
+
   // Validate all fields, but skip conditional fields that shouldn't be visible
   for (const section of props.formSections) {
     for (const field of section.fields) {
@@ -677,33 +786,33 @@ const validateForm = () => {
       if (field.conditional) {
         const dependentValue = currentFormData[field.conditional.dependsOn];
         const shouldShow = field.conditional.showWhen(dependentValue);
-        
+
         // If field is not visible, skip validation entirely
         if (!shouldShow) {
           continue;
         }
       }
-      
+
       validateField(field.key);
     }
   }
-  
+
   // Custom form validation
   if (props.customValidator) {
     const customErrors = props.customValidator(currentFormData);
-    
+
     // COMPLETELY REPLACE field validation errors with custom validation results
     // Clear all existing errors first
     Object.keys(validationErrors).forEach(key => {
       delete validationErrors[key];
     });
-    
+
     // Then assign custom validation errors
     Object.assign(validationErrors, customErrors);
   }
-  
+
   const hasErrors = Object.keys(validationErrors).length > 0;
-  
+
   return !hasErrors;
 };
 
@@ -718,14 +827,14 @@ const findField = (fieldKey: string): FormField | undefined => {
 // Event handlers
 const handleSubmit = () => {
   const currentFormData = getFormData();
-  
+
   if (props.validateOnSubmit) {
     const isValid = validateForm();
     if (!isValid) {
       return;
     }
   }
-  
+
   emit('submit', { ...currentFormData });
 };
 
@@ -780,19 +889,19 @@ const isOptionSelected = (fieldKey: string, optionValue: string): boolean => {
 const toggleOption = (fieldKey: string, optionValue: string) => {
   const currentValues = formData.value?.[fieldKey] || [];
   const newValues = Array.isArray(currentValues) ? [...currentValues] : [];
-  
+
   const index = newValues.indexOf(optionValue);
   if (index > -1) {
     newValues.splice(index, 1);
   } else {
     newValues.push(optionValue);
   }
-  
+
   updateFieldValue(fieldKey, newValues);
-  
+
   // Clear field error when user makes a selection
   clearFieldError(fieldKey);
-  
+
   // Update individual service flags for backward compatibility
   if (fieldKey === 'selectedServices') {
     const serviceFlags = {
@@ -801,9 +910,9 @@ const toggleOption = (fieldKey: string, optionValue: string) => {
       manutencao24: newValues.includes('manutencao24'),
       dumps: newValues.includes('dumps'),
       atcud: newValues.includes('atcud'),
-      vectronConnect: newValues.includes('vectronConnect')
+      vectronConnect: newValues.includes('vectronConnect'),
     };
-    
+
     Object.entries(serviceFlags).forEach(([key, value]) => {
       updateFieldValue(key, value);
     });
@@ -812,12 +921,14 @@ const toggleOption = (fieldKey: string, optionValue: string) => {
 
 const removeSelectedOption = (fieldKey: string, optionValue: string) => {
   const currentValues = formData.value[fieldKey] || [];
-  const newValues = Array.isArray(currentValues) ? currentValues.filter(v => v !== optionValue) : [];
+  const newValues = Array.isArray(currentValues)
+    ? currentValues.filter(v => v !== optionValue)
+    : [];
   updateFieldValue(fieldKey, newValues);
-  
+
   // Clear field error when user makes a change
   clearFieldError(fieldKey);
-  
+
   // Update individual service flags for backward compatibility
   if (fieldKey === 'selectedServices') {
     const serviceFlags = {
@@ -826,9 +937,9 @@ const removeSelectedOption = (fieldKey: string, optionValue: string) => {
       manutencao24: newValues.includes('manutencao24'),
       dumps: newValues.includes('dumps'),
       atcud: newValues.includes('atcud'),
-      vectronConnect: newValues.includes('vectronConnect')
+      vectronConnect: newValues.includes('vectronConnect'),
     };
-    
+
     Object.entries(serviceFlags).forEach(([key, value]) => {
       updateFieldValue(key, value);
     });
@@ -1004,23 +1115,23 @@ const getSelectedOptions = (field: FormField, selectedValues: any) => {
     @apply py-3 px-4; /* Larger touch area */
     font-size: 16px; /* Prevent zoom on iOS */
   }
-  
+
   .multiselect-tag {
     @apply text-xs px-1.5 py-0.5;
   }
-  
+
   .multiselect-tag-remove {
     @apply w-5 h-5; /* Larger touch target */
   }
-  
+
   .multiselect-dropdown {
     @apply max-h-48;
   }
-  
+
   .multiselect-option {
     @apply py-4 px-4; /* Larger touch areas */
   }
-  
+
   .multiselect-checkbox {
     @apply w-5 h-5; /* Larger on mobile */
   }
@@ -1031,7 +1142,7 @@ const getSelectedOptions = (field: FormField, selectedValues: any) => {
   .multiselect-option:active {
     @apply bg-primary-100;
   }
-  
+
   .multiselect-tag-remove:active {
     @apply bg-primary-300 scale-95;
   }
@@ -1064,11 +1175,11 @@ const getSelectedOptions = (field: FormField, selectedValues: any) => {
   .switch-track {
     @apply w-12 h-7; /* Slightly larger on mobile */
   }
-  
+
   .switch-thumb {
     @apply w-6 h-6 top-0.5 left-0.5;
   }
-  
+
   .switch-thumb-active {
     @apply translate-x-5;
   }

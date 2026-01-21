@@ -19,10 +19,12 @@ Non-goals:
 
 - Mobile-first responsive design with 44px minimum touch targets
 - Dashboard-centric navigation with content tiles
-- Consistent 5-view pattern: Home → List → Detail → Create → Update (separate Create/Update components)
+- Consistent 5-view pattern: Home → List → Detail → Create → Update (separate
+  Create/Update components)
 - Touch-friendly interfaces optimized for mobile use
 - Color scheme inspired by old_src (green primary: #75AE93)
-- Multiselect dropdowns instead of individual checkboxes for better mobile experience
+- Multiselect dropdowns instead of individual checkboxes for better mobile
+  experience
 - Conditional fields with dynamic visibility based on form selections
 - Dynamic configuration management with add/remove/edit functionality
 - Standardized section ordering across all content types

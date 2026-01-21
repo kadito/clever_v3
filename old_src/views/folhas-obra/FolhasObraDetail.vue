@@ -134,23 +134,33 @@
           <div class="pricing-table">
             <div class="pricing-row">
               <span class="pricing-label">Taxa Deslocação:</span>
-              <span class="pricing-value">{{ getDisplacementRate() }}€ <span class="vat-indicator">sem IVA</span></span>
+              <span class="pricing-value"
+                >{{ getDisplacementRate() }}€ <span class="vat-indicator">sem IVA</span></span
+              >
             </div>
             <div class="pricing-row">
               <span class="pricing-label">Preço KMs:</span>
-              <span class="pricing-value">{{ getKmsPrice() }}€ <span class="vat-indicator">sem IVA</span></span>
+              <span class="pricing-value"
+                >{{ getKmsPrice() }}€ <span class="vat-indicator">sem IVA</span></span
+              >
             </div>
             <div class="pricing-row">
               <span class="pricing-label">Valor Hora:</span>
-              <span class="pricing-value">{{ getHourlyRate() }}€ <span class="vat-indicator">sem IVA</span></span>
+              <span class="pricing-value"
+                >{{ getHourlyRate() }}€ <span class="vat-indicator">sem IVA</span></span
+              >
             </div>
             <div class="pricing-row">
               <span class="pricing-label">Preço Mão Obra:</span>
-              <span class="pricing-value">{{ getLaborPrice() }}€ <span class="vat-indicator">sem IVA</span></span>
+              <span class="pricing-value"
+                >{{ getLaborPrice() }}€ <span class="vat-indicator">sem IVA</span></span
+              >
             </div>
             <div class="pricing-row total">
               <span class="pricing-label">PREÇO TOTAL:</span>
-              <span class="pricing-value">{{ getTotalPrice() }}€ <span class="vat-indicator">sem IVA</span></span>
+              <span class="pricing-value"
+                >{{ getTotalPrice() }}€ <span class="vat-indicator">sem IVA</span></span
+              >
             </div>
           </div>
         </div>
@@ -198,11 +208,17 @@
             <label>EQUIPAMENTOS</label>
             <p>{{ folhaData.otherData.equipment ? 'SIM' : 'NÃO' }}</p>
           </div>
-          <div class="info-item full-width" v-if="folhaData.otherData.materialUsed && folhaData.otherData.materialDetails">
+          <div
+            class="info-item full-width"
+            v-if="folhaData.otherData.materialUsed && folhaData.otherData.materialDetails"
+          >
             <label>DESCRIÇÃO DO MATERIAL UTILIZADO</label>
             <p>{{ folhaData.otherData.materialDetails }}</p>
           </div>
-          <div class="info-item full-width" v-if="folhaData.otherData.equipment && folhaData.otherData.equipmentDetails">
+          <div
+            class="info-item full-width"
+            v-if="folhaData.otherData.equipment && folhaData.otherData.equipmentDetails"
+          >
             <label>DESCRIÇÃO DOS EQUIPAMENTOS</label>
             <p>{{ folhaData.otherData.equipmentDetails }}</p>
           </div>
@@ -233,7 +249,10 @@
             <label>ANYDESK</label>
             <p>{{ folhaData.otherData.anydesk ? 'SIM' : 'NÃO' }}</p>
           </div>
-          <div class="info-item full-width" v-if="!folhaData.otherData.totallyResolved && folhaData.otherData.resolutionIssues">
+          <div
+            class="info-item full-width"
+            v-if="!folhaData.otherData.totallyResolved && folhaData.otherData.resolutionIssues"
+          >
             <label>OBSERVAÇÕES SOBRE PROBLEMAS NÃO RESOLVIDOS</label>
             <p>{{ folhaData.otherData.resolutionIssues }}</p>
           </div>
@@ -258,7 +277,11 @@
           <div class="info-item full-width">
             <label>ASSINATURA DO CLIENTE</label>
             <div class="signature-display">
-              <img :src="folhaData.otherData.clientSignature" alt="Assinatura do Cliente" class="signature-image">
+              <img
+                :src="folhaData.otherData.clientSignature"
+                alt="Assinatura do Cliente"
+                class="signature-image"
+              />
             </div>
           </div>
         </div>
@@ -269,15 +292,11 @@
         <!-- <div class="signature-canvas">
           <canvas ref="signatureCanvas" width="600" height="200"></canvas>
         </div> -->
-        
+
         <!-- Action Buttons -->
         <div class="action-buttons">
-          <button class="action-btn primary">
-            📋 FOLHA
-          </button>
-          <button @click="editFolha" class="action-btn secondary">
-            ✏️ Editar
-          </button>
+          <button class="action-btn primary">📋 FOLHA</button>
+          <button @click="editFolha" class="action-btn secondary">✏️ Editar</button>
         </div>
       </section>
     </div>
@@ -300,266 +319,272 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
-import { useFolhasObraStore } from '@/stores/folhas-obra.js'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
+import { useFolhasObraStore } from '@/stores/folhas-obra.js';
 
 // Router
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
 // Store
-const store = useFolhasObraStore()
-const { selectedFolha, loading, error } = storeToRefs(store)
-const { fetchFolhaById, getYearFromDate, clearError } = store
+const store = useFolhasObraStore();
+const { selectedFolha, loading, error } = storeToRefs(store);
+const { fetchFolhaById, getYearFromDate, clearError } = store;
 
 // Template refs
-const signatureCanvas = ref(null)
+const signatureCanvas = ref(null);
 
 // Auto-retry state
-const autoRetryCountdown = ref(0)
-const autoRetryTimer = ref(null)
-const userInteractionCancelled = ref(false)
-const retryTimeoutId = ref(null)
+const autoRetryCountdown = ref(0);
+const autoRetryTimer = ref(null);
+const userInteractionCancelled = ref(false);
+const retryTimeoutId = ref(null);
 
 // Computed property to get the current folha data
 const folhaData = computed(() => {
-  return selectedFolha.value || {}
-})
+  return selectedFolha.value || {};
+});
 
 const year = computed(() => {
-  return route.query.year || getYearFromDate(folhaData.value.date) || new Date().getFullYear()
-})
+  return route.query.year || getYearFromDate(folhaData.value.date) || new Date().getFullYear();
+});
 
 // Methods
 const loadFolhaData = async () => {
-  const folhaId = route.params.id
-  const targetYear = route.query.year || new Date().getFullYear()
-  
-  console.log('Loading folha data for ID:', folhaId, 'Year:', targetYear)
-  
+  const folhaId = route.params.id;
+  const targetYear = route.query.year || new Date().getFullYear();
+
+  console.log('Loading folha data for ID:', folhaId, 'Year:', targetYear);
+
   try {
-    clearError()
-    await fetchFolhaById(targetYear, folhaId)
+    clearError();
+    await fetchFolhaById(targetYear, folhaId);
     // If successful, cancel any pending retries
-    cancelAutoRetry()
+    cancelAutoRetry();
   } catch (err) {
-    console.warn(`Folha with ID ${folhaId} not found in year ${targetYear}`)
+    console.warn(`Folha with ID ${folhaId} not found in year ${targetYear}`);
     // Check if it's a 404 or "not found" error
-    const isNotFound = err.message?.toLowerCase().includes('not found') || 
-                       error.value?.toLowerCase().includes('not found')
-    
+    const isNotFound =
+      err.message?.toLowerCase().includes('not found') ||
+      error.value?.toLowerCase().includes('not found');
+
     if (isNotFound && !userInteractionCancelled.value) {
       // Start auto-retry countdown
-      startAutoRetry()
+      startAutoRetry();
     }
   }
-}
+};
 
 const retryLoad = () => {
-  userInteractionCancelled.value = true
-  cancelAutoRetry()
-  loadFolhaData()
-}
+  userInteractionCancelled.value = true;
+  cancelAutoRetry();
+  loadFolhaData();
+};
 
 const startAutoRetry = () => {
-  cancelAutoRetry()
-  autoRetryCountdown.value = 10
-  
+  cancelAutoRetry();
+  autoRetryCountdown.value = 10;
+
   const updateCountdown = () => {
     if (autoRetryCountdown.value > 0 && !userInteractionCancelled.value) {
-      autoRetryCountdown.value--
-      retryTimeoutId.value = setTimeout(updateCountdown, 1000)
+      autoRetryCountdown.value--;
+      retryTimeoutId.value = setTimeout(updateCountdown, 1000);
     } else if (autoRetryCountdown.value === 0 && !userInteractionCancelled.value) {
       // Auto-retry after countdown
-      loadFolhaData()
+      loadFolhaData();
     }
-  }
-  
-  retryTimeoutId.value = setTimeout(updateCountdown, 1000)
-}
+  };
+
+  retryTimeoutId.value = setTimeout(updateCountdown, 1000);
+};
 
 const cancelAutoRetry = () => {
   if (retryTimeoutId.value) {
-    clearTimeout(retryTimeoutId.value)
-    retryTimeoutId.value = null
+    clearTimeout(retryTimeoutId.value);
+    retryTimeoutId.value = null;
   }
-  autoRetryCountdown.value = 0
-}
+  autoRetryCountdown.value = 0;
+};
 
 const handleUserInteraction = () => {
-  userInteractionCancelled.value = true
-  cancelAutoRetry()
-}
+  userInteractionCancelled.value = true;
+  cancelAutoRetry();
+};
 
 // Watch for successful data load to cancel retries
-watch(() => folhaData.value?.id, (newId) => {
-  if (newId) {
-    cancelAutoRetry()
-    userInteractionCancelled.value = false
+watch(
+  () => folhaData.value?.id,
+  newId => {
+    if (newId) {
+      cancelAutoRetry();
+      userInteractionCancelled.value = false;
+    }
   }
-})
+);
 
-const formatDate = (dateString) => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('pt-PT', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  }) + ' at 12:00'
-}
+const formatDate = dateString => {
+  const date = new Date(dateString);
+  return (
+    date.toLocaleDateString('pt-PT', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }) + ' at 12:00'
+  );
+};
 
 // Pricing calculation methods
 const getDisplacementRate = () => {
   // Taxa de deslocação based on total km
-  const totalKms = folhaData.value.displacement?.totalKms || 0
-  return totalKms > 180 ? 50 : 35
-}
+  const totalKms = folhaData.value.displacement?.totalKms || 0;
+  return totalKms > 180 ? 50 : 35;
+};
 
 const getDisplacementRateDescription = () => {
-  const totalKms = folhaData.value.displacement?.totalKms || 0
-  return totalKms > 180 ? 'Mais de 180km' : 'Até 180km'
-}
+  const totalKms = folhaData.value.displacement?.totalKms || 0;
+  return totalKms > 180 ? 'Mais de 180km' : 'Até 180km';
+};
 
 const getHourlyRate = () => {
-  return folhaData.value.displacement?.weekendHoliday ? 60 : 45
-}
+  return folhaData.value.displacement?.weekendHoliday ? 60 : 45;
+};
 
 const getHourlyRateDescription = () => {
-  return folhaData.value.displacement?.weekendHoliday ? 'Fim de semana/Feriado' : 'Dias úteis'
-}
+  return folhaData.value.displacement?.weekendHoliday ? 'Fim de semana/Feriado' : 'Dias úteis';
+};
 
 const getWorkDuration = () => {
-  const startTime = folhaData.value.request?.timeArrivedClient
-  const endTime = folhaData.value.request?.timeExitClient
-  if (!startTime || !endTime) return 'N/A'
+  const startTime = folhaData.value.request?.timeArrivedClient;
+  const endTime = folhaData.value.request?.timeExitClient;
+  if (!startTime || !endTime) return 'N/A';
 
-  const [startHour, startMinute] = startTime.split(':').map(Number)
-  const [endHour, endMinute] = endTime.split(':').map(Number)
+  const [startHour, startMinute] = startTime.split(':').map(Number);
+  const [endHour, endMinute] = endTime.split(':').map(Number);
 
-  const startDate = new Date(0, 0, 0, startHour, startMinute)
-  let endDate = new Date(0, 0, 0, endHour, endMinute)
+  const startDate = new Date(0, 0, 0, startHour, startMinute);
+  let endDate = new Date(0, 0, 0, endHour, endMinute);
 
   if (endDate < startDate) {
-    endDate.setDate(endDate.getDate() + 1) // Assume next day if end time is earlier
+    endDate.setDate(endDate.getDate() + 1); // Assume next day if end time is earlier
   }
 
-  const diffMs = endDate - startDate
-  const diffHours = diffMs / (1000 * 60 * 60)
-  
+  const diffMs = endDate - startDate;
+  const diffHours = diffMs / (1000 * 60 * 60);
+
   if (diffHours < 1) {
-    const minutes = Math.round(diffHours * 60)
-    return `${minutes}min`
+    const minutes = Math.round(diffHours * 60);
+    return `${minutes}min`;
   } else {
-    const hours = Math.floor(diffHours)
-    const minutes = Math.round((diffHours - hours) * 60)
-    return minutes > 0 ? `${hours}h ${minutes}min` : `${hours}h`
+    const hours = Math.floor(diffHours);
+    const minutes = Math.round((diffHours - hours) * 60);
+    return minutes > 0 ? `${hours}h ${minutes}min` : `${hours}h`;
   }
-}
+};
 
 const getKmsPrice = () => {
   // KMs price = 0.4€ per km × total km
-  const pricePerKm = 0.4
-  const totalKms = folhaData.value.displacement?.totalKms || 0
-  
-  return Math.round(pricePerKm * totalKms * 100) / 100
-}
+  const pricePerKm = 0.4;
+  const totalKms = folhaData.value.displacement?.totalKms || 0;
+
+  return Math.round(pricePerKm * totalKms * 100) / 100;
+};
 
 const getDisplacementPrice = () => {
   // Displacement price = Taxa (35€ or 50€ based on km) + (0.4€ per km × total km)
-  const taxa = getDisplacementRate()
-  const kmsPrice = getKmsPrice()
-  
-  return taxa + kmsPrice
-}
+  const taxa = getDisplacementRate();
+  const kmsPrice = getKmsPrice();
+
+  return taxa + kmsPrice;
+};
 
 const getLaborPrice = () => {
-  const arrivalTime = folhaData.value.request?.arrivalTime
-  const departureTime = folhaData.value.request?.departureTime
-  
-  if (!arrivalTime || !departureTime) return 0
-  
+  const arrivalTime = folhaData.value.request?.arrivalTime;
+  const departureTime = folhaData.value.request?.departureTime;
+
+  if (!arrivalTime || !departureTime) return 0;
+
   // Parse time strings (HH:MM format)
-  const [arrivalHours, arrivalMinutes] = arrivalTime.split(':').map(Number)
-  const [departureHours, departureMinutes] = departureTime.split(':').map(Number)
-  
+  const [arrivalHours, arrivalMinutes] = arrivalTime.split(':').map(Number);
+  const [departureHours, departureMinutes] = departureTime.split(':').map(Number);
+
   // Convert to minutes for easier calculation
-  const arrivalTotalMinutes = arrivalHours * 60 + arrivalMinutes
-  const departureTotalMinutes = departureHours * 60 + departureMinutes
-  
+  const arrivalTotalMinutes = arrivalHours * 60 + arrivalMinutes;
+  const departureTotalMinutes = departureHours * 60 + departureMinutes;
+
   // Calculate difference in minutes
-  let diffMinutes = departureTotalMinutes - arrivalTotalMinutes
-  
+  let diffMinutes = departureTotalMinutes - arrivalTotalMinutes;
+
   // Handle case where departure is next day
   if (diffMinutes < 0) {
-    diffMinutes += 24 * 60 // Add 24 hours
+    diffMinutes += 24 * 60; // Add 24 hours
   }
-  
+
   // Convert to hours (with decimal)
-  const totalHours = diffMinutes / 60
-  
+  const totalHours = diffMinutes / 60;
+
   // Get hourly rate
-  const hourlyRate = getHourlyRate()
-  
+  const hourlyRate = getHourlyRate();
+
   // Minimum charge of 1 hour: if total < 1h, charge for 1h, otherwise charge actual hours
-  const chargeableHours = totalHours < 1 ? 1 : totalHours
-  
+  const chargeableHours = totalHours < 1 ? 1 : totalHours;
+
   // Calculate labor price
-  return Math.round(chargeableHours * hourlyRate * 100) / 100 // Round to 2 decimal places
-}
+  return Math.round(chargeableHours * hourlyRate * 100) / 100; // Round to 2 decimal places
+};
 
 const getTotalPrice = () => {
-  const displacementPrice = getDisplacementPrice()
-  const laborPrice = getLaborPrice()
-  return Math.round((displacementPrice + laborPrice) * 100) / 100 // Round to 2 decimal places
-}
+  const displacementPrice = getDisplacementPrice();
+  const laborPrice = getLaborPrice();
+  return Math.round((displacementPrice + laborPrice) * 100) / 100; // Round to 2 decimal places
+};
 
 const editFolha = () => {
-  const currentYear = route.query.year || getYearFromDate(folhaData.value.date)
-  console.log('Navigating to edit with year:', currentYear)
-  router.push(`/folhas-obra/${route.params.id}/edit?year=${currentYear}`)
-}
+  const currentYear = route.query.year || getYearFromDate(folhaData.value.date);
+  console.log('Navigating to edit with year:', currentYear);
+  router.push(`/folhas-obra/${route.params.id}/edit?year=${currentYear}`);
+};
 
 const initializeSignature = () => {
   // Initialize signature canvas with a sample signature
-  const canvas = signatureCanvas.value
-  const ctx = canvas.getContext('2d')
-  
+  const canvas = signatureCanvas.value;
+  const ctx = canvas.getContext('2d');
+
   // Set canvas background
-  ctx.fillStyle = '#ffffff'
-  ctx.fillRect(0, 0, canvas.width, canvas.height)
-  
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
   // Draw sample signature (you can replace this with actual signature data)
-  ctx.strokeStyle = '#000000'
-  ctx.lineWidth = 2
-  ctx.beginPath()
-  ctx.moveTo(100, 100)
-  ctx.bezierCurveTo(150, 50, 200, 150, 250, 100)
-  ctx.bezierCurveTo(300, 80, 350, 120, 400, 100)
-  ctx.stroke()
-}
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(100, 100);
+  ctx.bezierCurveTo(150, 50, 200, 150, 250, 100);
+  ctx.bezierCurveTo(300, 80, 350, 120, 400, 100);
+  ctx.stroke();
+};
 
 // Lifecycle hooks
 onMounted(async () => {
   // Add event listeners for user interaction
-  window.addEventListener('click', handleUserInteraction)
-  window.addEventListener('scroll', handleUserInteraction)
-  window.addEventListener('keydown', handleUserInteraction)
-  
-  await loadFolhaData()
+  window.addEventListener('click', handleUserInteraction);
+  window.addEventListener('scroll', handleUserInteraction);
+  window.addEventListener('keydown', handleUserInteraction);
+
+  await loadFolhaData();
   if (folhaData.value.id) {
-    initializeSignature()
+    initializeSignature();
   }
-})
+});
 
 onBeforeUnmount(() => {
-  cancelAutoRetry()
-  window.removeEventListener('click', handleUserInteraction)
-  window.removeEventListener('scroll', handleUserInteraction)
-  window.removeEventListener('keydown', handleUserInteraction)
-})
+  cancelAutoRetry();
+  window.removeEventListener('click', handleUserInteraction);
+  window.removeEventListener('scroll', handleUserInteraction);
+  window.removeEventListener('keydown', handleUserInteraction);
+});
 </script>
 
 <style scoped>
@@ -583,7 +608,9 @@ onBeforeUnmount(() => {
   margin: 0;
 }
 
-.loading-state, .error-state, .no-data-state {
+.loading-state,
+.error-state,
+.no-data-state {
   background: white;
   padding: 3rem 2rem;
   border-radius: 8px;
@@ -719,7 +746,7 @@ onBeforeUnmount(() => {
 }
 
 .info-item p:empty::before {
-  content: "—";
+  content: '—';
   color: #999;
   font-style: italic;
 }
@@ -928,48 +955,47 @@ onBeforeUnmount(() => {
   .folha-detail {
     padding: 0.5rem;
   }
-  
+
   .detail-header {
     margin-bottom: 1.5rem;
   }
-  
+
   .detail-header h1 {
     font-size: 1.5rem;
   }
-  
+
   .info-section {
     padding: 1.5rem;
   }
-  
+
   .info-section h2 {
     font-size: 1.1rem;
   }
-  
+
   .info-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .work-description {
     padding: 1rem;
     margin-top: 1.5rem;
   }
-  
+
   .signature-canvas canvas {
     max-width: 100%;
     height: auto;
   }
-  
+
   .signature-image {
     max-height: 150px;
   }
-  
-  
+
   .action-buttons {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .action-btn {
     width: 100%;
     max-width: 250px;
@@ -980,25 +1006,25 @@ onBeforeUnmount(() => {
   .info-section {
     padding: 1rem;
   }
-  
+
   .info-section h2 {
     font-size: 1rem;
   }
-  
+
   .info-item label {
     font-size: 0.7rem;
   }
-  
+
   .info-item p {
     font-size: 0.9rem;
   }
-  
+
   .work-description h3 {
     font-size: 0.9rem;
   }
-  
+
   .work-description h4 {
     font-size: 0.85rem;
   }
 }
-</style> 
+</style>

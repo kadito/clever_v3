@@ -26,7 +26,7 @@ export function validateLicenseCreation(data: LicenseData): string[] {
   if (data.dataInicio && data.dataVencimento) {
     const startDate = new Date(data.dataInicio);
     const endDate = new Date(data.dataVencimento);
-    
+
     if (startDate >= endDate) {
       errors.push('Data de vencimento deve ser posterior à data de início');
     }
@@ -38,7 +38,7 @@ export function validateLicenseCreation(data: LicenseData): string[] {
       if (invoice.dataFatura && invoice.dataAviso) {
         const invoiceDate = new Date(invoice.dataFatura);
         const noticeDate = new Date(invoice.dataAviso);
-        
+
         if (noticeDate < invoiceDate) {
           errors.push(`Fatura ${index + 1}: Data do aviso deve ser posterior à data da fatura`);
         }
@@ -77,7 +77,7 @@ export function validateLicenseUpdate(data: Partial<LicenseData>): string[] {
   if (data.dataInicio && data.dataVencimento) {
     const startDate = new Date(data.dataInicio);
     const endDate = new Date(data.dataVencimento);
-    
+
     if (startDate >= endDate) {
       errors.push('Data de vencimento deve ser posterior à data de início');
     }
@@ -140,7 +140,7 @@ export function sanitizeLicenseData(data: Partial<LicenseData>): Partial<License
   // First sanitize relation fields using the centralized utility
   // Requirements: 1.4 - Allow null/empty relation IDs for optional relationships
   const sanitizedRelations = sanitizeRelationFields('licenses', data);
-  
+
   return {
     ...sanitizedRelations,
     clientName: data.clientName?.trim() || undefined,
@@ -149,11 +149,12 @@ export function sanitizeLicenseData(data: Partial<LicenseData>): Partial<License
     modalidade: data.modalidade?.trim() || undefined,
     duracaoContrato: data.duracaoContrato?.trim() || undefined,
     software: data.software ? sanitizeSoftwareData(data.software) : undefined,
-    invoices: data.invoices?.map(invoice => ({
-      ...invoice,
-      ano: invoice.ano?.trim() || undefined,
-      numeroFatura: invoice.numeroFatura?.trim() || undefined
-    })) || undefined
+    invoices:
+      data.invoices?.map(invoice => ({
+        ...invoice,
+        ano: invoice.ano?.trim() || undefined,
+        numeroFatura: invoice.numeroFatura?.trim() || undefined,
+      })) || undefined,
   } as Partial<LicenseData>;
 }
 
@@ -174,7 +175,7 @@ function sanitizeSoftwareData(software: Partial<LicenseSoftware>): Partial<Licen
     numeroSerie: software.numeroSerie?.trim() || undefined,
     versaoSoftware: software.versaoSoftware?.trim() || undefined,
     versaoLicenca: software.versaoLicenca?.trim() || undefined,
-    modules: software.modules || []
+    modules: software.modules || [],
   };
 }
 

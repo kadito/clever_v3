@@ -34,51 +34,51 @@
               @change="onClienteChange"
             />
           </div>
-          
+
           <div class="form-group">
             <label for="nome">NOME *</label>
-            <input 
-              type="text" 
-              id="nome" 
-              v-model="form.nome" 
+            <input
+              type="text"
+              id="nome"
+              v-model="form.nome"
               class="form-control"
               readonly
               required
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="nomeComercial">NOME COMERCIAL *</label>
-            <input 
-              type="text" 
-              id="nomeComercial" 
-              v-model="form.nomeComercial" 
+            <input
+              type="text"
+              id="nomeComercial"
+              v-model="form.nomeComercial"
               class="form-control"
               readonly
               required
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="nomeSocial">NOME SOCIAL</label>
-            <input 
-              type="text" 
-              id="nomeSocial" 
-              v-model="form.nomeSocial" 
+            <input
+              type="text"
+              id="nomeSocial"
+              v-model="form.nomeSocial"
               class="form-control"
               readonly
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="contribuinte">CONTRIBUINTE</label>
-            <input 
-              type="text" 
-              id="contribuinte" 
-              v-model="form.contribuinte" 
+            <input
+              type="text"
+              id="contribuinte"
+              v-model="form.contribuinte"
               class="form-control"
               readonly
-            >
+            />
           </div>
         </div>
       </section>
@@ -89,31 +89,19 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="contacto">CONTACTO</label>
-            <input 
-              type="tel" 
-              id="contacto" 
-              v-model="form.contacto" 
-              class="form-control"
-              readonly
-            >
+            <input type="tel" id="contacto" v-model="form.contacto" class="form-control" readonly />
           </div>
-          
+
           <div class="form-group">
             <label for="email">E-MAIL</label>
-            <input 
-              type="email" 
-              id="email" 
-              v-model="form.email" 
-              class="form-control"
-              readonly
-            >
+            <input type="email" id="email" v-model="form.email" class="form-control" readonly />
           </div>
-          
+
           <div class="form-group full-width">
             <label for="morada">MORADA</label>
-            <textarea 
-              id="morada" 
-              v-model="form.morada" 
+            <textarea
+              id="morada"
+              v-model="form.morada"
               class="form-control"
               rows="2"
               readonly
@@ -125,33 +113,35 @@
       <!-- Contract Plan Section -->
       <section class="form-section">
         <h2>PLANOS DE CONTRATO</h2>
-        <p class="section-note">O cliente pode ter um ou ambos os tipos de contrato (CPA e/ou S&H)</p>
-        
+        <p class="section-note">
+          O cliente pode ter um ou ambos os tipos de contrato (CPA e/ou S&H)
+        </p>
+
         <!-- CPA Contract Plan -->
         <div class="contract-type-section">
           <div class="contract-type-header">
             <h3>CPA - Cashlogy</h3>
             <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                id="hasCPA" 
+              <input
+                type="checkbox"
+                id="hasCPA"
                 v-model="form.hasCPAContract"
                 class="toggle-input"
                 @change="onCPAToggle"
-              >
+              />
               <label for="hasCPA" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
             </div>
           </div>
-          
+
           <div v-if="form.hasCPAContract" class="contract-type-content">
             <div class="form-grid">
               <div class="form-group">
                 <label for="cpaContractType">TIPO DE CONTRATO CPA *</label>
-                <select 
-                  id="cpaContractType" 
-                  v-model="form.cpaContractType" 
+                <select
+                  id="cpaContractType"
+                  v-model="form.cpaContractType"
                   class="form-control"
                   :required="form.hasCPAContract"
                   @change="onCPAContractTypeChange"
@@ -161,32 +151,28 @@
                   <option value="CPA_1500">CPA - Cashlogy (1500)</option>
                 </select>
               </div>
-              
+
               <div class="form-group" v-if="form.cpaContractType">
                 <label for="planIdCPA">PLANO CPA *</label>
-                <select 
-                  id="planIdCPA" 
-                  v-model="form.planIdCPA" 
+                <select
+                  id="planIdCPA"
+                  v-model="form.planIdCPA"
                   class="form-control"
                   :required="form.hasCPAContract"
                   @change="onCPAPlanChange"
                 >
                   <option value="">Selecione o plano...</option>
-                  <option 
-                    v-for="plan in availableCPAPlans" 
-                    :key="plan.id" 
-                    :value="plan.id"
-                  >
+                  <option v-for="plan in availableCPAPlans" :key="plan.id" :value="plan.id">
                     {{ plan.name }}
                   </option>
                 </select>
               </div>
-              
+
               <div class="form-group" v-if="form.planIdCPA && form.cpaContractType === 'CPA'">
                 <label for="distanceCPA">DISTÂNCIA *</label>
-                <select 
-                  id="distanceCPA" 
-                  v-model="form.distanceCPA" 
+                <select
+                  id="distanceCPA"
+                  v-model="form.distanceCPA"
                   class="form-control"
                   :required="form.hasCPAContract && form.cpaContractType === 'CPA'"
                   @change="onCPADistanceChange"
@@ -197,86 +183,85 @@
                 </select>
               </div>
             </div>
-            
+
             <!-- CPA Equipment Information -->
             <div class="equipment-info-section">
               <div class="equipment-header">
                 <h5>Equipamentos CPA</h5>
-                <button 
-                  type="button" 
-                  @click="addCPAEquipment" 
-                  class="btn btn-add-equipment"
-                >
+                <button type="button" @click="addCPAEquipment" class="btn btn-add-equipment">
                   ➕ Adicionar Equipamento
                 </button>
               </div>
-              
+
               <div class="equipment-note" v-if="form.cpaEquipments.length > 0">
                 <span class="note-icon">ℹ️</span>
-                <span>O desconto aplica-se apenas aos equipamentos adicionais (2º, 3º, etc.). O primeiro equipamento não tem desconto.</span>
+                <span
+                  >O desconto aplica-se apenas aos equipamentos adicionais (2º, 3º, etc.). O
+                  primeiro equipamento não tem desconto.</span
+                >
               </div>
-              
+
               <!-- Equipment Cards -->
-              <div 
-                v-for="(equipment, index) in form.cpaEquipments" 
+              <div
+                v-for="(equipment, index) in form.cpaEquipments"
                 :key="equipment.id"
                 class="equipment-card"
               >
                 <div class="equipment-card-header">
                   <h6>Equipamento {{ index + 1 }}</h6>
-                  <button 
-                    type="button" 
-                    @click="removeCPAEquipment(index)" 
+                  <button
+                    type="button"
+                    @click="removeCPAEquipment(index)"
                     class="btn btn-remove-equipment"
                     v-if="form.cpaEquipments.length > 1"
                   >
                     ❌
                   </button>
                 </div>
-                
+
                 <div class="form-grid">
                   <div class="form-group">
                     <label :for="`modeloCPA-${equipment.id}`">MODELO</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       :id="`modeloCPA-${equipment.id}`"
-                      v-model="equipment.modelo" 
+                      v-model="equipment.modelo"
                       class="form-control"
                       placeholder="Ex: GEST 15"
-                    >
+                    />
                   </div>
-                  
+
                   <div class="form-group">
                     <label :for="`numeroSerieCPA-${equipment.id}`">Nº SÉRIE</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       :id="`numeroSerieCPA-${equipment.id}`"
-                      v-model="equipment.numeroSerie" 
+                      v-model="equipment.numeroSerie"
                       class="form-control"
                       placeholder="Ex: 1234567"
-                    >
+                    />
                   </div>
-                  
+
                   <!-- Discount only for 2nd equipment onwards (N+1) -->
                   <div class="form-group" v-if="index > 0">
                     <label :for="`descontoCPA-${equipment.id}`">DESCONTO (%)</label>
-                    <input 
-                      type="number" 
+                    <input
+                      type="number"
                       :id="`descontoCPA-${equipment.id}`"
-                      v-model.number="equipment.desconto" 
+                      v-model.number="equipment.desconto"
                       class="form-control"
                       placeholder="0"
                       min="0"
                       max="100"
                       step="0.01"
-                    >
+                    />
                   </div>
-                  
+
                   <div class="form-group" :class="{ 'full-width-field': index === 0 }">
                     <label :for="`observacoesCPA-${equipment.id}`">OBSERVAÇÕES</label>
-                    <textarea 
+                    <textarea
                       :id="`observacoesCPA-${equipment.id}`"
-                      v-model="equipment.observacoes" 
+                      v-model="equipment.observacoes"
                       class="form-control"
                       placeholder="Observações sobre este equipamento..."
                       rows="2"
@@ -284,46 +269,51 @@
                   </div>
                 </div>
               </div>
-              
+
               <!-- Empty state -->
               <div v-if="form.cpaEquipments.length === 0" class="no-equipment-message">
                 Nenhum equipamento adicionado. Clique em "Adicionar Equipamento" para começar.
               </div>
             </div>
-            
+
             <!-- CPA Contract Dates -->
             <div class="equipment-info-section">
               <h5>Datas do Contrato</h5>
               <div class="form-grid">
                 <div class="form-group">
                   <label for="inicioContratoCPA">INÍCIO DE CONTRATO</label>
-                  <input 
-                    type="date" 
-                    id="inicioContratoCPA" 
-                    v-model="form.inicioContratoCPA" 
+                  <input
+                    type="date"
+                    id="inicioContratoCPA"
+                    v-model="form.inicioContratoCPA"
                     class="form-control"
-                  >
+                  />
                 </div>
-                
+
                 <div class="form-group">
                   <label for="fimContratoCPA">FIM DE CONTRATO</label>
-                  <input 
-                    type="date" 
-                    id="fimContratoCPA" 
-                    v-model="form.fimContratoCPA" 
+                  <input
+                    type="date"
+                    id="fimContratoCPA"
+                    v-model="form.fimContratoCPA"
                     class="form-control"
-                  >
+                  />
                 </div>
               </div>
             </div>
-            
+
             <!-- CPA Plan Details Display -->
-            <div v-if="selectedCPAPlanDetails && (form.cpaContractType === 'CPA_1500' || form.distanceCPA)" class="plan-details-card">
+            <div
+              v-if="
+                selectedCPAPlanDetails && (form.cpaContractType === 'CPA_1500' || form.distanceCPA)
+              "
+              class="plan-details-card"
+            >
               <h4>{{ selectedCPAPlanDetails.name }}</h4>
               <div class="plan-description">
                 {{ selectedCPAPlanDetails.description }}
               </div>
-              
+
               <div class="plan-features">
                 <div class="feature-item">
                   <span class="feature-icon">🔧</span>
@@ -343,12 +333,19 @@
                 </div>
                 <div class="feature-item" v-if="selectedCPAPlanDetails.additionalPackage">
                   <span class="feature-icon">📦</span>
-                  <span>{{ selectedCPAPlanDetails.additionalPackage.description }} (+{{ formatPrice(selectedCPAPlanDetails.additionalPackage.price) }})</span>
+                  <span
+                    >{{ selectedCPAPlanDetails.additionalPackage.description }} (+{{
+                      formatPrice(selectedCPAPlanDetails.additionalPackage.price)
+                    }})</span
+                  >
                 </div>
               </div>
-              
+
               <!-- POS Assistance Package (only for CPA_1500 PREMIUM) -->
-              <div v-if="form.cpaContractType === 'CPA_1500' && form.planIdCPA === 'cpa_1500_premium'" class="pos-package-section">
+              <div
+                v-if="form.cpaContractType === 'CPA_1500' && form.planIdCPA === 'cpa_1500_premium'"
+                class="pos-package-section"
+              >
                 <div class="pos-package-header">
                   <div class="pos-package-info">
                     <span class="feature-icon">📦</span>
@@ -358,26 +355,26 @@
                     </div>
                   </div>
                   <div class="toggle-switch">
-                    <input 
-                      type="checkbox" 
-                      id="hasPOSPackage" 
+                    <input
+                      type="checkbox"
+                      id="hasPOSPackage"
                       v-model="form.hasPOSPackage"
                       class="toggle-input"
-                    >
+                    />
                     <label for="hasPOSPackage" class="toggle-label">
                       <span class="toggle-slider"></span>
                     </label>
                   </div>
                 </div>
               </div>
-              
+
               <div class="plan-pricing">
                 <h5>Selecione a Modalidade de Pagamento:</h5>
                 <div class="pricing-grid">
                   <button
                     type="button"
                     class="price-item"
-                    :class="{ 'selected': form.modalidadePagamentoCPA === 'MENSAL' }"
+                    :class="{ selected: form.modalidadePagamentoCPA === 'MENSAL' }"
                     @click="selectCPAPaymentMethod('MENSAL')"
                   >
                     <span class="price-label">Mensal</span>
@@ -386,7 +383,7 @@
                   <button
                     type="button"
                     class="price-item"
-                    :class="{ 'selected': form.modalidadePagamentoCPA === 'TRIMESTRAL' }"
+                    :class="{ selected: form.modalidadePagamentoCPA === 'TRIMESTRAL' }"
                     @click="selectCPAPaymentMethod('TRIMESTRAL')"
                     v-if="getCPAPrice('quarterly')"
                   >
@@ -396,7 +393,7 @@
                   <button
                     type="button"
                     class="price-item"
-                    :class="{ 'selected': form.modalidadePagamentoCPA === 'SEMESTRAL' }"
+                    :class="{ selected: form.modalidadePagamentoCPA === 'SEMESTRAL' }"
                     @click="selectCPAPaymentMethod('SEMESTRAL')"
                     v-if="getCPAPrice('semiannual')"
                   >
@@ -406,7 +403,7 @@
                   <button
                     type="button"
                     class="price-item"
-                    :class="{ 'selected': form.modalidadePagamentoCPA === 'ANUAL' }"
+                    :class="{ selected: form.modalidadePagamentoCPA === 'ANUAL' }"
                     @click="selectCPAPaymentMethod('ANUAL')"
                   >
                     <span class="price-label">Anual</span>
@@ -417,52 +414,52 @@
             </div>
           </div>
         </div>
-        
+
         <!-- S&H Contract Plan -->
         <div class="contract-type-section">
           <div class="contract-type-header">
             <h3>S&H - Software e Hardware</h3>
             <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                id="hasSH" 
+              <input
+                type="checkbox"
+                id="hasSH"
                 v-model="form.hasSHContract"
                 class="toggle-input"
                 @change="onSHToggle"
-              >
+              />
               <label for="hasSH" class="toggle-label">
                 <span class="toggle-slider"></span>
               </label>
             </div>
           </div>
-          
+
           <div v-if="form.hasSHContract" class="contract-type-content">
             <div class="form-grid">
               <div class="form-group">
                 <label for="planIdSH">PLANO S&H *</label>
-                <select 
-                  id="planIdSH" 
-                  v-model="form.planIdSH" 
+                <select
+                  id="planIdSH"
+                  v-model="form.planIdSH"
                   class="form-control"
                   :required="form.hasSHContract"
                   @change="onSHPlanChange"
                 >
                   <option value="">Selecione o plano...</option>
-                  <option 
-                    v-for="plan in contractPlans['S&H'].plans" 
-                    :key="plan.id" 
+                  <option
+                    v-for="plan in contractPlans['S&H'].plans"
+                    :key="plan.id"
                     :value="plan.id"
                   >
                     {{ plan.name }}
                   </option>
                 </select>
               </div>
-              
+
               <div class="form-group" v-if="form.planIdSH">
                 <label for="distanceSH">DISTÂNCIA *</label>
-                <select 
-                  id="distanceSH" 
-                  v-model="form.distanceSH" 
+                <select
+                  id="distanceSH"
+                  v-model="form.distanceSH"
                   class="form-control"
                   :required="form.hasSHContract"
                   @change="onSHDistanceChange"
@@ -473,79 +470,79 @@
                 </select>
               </div>
             </div>
-            
+
             <!-- S&H Equipment Information -->
             <div class="equipment-info-section">
               <h5>Informação do Equipamento</h5>
               <div class="form-grid">
                 <div class="form-group">
                   <label for="modeloPSO">MODELO</label>
-                  <input 
-                    type="text" 
-                    id="modeloPSO" 
-                    v-model="form.modeloPSO" 
+                  <input
+                    type="text"
+                    id="modeloPSO"
+                    v-model="form.modeloPSO"
                     class="form-control"
                     placeholder="Ex: Dell Optiplex 7090"
-                  >
+                  />
                 </div>
-                
+
                 <div class="form-group">
                   <label for="numeroSeriePSO">Nº SÉRIE</label>
-                  <input 
-                    type="text" 
-                    id="numeroSeriePSO" 
-                    v-model="form.numeroSeriePSO" 
+                  <input
+                    type="text"
+                    id="numeroSeriePSO"
+                    v-model="form.numeroSeriePSO"
                     class="form-control"
                     placeholder="Ex: ABC123456"
-                  >
+                  />
                 </div>
-                
+
                 <div class="form-group">
                   <label for="softwarePSO">SOFTWARE</label>
-                  <input 
-                    type="text" 
-                    id="softwarePSO" 
-                    v-model="form.softwarePSO" 
+                  <input
+                    type="text"
+                    id="softwarePSO"
+                    v-model="form.softwarePSO"
                     class="form-control"
                     placeholder="Ex: Windows 11 Pro"
-                  >
+                  />
                 </div>
               </div>
             </div>
-            
+
             <!-- S&H Contract Dates -->
             <div class="equipment-info-section">
               <h5>Datas do Contrato</h5>
               <div class="form-grid">
                 <div class="form-group">
                   <label for="inicioContratoSH">INÍCIO DE CONTRATO</label>
-                  <input 
-                    type="date" 
-                    id="inicioContratoSH" 
-                    v-model="form.inicioContratoSH" 
+                  <input
+                    type="date"
+                    id="inicioContratoSH"
+                    v-model="form.inicioContratoSH"
                     class="form-control"
-                  >
+                  />
                 </div>
-                
+
                 <div class="form-group">
                   <label for="fimContratoSH">FIM DE CONTRATO</label>
-                  <input 
-                    type="date" 
-                    id="fimContratoSH" 
-                    v-model="form.fimContratoSH" 
+                  <input
+                    type="date"
+                    id="fimContratoSH"
+                    v-model="form.fimContratoSH"
                     class="form-control"
-                  >
+                  />
                 </div>
               </div>
             </div>
-            
+
             <!-- S&H Plan Details Display -->
             <div v-if="selectedSHPlanDetails && form.distanceSH" class="plan-details-card">
               <h4>{{ selectedSHPlanDetails.name }}</h4>
               <div class="plan-description">
                 {{ selectedSHPlanDetails.description }}
               </div>
-              
+
               <div class="plan-features">
                 <div class="feature-item">
                   <span class="feature-icon">⏱️</span>
@@ -553,7 +550,11 @@
                 </div>
                 <div class="feature-item">
                   <span class="feature-icon">🚗</span>
-                  <span>{{ selectedSHPlanDetails.displacementsIncluded === 'ilimitadas' ? 'Deslocações ilimitadas' : `${selectedSHPlanDetails.displacementsIncluded} deslocações incluídas` }}</span>
+                  <span>{{
+                    selectedSHPlanDetails.displacementsIncluded === 'ilimitadas'
+                      ? 'Deslocações ilimitadas'
+                      : `${selectedSHPlanDetails.displacementsIncluded} deslocações incluídas`
+                  }}</span>
                 </div>
                 <div class="feature-item">
                   <span class="feature-icon">💻</span>
@@ -572,14 +573,14 @@
                   <span>Gestor de conta dedicado</span>
                 </div>
               </div>
-              
+
               <div class="plan-pricing">
                 <h5>Selecione a Modalidade de Pagamento:</h5>
                 <div class="pricing-grid">
                   <button
                     type="button"
                     class="price-item"
-                    :class="{ 'selected': form.modalidadePagamentoSH === 'MENSAL' }"
+                    :class="{ selected: form.modalidadePagamentoSH === 'MENSAL' }"
                     @click="selectSHPaymentMethod('MENSAL')"
                   >
                     <span class="price-label">Mensal</span>
@@ -588,7 +589,7 @@
                   <button
                     type="button"
                     class="price-item"
-                    :class="{ 'selected': form.modalidadePagamentoSH === 'TRIMESTRAL' }"
+                    :class="{ selected: form.modalidadePagamentoSH === 'TRIMESTRAL' }"
                     @click="selectSHPaymentMethod('TRIMESTRAL')"
                   >
                     <span class="price-label">Trimestral</span>
@@ -597,7 +598,7 @@
                   <button
                     type="button"
                     class="price-item"
-                    :class="{ 'selected': form.modalidadePagamentoSH === 'ANUAL' }"
+                    :class="{ selected: form.modalidadePagamentoSH === 'ANUAL' }"
                     @click="selectSHPaymentMethod('ANUAL')"
                   >
                     <span class="price-label">Anual</span>
@@ -608,7 +609,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Warning if no contract type selected -->
         <div v-if="!form.hasCPAContract && !form.hasSHContract" class="warning-message">
           ⚠️ Selecione pelo menos um tipo de contrato (CPA e/ou S&H)
@@ -621,11 +622,7 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="metodoPagamento">MÉTODO DE PAGAMENTO</label>
-            <select 
-              id="metodoPagamento" 
-              v-model="form.metodoPagamento" 
-              class="form-control"
-            >
+            <select id="metodoPagamento" v-model="form.metodoPagamento" class="form-control">
               <option value="">Selecione o método...</option>
               <option value="TRANSFERENCIA_BANCARIA">Transferência Bancária</option>
               <option value="DEBITO_DIRETO">Débito Direto</option>
@@ -640,9 +637,7 @@
 
       <!-- Form Actions -->
       <div class="form-actions">
-        <button type="button" @click="navigateBack" class="btn btn-secondary">
-          Cancelar
-        </button>
+        <button type="button" @click="navigateBack" class="btn btn-secondary">Cancelar</button>
         <button type="submit" class="btn btn-primary" :disabled="!validateForm()">
           {{ isEditing ? 'Atualizar' : 'Criar' }} Contrato
         </button>
@@ -652,31 +647,31 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
-import ClienteSearchSelect from '@/components/ClienteSearchSelect.vue'
-import { useContratosStore } from '@/stores/contratos.js'
-import { useClientesStore } from '@/stores/clientes.js'
-import contractPlans from '@/config/contract-plans.json'
+import { ref, reactive, computed, onMounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
+import ClienteSearchSelect from '@/components/ClienteSearchSelect.vue';
+import { useContratosStore } from '@/stores/contratos.js';
+import { useClientesStore } from '@/stores/clientes.js';
+import contractPlans from '@/config/contract-plans.json';
 
 // Router
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
 // Store
-const store = useContratosStore()
-const { loading, error, selectedContrato, currentYear } = storeToRefs(store)
-const { fetchContratoById, clearError } = store
+const store = useContratosStore();
+const { loading, error, selectedContrato, currentYear } = storeToRefs(store);
+const { fetchContratoById, clearError } = store;
 
 // Clients store
-const clientesStore = useClientesStore()
-const { clientes } = storeToRefs(clientesStore)
-const { fetchClientes, fetchClienteById } = clientesStore
+const clientesStore = useClientesStore();
+const { clientes } = storeToRefs(clientesStore);
+const { fetchClientes, fetchClienteById } = clientesStore;
 
 // Determine if we're editing or creating
-const isEditing = computed(() => !!route.params.id)
+const isEditing = computed(() => !!route.params.id);
 
 // Default form structure
 const defaultForm = {
@@ -718,93 +713,93 @@ const defaultForm = {
   horasAssistenciaAnual: 0,
   deslocacoesPorAno: 0,
   manutencoesPorAno: 0,
-  metodoPagamento: ''
-}
+  metodoPagamento: '',
+};
 
 // Form state
-const form = reactive({ ...defaultForm })
+const form = reactive({ ...defaultForm });
 
 // Computed properties for plan selection
 const availableCPAPlans = computed(() => {
-  if (!form.cpaContractType) return []
-  return contractPlans[form.cpaContractType]?.plans || []
-})
+  if (!form.cpaContractType) return [];
+  return contractPlans[form.cpaContractType]?.plans || [];
+});
 
 const selectedCPAPlanDetails = computed(() => {
-  if (!form.planIdCPA || !form.cpaContractType) return null
-  const plans = contractPlans[form.cpaContractType]?.plans || []
-  return plans.find(plan => plan.id === form.planIdCPA)
-})
+  if (!form.planIdCPA || !form.cpaContractType) return null;
+  const plans = contractPlans[form.cpaContractType]?.plans || [];
+  return plans.find(plan => plan.id === form.planIdCPA);
+});
 
 const selectedSHPlanDetails = computed(() => {
-  if (!form.planIdSH) return null
-  const plans = contractPlans['S&H']?.plans || []
-  return plans.find(plan => plan.id === form.planIdSH)
-})
+  if (!form.planIdSH) return null;
+  const plans = contractPlans['S&H']?.plans || [];
+  return plans.find(plan => plan.id === form.planIdSH);
+});
 
 // Computed properties
 const cancelRoute = computed(() => {
   if (isEditing.value) {
-    return `/contratos/${route.params.id}?year=${route.query.year || currentYear.value}`
+    return `/contratos/${route.params.id}?year=${route.query.year || currentYear.value}`;
   } else {
-    return '/contratos/list'
+    return '/contratos/list';
   }
-})
+});
 
 // Methods
 const loadContratoData = async () => {
   if (isEditing.value) {
     try {
-      const year = route.query.year || currentYear.value
-      const id = route.params.id
-      
-      console.log('Loading contrato data for edit:', { id, year })
-      
+      const year = route.query.year || currentYear.value;
+      const id = route.params.id;
+
+      console.log('Loading contrato data for edit:', { id, year });
+
       // Clear any previous data
-      selectedContrato.value = null
-      
+      selectedContrato.value = null;
+
       try {
         // Try the store method first
-        await fetchContratoById(year, id)
-        console.log('Contrato fetched via store, selectedContrato:', selectedContrato.value)
+        await fetchContratoById(year, id);
+        console.log('Contrato fetched via store, selectedContrato:', selectedContrato.value);
       } catch (storeError) {
-        console.warn('Store method failed, trying direct API call:', storeError)
-        
+        console.warn('Store method failed, trying direct API call:', storeError);
+
         // Fallback to direct API call
-        const response = await fetch(`/api/contratos/${year}/${id}`)
+        const response = await fetch(`/api/contratos/${year}/${id}`);
         if (!response.ok) {
-          throw new Error(`API request failed with status ${response.status}`)
+          throw new Error(`API request failed with status ${response.status}`);
         }
-        
-        const contrato = await response.json()
-        console.log('Contrato fetched via direct API:', contrato)
-        
+
+        const contrato = await response.json();
+        console.log('Contrato fetched via direct API:', contrato);
+
         // Manually set the selectedContrato
-        selectedContrato.value = contrato
+        selectedContrato.value = contrato;
       }
     } catch (err) {
-      console.error('Failed to load contrato data:', err)
-      router.push('/contratos/list')
+      console.error('Failed to load contrato data:', err);
+      router.push('/contratos/list');
     }
   }
-}
+};
 
 // Function to populate form with selected contrato data
 const populateFormFromSelectedContrato = async () => {
-  if (!selectedContrato.value || !isEditing.value) return
-  
-  console.log('Populating form with data:', selectedContrato.value)
-  
+  if (!selectedContrato.value || !isEditing.value) return;
+
+  console.log('Populating form with data:', selectedContrato.value);
+
   // Reset form to defaults first
-  Object.assign(form, JSON.parse(JSON.stringify(defaultForm)))
-  
+  Object.assign(form, JSON.parse(JSON.stringify(defaultForm)));
+
   // Populate with selected contrato data
   Object.keys(form).forEach(key => {
     if (selectedContrato.value[key] !== undefined) {
-      form[key] = selectedContrato.value[key]
+      form[key] = selectedContrato.value[key];
     }
-  })
-  
+  });
+
   // Handle CPA equipment migration from old format to new format
   if (selectedContrato.value.cpaEquipments && Array.isArray(selectedContrato.value.cpaEquipments)) {
     // New format: use the array directly, ensuring first equipment has 0 discount
@@ -812,344 +807,355 @@ const populateFormFromSelectedContrato = async () => {
       id: eq.id || Date.now() + Math.random(),
       modelo: eq.modelo || '',
       numeroSerie: eq.numeroSerie || '',
-      desconto: index === 0 ? 0 : (eq.desconto || 0), // First equipment always 0%
-      observacoes: eq.observacoes || ''
-    }))
+      desconto: index === 0 ? 0 : eq.desconto || 0, // First equipment always 0%
+      observacoes: eq.observacoes || '',
+    }));
   } else if (selectedContrato.value.modeloCPA || selectedContrato.value.numeroSerieCPA) {
     // Old format: migrate single equipment to array (first equipment = 0% discount)
-    form.cpaEquipments = [{
-      id: Date.now(),
-      modelo: selectedContrato.value.modeloCPA || '',
-      numeroSerie: selectedContrato.value.numeroSerieCPA || '',
-      desconto: 0, // First equipment always 0%
-      observacoes: ''
-    }]
+    form.cpaEquipments = [
+      {
+        id: Date.now(),
+        modelo: selectedContrato.value.modeloCPA || '',
+        numeroSerie: selectedContrato.value.numeroSerieCPA || '',
+        desconto: 0, // First equipment always 0%
+        observacoes: '',
+      },
+    ];
   } else if (form.hasCPAContract) {
     // No equipment data but has CPA contract: initialize with one empty equipment
-    form.cpaEquipments = [{
-      id: Date.now(),
-      modelo: '',
-      numeroSerie: '',
-      desconto: 0, // First equipment always 0%
-      observacoes: ''
-    }]
+    form.cpaEquipments = [
+      {
+        id: Date.now(),
+        modelo: '',
+        numeroSerie: '',
+        desconto: 0, // First equipment always 0%
+        observacoes: '',
+      },
+    ];
   }
-  
+
   // Set clienteId and clienteName from contrato
   if (selectedContrato.value.clienteId) {
-    form.clienteId = selectedContrato.value.clienteId
-    form.clienteName = selectedContrato.value.clienteName || ''
-    form.selectedClienteId = selectedContrato.value.clienteId
-    
+    form.clienteId = selectedContrato.value.clienteId;
+    form.clienteName = selectedContrato.value.clienteName || '';
+    form.selectedClienteId = selectedContrato.value.clienteId;
+
     // Fetch cliente data to populate form fields
     try {
-      const cliente = await fetchClienteById(selectedContrato.value.clienteId)
+      const cliente = await fetchClienteById(selectedContrato.value.clienteId);
       if (cliente) {
         // Populate read-only display fields from client data
-        form.nome = cliente.nomeComercial || cliente.nomeEmpresa || ''
-        form.nomeComercial = cliente.nomeComercial || ''
-        form.nomeSocial = cliente.nomeEmpresa || ''
-        form.contribuinte = cliente.contribuinte || ''
-        
+        form.nome = cliente.nomeComercial || cliente.nomeEmpresa || '';
+        form.nomeComercial = cliente.nomeComercial || '';
+        form.nomeSocial = cliente.nomeEmpresa || '';
+        form.contribuinte = cliente.contribuinte || '';
+
         // Populate contact fields from client data (read-only)
-        form.contacto = cliente.telefoneContato || cliente.telefone || ''
-        form.email = cliente.email || ''
-        form.morada = cliente.morada || ''
+        form.contacto = cliente.telefoneContato || cliente.telefone || '';
+        form.email = cliente.email || '';
+        form.morada = cliente.morada || '';
       }
     } catch (err) {
-      console.error('Error fetching cliente data:', err)
+      console.error('Error fetching cliente data:', err);
       // If cliente fetch fails, use data from contrato if available
       if (selectedContrato.value.clienteName) {
-        form.nome = selectedContrato.value.clienteName
-        form.nomeComercial = selectedContrato.value.clienteName
+        form.nome = selectedContrato.value.clienteName;
+        form.nomeComercial = selectedContrato.value.clienteName;
       }
     }
   } else {
     // Fallback: Try to find the matching client by name if clienteId is missing
     if (selectedContrato.value.clienteName && clientes.value.length > 0) {
-      const matchingCliente = clientes.value.find(c => 
-        (c.nomeComercial && c.nomeComercial === selectedContrato.value.clienteName) ||
-        (c.nomeEmpresa && c.nomeEmpresa === selectedContrato.value.clienteName)
-      )
+      const matchingCliente = clientes.value.find(
+        c =>
+          (c.nomeComercial && c.nomeComercial === selectedContrato.value.clienteName) ||
+          (c.nomeEmpresa && c.nomeEmpresa === selectedContrato.value.clienteName)
+      );
       if (matchingCliente) {
-        form.selectedClienteId = matchingCliente.id
-        form.clienteId = matchingCliente.id
-        form.clienteName = matchingCliente.nomeComercial || matchingCliente.nomeEmpresa || ''
-        
+        form.selectedClienteId = matchingCliente.id;
+        form.clienteId = matchingCliente.id;
+        form.clienteName = matchingCliente.nomeComercial || matchingCliente.nomeEmpresa || '';
+
         // Populate form fields from matching cliente
-        form.nome = matchingCliente.nomeComercial || matchingCliente.nomeEmpresa || ''
-        form.nomeComercial = matchingCliente.nomeComercial || ''
-        form.nomeSocial = matchingCliente.nomeEmpresa || ''
-        form.contribuinte = matchingCliente.contribuinte || ''
-        form.contacto = matchingCliente.telefoneContato || matchingCliente.telefone || ''
-        form.email = matchingCliente.email || ''
-        form.morada = matchingCliente.morada || ''
+        form.nome = matchingCliente.nomeComercial || matchingCliente.nomeEmpresa || '';
+        form.nomeComercial = matchingCliente.nomeComercial || '';
+        form.nomeSocial = matchingCliente.nomeEmpresa || '';
+        form.contribuinte = matchingCliente.contribuinte || '';
+        form.contacto = matchingCliente.telefoneContato || matchingCliente.telefone || '';
+        form.email = matchingCliente.email || '';
+        form.morada = matchingCliente.morada || '';
       }
     }
   }
-  
-  console.log('Form populated with data:', form)
-}
+
+  console.log('Form populated with data:', form);
+};
 
 // Method to handle client selection
-const onClienteChange = (cliente) => {
+const onClienteChange = cliente => {
   if (cliente && form.selectedClienteId) {
     // Store the client ID and name (for list display)
-    form.clienteId = cliente.id
-    form.clienteName = cliente.nomeComercial || ''
-    
+    form.clienteId = cliente.id;
+    form.clienteName = cliente.nomeComercial || '';
+
     // Populate read-only display fields from client data
-    form.nome = cliente.nomeComercial || ''
-    form.nomeComercial = cliente.nomeComercial || ''
-    form.nomeSocial = cliente.nomeEmpresa || ''
-    form.contribuinte = cliente.contribuinte || ''
-    
+    form.nome = cliente.nomeComercial || '';
+    form.nomeComercial = cliente.nomeComercial || '';
+    form.nomeSocial = cliente.nomeEmpresa || '';
+    form.contribuinte = cliente.contribuinte || '';
+
     // Populate contact fields from client data (read-only)
-    form.contacto = cliente.telefoneContato || cliente.telefone || ''
-    form.email = cliente.email || ''
-    form.morada = cliente.morada || ''
+    form.contacto = cliente.telefoneContato || cliente.telefone || '';
+    form.email = cliente.email || '';
+    form.morada = cliente.morada || '';
   } else {
     // Clear all fields when no client is selected
-    form.clienteId = ''
-    form.clienteName = ''
-    form.nome = ''
-    form.nomeComercial = ''
-    form.nomeSocial = ''
-    form.contribuinte = ''
-    form.contacto = ''
-    form.email = ''
-    form.morada = ''
+    form.clienteId = '';
+    form.clienteName = '';
+    form.nome = '';
+    form.nomeComercial = '';
+    form.nomeSocial = '';
+    form.contribuinte = '';
+    form.contacto = '';
+    form.email = '';
+    form.morada = '';
   }
-}
+};
 
 // Handle CPA contract toggle
 const onCPAToggle = () => {
   if (!form.hasCPAContract) {
-    form.cpaContractType = ''
-    form.planIdCPA = ''
-    form.planoCPA = ''
-    form.distanceCPA = ''
-    form.modalidadePagamentoCPA = ''
-    form.manutencoesPorAno = 0
-    form.cpaEquipments = []
+    form.cpaContractType = '';
+    form.planIdCPA = '';
+    form.planoCPA = '';
+    form.distanceCPA = '';
+    form.modalidadePagamentoCPA = '';
+    form.manutencoesPorAno = 0;
+    form.cpaEquipments = [];
   } else {
     // Initialize with one equipment if enabling CPA contract
     if (form.cpaEquipments.length === 0) {
-      addCPAEquipment()
+      addCPAEquipment();
     }
   }
-}
+};
 
 // Add CPA equipment
 const addCPAEquipment = () => {
-  const isFirstEquipment = form.cpaEquipments.length === 0
+  const isFirstEquipment = form.cpaEquipments.length === 0;
   form.cpaEquipments.push({
     id: Date.now(),
     modelo: '',
     numeroSerie: '',
     desconto: isFirstEquipment ? 0 : 0, // First equipment always has 0% discount
-    observacoes: ''
-  })
-}
+    observacoes: '',
+  });
+};
 
 // Remove CPA equipment
-const removeCPAEquipment = (index) => {
+const removeCPAEquipment = index => {
   if (form.cpaEquipments.length > 1) {
-    form.cpaEquipments.splice(index, 1)
+    form.cpaEquipments.splice(index, 1);
   }
-}
+};
 
 // Handle CPA contract type change
 const onCPAContractTypeChange = () => {
   // Clear plan selection when contract type changes
-  form.planIdCPA = ''
-  form.planoCPA = ''
-  form.distanceCPA = ''
-  form.modalidadePagamentoCPA = ''
-  form.manutencoesPorAno = 0
-  form.hasPOSPackage = false
-}
+  form.planIdCPA = '';
+  form.planoCPA = '';
+  form.distanceCPA = '';
+  form.modalidadePagamentoCPA = '';
+  form.manutencoesPorAno = 0;
+  form.hasPOSPackage = false;
+};
 
 // Handle S&H contract toggle
 const onSHToggle = () => {
   if (!form.hasSHContract) {
-    form.planIdSH = ''
-    form.planoSH = ''
-    form.distanceSH = ''
-    form.modalidadePagamentoSH = ''
-    form.horasAssistenciaAnual = 0
+    form.planIdSH = '';
+    form.planoSH = '';
+    form.distanceSH = '';
+    form.modalidadePagamentoSH = '';
+    form.horasAssistenciaAnual = 0;
   }
-}
+};
 
 // Handle CPA plan selection change
 const onCPAPlanChange = () => {
   if (selectedCPAPlanDetails.value) {
     // Auto-populate fields based on selected CPA plan
-    form.planoCPA = selectedCPAPlanDetails.value.description
-    form.manutencoesPorAno = selectedCPAPlanDetails.value.maintenancePerYear || 0
-    
+    form.planoCPA = selectedCPAPlanDetails.value.description;
+    form.manutencoesPorAno = selectedCPAPlanDetails.value.maintenancePerYear || 0;
+
     // Clear distance and payment method when changing plan
-    form.distanceCPA = ''
-    form.modalidadePagamentoCPA = ''
-    
+    form.distanceCPA = '';
+    form.modalidadePagamentoCPA = '';
+
     // Clear POS package if not CPA_1500 PREMIUM
     if (form.cpaContractType !== 'CPA_1500' || form.planIdCPA !== 'cpa_1500_premium') {
-      form.hasPOSPackage = false
+      form.hasPOSPackage = false;
     }
-    
+
     // Update combined field for backward compatibility
-    updateCombinedPlanoContrato()
+    updateCombinedPlanoContrato();
   }
-}
+};
 
 // Handle CPA distance selection change
 const onCPADistanceChange = () => {
   // Clear payment method when changing distance
-  form.modalidadePagamentoCPA = ''
-}
+  form.modalidadePagamentoCPA = '';
+};
 
 // Handle S&H plan selection change
 const onSHPlanChange = () => {
   if (selectedSHPlanDetails.value) {
     // Auto-populate fields based on selected S&H plan
-    form.planoSH = selectedSHPlanDetails.value.description
-    form.horasAssistenciaAnual = selectedSHPlanDetails.value.hoursPerYear || 0
-    
+    form.planoSH = selectedSHPlanDetails.value.description;
+    form.horasAssistenciaAnual = selectedSHPlanDetails.value.hoursPerYear || 0;
+
     // Calculate displacements (999 for unlimited)
-    const displacements = selectedSHPlanDetails.value.displacementsIncluded === 'ilimitadas' 
-      ? 999 
-      : (selectedSHPlanDetails.value.displacementsIncluded || 0)
-    
+    const displacements =
+      selectedSHPlanDetails.value.displacementsIncluded === 'ilimitadas'
+        ? 999
+        : selectedSHPlanDetails.value.displacementsIncluded || 0;
+
     // Only set displacements if CPA doesn't have a value
     if (!form.hasCPAContract || !form.planIdCPA) {
-      form.deslocacoesPorAno = displacements
+      form.deslocacoesPorAno = displacements;
     }
-    
+
     // Clear distance and payment method when changing plan
-    form.distanceSH = ''
-    form.modalidadePagamentoSH = ''
-    
+    form.distanceSH = '';
+    form.modalidadePagamentoSH = '';
+
     // Update combined field for backward compatibility
-    updateCombinedPlanoContrato()
+    updateCombinedPlanoContrato();
   }
-}
+};
 
 // Handle S&H distance selection change
 const onSHDistanceChange = () => {
   // Clear payment method when changing distance
-  form.modalidadePagamentoSH = ''
-}
+  form.modalidadePagamentoSH = '';
+};
 
 // Handle CPA payment method selection
-const selectCPAPaymentMethod = (method) => {
-  form.modalidadePagamentoCPA = method
-}
+const selectCPAPaymentMethod = method => {
+  form.modalidadePagamentoCPA = method;
+};
 
 // Handle S&H payment method selection
-const selectSHPaymentMethod = (method) => {
-  form.modalidadePagamentoSH = method
-}
+const selectSHPaymentMethod = method => {
+  form.modalidadePagamentoSH = method;
+};
 
 // Update combined planoContrato field (for backward compatibility)
 const updateCombinedPlanoContrato = () => {
-  const parts = []
+  const parts = [];
   if (form.hasCPAContract && form.planoCPA) {
-    parts.push('=== CPA - CASHLOGY ===\n' + form.planoCPA)
+    parts.push('=== CPA - CASHLOGY ===\n' + form.planoCPA);
   }
   if (form.hasSHContract && form.planoSH) {
-    parts.push('=== S&H - SOFTWARE E HARDWARE ===\n' + form.planoSH)
+    parts.push('=== S&H - SOFTWARE E HARDWARE ===\n' + form.planoSH);
   }
-  form.planoContrato = parts.join('\n\n')
-}
+  form.planoContrato = parts.join('\n\n');
+};
 
 // Get CPA price based on distance or direct pricing
-const getCPAPrice = (period) => {
-  if (!selectedCPAPlanDetails.value) return 0
-  
-  let basePrice = 0
-  
+const getCPAPrice = period => {
+  if (!selectedCPAPlanDetails.value) return 0;
+
+  let basePrice = 0;
+
   // CPA_1500 has direct pricing (no distance-based)
   if (form.cpaContractType === 'CPA_1500') {
-    basePrice = selectedCPAPlanDetails.value.prices?.[period] || 0
+    basePrice = selectedCPAPlanDetails.value.prices?.[period] || 0;
   } else {
     // CPA (2023) has distance-based pricing
-    if (!form.distanceCPA) return 0
-    basePrice = selectedCPAPlanDetails.value.prices[form.distanceCPA]?.[period] || 0
+    if (!form.distanceCPA) return 0;
+    basePrice = selectedCPAPlanDetails.value.prices[form.distanceCPA]?.[period] || 0;
   }
-  
+
   // Add POS package cost if selected (only for CPA_1500 PREMIUM)
-  if (form.hasPOSPackage && form.cpaContractType === 'CPA_1500' && form.planIdCPA === 'cpa_1500_premium') {
-    const posPackageAnnualCost = 100
-    let posPackageCost = 0
-    
+  if (
+    form.hasPOSPackage &&
+    form.cpaContractType === 'CPA_1500' &&
+    form.planIdCPA === 'cpa_1500_premium'
+  ) {
+    const posPackageAnnualCost = 100;
+    let posPackageCost = 0;
+
     switch (period) {
       case 'monthly':
-        posPackageCost = posPackageAnnualCost / 12
-        break
+        posPackageCost = posPackageAnnualCost / 12;
+        break;
       case 'quarterly':
-        posPackageCost = posPackageAnnualCost / 4
-        break
+        posPackageCost = posPackageAnnualCost / 4;
+        break;
       case 'semiannual':
-        posPackageCost = posPackageAnnualCost / 2
-        break
+        posPackageCost = posPackageAnnualCost / 2;
+        break;
       case 'annual':
-        posPackageCost = posPackageAnnualCost
-        break
+        posPackageCost = posPackageAnnualCost;
+        break;
     }
-    
-    basePrice += posPackageCost
+
+    basePrice += posPackageCost;
   }
-  
-  return basePrice
-}
+
+  return basePrice;
+};
 
 // Get S&H price based on distance
-const getSHPrice = (period) => {
-  if (!selectedSHPlanDetails.value || !form.distanceSH) return 0
-  return selectedSHPlanDetails.value.prices[form.distanceSH]?.[period] || 0
-}
+const getSHPrice = period => {
+  if (!selectedSHPlanDetails.value || !form.distanceSH) return 0;
+  return selectedSHPlanDetails.value.prices[form.distanceSH]?.[period] || 0;
+};
 
 // Format price for display
-const formatPrice = (price) => {
+const formatPrice = price => {
   return new Intl.NumberFormat('pt-PT', {
     style: 'currency',
-    currency: 'EUR'
-  }).format(price)
-}
+    currency: 'EUR',
+  }).format(price);
+};
 
 const validateForm = () => {
-  const hasBasicInfo = form.selectedClienteId && form.nome && form.nomeComercial
-  const hasAtLeastOneContract = form.hasCPAContract || form.hasSHContract
-  
+  const hasBasicInfo = form.selectedClienteId && form.nome && form.nomeComercial;
+  const hasAtLeastOneContract = form.hasCPAContract || form.hasSHContract;
+
   // CPA validation depends on contract type
-  let cpaValid = true
+  let cpaValid = true;
   if (form.hasCPAContract) {
     if (!form.cpaContractType || !form.planIdCPA || !form.modalidadePagamentoCPA) {
-      cpaValid = false
+      cpaValid = false;
     }
     // Distance is only required for CPA (2023) - not CPA_1500
     if (form.cpaContractType === 'CPA' && !form.distanceCPA) {
-      cpaValid = false
+      cpaValid = false;
     }
     // At least one equipment should be present (but fields can be empty)
     if (!form.cpaEquipments || form.cpaEquipments.length === 0) {
-      cpaValid = false
+      cpaValid = false;
     }
   }
-  
-  const shValid = !form.hasSHContract || (form.planIdSH && form.distanceSH && form.modalidadePagamentoSH)
-  
-  return hasBasicInfo && hasAtLeastOneContract && cpaValid && shValid
-}
+
+  const shValid =
+    !form.hasSHContract || (form.planIdSH && form.distanceSH && form.modalidadePagamentoSH);
+
+  return hasBasicInfo && hasAtLeastOneContract && cpaValid && shValid;
+};
 
 const handleSubmit = async () => {
-  if (!validateForm()) return
-  
+  if (!validateForm()) return;
+
   try {
-    const year = form.inicioContratoCPA ? 
-      new Date(form.inicioContratoCPA).getFullYear() : 
-      new Date().getFullYear()
-    
+    const year = form.inicioContratoCPA
+      ? new Date(form.inicioContratoCPA).getFullYear()
+      : new Date().getFullYear();
+
     // Prepare contrato data - ONLY include clienteId and clienteName, not duplicate contact fields
     const contratoData = {
       clienteId: form.selectedClienteId,
@@ -1166,7 +1172,7 @@ const handleSubmit = async () => {
       numeroSerieCPA: form.numeroSerieCPA, // Legacy - for backward compatibility
       inicioContratoCPA: form.inicioContratoCPA,
       fimContratoCPA: form.fimContratoCPA,
-      
+
       hasSHContract: form.hasSHContract,
       planIdSH: form.planIdSH,
       planoSH: form.planoSH,
@@ -1177,100 +1183,117 @@ const handleSubmit = async () => {
       softwarePSO: form.softwarePSO,
       inicioContratoSH: form.inicioContratoSH,
       fimContratoSH: form.fimContratoSH,
-      
+
       // Service details
       horasAssistenciaAnual: form.horasAssistenciaAnual,
       deslocacoesPorAno: form.deslocacoesPorAno,
       manutencoesPorAno: form.manutencoesPorAno,
-      
+
       // Additional information
       metodoPagamento: form.metodoPagamento,
-      
+
       // Legacy fields for backward compatibility
       planoContrato: form.planoContrato,
       temCPA: form.temCPA,
-      temPSO: form.temPSO
-    }
-    
+      temPSO: form.temPSO,
+    };
+
     if (isEditing.value) {
-      const id = route.params.id
-      await store.updateContrato(year, id, contratoData)
-      router.push(`/contratos/${id}?year=${year}`)
+      const id = route.params.id;
+      await store.updateContrato(year, id, contratoData);
+      router.push(`/contratos/${id}?year=${year}`);
     } else {
-      const newContrato = await store.createContrato(year, contratoData)
-      router.push(`/contratos/${newContrato.id}?year=${year}`)
+      const newContrato = await store.createContrato(year, contratoData);
+      router.push(`/contratos/${newContrato.id}?year=${year}`);
     }
   } catch (err) {
-    console.error('Error saving contrato:', err)
+    console.error('Error saving contrato:', err);
   }
-}
+};
 
 const navigateBack = () => {
-  router.push(cancelRoute.value)
-}
+  router.push(cancelRoute.value);
+};
 
 // Lifecycle hooks
 onMounted(async () => {
-  console.log('ContratoForm mounted, isEditing:', isEditing.value)
-  
+  console.log('ContratoForm mounted, isEditing:', isEditing.value);
+
   // Fetch clients for dropdown first (needed for both create and edit)
   try {
-    await fetchClientes()
-    console.log('Clientes loaded:', clientes.value.length)
+    await fetchClientes();
+    console.log('Clientes loaded:', clientes.value.length);
   } catch (error) {
-    console.error('Error fetching clients:', error)
+    console.error('Error fetching clients:', error);
   }
-  
+
   if (!isEditing.value) {
     // Clear any previous data for create mode
-    selectedContrato.value = null
-    console.log('Create mode: form will show empty fields')
+    selectedContrato.value = null;
+    console.log('Create mode: form will show empty fields');
   } else {
     // Load data for edit mode
     try {
-      await loadContratoData()
+      await loadContratoData();
       // populateFormFromSelectedContrato will be called by the watcher
     } catch (error) {
-      console.error('Error in onMounted:', error)
+      console.error('Error in onMounted:', error);
     }
   }
-})
+});
 
 // Watch for changes in selectedContrato to populate the form
-watch(selectedContrato, async (newValue, oldValue) => {
-  console.log('selectedContrato watcher triggered:', { newValue, oldValue, isEditing: isEditing.value })
-  
-  if (newValue && isEditing.value) {
-    console.log('selectedContrato changed, populating form:', newValue)
-    await populateFormFromSelectedContrato()
-  }
-}, { immediate: true })
+watch(
+  selectedContrato,
+  async (newValue, oldValue) => {
+    console.log('selectedContrato watcher triggered:', {
+      newValue,
+      oldValue,
+      isEditing: isEditing.value,
+    });
+
+    if (newValue && isEditing.value) {
+      console.log('selectedContrato changed, populating form:', newValue);
+      await populateFormFromSelectedContrato();
+    }
+  },
+  { immediate: true }
+);
 
 // Watch for equipment changes to clear dependent fields
-watch(() => form.temCPA, (newValue) => {
-  if (!newValue) {
-    form.modeloCPA = ''
-    form.numeroSerieCPA = ''
+watch(
+  () => form.temCPA,
+  newValue => {
+    if (!newValue) {
+      form.modeloCPA = '';
+      form.numeroSerieCPA = '';
+    }
   }
-})
+);
 
-watch(() => form.temPSO, (newValue) => {
-  if (!newValue) {
-    form.modeloPSO = ''
-    form.numeroSeriePSO = ''
-    form.softwarePSO = ''
+watch(
+  () => form.temPSO,
+  newValue => {
+    if (!newValue) {
+      form.modeloPSO = '';
+      form.numeroSeriePSO = '';
+      form.softwarePSO = '';
+    }
   }
-})
+);
 
 // Watch for route changes to reload data if needed
-watch(() => route.params.id, async (newId, oldId) => {
-  console.log('Route param id changed:', { newId, oldId })
-  
-  if (newId && newId !== oldId && isEditing.value) {
-    console.log('Route changed to edit different contrato, reloading data')
-    await loadContratoData()
+watch(
+  () => route.params.id,
+  async (newId, oldId) => {
+    console.log('Route param id changed:', { newId, oldId });
+
+    if (newId && newId !== oldId && isEditing.value) {
+      console.log('Route changed to edit different contrato, reloading data');
+      await loadContratoData();
+    }
   }
-})
+);
 </script>
 
 <style scoped>
@@ -1449,7 +1472,9 @@ watch(() => route.params.id, async (newId, oldId) => {
 }
 
 .toggle-input:focus + .toggle-label {
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1), 0 0 0 2px rgba(117, 174, 147, 0.3);
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.1),
+    0 0 0 2px rgba(117, 174, 147, 0.3);
 }
 
 .form-actions {
@@ -1498,65 +1523,65 @@ watch(() => route.params.id, async (newId, oldId) => {
   .contrato-form-container {
     padding: 0.5rem;
   }
-  
+
   .form-section {
     padding: 1rem;
     margin-bottom: 1rem;
   }
-  
+
   .form-section h2 {
     font-size: 1rem;
     margin-bottom: 0.75rem;
   }
-  
+
   .form-grid {
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
-  
+
   .form-actions {
     padding: 1.5rem 1rem;
     flex-direction: column;
   }
-  
+
   .btn {
     width: 100%;
   }
-  
+
   .equipment-info-section {
     padding: 0.75rem;
   }
-  
+
   .equipment-header {
     flex-direction: column;
     align-items: stretch;
     gap: 0.75rem;
   }
-  
+
   .btn-add-equipment {
     width: 100%;
   }
-  
+
   .btn-remove-equipment {
     width: auto;
     min-width: auto;
   }
-  
+
   .equipment-card {
     padding: 0.75rem;
   }
-  
+
   /* Adjust toggle switch for mobile */
   .toggle-switch .toggle-label {
     width: 45px;
     height: 22px;
   }
-  
+
   .toggle-switch .toggle-slider {
     width: 18px;
     height: 18px;
   }
-  
+
   .toggle-switch .toggle-input:checked + .toggle-label .toggle-slider {
     transform: translateX(23px);
   }
@@ -1566,25 +1591,25 @@ watch(() => route.params.id, async (newId, oldId) => {
   .form-header h1 {
     font-size: 1.5rem;
   }
-  
+
   .form-section {
     padding: 0.75rem;
   }
-  
+
   .form-section h2 {
     font-size: 0.9rem;
   }
-  
+
   .toggle-switch .toggle-label {
     width: 40px;
     height: 20px;
   }
-  
+
   .toggle-switch .toggle-slider {
     width: 16px;
     height: 16px;
   }
-  
+
   .toggle-switch .toggle-input:checked + .toggle-label .toggle-slider {
     transform: translateX(20px);
   }
@@ -1975,64 +2000,64 @@ watch(() => route.params.id, async (newId, oldId) => {
     font-size: 0.85rem;
     padding: 0.5rem;
   }
-  
+
   .contract-type-section {
     padding: 1rem;
   }
-  
+
   .contract-type-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .contract-type-header h3 {
     font-size: 1rem;
   }
-  
+
   .plan-details-card {
     padding: 1rem;
   }
-  
+
   .plan-details-card h4 {
     font-size: 1.1rem;
   }
-  
+
   .plan-details-card h5 {
     font-size: 0.9rem;
   }
-  
+
   .plan-description {
     font-size: 0.9rem;
     padding: 0.75rem;
   }
-  
+
   .plan-features {
     padding: 0.75rem;
     gap: 0.5rem;
   }
-  
+
   .feature-item {
     padding: 0.4rem;
     font-size: 0.85rem;
   }
-  
+
   .feature-icon {
     font-size: 1rem;
   }
-  
+
   .pricing-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .price-item {
     padding: 0.5rem;
   }
-  
+
   .price-value {
     font-size: 1.1rem;
   }
-  
+
   .warning-message {
     font-size: 0.9rem;
     padding: 0.75rem 1rem;
@@ -2043,21 +2068,21 @@ watch(() => route.params.id, async (newId, oldId) => {
   .contract-type-section {
     padding: 0.75rem;
   }
-  
+
   .contract-type-header h3 {
     font-size: 0.9rem;
   }
-  
+
   .pricing-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .plan-details-card h4 {
     font-size: 1rem;
   }
-  
+
   .section-note {
     font-size: 0.8rem;
   }
 }
-</style> 
+</style>

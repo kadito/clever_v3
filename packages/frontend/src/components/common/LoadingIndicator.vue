@@ -3,23 +3,23 @@
     <div v-if="type === 'spinner'" class="loading-spinner" :class="spinnerSizeClass">
       <div class="spinner-ring"></div>
     </div>
-    
+
     <div v-else-if="type === 'dots'" class="loading-dots">
       <div class="dot"></div>
       <div class="dot"></div>
       <div class="dot"></div>
     </div>
-    
+
     <div v-else-if="type === 'pulse'" class="loading-pulse" :class="pulseSizeClass">
       <div class="pulse-circle"></div>
     </div>
-    
+
     <div v-else-if="type === 'skeleton'" class="loading-skeleton" :class="skeletonSizeClass">
       <div class="skeleton-line"></div>
       <div class="skeleton-line short"></div>
       <div class="skeleton-line"></div>
     </div>
-    
+
     <span v-if="text" class="loading-text" :class="textSizeClass">
       {{ text }}
     </span>
@@ -27,54 +27,54 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 interface Props {
-  type?: 'spinner' | 'dots' | 'pulse' | 'skeleton'
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
-  text?: string
-  color?: 'primary' | 'secondary' | 'white' | 'gray'
+  type?: 'spinner' | 'dots' | 'pulse' | 'skeleton';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  text?: string;
+  color?: 'primary' | 'secondary' | 'white' | 'gray';
 }
 
 const props = withDefaults(defineProps<Props>(), {
   type: 'spinner',
   size: 'md',
   text: '',
-  color: 'primary'
-})
+  color: 'primary',
+});
 
 const sizeClass = computed(() => {
   const sizeMap = {
     xs: 'loading-xs',
-    sm: 'loading-sm', 
+    sm: 'loading-sm',
     md: 'loading-md',
     lg: 'loading-lg',
-    xl: 'loading-xl'
-  }
-  return sizeMap[props.size]
-})
+    xl: 'loading-xl',
+  };
+  return sizeMap[props.size];
+});
 
 const spinnerSizeClass = computed(() => {
   const sizeMap = {
     xs: 'spinner-xs',
     sm: 'spinner-sm',
-    md: 'spinner-md', 
+    md: 'spinner-md',
     lg: 'spinner-lg',
-    xl: 'spinner-xl'
-  }
-  return `${sizeMap[props.size]} spinner-${props.color}`
-})
+    xl: 'spinner-xl',
+  };
+  return `${sizeMap[props.size]} spinner-${props.color}`;
+});
 
 const pulseSizeClass = computed(() => {
   const sizeMap = {
     xs: 'pulse-xs',
     sm: 'pulse-sm',
     md: 'pulse-md',
-    lg: 'pulse-lg', 
-    xl: 'pulse-xl'
-  }
-  return `${sizeMap[props.size]} pulse-${props.color}`
-})
+    lg: 'pulse-lg',
+    xl: 'pulse-xl',
+  };
+  return `${sizeMap[props.size]} pulse-${props.color}`;
+});
 
 const skeletonSizeClass = computed(() => {
   const sizeMap = {
@@ -82,10 +82,10 @@ const skeletonSizeClass = computed(() => {
     sm: 'skeleton-sm',
     md: 'skeleton-md',
     lg: 'skeleton-lg',
-    xl: 'skeleton-xl'
-  }
-  return sizeMap[props.size]
-})
+    xl: 'skeleton-xl',
+  };
+  return sizeMap[props.size];
+});
 
 const textSizeClass = computed(() => {
   const sizeMap = {
@@ -93,10 +93,10 @@ const textSizeClass = computed(() => {
     sm: 'text-sm',
     md: 'text-sm',
     lg: 'text-base',
-    xl: 'text-lg'
-  }
-  return sizeMap[props.size]
-})
+    xl: 'text-lg',
+  };
+  return sizeMap[props.size];
+});
 </script>
 
 <style scoped>
@@ -277,7 +277,8 @@ const textSizeClass = computed(() => {
 
 /* Animation keyframes */
 @keyframes pulse-primary {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -293,15 +294,15 @@ const textSizeClass = computed(() => {
   .skeleton-line {
     animation: none;
   }
-  
+
   .loading-dots .dot {
     @apply opacity-50;
   }
-  
+
   .loading-pulse .pulse-circle {
     @apply opacity-50;
   }
-  
+
   .loading-skeleton .skeleton-line {
     @apply opacity-50;
   }

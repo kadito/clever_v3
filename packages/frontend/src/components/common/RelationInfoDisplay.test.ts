@@ -1,12 +1,12 @@
 /**
  * RelationInfoDisplay Component Tests (Task 10 - Frontend)
- * 
+ *
  * Tests the RelationInfoDisplay component's handling of different relation states:
  * - Resolved relations with valid data
  * - Error relations (404/500 errors)
  * - Missing relations (null/undefined)
  * - Proper error styling and user experience
- * 
+ *
  * Requirements: 8.4, 8.5 - Verify structured error handling and user experience
  */
 
@@ -22,19 +22,19 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
     nomeEmpresa: 'Empresa Teste Lda',
     nomeComercial: 'Teste',
     contribuinte: '123456789',
-    localidade: 'Lisboa'
+    localidade: 'Lisboa',
   };
 
   const mock404Error: RelationError = {
     type: 'error',
     code: 404,
-    message: 'Not found'
+    message: 'Not found',
   };
 
   const mock500Error: RelationError = {
     type: 'error',
     code: 500,
-    message: 'Internal Server Error'
+    message: 'Internal Server Error',
   };
 
   describe('Resolved Relations Display', () => {
@@ -43,22 +43,22 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
         props: {
           relationData: mockResolvedClient,
           relationType: 'client',
-          relationId: 'client-123'
-        }
+          relationId: 'client-123',
+        },
       });
 
       // Check that the component renders
       expect(wrapper.find('.relation-info-section').exists()).toBe(true);
-      
+
       // Check title
       expect(wrapper.find('.relation-info-title').text()).toBe('Informação do Cliente');
-      
+
       // Check that client data is displayed
       expect(wrapper.text()).toContain('Empresa Teste Lda');
       expect(wrapper.text()).toContain('Teste');
       expect(wrapper.text()).toContain('123456789');
       expect(wrapper.text()).toContain('Lisboa');
-      
+
       // Should not have error styling
       expect(wrapper.find('.relation-info-card--error').exists()).toBe(false);
       expect(wrapper.find('.relation-info-card--missing').exists()).toBe(false);
@@ -68,14 +68,14 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
       const wrapper = mount(RelationInfoDisplay, {
         props: {
           relationData: mockResolvedClient,
-          relationType: 'client'
-        }
+          relationType: 'client',
+        },
       });
 
       // Check that all basic client fields are shown
       const fieldLabels = wrapper.findAll('.relation-data-label');
       const labelTexts = fieldLabels.map(label => label.text());
-      
+
       expect(labelTexts).toContain('Nome da Empresa');
       expect(labelTexts).toContain('Nome Comercial');
       expect(labelTexts).toContain('NIF');
@@ -87,20 +87,20 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
         uuid: 'client-456',
         contentType: 'clients',
         nomeEmpresa: 'Empresa Parcial Lda',
-        contribuinte: '987654321'
+        contribuinte: '987654321',
         // Missing nomeComercial and localidade
       };
 
       const wrapper = mount(RelationInfoDisplay, {
         props: {
           relationData: partialClient,
-          relationType: 'client'
-        }
+          relationType: 'client',
+        },
       });
 
       expect(wrapper.text()).toContain('Empresa Parcial Lda');
       expect(wrapper.text()).toContain('987654321');
-      
+
       // Should show em dash for missing fields
       const values = wrapper.findAll('.relation-data-value');
       const hasEmDash = values.some(value => value.text().includes('—'));
@@ -114,21 +114,21 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
         props: {
           relationData: mock404Error,
           relationType: 'client',
-          relationId: 'non-existent-client'
-        }
+          relationId: 'non-existent-client',
+        },
       });
 
       // Check error styling is applied
       expect(wrapper.find('.relation-info-card--error').exists()).toBe(true);
-      
+
       // Check error content
       expect(wrapper.find('.relation-error-content').exists()).toBe(true);
       expect(wrapper.find('.relation-error-message').text()).toBe('Conteúdo não encontrado');
       expect(wrapper.find('.relation-error-code').text()).toBe('Código: 404');
-      
+
       // Check error icon is present
       expect(wrapper.find('.relation-info-status svg').exists()).toBe(true);
-      
+
       // Should not show data content
       expect(wrapper.find('.relation-data-content').exists()).toBe(false);
     });
@@ -138,13 +138,13 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
         props: {
           relationData: mock500Error,
           relationType: 'client',
-          relationId: 'server-error-client'
-        }
+          relationId: 'server-error-client',
+        },
       });
 
       // Check error styling is applied
       expect(wrapper.find('.relation-info-card--error').exists()).toBe(true);
-      
+
       // Check error content
       expect(wrapper.find('.relation-error-message').text()).toBe('Erro interno do servidor');
       expect(wrapper.find('.relation-error-code').text()).toBe('Código: 500');
@@ -154,14 +154,14 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
       const unknownError: RelationError = {
         type: 'error',
         code: 503 as any,
-        message: 'Service Unavailable'
+        message: 'Service Unavailable',
       };
 
       const wrapper = mount(RelationInfoDisplay, {
         props: {
           relationData: unknownError,
-          relationType: 'client'
-        }
+          relationType: 'client',
+        },
       });
 
       // Should fall back to original message
@@ -173,17 +173,17 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
       const wrapper = mount(RelationInfoDisplay, {
         props: {
           relationData: mock404Error,
-          relationType: 'client'
-        }
+          relationType: 'client',
+        },
       });
 
       // Check error-specific CSS classes
       expect(wrapper.find('.relation-info-card').classes()).toContain('relation-info-card--error');
-      
+
       // Check that error styling is applied (the component uses conditional classes)
       const header = wrapper.find('.relation-info-header');
       expect(header.exists()).toBe(true);
-      
+
       // The component applies error styling through CSS classes in the style section
       // We can verify the error state by checking the error content is displayed
       expect(wrapper.find('.relation-error-content').exists()).toBe(true);
@@ -196,17 +196,19 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
         props: {
           relationData: null,
           relationType: 'client',
-          relationId: 'missing-client'
-        }
+          relationId: 'missing-client',
+        },
       });
 
       // Check missing styling is applied
       expect(wrapper.find('.relation-info-card--missing').exists()).toBe(true);
-      
+
       // Check missing content
       expect(wrapper.find('.relation-missing-content').exists()).toBe(true);
-      expect(wrapper.find('.relation-missing-message').text()).toBe('Informação do Cliente não encontrado');
-      
+      expect(wrapper.find('.relation-missing-message').text()).toBe(
+        'Informação do Cliente não encontrado'
+      );
+
       // Should not show data or error content
       expect(wrapper.find('.relation-data-content').exists()).toBe(false);
       expect(wrapper.find('.relation-error-content').exists()).toBe(false);
@@ -216,17 +218,19 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
       const wrapper = mount(RelationInfoDisplay, {
         props: {
           relationData: null,
-          relationType: 'client'
-        }
+          relationType: 'client',
+        },
       });
 
       // Check missing-specific CSS classes
-      expect(wrapper.find('.relation-info-card').classes()).toContain('relation-info-card--missing');
-      
+      expect(wrapper.find('.relation-info-card').classes()).toContain(
+        'relation-info-card--missing'
+      );
+
       // Check that missing styling is applied (the component uses conditional classes)
       const header = wrapper.find('.relation-info-header');
       expect(header.exists()).toBe(true);
-      
+
       // The component applies missing styling through CSS classes in the style section
       // We can verify the missing state by checking the missing content is displayed
       expect(wrapper.find('.relation-missing-content').exists()).toBe(true);
@@ -239,8 +243,8 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
         props: {
           relationData: mockResolvedClient,
           relationType: 'client',
-          customDisplayName: 'Dados do Cliente Personalizado'
-        }
+          customDisplayName: 'Dados do Cliente Personalizado',
+        },
       });
 
       expect(wrapper.find('.relation-info-title').text()).toBe('Dados do Cliente Personalizado');
@@ -249,20 +253,20 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
     it('should use custom fields when provided', () => {
       const customFields = [
         { key: 'nomeEmpresa', label: 'Company Name' },
-        { key: 'contribuinte', label: 'Tax ID' }
+        { key: 'contribuinte', label: 'Tax ID' },
       ];
 
       const wrapper = mount(RelationInfoDisplay, {
         props: {
           relationData: mockResolvedClient,
           relationType: 'client',
-          customFields
-        }
+          customFields,
+        },
       });
 
       const fieldLabels = wrapper.findAll('.relation-data-label');
       const labelTexts = fieldLabels.map(label => label.text());
-      
+
       expect(labelTexts).toContain('Company Name');
       expect(labelTexts).toContain('Tax ID');
       expect(labelTexts).not.toContain('Nome Comercial');
@@ -275,8 +279,8 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
           relationData: mockResolvedClient,
           relationType: 'client',
           relationId: 'debug-client-123',
-          showDebugInfo: true
-        }
+          showDebugInfo: true,
+        },
       });
 
       expect(wrapper.find('.relation-info-footer').exists()).toBe(true);
@@ -288,8 +292,8 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
         props: {
           relationData: mockResolvedClient,
           relationType: 'client',
-          relationId: 'debug-client-123'
-        }
+          relationId: 'debug-client-123',
+        },
       });
 
       expect(wrapper.find('.relation-info-footer').exists()).toBe(false);
@@ -303,14 +307,14 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
         contentType: 'contracts',
         numeroContrato: 'CT-2024-001',
         dataInicio: '2024-01-01',
-        dataFim: '2024-12-31'
+        dataFim: '2024-12-31',
       };
 
       const wrapper = mount(RelationInfoDisplay, {
         props: {
           relationData: mockContract,
-          relationType: 'contract'
-        }
+          relationType: 'contract',
+        },
       });
 
       expect(wrapper.find('.relation-info-title').text()).toBe('Informação do Contrato');
@@ -323,14 +327,14 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
       const mockUnknown: ResolvedRelation = {
         uuid: 'unknown-123',
         contentType: 'unknown',
-        someField: 'Some Value'
+        someField: 'Some Value',
       };
 
       const wrapper = mount(RelationInfoDisplay, {
         props: {
           relationData: mockUnknown,
-          relationType: 'unknown'
-        }
+          relationType: 'unknown',
+        },
       });
 
       expect(wrapper.find('.relation-info-title').text()).toBe('Informação de unknown');
@@ -344,21 +348,21 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
         contentType: 'clients',
         nomeEmpresa: 'Empresa com Datas',
         dataInicio: '2024-01-15T10:30:00Z',
-        dataFim: '2024-12-31T23:59:59Z'
+        dataFim: '2024-12-31T23:59:59Z',
       };
 
       const customFields = [
         { key: 'nomeEmpresa', label: 'Nome' },
         { key: 'dataInicio', label: 'Data de Início' },
-        { key: 'dataFim', label: 'Data de Fim' }
+        { key: 'dataFim', label: 'Data de Fim' },
       ];
 
       const wrapper = mount(RelationInfoDisplay, {
         props: {
           relationData: mockWithDates,
           relationType: 'client',
-          customFields
-        }
+          customFields,
+        },
       });
 
       // Check that dates are formatted in Portuguese format
@@ -371,20 +375,20 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
         uuid: 'client-invalid-date',
         contentType: 'clients',
         nomeEmpresa: 'Empresa',
-        dataInvalida: 'not-a-date'
+        dataInvalida: 'not-a-date',
       };
 
       const customFields = [
         { key: 'nomeEmpresa', label: 'Nome' },
-        { key: 'dataInvalida', label: 'Data Inválida' }
+        { key: 'dataInvalida', label: 'Data Inválida' },
       ];
 
       const wrapper = mount(RelationInfoDisplay, {
         props: {
           relationData: mockWithInvalidDate,
           relationType: 'client',
-          customFields
-        }
+          customFields,
+        },
       });
 
       // Should show original value for invalid dates
@@ -397,8 +401,8 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
       const wrapper = mount(RelationInfoDisplay, {
         props: {
           relationData: undefined,
-          relationType: 'client'
-        }
+          relationType: 'client',
+        },
       });
 
       expect(wrapper.find('.relation-info-section').exists()).toBe(false);
@@ -408,8 +412,8 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
       const wrapper = mount(RelationInfoDisplay, {
         props: {
           relationData: null,
-          relationType: 'client'
-        }
+          relationType: 'client',
+        },
       });
 
       expect(wrapper.find('.relation-info-section').exists()).toBe(true);
@@ -420,8 +424,8 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
       const wrapper = mount(RelationInfoDisplay, {
         props: {
           relationData: mock404Error,
-          relationType: 'client'
-        }
+          relationType: 'client',
+        },
       });
 
       expect(wrapper.find('.relation-info-section').exists()).toBe(true);
@@ -432,8 +436,8 @@ describe('RelationInfoDisplay Component (Task 10)', () => {
       const wrapper = mount(RelationInfoDisplay, {
         props: {
           relationData: mockResolvedClient,
-          relationType: 'client'
-        }
+          relationType: 'client',
+        },
       });
 
       expect(wrapper.find('.relation-info-section').exists()).toBe(true);

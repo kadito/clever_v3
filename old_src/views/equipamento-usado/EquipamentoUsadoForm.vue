@@ -18,16 +18,15 @@
 
     <!-- Form -->
     <form @submit.prevent="handleSubmit" class="form" v-if="!loading">
-      
       <!-- Equipment Information -->
       <section class="form-section">
         <h2>📦 INFORMAÇÕES DO EQUIPAMENTO</h2>
         <div class="form-grid">
           <div class="form-group">
             <label for="tipoEquipamento">TIPO DE EQUIPAMENTO *</label>
-            <select 
-              id="tipoEquipamento" 
-              v-model="form.tipoEquipamento" 
+            <select
+              id="tipoEquipamento"
+              v-model="form.tipoEquipamento"
               class="form-control"
               required
             >
@@ -39,35 +38,35 @@
 
           <div class="form-group">
             <label for="marca">MARCA</label>
-            <input 
-              type="text" 
-              id="marca" 
-              v-model="form.marca" 
+            <input
+              type="text"
+              id="marca"
+              v-model="form.marca"
               class="form-control"
               placeholder="Ex: SAM4S, INGENICO, EPSON..."
-            >
+            />
           </div>
 
           <div class="form-group">
             <label for="modelo">MODELO</label>
-            <input 
-              type="text" 
-              id="modelo" 
-              v-model="form.modelo" 
+            <input
+              type="text"
+              id="modelo"
+              v-model="form.modelo"
               class="form-control"
               placeholder="Ex: SPL-4700, iCT220..."
-            >
+            />
           </div>
 
           <div class="form-group">
             <label for="numeroSerie">NÚMERO DE SÉRIE</label>
-            <input 
-              type="text" 
-              id="numeroSerie" 
-              v-model="form.numeroSerie" 
+            <input
+              type="text"
+              id="numeroSerie"
+              v-model="form.numeroSerie"
               class="form-control"
               placeholder="Número de série do equipamento"
-            >
+            />
           </div>
         </div>
       </section>
@@ -78,20 +77,16 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="clienteEmprestimo">CLIENTE</label>
-            <select 
-              id="clienteEmprestimo" 
-              v-model="form.clienteEmprestimo" 
+            <select
+              id="clienteEmprestimo"
+              v-model="form.clienteEmprestimo"
               class="form-control"
               :disabled="clientesStore.loading"
             >
               <option value="" disabled>
                 {{ clientesStore.loading ? 'A carregar clientes...' : 'Seleccionar cliente' }}
               </option>
-              <option 
-                v-for="cliente in clientes" 
-                :key="cliente.id" 
-                :value="cliente.nomeComercial"
-              >
+              <option v-for="cliente in clientes" :key="cliente.id" :value="cliente.nomeComercial">
                 {{ cliente.nomeComercial }}
               </option>
             </select>
@@ -102,22 +97,17 @@
 
           <div class="form-group">
             <label for="dataEmprestimo">DATA DE EMPRÉSTIMO</label>
-            <input 
-              type="date" 
-              id="dataEmprestimo" 
-              v-model="form.dataEmprestimo" 
+            <input
+              type="date"
+              id="dataEmprestimo"
+              v-model="form.dataEmprestimo"
               class="form-control"
-            >
+            />
           </div>
 
           <div class="form-group">
             <label for="dataRetorno">DATA DE TÉRMINO DO EMPRÉSTIMO</label>
-            <input 
-              type="date" 
-              id="dataRetorno" 
-              v-model="form.dataRetorno" 
-              class="form-control"
-            >
+            <input type="date" id="dataRetorno" v-model="form.dataRetorno" class="form-control" />
           </div>
         </div>
       </section>
@@ -128,11 +118,7 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="visor">VISOR</label>
-            <select 
-              id="visor" 
-              v-model="form.visor" 
-              class="form-control"
-            >
+            <select id="visor" v-model="form.visor" class="form-control">
               <option value="">Seleccionar estado</option>
               <option value="EQUIPAMENTO EM ÓTIMAS CONDIÇÕES">Ótimas condições</option>
               <option value="EQUIPAMENTO EM BOAS CONDIÇÕES">Boas condições</option>
@@ -143,11 +129,7 @@
 
           <div class="form-group">
             <label for="corpoEquipamento">CORPO DO EQUIPAMENTO</label>
-            <select 
-              id="corpoEquipamento" 
-              v-model="form.corpoEquipamento" 
-              class="form-control"
-            >
+            <select id="corpoEquipamento" v-model="form.corpoEquipamento" class="form-control">
               <option value="">Seleccionar estado</option>
               <option value="EQUIPAMENTO EM ÓTIMAS CONDIÇÕES">Ótimas condições</option>
               <option value="EQUIPAMENTO EM BOAS CONDIÇÕES">Boas condições</option>
@@ -158,11 +140,7 @@
 
           <div class="form-group">
             <label for="transformadorCabos">TRANSFORMADOR E CABOS</label>
-            <select 
-              id="transformadorCabos" 
-              v-model="form.transformadorCabos" 
-              class="form-control"
-            >
+            <select id="transformadorCabos" v-model="form.transformadorCabos" class="form-control">
               <option value="">Seleccionar estado</option>
               <option value="EQUIPAMENTO EM ÓTIMAS CONDIÇÕES">Ótimas condições</option>
               <option value="EQUIPAMENTO EM BOAS CONDIÇÕES">Boas condições</option>
@@ -173,11 +151,7 @@
 
           <div class="form-group">
             <label for="estadoGeral">ESTADO GERAL</label>
-            <select 
-              id="estadoGeral" 
-              v-model="form.estadoGeral" 
-              class="form-control"
-            >
+            <select id="estadoGeral" v-model="form.estadoGeral" class="form-control">
               <option value="">Seleccionar estado</option>
               <option value="EQUIPAMENTO EM ÓTIMAS CONDIÇÕES">Ótimas condições</option>
               <option value="EQUIPAMENTO EM BOAS CONDIÇÕES">Boas condições</option>
@@ -194,9 +168,9 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="notas">NOTAS</label>
-            <textarea 
-              id="notas" 
-              v-model="form.notas" 
+            <textarea
+              id="notas"
+              v-model="form.notas"
               class="form-control"
               rows="4"
               placeholder="Especificações técnicas, problemas identificados, software instalado..."
@@ -207,19 +181,10 @@
 
       <!-- Action buttons -->
       <div class="form-actions">
-        <button 
-          type="button" 
-          @click="handleCancel" 
-          class="btn btn-cancel"
-          :disabled="loading"
-        >
+        <button type="button" @click="handleCancel" class="btn btn-cancel" :disabled="loading">
           Cancelar
         </button>
-        <button 
-          type="submit" 
-          class="btn btn-primary"
-          :disabled="loading || !isFormValid"
-        >
+        <button type="submit" class="btn btn-primary" :disabled="loading || !isFormValid">
           {{ isEditing ? 'Atualizar' : 'Criar' }} Equipamento
         </button>
       </div>
@@ -228,37 +193,32 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
-import { useEquipamentoUsadoStore } from '@/stores/equipamento-usado'
-import { useClientesStore } from '@/stores/clientes'
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
+import { useEquipamentoUsadoStore } from '@/stores/equipamento-usado';
+import { useClientesStore } from '@/stores/clientes';
 
 // Router
-const router = useRouter()
-const route = useRoute()
+const router = useRouter();
+const route = useRoute();
 
 // Stores
-const equipamentoUsadoStore = useEquipamentoUsadoStore()
-const { loading, error } = storeToRefs(equipamentoUsadoStore)
-const { 
-  createEquipamento, 
-  updateEquipamento, 
-  fetchEquipamentoById, 
-  clearError,
-  getYearFromDate
-} = equipamentoUsadoStore
+const equipamentoUsadoStore = useEquipamentoUsadoStore();
+const { loading, error } = storeToRefs(equipamentoUsadoStore);
+const { createEquipamento, updateEquipamento, fetchEquipamentoById, clearError, getYearFromDate } =
+  equipamentoUsadoStore;
 
 // Clientes Store
-const clientesStore = useClientesStore()
-const { clientes } = storeToRefs(clientesStore)
-const { fetchClientes } = clientesStore
+const clientesStore = useClientesStore();
+const { clientes } = storeToRefs(clientesStore);
+const { fetchClientes } = clientesStore;
 
 // Form state
-const isEditing = ref(false)
-const equipamentoYear = ref(null)
-const equipamentoId = ref(null)
+const isEditing = ref(false);
+const equipamentoYear = ref(null);
+const equipamentoId = ref(null);
 
 // Form data with defaults
 const form = ref({
@@ -273,108 +233,113 @@ const form = ref({
   corpoEquipamento: '',
   transformadorCabos: '',
   estadoGeral: '',
-  notas: ''
-})
+  notas: '',
+});
 
 // Validation
 const isFormValid = computed(() => {
-  return form.value.tipoEquipamento && 
-         form.value.tipoEquipamento.trim() !== ''
-})
+  return form.value.tipoEquipamento && form.value.tipoEquipamento.trim() !== '';
+});
 
 // Cancel route logic
 const cancelRoute = computed(() => {
-  const from = route.query.from
+  const from = route.query.from;
   if (from === 'detail' && equipamentoYear.value && equipamentoId.value) {
-    return `/equipamento-usado/${equipamentoYear.value}/${equipamentoId.value}`
+    return `/equipamento-usado/${equipamentoYear.value}/${equipamentoId.value}`;
   } else if (from === 'list') {
-    return '/equipamento-usado/list'
+    return '/equipamento-usado/list';
   } else {
-    return '/equipamento-usado'
+    return '/equipamento-usado';
   }
-})
+});
 
 // Methods
 const handleSubmit = async () => {
-  if (!isFormValid.value) return
-  
+  if (!isFormValid.value) return;
+
   try {
-    let year = equipamentoYear.value
-    
+    let year = equipamentoYear.value;
+
     // If creating new, determine year from loan date or use current year
     if (!isEditing.value) {
       if (form.value.dataEmprestimo) {
-        year = getYearFromDate(form.value.dataEmprestimo)
+        year = getYearFromDate(form.value.dataEmprestimo);
       } else {
-        year = new Date().getFullYear().toString()
+        year = new Date().getFullYear().toString();
       }
     }
-    
+
     if (isEditing.value) {
-      await updateEquipamento(equipamentoYear.value, equipamentoId.value, form.value)
-      router.push(`/equipamento-usado/${equipamentoYear.value}/${equipamentoId.value}`)
+      await updateEquipamento(equipamentoYear.value, equipamentoId.value, form.value);
+      router.push(`/equipamento-usado/${equipamentoYear.value}/${equipamentoId.value}`);
     } else {
-      const newEquipamento = await createEquipamento(year, form.value)
-      router.push(`/equipamento-usado/${year}/${newEquipamento.id}`)
+      const newEquipamento = await createEquipamento(year, form.value);
+      router.push(`/equipamento-usado/${year}/${newEquipamento.id}`);
     }
   } catch (err) {
-    console.error('Form submission error:', err)
+    console.error('Form submission error:', err);
   }
-}
+};
 
 const handleCancel = () => {
-  router.push(cancelRoute.value)
-}
+  router.push(cancelRoute.value);
+};
 
 // Watchers
-watch(() => form.value.dataEmprestimo, (newDate) => {
-  // Clear return date if loan date is cleared
-  if (!newDate && form.value.dataRetorno) {
-    form.value.dataRetorno = ''
+watch(
+  () => form.value.dataEmprestimo,
+  newDate => {
+    // Clear return date if loan date is cleared
+    if (!newDate && form.value.dataRetorno) {
+      form.value.dataRetorno = '';
+    }
   }
-})
+);
 
-watch(() => form.value.clienteEmprestimo, (newClient) => {
-  // Clear loan-related fields if client is cleared
-  if (!newClient) {
-    form.value.dataEmprestimo = ''
-    form.value.dataRetorno = ''
+watch(
+  () => form.value.clienteEmprestimo,
+  newClient => {
+    // Clear loan-related fields if client is cleared
+    if (!newClient) {
+      form.value.dataEmprestimo = '';
+      form.value.dataRetorno = '';
+    }
   }
-})
+);
 
 // Lifecycle
 onMounted(async () => {
   // Fetch clients for dropdown
-  await fetchClientes()
-  
-  const year = route.params.year
-  const id = route.params.id
-  
+  await fetchClientes();
+
+  const year = route.params.year;
+  const id = route.params.id;
+
   if (year && id) {
     // Editing mode
-    isEditing.value = true
-    equipamentoYear.value = year
-    equipamentoId.value = parseInt(id)
-    
+    isEditing.value = true;
+    equipamentoYear.value = year;
+    equipamentoId.value = parseInt(id);
+
     try {
-      const equipamento = await fetchEquipamentoById(year, parseInt(id))
-      
+      const equipamento = await fetchEquipamentoById(year, parseInt(id));
+
       // Populate form with existing data
       Object.keys(form.value).forEach(key => {
         if (equipamento[key] !== undefined) {
           // Convert dates to YYYY-MM-DD format for date inputs
           if ((key.includes('data') || key.includes('Data')) && equipamento[key]) {
-            form.value[key] = new Date(equipamento[key]).toISOString().split('T')[0]
+            form.value[key] = new Date(equipamento[key]).toISOString().split('T')[0];
           } else {
-            form.value[key] = equipamento[key] || ''
+            form.value[key] = equipamento[key] || '';
           }
         }
-      })
+      });
     } catch (err) {
-      console.error('Error loading equipamento:', err)
+      console.error('Error loading equipamento:', err);
     }
   }
-})
+});
 </script>
 
 <style scoped>
@@ -466,7 +431,9 @@ onMounted(async () => {
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .form-control:focus {
@@ -537,22 +504,22 @@ textarea.form-control {
   .form-container {
     padding: 0.5rem;
   }
-  
+
   .form-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .form-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .form-actions {
     flex-direction: column;
   }
-  
+
   .btn {
     min-width: auto;
   }
@@ -563,11 +530,11 @@ textarea.form-control {
   .form-section {
     padding: 1rem;
   }
-  
+
   .form-section h2 {
     font-size: 1.1rem;
   }
-  
+
   .form-control {
     font-size: 16px; /* Prevents zoom on iOS */
   }

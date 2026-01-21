@@ -42,17 +42,28 @@
         </span>
 
         <!-- Expiration date -->
-        <span v-if="item.data.dataVencimento" class="flex items-center before:content-['•'] before:mx-1">
+        <span
+          v-if="item.data.dataVencimento"
+          class="flex items-center before:content-['•'] before:mx-1"
+        >
           <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
           </svg>
           {{ formatDate(item.data.dataVencimento) }}
         </span>
 
         <!-- Software summary -->
-        <div v-if="item.data.software && item.data.software.name && item.data.software.name.length > 0" class="flex flex-wrap gap-1 mt-1">
-          <span 
-            v-for="software in item.data.software.name.slice(0, 3)" 
+        <div
+          v-if="item.data.software && item.data.software.name && item.data.software.name.length > 0"
+          class="flex flex-wrap gap-1 mt-1"
+        >
+          <span
+            v-for="software in item.data.software.name.slice(0, 3)"
             :key="software"
             class="software-badge"
           >
@@ -64,17 +75,33 @@
         </div>
 
         <!-- License modality -->
-        <span v-if="item.data.modalidade" class="flex items-center before:content-['•'] before:mx-1">
+        <span
+          v-if="item.data.modalidade"
+          class="flex items-center before:content-['•'] before:mx-1"
+        >
           <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
           {{ item.data.modalidade }}
         </span>
 
         <!-- Invoice count -->
-        <span v-if="item.data.invoices && item.data.invoices.length > 0" class="flex items-center before:content-['•'] before:mx-1">
+        <span
+          v-if="item.data.invoices && item.data.invoices.length > 0"
+          class="flex items-center before:content-['•'] before:mx-1"
+        >
           <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
           </svg>
           {{ item.data.invoices.length }} fatura{{ item.data.invoices.length > 1 ? 's' : '' }}
         </span>
@@ -115,7 +142,7 @@ const displayedLicenses = computed(() => {
   if (!searchQuery.value) {
     return licenses.value;
   }
-  
+
   const query = searchQuery.value.toLowerCase();
   return licenses.value.filter(license => {
     const data = license.data;
@@ -130,9 +157,10 @@ const displayedLicenses = computed(() => {
       data.software?.product?.toLowerCase().includes(query) ||
       data.software?.version?.toLowerCase().includes(query) ||
       data.software?.licenseType?.toLowerCase().includes(query) ||
-      data.invoices?.some(invoice => 
-        invoice.numeroFatura?.toLowerCase().includes(query) ||
-        invoice.ano?.toLowerCase().includes(query)
+      data.invoices?.some(
+        invoice =>
+          invoice.numeroFatura?.toLowerCase().includes(query) ||
+          invoice.ano?.toLowerCase().includes(query)
       )
     );
   });
@@ -141,22 +169,27 @@ const displayedLicenses = computed(() => {
 // Display functions for ContentListTemplate
 const getLicenseTitle = (item: BaseContent): string => {
   const license = item as ContentWithRelations<License['data']>;
-  
+
   // Try to get client name from resolved relations first
   if (license.relations?.client) {
     const clientRelation = license.relations.client;
-    
+
     // Check if it's a resolved relation with client data
     if (clientRelation && typeof clientRelation === 'object' && 'nomeEmpresa' in clientRelation) {
       return clientRelation.nomeEmpresa || 'Cliente sem nome';
     }
-    
+
     // Check if it's an error
-    if (clientRelation && typeof clientRelation === 'object' && 'type' in clientRelation && clientRelation.type === 'error') {
+    if (
+      clientRelation &&
+      typeof clientRelation === 'object' &&
+      'type' in clientRelation &&
+      clientRelation.type === 'error'
+    ) {
       return 'Cliente não encontrado';
     }
   }
-  
+
   // Fallback to stored client name or default
   return license.data.clientName || 'Licença sem cliente';
 };
@@ -164,15 +197,15 @@ const getLicenseTitle = (item: BaseContent): string => {
 const getLicenseSubtitle = (item: BaseContent): string => {
   const license = item as ContentWithRelations<License['data']>;
   const parts = [];
-  
+
   if (license.data.software?.name && license.data.software.name.length > 0) {
     parts.push(license.data.software.name.join(', '));
   }
-  
+
   if (license.data.versao) {
     parts.push(`v${license.data.versao}`);
   }
-  
+
   return parts.join(' • ');
 };
 
@@ -181,9 +214,9 @@ const getLicenseMeta1 = (item: BaseContent): string => {
   if (license.data.dataVencimento) {
     const status = calculateLicenseStatus(license.data.dataVencimento);
     const statusText = {
-      'active': 'Ativa',
-      'expiring': 'A Expirar',
-      'expired': 'Expirada'
+      active: 'Ativa',
+      expiring: 'A Expirar',
+      expired: 'Expirada',
     }[status];
     return statusText;
   }
@@ -202,7 +235,7 @@ const getLicenseMeta2 = (item: BaseContent): string => {
 // Helper functions for custom template slots
 const getLicenseInitials = (item: BaseContent): string => {
   const license = item as ContentWithRelations<License['data']>;
-  
+
   // Try to get client name from resolved relations first
   let name = 'L';
   if (license.relations?.client) {
@@ -213,7 +246,7 @@ const getLicenseInitials = (item: BaseContent): string => {
   } else if (license.data.clientName) {
     name = license.data.clientName;
   }
-  
+
   return name
     .split(' ')
     .map(word => word.charAt(0))
@@ -224,18 +257,26 @@ const getLicenseInitials = (item: BaseContent): string => {
 
 const getLicenseIconClass = (item: BaseContent): string => {
   const license = item as ContentWithRelations<License['data']>;
-  
+
   // Check if there's a client relation error
-  if (license.relations?.client && typeof license.relations.client === 'object' && 'type' in license.relations.client && license.relations.client.type === 'error') {
+  if (
+    license.relations?.client &&
+    typeof license.relations.client === 'object' &&
+    'type' in license.relations.client &&
+    license.relations.client.type === 'error'
+  ) {
     return 'bg-red-500 text-white'; // Error state
   }
-  
+
   if (license.data.dataVencimento) {
     const status = calculateLicenseStatus(license.data.dataVencimento);
     switch (status) {
-      case 'expired': return 'bg-red-500 text-white';
-      case 'expiring': return 'bg-orange-500 text-white';
-      case 'active': return 'bg-green-500 text-white';
+      case 'expired':
+        return 'bg-red-500 text-white';
+      case 'expiring':
+        return 'bg-orange-500 text-white';
+      case 'active':
+        return 'bg-green-500 text-white';
     }
   }
   return 'bg-gray-500 text-white';
@@ -243,18 +284,26 @@ const getLicenseIconClass = (item: BaseContent): string => {
 
 const getLicenseStatusClass = (item: BaseContent): string => {
   const license = item as ContentWithRelations<License['data']>;
-  
+
   // Check if there's a client relation error
-  if (license.relations?.client && typeof license.relations.client === 'object' && 'type' in license.relations.client && license.relations.client.type === 'error') {
+  if (
+    license.relations?.client &&
+    typeof license.relations.client === 'object' &&
+    'type' in license.relations.client &&
+    license.relations.client.type === 'error'
+  ) {
     return 'bg-red-100 text-red-800'; // Error state
   }
-  
+
   if (license.data.dataVencimento) {
     const status = calculateLicenseStatus(license.data.dataVencimento);
     switch (status) {
-      case 'expired': return 'bg-red-100 text-red-800';
-      case 'expiring': return 'bg-orange-100 text-orange-800';
-      case 'active': return 'bg-green-100 text-green-800';
+      case 'expired':
+        return 'bg-red-100 text-red-800';
+      case 'expiring':
+        return 'bg-orange-100 text-orange-800';
+      case 'active':
+        return 'bg-green-100 text-green-800';
     }
   }
   return 'bg-gray-100 text-gray-800';
@@ -262,18 +311,26 @@ const getLicenseStatusClass = (item: BaseContent): string => {
 
 const getLicenseStatusText = (item: BaseContent): string => {
   const license = item as ContentWithRelations<License['data']>;
-  
+
   // Check if there's a client relation error
-  if (license.relations?.client && typeof license.relations.client === 'object' && 'type' in license.relations.client && license.relations.client.type === 'error') {
+  if (
+    license.relations?.client &&
+    typeof license.relations.client === 'object' &&
+    'type' in license.relations.client &&
+    license.relations.client.type === 'error'
+  ) {
     return 'Erro Cliente'; // Error state
   }
-  
+
   if (license.data.dataVencimento) {
     const status = calculateLicenseStatus(license.data.dataVencimento);
     switch (status) {
-      case 'expired': return 'Expirada';
-      case 'expiring': return 'A Expirar';
-      case 'active': return 'Ativa';
+      case 'expired':
+        return 'Expirada';
+      case 'expiring':
+        return 'A Expirar';
+      case 'active':
+        return 'Ativa';
     }
   }
   return 'Indefinida';
@@ -313,9 +370,9 @@ const loadLicenses = async () => {
   try {
     isLoading.value = true;
     clearError();
-    
+
     await api.fetchList();
-    
+
     if (api.items.value) {
       // Sort licenses by creation date (most recent first)
       licenses.value = (api.items.value as ContentWithRelations<License['data']>[]).sort((a, b) => {
@@ -363,7 +420,7 @@ onMounted(() => {
   .icon-circle {
     @apply w-8 h-8 text-xs;
   }
-  
+
   .license-status-badge,
   .software-badge {
     @apply px-1.5 py-0.5 text-xs;

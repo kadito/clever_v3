@@ -3,7 +3,20 @@
 export interface FormField {
   key: string;
   label: string;
-  type: 'text' | 'email' | 'tel' | 'url' | 'password' | 'number' | 'textarea' | 'select' | 'multiselect' | 'checkbox' | 'switch' | 'date' | 'custom';
+  type:
+    | 'text'
+    | 'email'
+    | 'tel'
+    | 'url'
+    | 'password'
+    | 'number'
+    | 'textarea'
+    | 'select'
+    | 'multiselect'
+    | 'checkbox'
+    | 'switch'
+    | 'date'
+    | 'custom';
   placeholder?: string;
   help?: string;
   required?: boolean;
@@ -11,31 +24,31 @@ export interface FormField {
   readonly?: boolean;
   fullWidth?: boolean;
   defaultValue?: any;
-  
+
   // Text/Number specific
   maxLength?: number;
   min?: number;
   max?: number;
   step?: number;
-  
+
   // Textarea specific
   rows?: number;
-  
+
   // Select/Multiselect specific
   options?: Array<{ value: any; label: string }>;
-  
+
   // Checkbox specific
   checkboxLabel?: string;
-  
+
   // Switch specific
   switchLabel?: string;
-  
+
   // Conditional field support
   conditional?: {
     dependsOn: string;
     showWhen: (value: any) => boolean;
   };
-  
+
   // Validation
   validator?: (value: any) => string | null;
 }

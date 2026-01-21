@@ -11,28 +11,28 @@ export const clientsFormSections: FormSection[] = [
         label: 'Nome da Empresa',
         type: 'text',
         required: true,
-        placeholder: 'Nome oficial da empresa'
+        placeholder: 'Nome oficial da empresa',
       },
       {
         key: 'nomeComercial',
         label: 'Nome Comercial',
         type: 'text',
         required: true,
-        placeholder: 'Nome comercial da empresa'
+        placeholder: 'Nome comercial da empresa',
       },
       {
         key: 'contribuinte',
         label: 'Contribuinte',
         type: 'text',
-        placeholder: '123456789'
+        placeholder: '123456789',
       },
       {
         key: 'responsavel',
         label: 'Responsável',
         type: 'text',
-        placeholder: 'Nome do responsável'
-      }
-    ]
+        placeholder: 'Nome do responsável',
+      },
+    ],
   },
   {
     key: 'contact',
@@ -43,27 +43,27 @@ export const clientsFormSections: FormSection[] = [
         key: 'telefone',
         label: 'Telefone',
         type: 'tel',
-        placeholder: '+351 123 456 789'
+        placeholder: '+351 123 456 789',
       },
       {
         key: 'telefoneContato',
         label: 'Telefone do Contacto',
         type: 'tel',
-        placeholder: '+351 987 654 321'
+        placeholder: '+351 987 654 321',
       },
       {
         key: 'email',
         label: 'E-mail',
         type: 'email',
-        placeholder: 'empresa@exemplo.com'
+        placeholder: 'empresa@exemplo.com',
       },
       {
         key: 'emailContato',
         label: 'E-mail do Contacto',
         type: 'email',
-        placeholder: 'contacto@exemplo.com'
-      }
-    ]
+        placeholder: 'contacto@exemplo.com',
+      },
+    ],
   },
   {
     key: 'address',
@@ -76,21 +76,21 @@ export const clientsFormSections: FormSection[] = [
         type: 'textarea',
         rows: 3,
         fullWidth: true,
-        placeholder: 'Rua, número, andar, etc.'
+        placeholder: 'Rua, número, andar, etc.',
       },
       {
         key: 'codigoPostal',
         label: 'Código Postal',
         type: 'text',
-        placeholder: '0000-000'
+        placeholder: '0000-000',
       },
       {
         key: 'localidade',
         label: 'Localidade',
         type: 'text',
-        placeholder: 'Cidade'
-      }
-    ]
+        placeholder: 'Cidade',
+      },
+    ],
   },
   {
     key: 'financial',
@@ -102,9 +102,9 @@ export const clientsFormSections: FormSection[] = [
         label: 'IBAN',
         type: 'text',
         fullWidth: true,
-        placeholder: 'PT50 0000 0000 0000 0000 0000 0'
-      }
-    ]
+        placeholder: 'PT50 0000 0000 0000 0000 0000 0',
+      },
+    ],
   },
   {
     key: 'services',
@@ -122,11 +122,11 @@ export const clientsFormSections: FormSection[] = [
           { value: 'temAnydesk', label: 'AnyDesk' },
           { value: 'manutencao', label: 'Manutenção' },
           { value: 'manutencao24', label: 'Manutenção 24h' },
-          { value: 'dumps', label: 'DUMPS' }
+          { value: 'dumps', label: 'DUMPS' },
         ],
-        placeholder: 'Selecione os serviços...'
-      }
-    ]
+        placeholder: 'Selecione os serviços...',
+      },
+    ],
   },
   {
     key: 'conditionalFields',
@@ -140,8 +140,8 @@ export const clientsFormSections: FormSection[] = [
         placeholder: 'Username AT',
         conditional: {
           dependsOn: 'selectedServices',
-          showWhen: (value: any) => Array.isArray(value) && value.includes('atcud')
-        }
+          showWhen: (value: any) => Array.isArray(value) && value.includes('atcud'),
+        },
       },
       {
         key: 'atPassword',
@@ -150,8 +150,8 @@ export const clientsFormSections: FormSection[] = [
         placeholder: 'Password AT',
         conditional: {
           dependsOn: 'selectedServices',
-          showWhen: (value: any) => Array.isArray(value) && value.includes('atcud')
-        }
+          showWhen: (value: any) => Array.isArray(value) && value.includes('atcud'),
+        },
       },
       {
         key: 'vectronAddress',
@@ -161,8 +161,8 @@ export const clientsFormSections: FormSection[] = [
         placeholder: 'Ex: 192.168.1.100 ou vectron.empresa.com',
         conditional: {
           dependsOn: 'selectedServices',
-          showWhen: (value: any) => Array.isArray(value) && value.includes('vectronConnect')
-        }
+          showWhen: (value: any) => Array.isArray(value) && value.includes('vectronConnect'),
+        },
       },
       {
         key: 'dumpsLink',
@@ -172,8 +172,8 @@ export const clientsFormSections: FormSection[] = [
         placeholder: 'https://drive.google.com/...',
         conditional: {
           dependsOn: 'selectedServices',
-          showWhen: (value: any) => Array.isArray(value) && value.includes('dumps')
-        }
+          showWhen: (value: any) => Array.isArray(value) && value.includes('dumps'),
+        },
       },
       {
         key: 'seriesDocumentos',
@@ -182,10 +182,10 @@ export const clientsFormSections: FormSection[] = [
         placeholder: 'Ex: A, B, C',
         conditional: {
           dependsOn: 'selectedServices',
-          showWhen: (value: any) => Array.isArray(value) && value.includes('atcud')
-        }
-      }
-    ]
+          showWhen: (value: any) => Array.isArray(value) && value.includes('atcud'),
+        },
+      },
+    ],
   },
   {
     key: 'software',
@@ -196,9 +196,9 @@ export const clientsFormSections: FormSection[] = [
         key: 'softwares',
         label: 'Softwares',
         type: 'custom',
-        fullWidth: true
-      }
-    ]
+        fullWidth: true,
+      },
+    ],
   },
   {
     key: 'observations',
@@ -211,8 +211,8 @@ export const clientsFormSections: FormSection[] = [
         type: 'textarea',
         rows: 4,
         fullWidth: true,
-        placeholder: 'Notas adicionais sobre o cliente...'
-      }
-    ]
-  }
+        placeholder: 'Notas adicionais sobre o cliente...',
+      },
+    ],
+  },
 ];

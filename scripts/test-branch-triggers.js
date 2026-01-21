@@ -19,7 +19,7 @@ class BranchTriggerTester {
       success: '\x1b[32m',
       error: '\x1b[31m',
       warning: '\x1b[33m',
-      reset: '\x1b[0m'
+      reset: '\x1b[0m',
     };
     console.log(`${colors[type]}${message}${colors.reset}`);
   }
@@ -105,7 +105,7 @@ class BranchTriggerTester {
 
     this.test('Test and production environments use different resources', () => {
       const wranglerContent = fs.readFileSync('wrangler.toml', 'utf8');
-      
+
       // Check test environment resources
       if (!wranglerContent.includes('clever-dashboard-test')) {
         throw new Error('Test worker name not configured');
@@ -113,7 +113,7 @@ class BranchTriggerTester {
       if (!wranglerContent.includes('clever-documents-test')) {
         throw new Error('Test R2 bucket not configured');
       }
-      
+
       // Check production environment resources
       if (!wranglerContent.includes('clever-dashboard-prod')) {
         throw new Error('Production worker name not configured');
@@ -128,7 +128,7 @@ class BranchTriggerTester {
 
     this.test('Environment variables are properly configured', () => {
       const wranglerContent = fs.readFileSync('wrangler.toml', 'utf8');
-      
+
       if (!wranglerContent.includes('NODE_ENV = "test"')) {
         throw new Error('Test environment NODE_ENV not configured');
       }
@@ -143,7 +143,7 @@ class BranchTriggerTester {
 
     this.test('Simulate test branch deployment flow', () => {
       const currentBranch = this.getCurrentBranch();
-      
+
       this.log('  1. Code pushed to test branch', 'info');
       this.log('  2. deploy-test.yml workflow triggers', 'info');
       this.log('  3. Dependencies installed with pnpm', 'info');
@@ -151,7 +151,7 @@ class BranchTriggerTester {
       this.log('  5. @clever/frontend and @clever/backend build', 'info');
       this.log('  6. Wrangler deploys to test environment', 'info');
       this.log('  7. Deployment verification runs', 'info');
-      
+
       if (currentBranch === 'test') {
         this.log('  ✅ Currently on test branch - workflow would execute', 'success');
       } else {
@@ -173,7 +173,7 @@ class BranchTriggerTester {
 
   async runAllTests() {
     this.log('🔍 Starting Branch Trigger Validation Tests', 'info');
-    
+
     this.testBranchConfiguration();
     this.testWorkflowTriggerLogic();
     this.testEnvironmentSeparation();
@@ -184,10 +184,12 @@ class BranchTriggerTester {
 
   printResults() {
     this.log('\n=== Branch Trigger Test Results ===', 'info');
-    
+
     const total = this.results.passed + this.results.failed;
-    this.log(`Tests: ${this.results.passed}/${total} passed`, 
-      this.results.failed === 0 ? 'success' : 'warning');
+    this.log(
+      `Tests: ${this.results.passed}/${total} passed`,
+      this.results.failed === 0 ? 'success' : 'warning'
+    );
 
     if (this.results.failed > 0) {
       this.log('\nFailed Tests:', 'error');
@@ -200,7 +202,10 @@ class BranchTriggerTester {
       this.log('\n🎉 All branch trigger tests passed!', 'success');
       this.log('Both workflows are properly configured for branch-based deployment.', 'success');
     } else {
-      this.log(`\n⚠️  ${this.results.failed} tests failed. Please review the issues above.`, 'warning');
+      this.log(
+        `\n⚠️  ${this.results.failed} tests failed. Please review the issues above.`,
+        'warning'
+      );
     }
 
     // Summary of what was validated

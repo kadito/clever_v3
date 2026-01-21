@@ -1,6 +1,8 @@
 # Content Implementation Template Guide
 
-This guide provides the complete templates and patterns discovered during implementation experience, incorporating all improvements and best practices for any content type.
+This guide provides the complete templates and patterns discovered during
+implementation experience, incorporating all improvements and best practices for
+any content type.
 
 ## Template Components
 
@@ -16,13 +18,16 @@ const globalFormData = ref<Record<string, any>>({});
 const globalValidationErrors = reactive<Record<string, string>>({});
 
 export function useSharedFormData(formKey: string) {
-  const initializeFormData = (initialData: Record<string, any>, formSections: any[]) => {
+  const initializeFormData = (
+    initialData: Record<string, any>,
+    formSections: any[]
+  ) => {
     // Create a new object
     const newFormData: Record<string, any> = {};
-    
+
     // Start with initial data
     Object.assign(newFormData, initialData);
-    
+
     // Ensure all form fields have keys
     for (const section of formSections) {
       for (const field of section.fields) {
@@ -41,7 +46,7 @@ export function useSharedFormData(formKey: string) {
         }
       }
     }
-    
+
     // Replace the global form data
     globalFormData.value = newFormData;
   };
@@ -51,9 +56,9 @@ export function useSharedFormData(formKey: string) {
       console.warn('Global form data not initialized');
       return;
     }
-    
+
     globalFormData.value[fieldKey] = value;
-    
+
     // Clear validation error for this field
     delete globalValidationErrors[fieldKey];
   };
@@ -75,7 +80,7 @@ export function useSharedFormData(formKey: string) {
     initializeFormData,
     updateFieldValue,
     getFormData,
-    clearFormData
+    clearFormData,
   };
 }
 ```
@@ -85,6 +90,7 @@ export function useSharedFormData(formKey: string) {
 **File**: `packages/frontend/src/components/common/ContentDetailTemplate.vue`
 
 Key improvements:
+
 - User email display in audit trail
 - Proper null checking for display functions
 - Mobile-first responsive design
@@ -106,7 +112,10 @@ Key improvements:
                   {{ getTitle(item) }}
                 </slot>
               </h1>
-              <p v-if="getSubtitle(item)" class="text-sm text-gray-600 truncate">
+              <p
+                v-if="getSubtitle(item)"
+                class="text-sm text-gray-600 truncate"
+              >
                 <slot name="subtitle" :item="item">
                   {{ getSubtitle(item) }}
                 </slot>
@@ -122,7 +131,12 @@ Key improvements:
                 @click="handleEdit"
                 class="btn-primary inline-flex items-center text-sm"
               >
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  class="w-4 h-4 mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -171,35 +185,61 @@ Key improvements:
         <!-- Audit trail section -->
         <div v-if="showAuditTrail" class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Histórico</h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="flex items-start space-x-3">
-                  <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                  <div
+                    class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center"
+                  >
+                    <svg
+                      class="w-4 h-4 text-green-600"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clip-rule="evenodd"
+                      />
                     </svg>
                   </div>
                   <div class="flex-1">
                     <p class="text-sm text-gray-900">
-                      <strong>Criado</strong> por {{ getUserDisplayName(item.createdBy) }}
+                      <strong>Criado</strong> por
+                      {{ getUserDisplayName(item.createdBy) }}
                     </p>
-                    <p class="text-xs text-gray-500">{{ formatDateTime(item.createdAt) }}</p>
+                    <p class="text-xs text-gray-500">
+                      {{ formatDateTime(item.createdAt) }}
+                    </p>
                   </div>
                 </div>
                 <div class="flex items-start space-x-3">
-                  <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                  <div
+                    class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center"
+                  >
+                    <svg
+                      class="w-4 h-4 text-blue-600"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+                      />
                     </svg>
                   </div>
                   <div class="flex-1">
                     <p class="text-sm text-gray-900">
-                      <strong>Atualizado</strong> por {{ getUserDisplayName(item.updatedBy) }}
+                      <strong>Atualizado</strong> por
+                      {{ getUserDisplayName(item.updatedBy) }}
                     </p>
-                    <p class="text-xs text-gray-500">{{ formatDateTime(item.updatedAt) }}</p>
+                    <p class="text-xs text-gray-500">
+                      {{ formatDateTime(item.updatedAt) }}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -233,16 +273,16 @@ interface Props {
   item: BaseContent | null;
   isLoading?: boolean;
   error?: string | null;
-  
+
   // Navigation
   backRoute?: string;
-  
+
   // Display configuration
   showEditButton?: boolean;
   showMetaBar?: boolean;
   showAuditTrail?: boolean;
   showMobileActions?: boolean;
-  
+
   // Content display functions
   getTitle?: (item: BaseContent | null) => string;
   getSubtitle?: (item: BaseContent | null) => string;
@@ -260,7 +300,9 @@ const props = withDefaults(defineProps<Props>(), {
   showMobileActions: true,
   getTitle: (item: BaseContent | null) => {
     if (!item || !item.data) return 'Item';
-    return item.data.name || item.data.title || `Item #${item.uuid.slice(0, 8)}`;
+    return (
+      item.data.name || item.data.title || `Item #${item.uuid.slice(0, 8)}`
+    );
   },
   getSubtitle: (item: BaseContent | null) => {
     if (!item || !item.data) return '';
@@ -285,12 +327,12 @@ const { user } = useAuth();
 // User display name function
 const getUserDisplayName = (userId: string | undefined): string => {
   if (!userId) return 'Sistema';
-  
+
   // If it's the current user, show their email
   if (user.value && user.value.userId === userId) {
     return user.value.email || user.value.userId;
   }
-  
+
   // For other users, show the user ID for now
   // In the future, this could be enhanced with a user lookup service
   return userId;
@@ -363,11 +405,11 @@ const clearError = () => {
   .content-detail-container {
     background: white;
   }
-  
+
   header {
     display: none;
   }
-  
+
   .detail-section {
     break-inside: avoid;
     margin-bottom: 1rem;
@@ -390,13 +432,16 @@ const globalFormData = ref<Record<string, any>>({});
 const globalValidationErrors = reactive<Record<string, string>>({});
 
 export function useSharedFormData(formKey: string) {
-  const initializeFormData = (initialData: Record<string, any>, formSections: any[]) => {
+  const initializeFormData = (
+    initialData: Record<string, any>,
+    formSections: any[]
+  ) => {
     // Create a new object
     const newFormData: Record<string, any> = {};
-    
+
     // Start with initial data
     Object.assign(newFormData, initialData);
-    
+
     // Ensure all form fields have keys
     for (const section of formSections) {
       for (const field of section.fields) {
@@ -415,7 +460,7 @@ export function useSharedFormData(formKey: string) {
         }
       }
     }
-    
+
     // Replace the global form data
     globalFormData.value = newFormData;
   };
@@ -425,9 +470,9 @@ export function useSharedFormData(formKey: string) {
       console.warn('Global form data not initialized');
       return;
     }
-    
+
     globalFormData.value[fieldKey] = value;
-    
+
     // Clear validation error for this field
     delete globalValidationErrors[fieldKey];
   };
@@ -449,7 +494,7 @@ export function useSharedFormData(formKey: string) {
     initializeFormData,
     updateFieldValue,
     getFormData,
-    clearFormData
+    clearFormData,
   };
 }
 ```
@@ -459,6 +504,7 @@ export function useSharedFormData(formKey: string) {
 **File**: `packages/frontend/src/components/common/ContentDetailTemplate.vue`
 
 Key improvements:
+
 - User email display in audit trail
 - Proper null checking for display functions
 - Mobile-first responsive design
@@ -480,7 +526,10 @@ Key improvements:
                   {{ getTitle(item) }}
                 </slot>
               </h1>
-              <p v-if="getSubtitle(item)" class="text-sm text-gray-600 truncate">
+              <p
+                v-if="getSubtitle(item)"
+                class="text-sm text-gray-600 truncate"
+              >
                 <slot name="subtitle" :item="item">
                   {{ getSubtitle(item) }}
                 </slot>
@@ -496,7 +545,12 @@ Key improvements:
                 @click="handleEdit"
                 class="btn-primary inline-flex items-center text-sm"
               >
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  class="w-4 h-4 mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -545,35 +599,61 @@ Key improvements:
         <!-- Audit trail section -->
         <div v-if="showAuditTrail" class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Histórico</h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="flex items-start space-x-3">
-                  <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                  <div
+                    class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center"
+                  >
+                    <svg
+                      class="w-4 h-4 text-green-600"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clip-rule="evenodd"
+                      />
                     </svg>
                   </div>
                   <div class="flex-1">
                     <p class="text-sm text-gray-900">
-                      <strong>Criado</strong> por {{ getUserDisplayName(item.createdBy) }}
+                      <strong>Criado</strong> por
+                      {{ getUserDisplayName(item.createdBy) }}
                     </p>
-                    <p class="text-xs text-gray-500">{{ formatDateTime(item.createdAt) }}</p>
+                    <p class="text-xs text-gray-500">
+                      {{ formatDateTime(item.createdAt) }}
+                    </p>
                   </div>
                 </div>
                 <div class="flex items-start space-x-3">
-                  <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                  <div
+                    class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center"
+                  >
+                    <svg
+                      class="w-4 h-4 text-blue-600"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+                      />
                     </svg>
                   </div>
                   <div class="flex-1">
                     <p class="text-sm text-gray-900">
-                      <strong>Atualizado</strong> por {{ getUserDisplayName(item.updatedBy) }}
+                      <strong>Atualizado</strong> por
+                      {{ getUserDisplayName(item.updatedBy) }}
                     </p>
-                    <p class="text-xs text-gray-500">{{ formatDateTime(item.updatedAt) }}</p>
+                    <p class="text-xs text-gray-500">
+                      {{ formatDateTime(item.updatedAt) }}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -607,16 +687,16 @@ interface Props {
   item: BaseContent | null;
   isLoading?: boolean;
   error?: string | null;
-  
+
   // Navigation
   backRoute?: string;
-  
+
   // Display configuration
   showEditButton?: boolean;
   showMetaBar?: boolean;
   showAuditTrail?: boolean;
   showMobileActions?: boolean;
-  
+
   // Content display functions
   getTitle?: (item: BaseContent | null) => string;
   getSubtitle?: (item: BaseContent | null) => string;
@@ -634,7 +714,9 @@ const props = withDefaults(defineProps<Props>(), {
   showMobileActions: true,
   getTitle: (item: BaseContent | null) => {
     if (!item || !item.data) return 'Item';
-    return item.data.name || item.data.title || `Item #${item.uuid.slice(0, 8)}`;
+    return (
+      item.data.name || item.data.title || `Item #${item.uuid.slice(0, 8)}`
+    );
   },
   getSubtitle: (item: BaseContent | null) => {
     if (!item || !item.data) return '';
@@ -659,12 +741,12 @@ const { user } = useAuth();
 // User display name function
 const getUserDisplayName = (userId: string | undefined): string => {
   if (!userId) return 'Sistema';
-  
+
   // If it's the current user, show their email
   if (user.value && user.value.userId === userId) {
     return user.value.email || user.value.userId;
   }
-  
+
   // For other users, show the user ID for now
   // In the future, this could be enhanced with a user lookup service
   return userId;
@@ -737,11 +819,11 @@ const clearError = () => {
   .content-detail-container {
     background: white;
   }
-  
+
   header {
     display: none;
   }
-  
+
   .detail-section {
     break-inside: avoid;
     margin-bottom: 1rem;
@@ -793,15 +875,15 @@ interface Props {
   createTitle?: string;
   subtitle?: string;
   cancelRoute?: string;
-  
+
   // Form configuration
   formSections: FormSection[];
-  
+
   // State
   isLoading?: boolean;
   isSaving?: boolean;
   error?: string | null;
-  
+
   // Validation
   customValidator?: (data: Record<string, any>) => Record<string, string>;
 }
@@ -822,22 +904,29 @@ const emit = defineEmits<{
 }>();
 
 // Create-specific validation that can be overridden
-const validateCreateForm = (data: Record<string, any>): Record<string, string> => {
+const validateCreateForm = (
+  data: Record<string, any>
+): Record<string, string> => {
   // If custom validator is provided, use it exclusively
   if (props.customValidator) {
     return props.customValidator(data);
   }
-  
+
   // Default create validation - all required fields must be present
   const errors: Record<string, string> = {};
   for (const section of props.formSections) {
     for (const field of section.fields) {
-      if (field.required && (!data[field.key] || (typeof data[field.key] === 'string' && data[field.key].trim() === ''))) {
+      if (
+        field.required &&
+        (!data[field.key] ||
+          (typeof data[field.key] === 'string' &&
+            data[field.key].trim() === ''))
+      ) {
         errors[field.key] = `${field.label} é obrigatório`;
       }
     }
   }
-  
+
   return errors;
 };
 
@@ -868,13 +957,22 @@ const clearError = () => {
 export interface FormField {
   key: string;
   label: string;
-  type: 'text' | 'email' | 'tel' | 'url' | 'number' | 'textarea' | 'select' | 'checkbox' | 'date';
+  type:
+    | 'text'
+    | 'email'
+    | 'tel'
+    | 'url'
+    | 'number'
+    | 'textarea'
+    | 'select'
+    | 'checkbox'
+    | 'date';
   required?: boolean;
   placeholder?: string;
   help?: string;
   disabled?: boolean;
   fullWidth?: boolean;
-  
+
   // Type-specific options
   maxLength?: number;
   min?: number;
@@ -884,7 +982,7 @@ export interface FormField {
   options?: Array<{ value: string; label: string }>;
   checkboxLabel?: string;
   defaultValue?: any;
-  
+
   // Validation
   validator?: (value: any) => string | null;
 }
@@ -911,6 +1009,7 @@ export interface FormSection {
 ```
 
 **types.ts**:
+
 ```typescript
 import type { BaseContent } from '../base';
 
@@ -930,44 +1029,46 @@ export interface {ContentType} extends BaseContent {
 ```
 
 **validation.ts**:
+
 ```typescript
 import type { {ContentType}Data } from './types';
 
 export function validate{ContentType}Creation(data: {ContentType}Data): string[] {
   const errors: string[] = [];
-  
+
   // Required field validation
   if (!data.primaryField?.trim()) {
     errors.push('Campo principal é obrigatório');
   }
-  
+
   if (!data.secondaryField?.trim()) {
     errors.push('Campo secundário é obrigatório');
   }
-  
+
   // Type-specific validation
   if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
     errors.push('Email inválido');
   }
-  
+
   // Additional validation rules based on content type...
-  
+
   return errors;
 }
 
 export function validate{ContentType}Update(data: Partial<{ContentType}Data>): string[] {
   const errors: string[] = [];
-  
+
   // Update-specific validation (may be less strict)
   if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
     errors.push('Email inválido');
   }
-  
+
   return errors;
 }
 ```
 
 **index.ts**:
+
 ```typescript
 export * from './types';
 export * from './validation';
@@ -1041,6 +1142,7 @@ export default {contentType}Router;
 ```
 
 **{ContentType}CreateView.vue**:
+
 ```vue
 <template>
   <ContentCreateTemplate
@@ -1213,7 +1315,7 @@ const createFormSections: FormSection[] = [
 // Validation function
 const validateCreateForm = (data: Record<string, any>): Record<string, string> => {
   const errors: Record<string, string> = {};
-  
+
   try {
     // Convert multiselect arrays to individual boolean fields if needed
     const selectedServices = data.selectedServices || [];
@@ -1223,7 +1325,7 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
       hasService2: selectedServices.includes('service2'),
       hasService3: selectedServices.includes('service3')
     };
-    
+
     // Prepare content data for validation
     const contentData: {ContentType}Data = {
       primaryField: data.primaryField || '',
@@ -1232,10 +1334,10 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
       // Map all form data to ContentData structure...
       ...serviceFlags
     };
-    
+
     // Use shared validation
     const validationErrors = validate{ContentType}Creation(contentData);
-    
+
     // Convert validation errors to form errors
     validationErrors.forEach((errorMessage) => {
       // Map error messages to field keys
@@ -1250,7 +1352,7 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
     console.error('Error in validation:', err);
     errors.general = 'Erro na validação dos dados';
   }
-  
+
   return errors;
 };
 
@@ -1259,7 +1361,7 @@ const handleCreate = async (formData: Record<string, any>) => {
   try {
     isSaving.value = true;
     clearError();
-    
+
     // Convert multiselect arrays to individual boolean fields if needed
     const selectedServices = formData.selectedServices || [];
     const serviceFlags = {
@@ -1267,7 +1369,7 @@ const handleCreate = async (formData: Record<string, any>) => {
       hasService2: selectedServices.includes('service2'),
       hasService3: selectedServices.includes('service3')
     };
-    
+
     // Prepare the content data
     const contentData: {ContentType}Data = {
       primaryField: formData.primaryField || '',
@@ -1276,9 +1378,9 @@ const handleCreate = async (formData: Record<string, any>) => {
       // Map all form data...
       ...serviceFlags
     };
-    
+
     const response = await api.create({ data: contentData } as any);
-    
+
     if (response) {
       // Navigate to the created item's detail page
       router.push(`/{content-type}/${response.uuid}`);
@@ -1309,10 +1411,11 @@ const handleCancel = () => {
 ```
 
 **{ContentType}DetailView.vue**:
+
 ```vue
 <template>
   <ContentDetailTemplate
-    :item="{contentType}"
+    :item="{ contentType }"
     :is-loading="isLoading"
     :error="error"
     back-route="/{content-type}"
@@ -1333,31 +1436,41 @@ const handleCancel = () => {
         <!-- Basic Information Section -->
         <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-              <h2 class="text-lg font-semibold text-gray-900">Informação Básica</h2>
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
+              <h2 class="text-lg font-semibold text-gray-900">
+                Informação Básica
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
                 <div class="detail-item">
                   <label class="detail-label">Campo Principal</label>
-                  <div class="detail-value">{{ item.data.primaryField || '-' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.primaryField || '-' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Campo Secundário</label>
-                  <div class="detail-value">{{ item.data.secondaryField || '-' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.secondaryField || '-' }}
+                  </div>
                 </div>
                 <!-- Additional fields based on content type... -->
               </div>
             </div>
           </div>
         </div>
-        
+
         <!-- Additional sections based on content type requirements... -->
-        
+
         <!-- Services Section (if applicable) -->
         <div v-if="hasServices(item.data)" class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Serviços</h2>
             </div>
             <div class="p-4 sm:p-6">
@@ -1371,7 +1484,9 @@ const handleCancel = () => {
         <!-- Configuration Section (if applicable) -->
         <div v-if="hasConfigurations(item.data)" class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Configuração</h2>
             </div>
             <div class="p-4 sm:p-6">
@@ -1383,11 +1498,15 @@ const handleCancel = () => {
         <!-- Observations Section -->
         <div v-if="item.data.observacoes" class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Observações</h2>
             </div>
             <div class="p-4 sm:p-6">
-              <p class="text-gray-900 whitespace-pre-wrap">{{ item.data.observacoes }}</p>
+              <p class="text-gray-900 whitespace-pre-wrap">
+                {{ item.data.observacoes }}
+              </p>
             </div>
           </div>
         </div>
@@ -1431,20 +1550,20 @@ const get{ContentType}Subtitle = (item: BaseContent | null): string => {
   if (!item || !item.data) return '';
   const content = item as {ContentType};
   const parts = [];
-  
+
   if (content.data.optionalField) {
     parts.push(content.data.optionalField);
   }
-  
+
   // Additional subtitle parts based on content type...
-  
+
   return parts.join(' • ');
 };
 
 const get{ContentType}Status = (item: BaseContent | null): string => {
   if (!item || !item.data) return '{Portuguese Label}';
   const content = item as {ContentType};
-  
+
   // Content-specific status logic
   return '{Portuguese Label} Ativo';
 };
@@ -1474,18 +1593,18 @@ const handleBack = () => {
 // Data loading
 const load{ContentType} = async () => {
   const contentId = route.params.uuid as string;
-  
+
   if (!contentId) {
     error.value = 'ID do {portuguese label} não fornecido';
     return;
   }
-  
+
   try {
     isLoading.value = true;
     clearError();
-    
+
     await api.fetchById(contentId);
-    
+
     if (api.currentItem.value) {
       {contentType}.value = api.currentItem.value;
     } else {
@@ -1550,41 +1669,55 @@ onMounted(() => {
 For each new content type, follow this checklist:
 
 ### Phase 1: Analysis
-- [ ] Analyze legacy Detail view component (`old_src/views/{content-type}/{ContentType}Detail.vue`)
-- [ ] Analyze legacy Form view component (`old_src/views/{content-type}/{ContentType}Form.vue`)
+
+- [ ] Analyze legacy Detail view component
+      (`old_src/views/{content-type}/{ContentType}Detail.vue`)
+- [ ] Analyze legacy Form view component
+      (`old_src/views/{content-type}/{ContentType}Form.vue`)
 - [ ] Extract data structure and field definitions
 - [ ] Identify validation rules and business logic
 - [ ] Document Portuguese labels and terminology
 
 ### Phase 2: Shared Package
+
 - [ ] Create `types.ts` with content-specific interfaces extending BaseContent
 - [ ] Create `validation.ts` with validation functions using Portuguese messages
 - [ ] Create `index.ts` with exports
 - [ ] Add content type to shared package exports
 
 ### Phase 3: Backend
-- [ ] Create route file using content route template (`packages/backend/src/routes/{content-type}.ts`)
-- [ ] Configure content-specific sorting strategy (alphabetical for clients, date-desc for others)
+
+- [ ] Create route file using content route template
+      (`packages/backend/src/routes/{content-type}.ts`)
+- [ ] Configure content-specific sorting strategy (alphabetical for clients,
+      date-desc for others)
 - [ ] Implement validation integration with shared validation functions
 - [ ] Configure searchable fields and index fields for efficient filtering
 - [ ] Add route to main router
 
 ### Phase 4: Frontend Configuration
-- [ ] Create form sections configuration file (`packages/frontend/src/config/{content-type}-form-sections.ts`)
+
+- [ ] Create form sections configuration file
+      (`packages/frontend/src/config/{content-type}-form-sections.ts`)
 - [ ] Define all form sections with proper field types and validation
 - [ ] Implement multiselect dropdowns where appropriate
 - [ ] Configure conditional fields with dependency tracking
 - [ ] Set up dynamic configuration management if needed
 
 ### Phase 5: Frontend Components
+
 - [ ] Create ListView component with content-specific display functions
-- [ ] Create DetailView component with proper display functions and section ordering
-- [ ] Create CreateView component with form sections and custom field implementations
-- [ ] Create UpdateView component (if different from create) with pre-population logic
+- [ ] Create DetailView component with proper display functions and section
+      ordering
+- [ ] Create CreateView component with form sections and custom field
+      implementations
+- [ ] Create UpdateView component (if different from create) with pre-population
+      logic
 - [ ] Add routes to Vue Router with proper navigation
 - [ ] Add navigation tiles to dashboard
 
 ### Phase 6: Testing & Validation
+
 - [ ] Test complete CRUD workflow (Create, Read, Update, Delete)
 - [ ] Verify mobile responsiveness across all breakpoints (320px+)
 - [ ] Test form validation with Portuguese messages
@@ -1597,31 +1730,50 @@ For each new content type, follow this checklist:
 
 ## Best Practices Summary
 
-1. **Form Data Management**: Always use `useSharedFormData` composable to handle Vue component recreation issues
-2. **Validation**: Use shared validation functions with Portuguese messages and proper field mapping
-3. **Null Safety**: Add proper null checking in all display functions to prevent runtime errors
-4. **Mobile-First**: Design for 320px+ width with touch-friendly targets (minimum 44px)
-5. **Portuguese UI**: All labels in Portuguese, code in English with proper terminology mapping
-6. **Audit Trail**: Display user emails instead of user IDs using `useAuth()` composable
-7. **Error Handling**: Provide clear Portuguese error messages with field-specific feedback
+1. **Form Data Management**: Always use `useSharedFormData` composable to handle
+   Vue component recreation issues
+2. **Validation**: Use shared validation functions with Portuguese messages and
+   proper field mapping
+3. **Null Safety**: Add proper null checking in all display functions to prevent
+   runtime errors
+4. **Mobile-First**: Design for 320px+ width with touch-friendly targets
+   (minimum 44px)
+5. **Portuguese UI**: All labels in Portuguese, code in English with proper
+   terminology mapping
+6. **Audit Trail**: Display user emails instead of user IDs using `useAuth()`
+   composable
+7. **Error Handling**: Provide clear Portuguese error messages with
+   field-specific feedback
 8. **Loading States**: Show loading skeletons for better UX during data fetching
-9. **Responsive Design**: Use CSS Grid with proper breakpoints (sm: 768px, md: 1024px, lg: 1280px)
-10. **TypeScript**: Maintain strict mode compliance throughout all implementations
-11. **Multiselect Dropdowns**: Replace individual checkboxes with touch-friendly multiselect interfaces
-12. **Conditional Fields**: Implement dynamic field visibility based on form selections with proper dependency tracking
-13. **Section Ordering**: Follow standard ordering (Basic → Contact → Address → Financial → Services → Configuration → Observations)
-14. **Dynamic Configuration**: Support add/remove/edit functionality for complex configuration items
-15. **JSON Configuration**: Maintain all form sections in JSON configuration files for better maintainability
+9. **Responsive Design**: Use CSS Grid with proper breakpoints (sm: 768px, md:
+   1024px, lg: 1280px)
+10. **TypeScript**: Maintain strict mode compliance throughout all
+    implementations
+11. **Multiselect Dropdowns**: Replace individual checkboxes with touch-friendly
+    multiselect interfaces
+12. **Conditional Fields**: Implement dynamic field visibility based on form
+    selections with proper dependency tracking
+13. **Section Ordering**: Follow standard ordering (Basic → Contact → Address →
+    Financial → Services → Configuration → Observations)
+14. **Dynamic Configuration**: Support add/remove/edit functionality for complex
+    configuration items
+15. **JSON Configuration**: Maintain all form sections in JSON configuration
+    files for better maintainability
 
 ## Generic Placeholder Reference
 
 When implementing any content type, replace these placeholders:
 
-- `{content-type}` → kebab-case content type (e.g., `clients`, `contracts`, `work-sheets`)
-- `{ContentType}` → PascalCase content type (e.g., `Client`, `Contract`, `WorkSheet`)
-- `{contentType}` → camelCase content type (e.g., `client`, `contract`, `workSheet`)
-- `{portuguese-label}` → Portuguese label lowercase (e.g., `cliente`, `contrato`, `folha de obra`)
-- `{Portuguese Label}` → Portuguese label title case (e.g., `Cliente`, `Contrato`, `Folha de Obra`)
+- `{content-type}` → kebab-case content type (e.g., `clients`, `contracts`,
+  `work-sheets`)
+- `{ContentType}` → PascalCase content type (e.g., `Client`, `Contract`,
+  `WorkSheet`)
+- `{contentType}` → camelCase content type (e.g., `client`, `contract`,
+  `workSheet`)
+- `{portuguese-label}` → Portuguese label lowercase (e.g., `cliente`,
+  `contrato`, `folha de obra`)
+- `{Portuguese Label}` → Portuguese label title case (e.g., `Cliente`,
+  `Contrato`, `Folha de Obra`)
 
 ## Content Type Mapping Reference
 

@@ -2,7 +2,10 @@
 
 ## Overview
 
-Migrate the CLEVER Dashboard monorepo from npm workspaces to pnpm workspaces through a systematic approach that preserves functionality while gaining performance benefits. The implementation includes configuration updates, documentation changes, and comprehensive verification.
+Migrate the CLEVER Dashboard monorepo from npm workspaces to pnpm workspaces
+through a systematic approach that preserves functionality while gaining
+performance benefits. The implementation includes configuration updates,
+documentation changes, and comprehensive verification.
 
 ## Tasks
 
@@ -25,7 +28,7 @@ Migrate the CLEVER Dashboard monorepo from npm workspaces to pnpm workspaces thr
   - _Requirements: 1.3, 2.3, 3.1, 3.2, 3.3, 3.4_
 
 - [x] 4. Update workspace package.json files
-  - Update internal dependencies to use workspace:* protocol
+  - Update internal dependencies to use workspace:\* protocol
   - Verify package names and structure remain unchanged
   - _Requirements: 1.4, 4.2_
 
@@ -102,7 +105,7 @@ Migrate the CLEVER Dashboard monorepo from npm workspaces to pnpm workspaces thr
     - Verify file structure and dependencies
     - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-  - [ ]* 10.2 Create rollback verification script
+  - [ ]\* 10.2 Create rollback verification script
     - Test rollback process works correctly
     - Verify npm workspace restoration
     - _Requirements: 6.3_

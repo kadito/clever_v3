@@ -4,15 +4,18 @@ This directory contains reusable components for the CLEVER dashboard system.
 
 ## RelationInfoDisplay Component
 
-A reusable component for displaying relation information with automatic error handling and responsive design.
+A reusable component for displaying relation information with automatic error
+handling and responsive design.
 
 ### Features
 
-- **Automatic Error Handling**: Displays appropriate error messages for 404/500 errors
+- **Automatic Error Handling**: Displays appropriate error messages for 404/500
+  errors
 - **Missing Data Handling**: Shows "não encontrado" messages for null relations
 - **Mobile-First Design**: Responsive layout optimized for mobile devices
 - **Portuguese Labels**: All UI text in Portuguese
-- **Consistent Layout**: Same relation types use identical layouts across content types
+- **Consistent Layout**: Same relation types use identical layouts across
+  content types
 - **TypeScript Support**: Full type safety with proper interfaces
 
 ### Usage
@@ -33,18 +36,19 @@ import { RelationInfoDisplay } from '@/components/common';
 
 ### Props
 
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `relationData` | `RelationResult \| null \| undefined` | Yes | The relation data (resolved relation or error) |
-| `relationType` | `string` | Yes | The relation type (e.g., 'client', 'contract') |
-| `relationId` | `string` | No | The original relation ID for debugging |
-| `showDebugInfo` | `boolean` | No | Whether to show debug information (relation ID) |
-| `customDisplayName` | `string` | No | Custom display name for the relation |
-| `customFields` | `Array<{ key: string; label: string }>` | No | Custom fields to display (overrides default fields) |
+| Prop                | Type                                    | Required | Description                                         |
+| ------------------- | --------------------------------------- | -------- | --------------------------------------------------- |
+| `relationData`      | `RelationResult \| null \| undefined`   | Yes      | The relation data (resolved relation or error)      |
+| `relationType`      | `string`                                | Yes      | The relation type (e.g., 'client', 'contract')      |
+| `relationId`        | `string`                                | No       | The original relation ID for debugging              |
+| `showDebugInfo`     | `boolean`                               | No       | Whether to show debug information (relation ID)     |
+| `customDisplayName` | `string`                                | No       | Custom display name for the relation                |
+| `customFields`      | `Array<{ key: string; label: string }>` | No       | Custom fields to display (overrides default fields) |
 
 ### Supported Relation Types
 
-- **client**: Displays client information (company name, NIF, location, contact info)
+- **client**: Displays client information (company name, NIF, location, contact
+  info)
 - **contract**: Displays contract information (contract number, dates, value)
 
 ### Error States
@@ -105,10 +109,11 @@ This component validates the following requirements:
 
 ## Five-View Pattern Architecture
 
-Each content type follows a **Five-View Pattern** for consistent user experience:
+Each content type follows a **Five-View Pattern** for consistent user
+experience:
 
 1. **ListView** - Browse and search content
-2. **DetailView** - View individual item details  
+2. **DetailView** - View individual item details
 3. **CreateView** - Create new content
 4. **UpdateView** - Edit existing content
 5. **HomeView** - Dashboard navigation tiles
@@ -117,9 +122,12 @@ Each content type follows a **Five-View Pattern** for consistent user experience
 
 ### Base Templates
 
-- **ContentListTemplate** - Mobile-first list view with search, pagination, and FAB
-- **ContentDetailTemplate** - Responsive detail view with sections and audit trail
-- **ContentFormTemplate** - Mobile-optimized form with validation and Portuguese labels
+- **ContentListTemplate** - Mobile-first list view with search, pagination, and
+  FAB
+- **ContentDetailTemplate** - Responsive detail view with sections and audit
+  trail
+- **ContentFormTemplate** - Mobile-optimized form with validation and Portuguese
+  labels
 
 ### Create/Update Templates
 
@@ -167,6 +175,7 @@ Each content type follows a **Five-View Pattern** for consistent user experience
 ### Create vs Update Differences
 
 **Create Components:**
+
 - All fields enabled for new content creation
 - Strict validation - all required fields must be filled
 - Default values can be pre-set
@@ -174,6 +183,7 @@ Each content type follows a **Five-View Pattern** for consistent user experience
 - No pre-population needed
 
 **Update Components:**
+
 - Some fields can be disabled (e.g., creation date, unique IDs)
 - Flexible validation - allow partial updates
 - Pre-populated with existing data
@@ -182,7 +192,8 @@ Each content type follows a **Five-View Pattern** for consistent user experience
 
 ### Form Configuration
 
-Both templates use the same `FormSection[]` structure but with different behaviors:
+Both templates use the same `FormSection[]` structure but with different
+behaviors:
 
 ```typescript
 interface FormSection {
@@ -195,7 +206,16 @@ interface FormSection {
 interface FormField {
   key: string;
   label: string;
-  type: 'text' | 'email' | 'tel' | 'url' | 'number' | 'textarea' | 'select' | 'checkbox' | 'date';
+  type:
+    | 'text'
+    | 'email'
+    | 'tel'
+    | 'url'
+    | 'number'
+    | 'textarea'
+    | 'select'
+    | 'checkbox'
+    | 'date';
   required?: boolean;
   disabled?: boolean;
   readonly?: boolean;
@@ -206,6 +226,7 @@ interface FormField {
 ### Mobile-First Design
 
 All components are designed mobile-first with:
+
 - Touch-friendly targets (minimum 44px)
 - Responsive layouts (320px+ width support)
 - Portuguese labels and validation messages
@@ -241,7 +262,8 @@ packages/frontend/src/components/common/
 ## Best Practices
 
 1. **Consistent Structure**: Follow the Five-View Pattern for all content types
-2. **Separation of Concerns**: Use separate Create/Update components for different business logic
+2. **Separation of Concerns**: Use separate Create/Update components for
+   different business logic
 3. **Mobile-First**: Design for mobile devices first, enhance for desktop
 4. **Portuguese Localization**: All user-facing text in Portuguese
 5. **Type Safety**: Use TypeScript interfaces for all props and data
@@ -249,10 +271,11 @@ packages/frontend/src/components/common/
 7. **Error Handling**: Provide clear, actionable error messages
 8. **Accessibility**: Ensure proper ARIA labels and keyboard navigation
 
-Each content type follows a **Five-View Pattern** for consistent user experience:
+Each content type follows a **Five-View Pattern** for consistent user
+experience:
 
 1. **ListView** - Browse and search content
-2. **DetailView** - View individual item details  
+2. **DetailView** - View individual item details
 3. **CreateView** - Create new content
 4. **UpdateView** - Edit existing content
 5. **HomeView** - Dashboard navigation tiles
@@ -261,9 +284,12 @@ Each content type follows a **Five-View Pattern** for consistent user experience
 
 ### Base Templates
 
-- **ContentListTemplate** - Mobile-first list view with search, pagination, and FAB
-- **ContentDetailTemplate** - Responsive detail view with sections and audit trail
-- **ContentFormTemplate** - Mobile-optimized form with validation and Portuguese labels
+- **ContentListTemplate** - Mobile-first list view with search, pagination, and
+  FAB
+- **ContentDetailTemplate** - Responsive detail view with sections and audit
+  trail
+- **ContentFormTemplate** - Mobile-optimized form with validation and Portuguese
+  labels
 
 ### Create/Update Templates
 
@@ -311,6 +337,7 @@ Each content type follows a **Five-View Pattern** for consistent user experience
 ### Create vs Update Differences
 
 **Create Components:**
+
 - All fields enabled for new content creation
 - Strict validation - all required fields must be filled
 - Default values can be pre-set
@@ -318,6 +345,7 @@ Each content type follows a **Five-View Pattern** for consistent user experience
 - No pre-population needed
 
 **Update Components:**
+
 - Some fields can be disabled (e.g., creation date, unique IDs)
 - Flexible validation - allow partial updates
 - Pre-populated with existing data
@@ -326,7 +354,8 @@ Each content type follows a **Five-View Pattern** for consistent user experience
 
 ### Form Configuration
 
-Both templates use the same `FormSection[]` structure but with different behaviors:
+Both templates use the same `FormSection[]` structure but with different
+behaviors:
 
 ```typescript
 interface FormSection {
@@ -339,7 +368,16 @@ interface FormSection {
 interface FormField {
   key: string;
   label: string;
-  type: 'text' | 'email' | 'tel' | 'url' | 'number' | 'textarea' | 'select' | 'checkbox' | 'date';
+  type:
+    | 'text'
+    | 'email'
+    | 'tel'
+    | 'url'
+    | 'number'
+    | 'textarea'
+    | 'select'
+    | 'checkbox'
+    | 'date';
   required?: boolean;
   disabled?: boolean;
   readonly?: boolean;
@@ -350,6 +388,7 @@ interface FormField {
 ### Mobile-First Design
 
 All components are designed mobile-first with:
+
 - Touch-friendly targets (minimum 44px)
 - Responsive layouts (320px+ width support)
 - Portuguese labels and validation messages
@@ -384,7 +423,8 @@ packages/frontend/src/components/common/
 ## Best Practices
 
 1. **Consistent Structure**: Follow the Five-View Pattern for all content types
-2. **Separation of Concerns**: Use separate Create/Update components for different business logic
+2. **Separation of Concerns**: Use separate Create/Update components for
+   different business logic
 3. **Mobile-First**: Design for mobile devices first, enhance for desktop
 4. **Portuguese Localization**: All user-facing text in Portuguese
 5. **Type Safety**: Use TypeScript interfaces for all props and data

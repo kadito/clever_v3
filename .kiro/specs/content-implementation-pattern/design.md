@@ -2,17 +2,24 @@
 
 ## Overview
 
-This design defines the standard implementation pattern for all content types in the CLEVER dashboard system. The pattern establishes a consistent architecture across shared types, backend API endpoints, and frontend Vue components, ensuring maintainability and a unified user experience.
+This design defines the standard implementation pattern for all content types in
+the CLEVER dashboard system. The pattern establishes a consistent architecture
+across shared types, backend API endpoints, and frontend Vue components,
+ensuring maintainability and a unified user experience.
 
-The design follows the established mobile-first approach with the Five-View Pattern (Home → List → Detail → Create → Update) and integrates with the existing monorepo structure using individual folders for each content type.
+The design follows the established mobile-first approach with the Five-View
+Pattern (Home → List → Detail → Create → Update) and integrates with the
+existing monorepo structure using individual folders for each content type.
 
 ## Key Improvements from Implementation Experience
 
 ### Form Data Management Architecture
 
-During implementation, we discovered and solved critical issues with Vue component recreation that affected form data persistence:
+During implementation, we discovered and solved critical issues with Vue
+component recreation that affected form data persistence:
 
 #### Shared Form Data Composable
+
 ```typescript
 // packages/frontend/src/composables/useSharedFormData.ts
 import { ref, reactive } from 'vue';
@@ -22,13 +29,16 @@ const globalFormData = ref<Record<string, any>>({});
 const globalValidationErrors = reactive<Record<string, string>>({});
 
 export function useSharedFormData(formKey: string) {
-  const initializeFormData = (initialData: Record<string, any>, formSections: any[]) => {
+  const initializeFormData = (
+    initialData: Record<string, any>,
+    formSections: any[]
+  ) => {
     // Create a new object
     const newFormData: Record<string, any> = {};
-    
+
     // Start with initial data
     Object.assign(newFormData, initialData);
-    
+
     // Ensure all form fields have keys
     for (const section of formSections) {
       for (const field of section.fields) {
@@ -47,7 +57,7 @@ export function useSharedFormData(formKey: string) {
         }
       }
     }
-    
+
     // Replace the global form data
     globalFormData.value = newFormData;
   };
@@ -57,9 +67,9 @@ export function useSharedFormData(formKey: string) {
       console.warn('Global form data not initialized');
       return;
     }
-    
+
     globalFormData.value[fieldKey] = value;
-    
+
     // Clear validation error for this field
     delete globalValidationErrors[fieldKey];
   };
@@ -81,13 +91,15 @@ export function useSharedFormData(formKey: string) {
     initializeFormData,
     updateFieldValue,
     getFormData,
-    clearFormData
+    clearFormData,
   };
 }
 ```
 
 #### Component Architecture Split
-The form handling was split into two components for better separation of concerns:
+
+The form handling was split into two components for better separation of
+concerns:
 
 1. **ContentFormTemplate.vue**: Core form rendering engine
    - Handles form field rendering and input types (including multiselect)
@@ -104,6 +116,7 @@ The form handling was split into two components for better separation of concern
 ### Multiselect Dropdown Implementation
 
 #### Enhanced Form Field Types
+
 Added multiselect support to form fields with touch-friendly dropdown interface:
 
 ```typescript
@@ -111,13 +124,24 @@ Added multiselect support to form fields with touch-friendly dropdown interface:
 export interface FormField {
   key: string;
   label: string;
-  type: 'text' | 'email' | 'tel' | 'url' | 'number' | 'textarea' | 'select' | 'checkbox' | 'date' | 'multiselect' | 'password';
+  type:
+    | 'text'
+    | 'email'
+    | 'tel'
+    | 'url'
+    | 'number'
+    | 'textarea'
+    | 'select'
+    | 'checkbox'
+    | 'date'
+    | 'multiselect'
+    | 'password';
   required?: boolean;
   placeholder?: string;
   help?: string;
   disabled?: boolean;
   fullWidth?: boolean;
-  
+
   // Type-specific options
   maxLength?: number;
   min?: number;
@@ -127,19 +151,20 @@ export interface FormField {
   options?: Array<{ value: string; label: string }>;
   checkboxLabel?: string;
   defaultValue?: any;
-  
+
   // Conditional field support
   conditional?: {
     dependsOn: string;
     showWhen: (value: any) => boolean;
   };
-  
+
   // Validation
   validator?: (value: any) => string | null;
 }
 ```
 
 #### Multiselect Component Features
+
 - Touch-friendly dropdown with proper mobile optimization
 - Click-outside closing functionality
 - Tag-based selected items display with individual remove buttons
@@ -150,6 +175,7 @@ export interface FormField {
 ### Conditional Fields Support
 
 #### Dynamic Field Visibility
+
 Form fields can now be conditionally shown based on other field values:
 
 ```typescript
@@ -170,6 +196,7 @@ Form fields can now be conditionally shown based on other field values:
 ### JSON Configuration for Form Sections
 
 #### Centralized Form Configuration
+
 All form sections moved to JSON configuration files for better maintenance:
 
 ```typescript
@@ -214,7 +241,9 @@ export const {contentType}FormSections: FormSection[] = [
 ### Audit Trail Enhancement
 
 #### User Email Display
-Modified `ContentDetailTemplate.vue` to show user email addresses instead of user IDs:
+
+Modified `ContentDetailTemplate.vue` to show user email addresses instead of
+user IDs:
 
 ```typescript
 // Auth composable integration
@@ -223,12 +252,12 @@ const { user } = useAuth();
 // User display name function
 const getUserDisplayName = (userId: string | undefined): string => {
   if (!userId) return 'Sistema';
-  
+
   // If it's the current user, show their email
   if (user.value && user.value.userId === userId) {
     return user.value.email || user.value.userId;
   }
-  
+
   // For other users, show the user ID for now
   // Future enhancement: user lookup service
   return userId;
@@ -236,18 +265,23 @@ const getUserDisplayName = (userId: string | undefined): string => {
 ```
 
 #### Template Updates
+
 ```vue
 <template>
   <!-- Audit trail section -->
   <div class="audit-trail">
     <p><strong>Criado</strong> por {{ getUserDisplayName(item.createdBy) }}</p>
-    <p><strong>Atualizado</strong> por {{ getUserDisplayName(item.updatedBy) }}</p>
+    <p>
+      <strong>Atualizado</strong> por {{ getUserDisplayName(item.updatedBy) }}
+    </p>
   </div>
 </template>
 ```
 
 #### Responsive Edit Button
+
 Edit button now shows conditionally based on screen size:
+
 - Hidden on mobile (available in mobile action bar)
 - Visible on desktop (≥768px) in header
 
@@ -258,7 +292,12 @@ Edit button now shows conditionally based on screen size:
     @click="handleEdit"
     class="btn-primary hidden sm:inline-flex items-center text-sm"
   >
-    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg
+      class="w-4 h-4 mr-1"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
       <path
         stroke-linecap="round"
         stroke-linejoin="round"
@@ -274,9 +313,12 @@ Edit button now shows conditionally based on screen size:
 ### Software Configuration Management
 
 #### Complete Software Configuration
-Implemented comprehensive software configuration system matching the legacy system:
+
+Implemented comprehensive software configuration system matching the legacy
+system:
 
 **Generic Software Types**:
+
 - Model/Product selection with type-specific options
 - Version fields (software version, license version)
 - Serial number tracking
@@ -284,6 +326,7 @@ Implemented comprehensive software configuration system matching the legacy syst
 - Dynamic software management (add/remove/edit)
 
 #### Dynamic Software Management
+
 - Add/remove software instances dynamically
 - Edit mode for individual software configurations
 - Proper validation for required software fields
@@ -292,11 +335,13 @@ Implemented comprehensive software configuration system matching the legacy syst
 ### Section Ordering Requirements
 
 #### Consistent Section Order
+
 Established standard section ordering for all content types:
 
 **Form Views (Create/Update)**:
+
 1. Basic Information
-2. Contact Information  
+2. Contact Information
 3. Address Information
 4. Financial Information
 5. Services (multiselect)
@@ -305,6 +350,7 @@ Established standard section ordering for all content types:
 8. Observations (always last)
 
 **Detail Views**:
+
 1. Basic Information
 2. Contact Information
 3. Address Information
@@ -314,47 +360,54 @@ Established standard section ordering for all content types:
 7. Observações (always last)
 
 ### Validation Architecture Improvements
+
 All validation logic moved to shared package for consistency:
 
 ```typescript
 // packages/shared/src/types/{content-type}/validation.ts
 export function validate{ContentType}Creation(data: {ContentType}Data): string[] {
   const errors: string[] = [];
-  
+
   if (!data.requiredField?.trim()) {
     errors.push('Campo obrigatório é necessário');
   }
-  
+
   if (!data.anotherRequiredField?.trim()) {
     errors.push('Outro campo obrigatório é necessário');
   }
-  
+
   // Additional validation rules...
   return errors;
 }
 ```
 
 #### Custom Validator Integration
+
 Content-specific validation can override or extend default validation:
 
 ```typescript
 // In ContentCreateTemplate.vue
-const validateCreateForm = (data: Record<string, any>): Record<string, string> => {
+const validateCreateForm = (
+  data: Record<string, any>
+): Record<string, string> => {
   // If custom validator is provided, use it exclusively
   if (props.customValidator) {
     return props.customValidator(data);
   }
-  
+
   // Default validation fallback
   const errors: Record<string, string> = {};
   for (const section of props.formSections) {
     for (const field of section.fields) {
-      if (field.required && (!data[field.key] || data[field.key].trim() === '')) {
+      if (
+        field.required &&
+        (!data[field.key] || data[field.key].trim() === '')
+      ) {
         errors[field.key] = `${field.label} é obrigatório`;
       }
     }
   }
-  
+
   return errors;
 };
 ```
@@ -362,6 +415,7 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
 ### Mobile-First Enhancements
 
 #### Touch Target Compliance
+
 All interactive elements meet the 44px minimum requirement:
 
 ```css
@@ -381,6 +435,7 @@ All interactive elements meet the 44px minimum requirement:
 ```
 
 #### Input Type Optimization
+
 Proper HTML5 input types for mobile keyboards:
 
 ```typescript
@@ -406,6 +461,7 @@ Proper HTML5 input types for mobile keyboards:
 ```
 
 #### Responsive Form Sections
+
 Forms adapt from mobile to desktop layouts:
 
 ```css
@@ -429,13 +485,16 @@ Forms adapt from mobile to desktop layouts:
 ### Error Handling Improvements
 
 #### Portuguese Error Messages
+
 All error messages are in Portuguese with proper field mapping:
 
 ```typescript
-const validateCreateForm = (data: Record<string, any>): Record<string, string> => {
+const validateCreateForm = (
+  data: Record<string, any>
+): Record<string, string> => {
   const errors: Record<string, string> = {};
-  
-  validationErrors.forEach((errorMessage) => {
+
+  validationErrors.forEach(errorMessage => {
     if (errorMessage.includes('Campo obrigatório')) {
       errors.requiredField = errorMessage;
     } else if (errorMessage.includes('Email inválido')) {
@@ -443,12 +502,13 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
     }
     // Additional error mapping...
   });
-  
+
   return errors;
 };
 ```
 
 #### Null Safety Improvements
+
 Added proper null checking throughout the components:
 
 ```typescript
@@ -499,18 +559,21 @@ packages/
 
 ### Content Type Mapping
 
-Based on analysis of the legacy system, content types follow this naming convention:
+Based on analysis of the legacy system, content types follow this naming
+convention:
 
-| Code Name           | Portuguese Label            | Legacy Reference    |
-| ------------------- | --------------------------- | ------------------- |
-| `{content-type}`    | {Portuguese Label}          | old_src/{legacy-folder} |
+| Code Name        | Portuguese Label   | Legacy Reference        |
+| ---------------- | ------------------ | ----------------------- |
+| `{content-type}` | {Portuguese Label} | old_src/{legacy-folder} |
 
 **Examples**:
+
 - `clients` → Clientes → old_src/clientes
-- `contracts` → Contratos → old_src/contratos  
+- `contracts` → Contratos → old_src/contratos
 - `licenses` → Licenças → old_src/licencas
 - `work-sheets` → Folhas de Obra → old_src/folhas-obra
-- `daily-records` → Registo Diário de Atividade → old_src/registo-diario-atividade
+- `daily-records` → Registo Diário de Atividade →
+  old_src/registo-diario-atividade
 - `remote-assistance` → Assistências Remotas → old_src/assistencias-remotas
 - `reminders` → Lembretes → (new content type)
 - `pending` → Pendentes → (new content type)
@@ -539,7 +602,9 @@ interface BaseContent {
 
 #### Content-Specific Interface Pattern
 
-Each content type extends BaseContent with its own data structure. The data structure is determined by analyzing the corresponding legacy components in old_src:
+Each content type extends BaseContent with its own data structure. The data
+structure is determined by analyzing the corresponding legacy components in
+old_src:
 
 ```typescript
 // Pattern: packages/shared/src/types/{content-type}/types.ts
@@ -553,11 +618,13 @@ interface {ContentType} extends BaseContent {
 ```
 
 **Implementation Process for Each Content Type**:
+
 1. Analyze `old_src/views/{content-type}/` components (Detail and Form views)
 2. Extract data structure from Vue component templates and form fields
 3. Create TypeScript interfaces matching the legacy schema
 
 **Example Analysis Pattern** (to be applied to all content types):
+
 - **Content Type A**: Analyze `old_src/views/{content-type-a}/` components
 - **Content Type B**: Analyze `old_src/views/{content-type-b}/` components
 - **Content Type C**: Analyze `old_src/views/{content-type-c}/` components
@@ -589,7 +656,8 @@ interface SearchResponse<T> extends ApiResponse<T[]> {
 
 #### ClientSearchInput Component Interface
 
-The ClientSearchInput component provides a reusable client search and selection interface for all content types that relate to clients:
+The ClientSearchInput component provides a reusable client search and selection
+interface for all content types that relate to clients:
 
 ```typescript
 // Component Props Interface
@@ -609,16 +677,25 @@ interface ClientSearchInputEmits {
 ```
 
 **Key Features:**
-- **Debounced Search**: 300ms delay after user stops typing to trigger search requests
-- **Initial Load**: Makes search request on focus even without text input to show recent clients
-- **Mobile-First Design**: Touch-friendly interactions with proper responsive breakpoints
-- **Client Information Display**: Shows company name, commercial name, tax number, and location
-- **Detailed View**: When selected, displays comprehensive client information including contact details
-- **State Management**: Handles loading, error, and empty states with Portuguese feedback
-- **Integration Ready**: Emits both client UUID and full client object for form integration
+
+- **Debounced Search**: 300ms delay after user stops typing to trigger search
+  requests
+- **Initial Load**: Makes search request on focus even without text input to
+  show recent clients
+- **Mobile-First Design**: Touch-friendly interactions with proper responsive
+  breakpoints
+- **Client Information Display**: Shows company name, commercial name, tax
+  number, and location
+- **Detailed View**: When selected, displays comprehensive client information
+  including contact details
+- **State Management**: Handles loading, error, and empty states with Portuguese
+  feedback
+- **Integration Ready**: Emits both client UUID and full client object for form
+  integration
 - **Accessibility**: Proper keyboard navigation and screen reader support
 
 **Usage Pattern:**
+
 ```vue
 <template>
   <ClientSearchInput
@@ -649,7 +726,7 @@ contentRouter.get('/', async (c) => {
   const query = c.req.query('search');
   const page = parseInt(c.req.query('page') || '1');
   const limit = parseInt(c.req.query('limit') || '50');
-  
+
   try {
     if (query) {
       // Search using index
@@ -687,7 +764,7 @@ contentRouter.get('/', async (c) => {
 // Get single content item
 contentRouter.get('/:uuid', async (c) => {
   const uuid = c.req.param('uuid');
-  
+
   try {
     const item = await getContentById(uuid);
     if (!item) {
@@ -697,7 +774,7 @@ contentRouter.get('/:uuid', async (c) => {
         timestamp: new Date().toISOString()
       } as ApiResponse<never>, 404);
     }
-    
+
     return c.json({
       success: true,
       data: item,
@@ -717,7 +794,7 @@ contentRouter.post('/', async (c) => {
   try {
     const body = await c.req.json();
     const item = await createContent(body);
-    
+
     return c.json({
       success: true,
       data: item,
@@ -735,11 +812,11 @@ contentRouter.post('/', async (c) => {
 // Update content
 contentRouter.put('/:uuid', async (c) => {
   const uuid = c.req.param('uuid');
-  
+
   try {
     const body = await c.req.json();
     const item = await updateContent(uuid, body);
-    
+
     return c.json({
       success: true,
       data: item,
@@ -757,10 +834,10 @@ contentRouter.put('/:uuid', async (c) => {
 // Soft delete content
 contentRouter.delete('/:uuid', async (c) => {
   const uuid = c.req.param('uuid');
-  
+
   try {
     await deleteContent(uuid);
-    
+
     return c.json({
       success: true,
       timestamp: new Date().toISOString()
@@ -790,10 +867,10 @@ class ContentStorageService<T extends BaseContent> {
   async get(uuid: string): Promise<T | null> {
     const key = `content/${this.contentType}/${uuid}.json`;
     const object = await this.r2Bucket.get(key);
-    
+
     if (!object) return null;
-    
-    const content = await object.json() as T;
+
+    const content = (await object.json()) as T;
     return content.isDeleted ? null : content;
   }
 
@@ -801,7 +878,7 @@ class ContentStorageService<T extends BaseContent> {
     const uuid = crypto.randomUUID();
     const now = new Date().toISOString();
     const user = 'current-user'; // From Clerk context
-    
+
     const content: T = {
       uuid,
       contentType: this.contentType,
@@ -811,49 +888,49 @@ class ContentStorageService<T extends BaseContent> {
       updatedBy: user,
       version: 1,
       isDeleted: false,
-      data
+      data,
     } as T;
 
     await this.save(content);
     await this.updateIndex(content, 'create');
-    
+
     return content;
   }
 
   async update(uuid: string, data: Partial<T['data']>): Promise<T> {
     const existing = await this.get(uuid);
     if (!existing) throw new Error('Content not found');
-    
+
     const now = new Date().toISOString();
     const user = 'current-user'; // From Clerk context
-    
+
     const updated: T = {
       ...existing,
       data: { ...existing.data, ...data },
       updatedAt: now,
       updatedBy: user,
-      version: existing.version + 1
+      version: existing.version + 1,
     };
 
     await this.save(updated);
     await this.updateIndex(updated, 'update');
-    
+
     return updated;
   }
 
   async delete(uuid: string): Promise<void> {
     const existing = await this.get(uuid);
     if (!existing) throw new Error('Content not found');
-    
+
     const now = new Date().toISOString();
     const user = 'current-user'; // From Clerk context
-    
+
     const deleted: T = {
       ...existing,
       isDeleted: true,
       deletedAt: now,
       deletedBy: user,
-      version: existing.version + 1
+      version: existing.version + 1,
     };
 
     await this.save(deleted);
@@ -865,16 +942,21 @@ class ContentStorageService<T extends BaseContent> {
     await this.r2Bucket.put(key, JSON.stringify(content));
   }
 
-  private async updateIndex(content: T, operation: 'create' | 'update' | 'delete'): Promise<void> {
+  private async updateIndex(
+    content: T,
+    operation: 'create' | 'update' | 'delete'
+  ): Promise<void> {
     const indexKey = `indexes/${this.contentType}-index.json`;
-    
+
     // Get current index
     const indexObject = await this.r2Bucket.get(indexKey);
     const index = indexObject ? await indexObject.json() : { items: [] };
-    
+
     // Update index based on operation
-    const existingIndex = index.items.findIndex((item: any) => item.uuid === content.uuid);
-    
+    const existingIndex = index.items.findIndex(
+      (item: any) => item.uuid === content.uuid
+    );
+
     if (operation === 'delete') {
       if (existingIndex !== -1) {
         index.items[existingIndex].isDeleted = true;
@@ -888,16 +970,16 @@ class ContentStorageService<T extends BaseContent> {
         isDeleted: content.isDeleted,
         // Searchable fields extracted from data
         searchableText: this.extractSearchableText(content),
-        ...this.extractIndexFields(content)
+        ...this.extractIndexFields(content),
       };
-      
+
       if (existingIndex !== -1) {
         index.items[existingIndex] = indexItem;
       } else {
         index.items.push(indexItem);
       }
     }
-    
+
     // Save updated index
     await this.r2Bucket.put(indexKey, JSON.stringify(index));
   }
@@ -922,7 +1004,8 @@ Based on analysis of the legacy components, the frontend follows this pattern:
 
 ##### Five-View Pattern Architecture
 
-The system uses a **Five-View Pattern** for each content type, providing better separation of concerns:
+The system uses a **Five-View Pattern** for each content type, providing better
+separation of concerns:
 
 1. **ListView**: Browse and search content
 2. **DetailView**: View individual item details
@@ -931,11 +1014,15 @@ The system uses a **Five-View Pattern** for each content type, providing better 
 5. **HomeView**: Dashboard navigation tiles
 
 **Benefits of Separate Create/Update Views:**
-- **Different Validation Rules**: Create might require all fields, Update might allow partial updates
-- **Field Behavior**: Some fields disabled on update (e.g., creation date, unique identifiers)
+
+- **Different Validation Rules**: Create might require all fields, Update might
+  allow partial updates
+- **Field Behavior**: Some fields disabled on update (e.g., creation date,
+  unique identifiers)
 - **Business Logic**: Different workflows for creation vs modification
 - **User Experience**: Tailored interfaces for different user intents
-- **Maintainability**: Clear separation of concerns, easier to modify independently
+- **Maintainability**: Clear separation of concerns, easier to modify
+  independently
 
 ##### Routing Configuration
 
@@ -951,7 +1038,7 @@ const {contentType}Routes = [
   },
   {
     path: '/{content-type}/create',
-    name: '{ContentType}Create', 
+    name: '{ContentType}Create',
     component: () => import('@/views/{content-type}/{ContentType}CreateView.vue')
   },
   {
@@ -984,13 +1071,13 @@ const {contentType}Routes = [
 
     <!-- Mobile-optimized search -->
     <div class="search-container">
-      <input 
-        type="text" 
-        v-model="searchQuery" 
+      <input
+        type="text"
+        v-model="searchQuery"
         @input="handleSearch"
-        placeholder="Pesquisar {portuguese label}..." 
+        placeholder="Pesquisar {portuguese label}..."
         class="search-input"
-      >
+      />
       <span class="search-icon">🔍</span>
     </div>
 
@@ -1004,8 +1091,8 @@ const {contentType}Routes = [
 
     <!-- Mobile-first content cards -->
     <div v-if="!loading && displayedItems.length > 0" class="content-list">
-      <div 
-        v-for="item in displayedItems" 
+      <div
+        v-for="item in displayedItems"
         :key="item.uuid"
         class="content-card"
         @click="navigateToDetail(item)"
@@ -1030,11 +1117,11 @@ const {contentType}Routes = [
     <div v-if="!loading && displayedItems.length === 0" class="empty-state">
       <h3>Nenhum {portuguese label} encontrado</h3>
       <p v-if="searchQuery">
-        Não foram encontrados {portuguese label} com o termo "{{ searchQuery }}".
+        Não foram encontrados {portuguese label} com o termo "{{
+          searchQuery
+        }}".
       </p>
-      <p v-else>
-        Não há {portuguese label} cadastrados no sistema.
-      </p>
+      <p v-else>Não há {portuguese label} cadastrados no sistema.</p>
     </div>
 
     <!-- Mobile FAB -->
@@ -1069,7 +1156,9 @@ import ErrorComponent from '@/components/ErrorComponent.vue';
   margin-bottom: 0.75rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   min-height: 44px; /* Touch target minimum */
 }
 
@@ -1145,19 +1234,21 @@ import ErrorComponent from '@/components/ErrorComponent.vue';
           <!-- More content-specific fields... -->
         </div>
       </section>
-      
+
       <!-- Additional sections following the same pattern -->
     </div>
   </div>
 </template>
 ```
+
           </div>
           <!-- More fields... -->
         </div>
       </section>
-      
+
       <!-- Additional sections following the same pattern -->
     </div>
+
   </div>
 </template>
 ```
@@ -1187,9 +1278,11 @@ import ErrorComponent from '@/components/ErrorComponent.vue';
       <div class="form-section">
         <div class="section-header">
           <h2 class="section-title">Configurações Específicas</h2>
-          <p class="section-description">Configure as opções específicas do {portuguese label}</p>
+          <p class="section-description">
+            Configure as opções específicas do {portuguese label}
+          </p>
         </div>
-        
+
         <!-- Complex form logic for content-specific features -->
         <div class="content-specific-management">
           <!-- Dynamic content-specific configuration forms -->
@@ -1247,17 +1340,17 @@ const createFormSections: FormSection[] = [
 // Validation function using shared validation
 const validateCreateForm = (data: Record<string, any>): Record<string, string> => {
   const errors: Record<string, string> = {};
-  
+
   try {
     const contentData: {ContentType}Data = {
       mainField: data.mainField || '',
       secondaryField: data.secondaryField || '',
       // Map all form data to ContentData structure...
     };
-    
+
     // Use shared validation
     const validationErrors = validate{ContentType}Creation(contentData);
-    
+
     // Convert validation errors to form errors with Portuguese messages
     validationErrors.forEach((errorMessage) => {
       if (errorMessage.includes('Campo principal')) {
@@ -1271,7 +1364,7 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
     console.error('Error in validation:', err);
     errors.general = 'Erro na validação dos dados';
   }
-  
+
   return errors;
 };
 
@@ -1280,13 +1373,13 @@ const handleCreate = async (formData: Record<string, any>) => {
   try {
     isSaving.value = true;
     clearError();
-    
+
     const contentData: {ContentType}Data = {
       // Map form data to ContentData structure
     };
-    
+
     const response = await api.create({ data: contentData } as any);
-    
+
     if (response) {
       router.push(`/{content-type}/${response.uuid}`);
     } else {
@@ -1363,16 +1456,20 @@ const clearError = () => {
 // - Audit trail considerations
 </script>
 ```
+
     subtitle="Atualizar informações do cliente"
     :custom-validator="validateUpdateForm"
     @submit="handleUpdate"
     @cancel="handleCancel"
-  >
+
+>
+
     <!-- Custom form sections for updates -->
     <template #customSections="{ formData, errors }">
       <!-- Update-specific fields or sections -->
       <!-- Some fields might be disabled or read-only -->
     </template>
+
   </ContentFormTemplate>
 </template>
 
@@ -1383,6 +1480,7 @@ const clearError = () => {
 // - Pre-population from existing data
 // - Audit trail considerations
 </script>
+
 ```
 
 ## Data Models
@@ -1399,20 +1497,13 @@ Based on analysis of the legacy `ClienteDetail.vue` and `ClienteForm.vue`, the c
 ### R2 Storage Structure
 
 ```
-R2 Bucket: clever-dashboard-{env}
-├── content/
-│   ├── clients/
-│   │   └── {uuid}.json
-│   ├── contracts/
-│   │   └── {uuid}.json
-│   └── [other content types]/
-├── indexes/
-│   ├── clients-index.json
-│   ├── contracts-index.json
-│   └── [other content type indexes]
-└── migrations/
-    └── [migration files]
-```
+
+R2 Bucket: clever-dashboard-{env} ├── content/ │ ├── clients/ │ │ └──
+{uuid}.json │ ├── contracts/ │ │ └── {uuid}.json │ └── [other content types]/
+├── indexes/ │ ├── clients-index.json │ ├── contracts-index.json │ └── [other
+content type indexes] └── migrations/ └── [migration files]
+
+````
 
 ### Search Index Structure
 
@@ -1435,121 +1526,129 @@ R2 Bucket: clever-dashboard-{env}
     }
   ]
 }
-```
+````
 
 ## Correctness Properties
 
-*A property is a characteristic or behavior that should hold true across all valid executions of a system—essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees.*
+_A property is a characteristic or behavior that should hold true across all
+valid executions of a system—essentially, a formal statement about what the
+system should do. Properties serve as the bridge between human-readable
+specifications and machine-verifiable correctness guarantees._
 
 Let me analyze the acceptance criteria for testability using the prework tool:
 
-<function_calls>
-<invoke name="prework">
+<function_calls> <invoke name="prework">
 <parameter name="featureName">content-implementation-pattern
 
-Based on the prework analysis, I'll now convert the testable acceptance criteria into correctness properties:
+Based on the prework analysis, I'll now convert the testable acceptance criteria
+into correctness properties:
 
-**Property 1: BaseContent Interface Compliance**
-*For any* content type implementation, all content items should extend the BaseContent interface with uuid, contentType, audit trail fields, and version tracking.
-**Validates: Requirements 1.1, 1.4**
+**Property 1: BaseContent Interface Compliance** _For any_ content type
+implementation, all content items should extend the BaseContent interface with
+uuid, contentType, audit trail fields, and version tracking. **Validates:
+Requirements 1.1, 1.4**
 
-**Property 2: Content Creation Audit Trail**
-*For any* content type, creating a new content item should generate a unique UUID and set initial audit trail values (createdAt, createdBy, version 1).
-**Validates: Requirements 1.2**
+**Property 2: Content Creation Audit Trail** _For any_ content type, creating a
+new content item should generate a unique UUID and set initial audit trail
+values (createdAt, createdBy, version 1). **Validates: Requirements 1.2**
 
-**Property 3: Content Update Versioning**
-*For any* content item update operation, the system should increment the version number and update the audit trail fields (updatedAt, updatedBy).
-**Validates: Requirements 1.3**
+**Property 3: Content Update Versioning** _For any_ content item update
+operation, the system should increment the version number and update the audit
+trail fields (updatedAt, updatedBy). **Validates: Requirements 1.3**
 
-**Property 4: Soft Delete Consistency**
-*For any* content item deletion, the system should set isDeleted flag to true and populate deletion audit trail (deletedAt, deletedBy) without removing the item from storage.
-**Validates: Requirements 1.5**
+**Property 4: Soft Delete Consistency** _For any_ content item deletion, the
+system should set isDeleted flag to true and populate deletion audit trail
+(deletedAt, deletedBy) without removing the item from storage. **Validates:
+Requirements 1.5**
 
-**Property 5: R2 Storage Key Pattern**
-*For any* content type and UUID, storing a content item should use the R2 key pattern content/{type}/{uuid}.json consistently.
-**Validates: Requirements 2.1**
+**Property 5: R2 Storage Key Pattern** _For any_ content type and UUID, storing
+a content item should use the R2 key pattern content/{type}/{uuid}.json
+consistently. **Validates: Requirements 2.1**
 
-**Property 6: Content Retrieval Round Trip**
-*For any* content item stored in R2, retrieving it using its UUID should return the same content data that was stored.
-**Validates: Requirements 2.2**
+**Property 6: Content Retrieval Round Trip** _For any_ content item stored in
+R2, retrieving it using its UUID should return the same content data that was
+stored. **Validates: Requirements 2.2**
 
-**Property 7: Index-Storage Synchronization**
-*For any* content modification (create, update, delete), both the individual R2 file and the search index should be updated consistently.
-**Validates: Requirements 2.4, 3.2, 3.3, 3.4**
+**Property 7: Index-Storage Synchronization** _For any_ content modification
+(create, update, delete), both the individual R2 file and the search index
+should be updated consistently. **Validates: Requirements 2.4, 3.2, 3.3, 3.4**
 
-**Property 8: Search Index Structure**
-*For any* content type, the search index should exist at indexes/{type}-index.json and contain searchable metadata for all non-deleted items.
-**Validates: Requirements 3.1, 3.5**
+**Property 8: Search Index Structure** _For any_ content type, the search index
+should exist at indexes/{type}-index.json and contain searchable metadata for
+all non-deleted items. **Validates: Requirements 3.1, 3.5**
 
-**Property 9: API Endpoint Completeness**
-*For any* content type, the system should provide all five CRUD endpoints (GET list, GET item, POST create, PUT update, DELETE) with consistent behavior.
-**Validates: Requirements 4.1, 4.2, 4.3, 4.4, 4.5**
+**Property 9: API Endpoint Completeness** _For any_ content type, the system
+should provide all five CRUD endpoints (GET list, GET item, POST create, PUT
+update, DELETE) with consistent behavior. **Validates: Requirements 4.1, 4.2,
+4.3, 4.4, 4.5**
 
-**Property 10: API Error Response Consistency**
-*For any* invalid API request, the system should return appropriate HTTP status codes and structured error messages in the ApiResponse format.
-**Validates: Requirements 4.6, 11.1**
+**Property 10: API Error Response Consistency** _For any_ invalid API request,
+the system should return appropriate HTTP status codes and structured error
+messages in the ApiResponse format. **Validates: Requirements 4.6, 11.1**
 
-**Property 11: Mobile Touch Target Compliance**
-*For any* content list view, all interactive elements should have minimum 44px touch targets for mobile accessibility.
-**Validates: Requirements 5.2**
+**Property 11: Mobile Touch Target Compliance** _For any_ content list view, all
+interactive elements should have minimum 44px touch targets for mobile
+accessibility. **Validates: Requirements 5.2**
 
-**Property 12: Responsive Layout Compatibility**
-*For any* content detail view, the layout should render correctly and remain usable on screens from 320px width.
-**Validates: Requirements 5.3**
+**Property 12: Responsive Layout Compatibility** _For any_ content detail view,
+the layout should render correctly and remain usable on screens from 320px
+width. **Validates: Requirements 5.3**
 
-**Property 13: Mobile Form Optimization**
-*For any* content form view, input fields should use appropriate mobile input types (tel, email, url) and provide mobile-friendly validation feedback.
-**Validates: Requirements 5.4**
+**Property 13: Mobile Form Optimization** _For any_ content form view, input
+fields should use appropriate mobile input types (tel, email, url) and provide
+mobile-friendly validation feedback. **Validates: Requirements 5.4**
 
-**Property 14: Color Palette Consistency**
-*For any* content type component, the CSS should use the established color variables (--primary-color: #75AE93, --secondary-color: #2c3e50).
-**Validates: Requirements 5.5**
+**Property 14: Color Palette Consistency** _For any_ content type component, the
+CSS should use the established color variables (--primary-color: #75AE93,
+--secondary-color: #2c3e50). **Validates: Requirements 5.5**
 
-**Property 15: Authentication Requirement**
-*For any* content API endpoint access, the system should require valid Clerk authentication and return 401 for unauthenticated requests.
-**Validates: Requirements 10.1, 10.4**
+**Property 15: Authentication Requirement** _For any_ content API endpoint
+access, the system should require valid Clerk authentication and return 401 for
+unauthenticated requests. **Validates: Requirements 10.1, 10.4**
 
-**Property 16: Audit Trail User Recording**
-*For any* content creation or update operation, the system should record the authenticated user's information in the appropriate audit trail fields.
-**Validates: Requirements 10.2, 10.3**
+**Property 16: Audit Trail User Recording** _For any_ content creation or update
+operation, the system should record the authenticated user's information in the
+appropriate audit trail fields. **Validates: Requirements 10.2, 10.3**
 
-**Property 17: Error Component Display**
-*For any* API request failure, the Vue application should display the error using the ErrorComponent with appropriate Portuguese error messages.
-**Validates: Requirements 11.2, 12.5**
+**Property 17: Error Component Display** _For any_ API request failure, the Vue
+application should display the error using the ErrorComponent with appropriate
+Portuguese error messages. **Validates: Requirements 11.2, 12.5**
 
-**Property 18: Authentication Redirect**
-*For any* 401 Unauthorized API response, the system should redirect the user to the sign-in page.
-**Validates: Requirements 11.3**
+**Property 18: Authentication Redirect** _For any_ 401 Unauthorized API
+response, the system should redirect the user to the sign-in page. **Validates:
+Requirements 11.3**
 
-**Property 19: Portuguese UI Language**
-*For any* content type interface, all UI labels, buttons, and messages should be displayed in Portuguese (Portugal variant) while maintaining English code identifiers.
-**Validates: Requirements 12.1, 12.2, 12.3**
+**Property 19: Portuguese UI Language** _For any_ content type interface, all UI
+labels, buttons, and messages should be displayed in Portuguese (Portugal
+variant) while maintaining English code identifiers. **Validates: Requirements
+12.1, 12.2, 12.3**
 
-**Property 20: Portuguese Locale Formatting**
-*For any* date or number display in content interfaces, the system should use Portuguese locale formatting (pt-PT).
-**Validates: Requirements 12.4**
+**Property 20: Portuguese Locale Formatting** _For any_ date or number display
+in content interfaces, the system should use Portuguese locale formatting
+(pt-PT). **Validates: Requirements 12.4**
 
-**Property 21: Search Input Debouncing**
-*For any* content search interface, search inputs should be debounced to prevent excessive API calls during typing.
+**Property 21: Search Input Debouncing** _For any_ content search interface,
+search inputs should be debounced to prevent excessive API calls during typing.
 **Validates: Requirements 13.4**
 
-**Property 22: Loading State Provision**
-*For any* content loading operation, the interface should provide loading states or skeleton screens for better user experience.
-**Validates: Requirements 13.5**
+**Property 22: Loading State Provision** _For any_ content loading operation,
+the interface should provide loading states or skeleton screens for better user
+experience. **Validates: Requirements 13.5**
 
-**Property 23: Client Search Debouncing**
-*For any* ClientSearchInput component usage, search requests should be debounced with a 300ms delay after the user stops typing to prevent excessive API calls.
-**Validates: Requirements 21.2**
+**Property 23: Client Search Debouncing** _For any_ ClientSearchInput component
+usage, search requests should be debounced with a 300ms delay after the user
+stops typing to prevent excessive API calls. **Validates: Requirements 21.2**
 
-**Property 24: Client Search Integration**
-*For any* content form that uses ClientSearchInput, selecting a client should emit both the client UUID and full client object for proper form integration.
-**Validates: Requirements 21.8**
+**Property 24: Client Search Integration** _For any_ content form that uses
+ClientSearchInput, selecting a client should emit both the client UUID and full
+client object for proper form integration. **Validates: Requirements 21.8**
 
 ## Error Handling
 
 ### Simple Error Handling Strategy
 
-The system follows a straightforward error handling approach without retry mechanisms:
+The system follows a straightforward error handling approach without retry
+mechanisms:
 
 1. **API Errors**: Display errors using Vue ErrorComponent
 2. **Authentication Errors**: 401 responses redirect to sign-in page
@@ -1594,9 +1693,11 @@ defineEmits<{
 
 ### Dual Testing Approach
 
-The testing strategy combines unit tests for specific implementations and property-based tests for universal behaviors:
+The testing strategy combines unit tests for specific implementations and
+property-based tests for universal behaviors:
 
 **Unit Tests**:
+
 - Content-specific schema validation
 - Component rendering with mock data
 - API endpoint integration testing
@@ -1604,6 +1705,7 @@ The testing strategy combines unit tests for specific implementations and proper
 - Mobile responsive breakpoint testing
 
 **Property-Based Tests**:
+
 - BaseContent interface compliance across all content types
 - R2 storage and retrieval consistency
 - Search index synchronization
@@ -1616,19 +1718,21 @@ The testing strategy combines unit tests for specific implementations and proper
 ### Testing Framework Configuration
 
 **Frontend Testing**:
+
 - Vitest for unit tests and component testing
 - Vue Test Utils for component testing
 - fast-check for property-based testing
 - Minimum 100 iterations per property test
 
 **Backend Testing**:
+
 - Vitest for unit tests and API testing
 - Hono test utilities for request/response testing
 - fast-check for property-based testing
 - R2 mock for storage testing
 
-**Property Test Tags**:
-Each property test must be tagged with: **Feature: content-implementation-pattern, Property {number}: {property_text}**
+**Property Test Tags**: Each property test must be tagged with: **Feature:
+content-implementation-pattern, Property {number}: {property_text}**
 
 ### Test Organization
 
@@ -1652,4 +1756,5 @@ packages/
             └── mobile-responsive.property.test.ts
 ```
 
-The property tests will validate universal behaviors across all content types, ensuring consistency and correctness of the
+The property tests will validate universal behaviors across all content types,
+ensuring consistency and correctness of the

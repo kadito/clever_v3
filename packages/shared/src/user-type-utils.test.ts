@@ -63,7 +63,7 @@ describe('User Type Utilities', () => {
   describe('getUserTypeOptions', () => {
     it('should return options with correct structure', () => {
       const result = getUserTypeOptions();
-      
+
       expect(result).toHaveLength(2);
       expect(result[0]).toHaveProperty('value');
       expect(result[0]).toHaveProperty('label');
@@ -74,7 +74,7 @@ describe('User Type Utilities', () => {
     it('should return Admin option with correct Portuguese label', () => {
       const result = getUserTypeOptions();
       const adminOption = result.find(option => option.value === 'Admin');
-      
+
       expect(adminOption).toBeDefined();
       expect(adminOption?.label).toBe('Administrador');
     });
@@ -82,7 +82,7 @@ describe('User Type Utilities', () => {
     it('should return User option with correct Portuguese label', () => {
       const result = getUserTypeOptions();
       const userOption = result.find(option => option.value === 'User');
-      
+
       expect(userOption).toBeDefined();
       expect(userOption?.label).toBe('Utilizador');
     });
@@ -90,7 +90,7 @@ describe('User Type Utilities', () => {
     it('should return options for all user types', () => {
       const result = getUserTypeOptions();
       const values = result.map(option => option.value);
-      
+
       expect(values).toContain('Admin');
       expect(values).toContain('User');
     });
@@ -100,7 +100,7 @@ describe('User Type Utilities', () => {
     it('should work with UserType type', () => {
       const adminType: UserType = 'Admin';
       const userType: UserType = 'User';
-      
+
       expect(getUserTypeDisplayName(adminType)).toBe('Administrador');
       expect(getUserTypeDisplayName(userType)).toBe('Utilizador');
       expect(isAdminUserType(adminType)).toBe(true);

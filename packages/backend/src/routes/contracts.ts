@@ -5,12 +5,21 @@
  */
 
 import { Hono } from 'hono';
-import { createContentRoutes, createStandardContentConfig, contentErrorHandler } from './content-route-template';
-import type { Contract, ContractData, ContractCreationData, ContractUpdateData } from '@clever/shared';
-import { 
-  sanitizeContractData,
+import {
+  createContentRoutes,
+  createStandardContentConfig,
+  contentErrorHandler,
+} from './content-route-template';
+import type {
+  Contract,
+  ContractData,
+  ContractCreationData,
+  ContractUpdateData,
+} from '@clever/shared';
+import {
   getContractSummary,
-  hasActiveContract
+  hasActiveContract,
+  // Note: sanitizeContractData will be added when contract validation is fully implemented
 } from '@clever/shared';
 
 /**
@@ -81,7 +90,7 @@ function validateContractCreationDirect(data: ContractCreationData): string[] {
 function validateContractCreate(requestData: any): void {
   // Extract the actual contract data from the request
   const contractData = requestData.data || requestData;
-  
+
   // Create a proper ContractCreationData object with defaults
   const contractCreationData: ContractCreationData = {
     clientId: contractData.clientId || '',
@@ -108,12 +117,12 @@ function validateContractCreate(requestData: any): void {
     manutencoesPorAnoSH: contractData.manutencoesPorAnoSH || 0,
     metodoPagamento: contractData.metodoPagamento || '',
     cpaEquipments: contractData.cpaEquipments || [],
-    shEquipments: contractData.shEquipments || []
+    shEquipments: contractData.shEquipments || [],
   };
-  
+
   // Use the comprehensive validation from shared package directly
   const errors = validateContractCreationDirect(contractCreationData);
-  
+
   if (errors.length > 0) {
     throw new Error(errors[0]); // Return first error for API response
   }
@@ -128,12 +137,16 @@ function validateContractCreate(requestData: any): void {
 function validateContractUpdateData(requestData: any, existingContent?: Contract): void {
   // Extract the actual contract data from the request
   const contractData = requestData.data || requestData;
-  
+
   // Prevent client changes during updates for data integrity
-  if (existingContent && contractData.clientId && contractData.clientId !== existingContent.data.clientId) {
+  if (
+    existingContent &&
+    contractData.clientId &&
+    contractData.clientId !== existingContent.data.clientId
+  ) {
     throw new Error('Cliente não pode ser alterado durante atualizações');
   }
-  
+
   // Create a proper ContractCreationData object with defaults
   const contractCreationData: ContractCreationData = {
     clientId: contractData.clientId || '',
@@ -160,12 +173,12 @@ function validateContractUpdateData(requestData: any, existingContent?: Contract
     manutencoesPorAnoSH: contractData.manutencoesPorAnoSH || 0,
     metodoPagamento: contractData.metodoPagamento || '',
     cpaEquipments: contractData.cpaEquipments || [],
-    shEquipments: contractData.shEquipments || []
+    shEquipments: contractData.shEquipments || [],
   };
-  
+
   // Use the update validation from shared package directly
   const errors = validateContractCreationDirect(contractCreationData);
-  
+
   if (errors.length > 0) {
     throw new Error(errors[0]); // Return first error for API response
   }
@@ -177,11 +190,11 @@ function validateContractUpdateData(requestData: any, existingContent?: Contract
  */
 function createContractSearchText(data: ContractData): string {
   const searchTerms: string[] = [];
-  
+
   // Basic information
   if (data.clienteName) searchTerms.push(data.clienteName.toLowerCase());
   if (data.clientId) searchTerms.push(data.clientId.toLowerCase());
-  
+
   // Contract types and plans
   if (data.hasCPAContract) {
     searchTerms.push('cpa');
@@ -190,14 +203,14 @@ function createContractSearchText(data: ContractData): string {
     if (data.modalidadePagamentoCPA) searchTerms.push(data.modalidadePagamentoCPA.toLowerCase());
     if (data.distanceCPA) searchTerms.push(data.distanceCPA.toLowerCase());
   }
-  
+
   if (data.hasSHContract) {
     searchTerms.push('s&h', 'sh');
     if (data.planIdSH) searchTerms.push(data.planIdSH.toLowerCase());
     if (data.modalidadePagamentoSH) searchTerms.push(data.modalidadePagamentoSH.toLowerCase());
     if (data.distanceSH) searchTerms.push(data.distanceSH.toLowerCase());
   }
-  
+
   // Equipment information
   if (data.cpaEquipments && data.cpaEquipments.length > 0) {
     data.cpaEquipments.forEach(equipment => {
@@ -205,7 +218,7 @@ function createContractSearchText(data: ContractData): string {
       if (equipment.numeroSerie) searchTerms.push(equipment.numeroSerie.toLowerCase());
     });
   }
-  
+
   if (data.shEquipments && data.shEquipments.length > 0) {
     data.shEquipments.forEach(equipment => {
       if (equipment.modelo) searchTerms.push(equipment.modelo.toLowerCase());
@@ -213,10 +226,10 @@ function createContractSearchText(data: ContractData): string {
       if (equipment.software) searchTerms.push(equipment.software.toLowerCase());
     });
   }
-  
+
   // Payment method
   if (data.metodoPagamento) searchTerms.push(data.metodoPagamento.toLowerCase());
-  
+
   return searchTerms.join(' ');
 }
 
@@ -240,18 +253,18 @@ contractConfig.extractSearchableText = (content: Contract) => {
 contractConfig.extractIndexFields = (content: Contract) => {
   const data = content.data;
   const summary = getContractSummary(data);
-  
+
   return {
     // Basic information for search and display
     clientId: data.clientId || '',
     clienteName: data.clienteName || '',
-    
+
     // Contract types and status
     hasCPAContract: data.hasCPAContract || false,
     hasSHContract: data.hasSHContract || false,
     contractTypes: summary.contractTypes,
     hasActiveContract: hasActiveContract(data),
-    
+
     // CPA Contract information
     cpaContractType: data.cpaContractType || '',
     planIdCPA: data.planIdCPA || '',
@@ -259,21 +272,21 @@ contractConfig.extractIndexFields = (content: Contract) => {
     distanceCPA: data.distanceCPA || '',
     inicioContratoCPA: data.inicioContratoCPA || '',
     fimContratoCPA: data.fimContratoCPA || '',
-    
+
     // S&H Contract information
     planIdSH: data.planIdSH || '',
     modalidadePagamentoSH: data.modalidadePagamentoSH || '',
     distanceSH: data.distanceSH || '',
     inicioContratoSH: data.inicioContratoSH || '',
     fimContratoSH: data.fimContratoSH || '',
-    
+
     // Equipment information for search
     cpaEquipmentModels: data.cpaEquipments?.map(e => e.modelo).filter(Boolean) || [],
     cpaEquipmentSerials: data.cpaEquipments?.map(e => e.numeroSerie).filter(Boolean) || [],
     shEquipmentModels: data.shEquipments?.map(e => e.modelo).filter(Boolean) || [],
     shEquipmentSerials: data.shEquipments?.map(e => e.numeroSerie).filter(Boolean) || [],
     equipmentCount: (data.cpaEquipments?.length || 0) + (data.shEquipments?.length || 0),
-    
+
     // Service details - handle both old and new field names for backward compatibility
     horasAssistenciaAnualCPA: data.horasAssistenciaAnualCPA || 0,
     deslocacoesPorAnoCPA: data.deslocacoesPorAnoCPA || 0,
@@ -281,12 +294,12 @@ contractConfig.extractIndexFields = (content: Contract) => {
     horasAssistenciaAnualSH: data.horasAssistenciaAnualSH || 0,
     deslocacoesPorAnoSH: data.deslocacoesPorAnoSH || 0,
     manutencoesPorAnoSH: data.manutencoesPorAnoSH || 0,
-    
+
     // Payment information
     metodoPagamento: data.metodoPagamento || '',
     planNames: summary.planNames,
     paymentMethods: summary.paymentMethods,
-    
+
     // Contract period information
     startDate: summary.startDate,
     endDate: summary.endDate,

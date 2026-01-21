@@ -1,7 +1,7 @@
 <template>
   <div class="relation-examples">
     <h1 class="text-2xl font-bold mb-6">RelationInfoDisplay Component Examples</h1>
-    
+
     <!-- Example 1: Successful client relation -->
     <section class="mb-8">
       <h2 class="text-lg font-semibold mb-4">1. Successful Client Relation</h2>
@@ -35,10 +35,7 @@
     <!-- Example 4: Missing client relation (null) -->
     <section class="mb-8">
       <h2 class="text-lg font-semibold mb-4">4. Missing Client Relation</h2>
-      <RelationInfoDisplay
-        :relation-data="null"
-        relation-type="client"
-      />
+      <RelationInfoDisplay :relation-data="null" relation-type="client" />
     </section>
 
     <!-- Example 5: Contract relation -->
@@ -79,7 +76,9 @@
       <h2 class="text-lg font-semibold mb-4">8. Integration Example (License Detail View)</h2>
       <div class="bg-gray-50 p-4 rounded-lg">
         <h3 class="font-medium mb-2">Before (Manual Client Section):</h3>
-        <pre class="text-sm bg-white p-3 rounded border overflow-x-auto"><code>&lt;!-- Manual client information section --&gt;
+        <pre
+          class="text-sm bg-white p-3 rounded border overflow-x-auto"
+        ><code>&lt;!-- Manual client information section --&gt;
 &lt;div v-if="clientInfo" class="detail-section"&gt;
   &lt;div class="bg-white rounded-touch border border-gray-200"&gt;
     &lt;div class="px-4 py-3 border-b border-gray-200 bg-gray-50"&gt;
@@ -96,9 +95,11 @@
     &lt;/div&gt;
   &lt;/div&gt;
 &lt;/div&gt;</code></pre>
-        
+
         <h3 class="font-medium mb-2 mt-4">After (Using RelationInfoDisplay):</h3>
-        <pre class="text-sm bg-white p-3 rounded border overflow-x-auto"><code>&lt;!-- Automatic relation display --&gt;
+        <pre
+          class="text-sm bg-white p-3 rounded border overflow-x-auto"
+        ><code>&lt;!-- Automatic relation display --&gt;
 &lt;RelationInfoDisplay
   :relation-data="license?.relations?.client"
   relation-type="client"
@@ -123,19 +124,19 @@ const successfulClientRelation: ResolvedRelation = {
   contribuinte: '123456789',
   localidade: 'Lisboa',
   telefoneContato: '+351 21 123 4567',
-  emailContato: 'geral@empresaabc.pt'
+  emailContato: 'geral@empresaabc.pt',
 };
 
 const clientRelationError404: RelationError = {
   type: 'error',
   code: 404,
-  message: 'Not found'
+  message: 'Not found',
 };
 
 const clientRelationError500: RelationError = {
   type: 'error',
   code: 500,
-  message: 'Internal Server Error'
+  message: 'Internal Server Error',
 };
 
 const successfulContractRelation: ResolvedRelation = {
@@ -144,13 +145,13 @@ const successfulContractRelation: ResolvedRelation = {
   numeroContrato: 'CT-2024-001',
   dataInicio: '2024-01-01T00:00:00.000Z',
   dataFim: '2024-12-31T23:59:59.000Z',
-  valor: '1500.00'
+  valor: '1500.00',
 };
 
 const customFields = [
   { key: 'nomeEmpresa', label: 'Empresa' },
   { key: 'contribuinte', label: 'Número Fiscal' },
-  { key: 'telefoneContato', label: 'Contacto' }
+  { key: 'telefoneContato', label: 'Contacto' },
 ];
 </script>
 

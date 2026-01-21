@@ -11,9 +11,9 @@ export const workSheetsFormSections: FormSection[] = [
         label: 'Cliente',
         type: 'custom',
         required: true,
-        placeholder: 'Pesquisar cliente...'
-      }
-    ]
+        placeholder: 'Pesquisar cliente...',
+      },
+    ],
   },
   {
     key: 'request',
@@ -25,14 +25,14 @@ export const workSheetsFormSections: FormSection[] = [
         label: 'Data do Pedido',
         type: 'date',
         fullWidth: false,
-        defaultValue: new Date().toISOString().split('T')[0]
+        defaultValue: new Date().toISOString().split('T')[0],
       },
       {
         key: 'receivedBy',
         label: 'Receção do Pedido',
         type: 'text',
         fullWidth: false,
-        placeholder: 'Nome do colaborador'
+        placeholder: 'Nome do colaborador',
       },
       {
         key: 'assistanceDate',
@@ -40,7 +40,7 @@ export const workSheetsFormSections: FormSection[] = [
         type: 'date',
         required: true,
         fullWidth: false,
-        defaultValue: new Date().toISOString().split('T')[0]
+        defaultValue: new Date().toISOString().split('T')[0],
       },
       {
         key: 'reason',
@@ -48,9 +48,9 @@ export const workSheetsFormSections: FormSection[] = [
         type: 'textarea',
         fullWidth: true,
         rows: 3,
-        placeholder: 'Descreva o motivo do pedido...'
-      }
-    ]
+        placeholder: 'Descreva o motivo do pedido...',
+      },
+    ],
   },
   {
     key: 'timeTracking',
@@ -62,14 +62,14 @@ export const workSheetsFormSections: FormSection[] = [
         label: 'Hora Chegada',
         type: 'custom',
         fullWidth: false,
-        placeholder: '10:00'
+        placeholder: '10:00',
       },
       {
         key: 'departureTime',
         label: 'Hora Saída',
         type: 'custom',
         fullWidth: false,
-        placeholder: '18:00'
+        placeholder: '18:00',
       },
       {
         key: 'totalHours',
@@ -77,9 +77,9 @@ export const workSheetsFormSections: FormSection[] = [
         type: 'text',
         fullWidth: false,
         disabled: true,
-        placeholder: 'Calculado automaticamente'
-      }
-    ]
+        placeholder: 'Calculado automaticamente',
+      },
+    ],
   },
   {
     key: 'service',
@@ -95,8 +95,8 @@ export const workSheetsFormSections: FormSection[] = [
           { value: '', label: '--' },
           { value: 'ASSISTÊNCIA PRESENCIAL', label: 'ASSISTÊNCIA PRESENCIAL' },
           { value: 'MANUTENÇÃO', label: 'MANUTENÇÃO' },
-          { value: 'INSTALAÇÃO', label: 'INSTALAÇÃO' }
-        ]
+          { value: 'INSTALAÇÃO', label: 'INSTALAÇÃO' },
+        ],
       },
       {
         key: 'serviceObservations',
@@ -104,9 +104,9 @@ export const workSheetsFormSections: FormSection[] = [
         type: 'textarea',
         fullWidth: true,
         rows: 3,
-        placeholder: 'Observações adicionais sobre o serviço...'
-      }
-    ]
+        placeholder: 'Observações adicionais sobre o serviço...',
+      },
+    ],
   },
   {
     key: 'displacement',
@@ -118,7 +118,7 @@ export const workSheetsFormSections: FormSection[] = [
         label: 'Deslocação',
         type: 'custom',
         fullWidth: false,
-        defaultValue: false
+        defaultValue: false,
       },
       {
         key: 'weekendHoliday',
@@ -126,7 +126,7 @@ export const workSheetsFormSections: FormSection[] = [
         type: 'switch',
         fullWidth: false,
         switchLabel: 'Serviço em fim-de-semana ou feriado',
-        defaultValue: false
+        defaultValue: false,
       },
       {
         key: 'oneWayKms',
@@ -138,8 +138,8 @@ export const workSheetsFormSections: FormSection[] = [
         placeholder: 'Quilómetros de ida',
         conditional: {
           dependsOn: 'hasDisplacement',
-          showWhen: (value: any) => value === true
-        }
+          showWhen: (value: any) => value === true,
+        },
       },
       {
         key: 'totalKms',
@@ -150,10 +150,10 @@ export const workSheetsFormSections: FormSection[] = [
         placeholder: 'Total automático',
         conditional: {
           dependsOn: 'hasDisplacement',
-          showWhen: (value: any) => value === true
-        }
-      }
-    ]
+          showWhen: (value: any) => value === true,
+        },
+      },
+    ],
   },
   {
     key: 'payment',
@@ -165,9 +165,9 @@ export const workSheetsFormSections: FormSection[] = [
         label: 'Método de Pagamento',
         type: 'custom',
         required: true,
-        fullWidth: true
-      }
-    ]
+        fullWidth: true,
+      },
+    ],
   },
   {
     key: 'contract',
@@ -183,8 +183,8 @@ export const workSheetsFormSections: FormSection[] = [
         defaultValue: false,
         conditional: {
           dependsOn: 'paymentMethod',
-          showWhen: (value: any) => value === 'CONTRATO'
-        }
+          showWhen: (value: any) => value === 'CONTRATO',
+        },
       },
       {
         key: 'contract',
@@ -195,8 +195,8 @@ export const workSheetsFormSections: FormSection[] = [
         defaultValue: false,
         conditional: {
           dependsOn: 'paymentMethod',
-          showWhen: (value: any) => value === 'CONTRATO'
-        }
+          showWhen: (value: any) => value === 'CONTRATO',
+        },
       },
       {
         key: 'contractYear',
@@ -207,15 +207,15 @@ export const workSheetsFormSections: FormSection[] = [
           { value: '2023', label: '2023' },
           { value: '2024', label: '2024' },
           { value: '2025', label: '2025' },
-          { value: '2026', label: '2026' }
+          { value: '2026', label: '2026' },
         ],
         defaultValue: new Date().getFullYear().toString(),
         conditional: {
           dependsOn: 'paymentMethod',
-          showWhen: (value: any) => value === 'CONTRATO'
-        }
-      }
-    ]
+          showWhen: (value: any) => value === 'CONTRATO',
+        },
+      },
+    ],
   },
   {
     key: 'materials',
@@ -228,7 +228,7 @@ export const workSheetsFormSections: FormSection[] = [
         type: 'switch',
         fullWidth: false,
         switchLabel: 'Foi utilizado material',
-        defaultValue: false
+        defaultValue: false,
       },
       {
         key: 'equipment',
@@ -236,7 +236,7 @@ export const workSheetsFormSections: FormSection[] = [
         type: 'switch',
         fullWidth: false,
         switchLabel: 'Foram utilizados equipamentos',
-        defaultValue: false
+        defaultValue: false,
       },
       {
         key: 'materialDetails',
@@ -248,8 +248,8 @@ export const workSheetsFormSections: FormSection[] = [
         placeholder: 'Descreva o material utilizado...',
         conditional: {
           dependsOn: 'materialUsed',
-          showWhen: (value: any) => value === true
-        }
+          showWhen: (value: any) => value === true,
+        },
       },
       {
         key: 'equipmentDetails',
@@ -261,10 +261,10 @@ export const workSheetsFormSections: FormSection[] = [
         placeholder: 'Descreva os equipamentos utilizados...',
         conditional: {
           dependsOn: 'equipment',
-          showWhen: (value: any) => value === true
-        }
-      }
-    ]
+          showWhen: (value: any) => value === true,
+        },
+      },
+    ],
   },
   {
     key: 'serviceStatus',
@@ -277,7 +277,7 @@ export const workSheetsFormSections: FormSection[] = [
         type: 'switch',
         fullWidth: false,
         switchLabel: 'O problema foi totalmente resolvido',
-        defaultValue: true
+        defaultValue: true,
       },
       {
         key: 'dumpReading',
@@ -285,7 +285,7 @@ export const workSheetsFormSections: FormSection[] = [
         type: 'switch',
         fullWidth: false,
         switchLabel: 'Foi realizada leitura de dump',
-        defaultValue: false
+        defaultValue: false,
       },
       {
         key: 'backup',
@@ -293,7 +293,7 @@ export const workSheetsFormSections: FormSection[] = [
         type: 'switch',
         fullWidth: false,
         switchLabel: 'Foi realizada cópia de segurança',
-        defaultValue: false
+        defaultValue: false,
       },
       {
         key: 'remoteAccessCheck',
@@ -301,7 +301,7 @@ export const workSheetsFormSections: FormSection[] = [
         type: 'switch',
         fullWidth: false,
         switchLabel: 'Foi verificado o acesso remoto',
-        defaultValue: false
+        defaultValue: false,
       },
       {
         key: 'anydesk',
@@ -309,7 +309,7 @@ export const workSheetsFormSections: FormSection[] = [
         type: 'switch',
         fullWidth: false,
         switchLabel: 'Foi utilizado AnyDesk',
-        defaultValue: false
+        defaultValue: false,
       },
       {
         key: 'resolutionIssues',
@@ -321,10 +321,10 @@ export const workSheetsFormSections: FormSection[] = [
         placeholder: 'Descreva os problemas que não foram totalmente resolvidos...',
         conditional: {
           dependsOn: 'totallyResolved',
-          showWhen: (value: any) => value === false
-        }
-      }
-    ]
+          showWhen: (value: any) => value === false,
+        },
+      },
+    ],
   },
   {
     key: 'observations',
@@ -337,8 +337,8 @@ export const workSheetsFormSections: FormSection[] = [
         type: 'textarea',
         fullWidth: true,
         rows: 5,
-        placeholder: 'Descrição detalhada do serviço realizado...'
-      }
-    ]
-  }
+        placeholder: 'Descrição detalhada do serviço realizado...',
+      },
+    ],
+  },
 ];

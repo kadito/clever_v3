@@ -9,21 +9,19 @@
       <div class="controls-left">
         <h2>Clientes ({{ displayedClientes.length }})</h2>
       </div>
-      
-      <button @click="refreshData" :disabled="loading" class="btn btn-refresh">
-        🔄 Atualizar
-      </button>
+
+      <button @click="refreshData" :disabled="loading" class="btn btn-refresh">🔄 Atualizar</button>
     </div>
 
     <!-- Search -->
     <div class="search-container">
-      <input 
-        type="text" 
-        v-model="searchQuery" 
+      <input
+        type="text"
+        v-model="searchQuery"
         @input="handleSearch"
-        placeholder="Pesquisar por nome, empresa, contribuinte..." 
+        placeholder="Pesquisar por nome, empresa, contribuinte..."
         class="search-input"
-      >
+      />
       <span class="search-icon">🔍</span>
     </div>
 
@@ -40,8 +38,8 @@
 
     <!-- Clientes List -->
     <div v-if="!loading && displayedClientes.length > 0" class="clientes-list">
-      <div 
-        v-for="cliente in displayedClientes" 
+      <div
+        v-for="cliente in displayedClientes"
         :key="cliente.id"
         class="cliente-item"
         @click="navigateToDetail(cliente)"
@@ -53,14 +51,16 @@
             <span class="cliente-localidade">{{ cliente.localidade || 'Sem localidade' }}</span>
           </div>
           <div class="cliente-contact" v-if="cliente.responsavel || cliente.telefoneContato">
-            <span v-if="cliente.responsavel" class="cliente-responsavel">{{ cliente.responsavel }}</span>
-            <span v-if="cliente.telefoneContato" class="cliente-telefone">📞 {{ cliente.telefoneContato }}</span>
+            <span v-if="cliente.responsavel" class="cliente-responsavel">{{
+              cliente.responsavel
+            }}</span>
+            <span v-if="cliente.telefoneContato" class="cliente-telefone"
+              >📞 {{ cliente.telefoneContato }}</span
+            >
           </div>
         </div>
         <div class="cliente-actions">
-          <button class="action-btn" @click.stop="showActions(cliente)">
-            ⋮
-          </button>
+          <button class="action-btn" @click.stop="showActions(cliente)">⋮</button>
         </div>
       </div>
     </div>
@@ -68,32 +68,24 @@
     <!-- Empty State -->
     <div v-if="!loading && displayedClientes.length === 0" class="empty-state">
       <h3>Nenhum cliente encontrado</h3>
-      <p v-if="searchQuery">
-        Não foram encontrados clientes com o termo "{{ searchQuery }}".
-      </p>
-      <p v-else>
-        Não há clientes cadastrados no sistema.
-      </p>
+      <p v-if="searchQuery">Não foram encontrados clientes com o termo "{{ searchQuery }}".</p>
+      <p v-else>Não há clientes cadastrados no sistema.</p>
     </div>
 
     <!-- Search Results Info -->
     <div v-if="searchResults && searchQuery" class="search-info">
-      <p>
-        {{ searchResults.count }} resultado(s) encontrado(s) para "{{ searchQuery }}"
-      </p>
+      <p>{{ searchResults.count }} resultado(s) encontrado(s) para "{{ searchQuery }}"</p>
     </div>
 
     <!-- Actions Modal -->
     <div v-if="showActionsModal" class="actions-modal-overlay" @click="closeActions">
       <div class="actions-modal" @click.stop>
-        <h3>{{ selectedClienteForActions?.nomeComercial || selectedClienteForActions?.nomeEmpresa }}</h3>
+        <h3>
+          {{ selectedClienteForActions?.nomeComercial || selectedClienteForActions?.nomeEmpresa }}
+        </h3>
         <div class="modal-actions">
-          <button @click="viewCliente" class="modal-btn view-btn">
-            📋 Ver Detalhes
-          </button>
-          <button @click="editCliente" class="modal-btn edit-btn">
-            ✏️ Editar
-          </button>
+          <button @click="viewCliente" class="modal-btn view-btn">📋 Ver Detalhes</button>
+          <button @click="editCliente" class="modal-btn edit-btn">✏️ Editar</button>
           <button @click="confirmDelete(selectedClienteForActions)" class="modal-btn delete-btn">
             🗑️ Eliminar
           </button>
@@ -106,16 +98,13 @@
       <div class="modal-content" @click.stop>
         <h3>Confirmar Eliminação</h3>
         <p>
-          Tem a certeza que pretende eliminar o cliente 
-          <strong>{{ clienteToDelete?.nomeComercial || clienteToDelete?.nomeEmpresa }}</strong>?
+          Tem a certeza que pretende eliminar o cliente
+          <strong>{{ clienteToDelete?.nomeComercial || clienteToDelete?.nomeEmpresa }}</strong
+          >?
         </p>
-        <p class="warning-text">
-          Esta ação não pode ser desfeita.
-        </p>
+        <p class="warning-text">Esta ação não pode ser desfeita.</p>
         <div class="modal-actions">
-          <button @click="cancelDelete" class="btn btn-secondary">
-            Cancelar
-          </button>
+          <button @click="cancelDelete" class="btn btn-secondary">Cancelar</button>
           <button @click="deleteClienteAction" class="btn btn-danger" :disabled="loading">
             {{ loading ? 'A eliminar...' : 'Eliminar' }}
           </button>
@@ -124,128 +113,121 @@
     </div>
 
     <!-- Floating Action Button -->
-    <button @click="navigateToCreate" class="fab">
-      ➕
-    </button>
+    <button @click="navigateToCreate" class="fab">➕</button>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import BackButton from '@/components/BackButton.vue'
-import { useClientesStore } from '@/stores/clientes.js'
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import BackButton from '@/components/BackButton.vue';
+import { useClientesStore } from '@/stores/clientes.js';
 
 // Router
-const router = useRouter()
+const router = useRouter();
 
 // Store
-const store = useClientesStore()
-const { clientes, loading, error } = storeToRefs(store)
-const { 
-  fetchClientes, 
-  searchClientes, 
-  clearError, 
-  deleteCliente: deleteClienteFromStore 
-} = store
+const store = useClientesStore();
+const { clientes, loading, error } = storeToRefs(store);
+const { fetchClientes, searchClientes, clearError, deleteCliente: deleteClienteFromStore } = store;
 
 // Local state
-const searchQuery = ref('')
-const searchResults = ref(null)
-const showActionsModal = ref(false)
-const selectedClienteForActions = ref(null)
-const showDeleteModal = ref(false)
-const clienteToDelete = ref(null)
+const searchQuery = ref('');
+const searchResults = ref(null);
+const showActionsModal = ref(false);
+const selectedClienteForActions = ref(null);
+const showDeleteModal = ref(false);
+const clienteToDelete = ref(null);
 
 // Computed
 const displayedClientes = computed(() => {
   if (searchResults.value && searchQuery.value) {
-    return searchResults.value.results || []
+    return searchResults.value.results || [];
   }
-  return clientes.value
-})
+  return clientes.value;
+});
 
 // Methods
 const refreshData = async () => {
-  await fetchClientes()
-}
+  await fetchClientes();
+};
 
-let searchTimeout = null
+let searchTimeout = null;
 const handleSearch = () => {
   if (searchTimeout) {
-    clearTimeout(searchTimeout)
+    clearTimeout(searchTimeout);
   }
-  
+
   searchTimeout = setTimeout(() => {
     if (searchQuery.value.trim()) {
-      const results = searchClientes(searchQuery.value)
-      searchResults.value = results
+      const results = searchClientes(searchQuery.value);
+      searchResults.value = results;
     } else {
-      searchResults.value = null
+      searchResults.value = null;
     }
-  }, 300)
-}
+  }, 300);
+};
 
-const navigateToDetail = (cliente) => {
-  router.push(`/clientes/${cliente.id}`)
-}
+const navigateToDetail = cliente => {
+  router.push(`/clientes/${cliente.id}`);
+};
 
 const navigateToCreate = () => {
-  router.push('/clientes/new?from=list')
-}
+  router.push('/clientes/new?from=list');
+};
 
-const showActions = (cliente) => {
-  selectedClienteForActions.value = cliente
-  showActionsModal.value = true
-}
+const showActions = cliente => {
+  selectedClienteForActions.value = cliente;
+  showActionsModal.value = true;
+};
 
 const closeActions = () => {
-  showActionsModal.value = false
-  selectedClienteForActions.value = null
-}
+  showActionsModal.value = false;
+  selectedClienteForActions.value = null;
+};
 
 const viewCliente = () => {
   if (selectedClienteForActions.value) {
-    navigateToDetail(selectedClienteForActions.value)
+    navigateToDetail(selectedClienteForActions.value);
   }
-  closeActions()
-}
+  closeActions();
+};
 
 const editCliente = () => {
   if (selectedClienteForActions.value) {
-    router.push(`/clientes/${selectedClienteForActions.value.id}/edit`)
+    router.push(`/clientes/${selectedClienteForActions.value.id}/edit`);
   }
-  closeActions()
-}
+  closeActions();
+};
 
-const confirmDelete = (cliente) => {
-  clienteToDelete.value = cliente
-  showDeleteModal.value = true
-  closeActions()
-}
+const confirmDelete = cliente => {
+  clienteToDelete.value = cliente;
+  showDeleteModal.value = true;
+  closeActions();
+};
 
 const cancelDelete = () => {
-  clienteToDelete.value = null
-  showDeleteModal.value = false
-}
+  clienteToDelete.value = null;
+  showDeleteModal.value = false;
+};
 
 const deleteClienteAction = async () => {
-  if (!clienteToDelete.value) return
-  
+  if (!clienteToDelete.value) return;
+
   try {
-    await deleteClienteFromStore(clienteToDelete.value.id)
-    cancelDelete()
+    await deleteClienteFromStore(clienteToDelete.value.id);
+    cancelDelete();
   } catch (err) {
-    console.error('Error deleting cliente:', err)
+    console.error('Error deleting cliente:', err);
     // Error is already handled by the store
   }
-}
+};
 
 // Lifecycle
 onMounted(async () => {
-  await fetchClientes()
-})
+  await fetchClientes();
+});
 </script>
 
 <style scoped>
@@ -729,4 +711,4 @@ onMounted(async () => {
     font-size: 1.25rem;
   }
 }
-</style> 
+</style>

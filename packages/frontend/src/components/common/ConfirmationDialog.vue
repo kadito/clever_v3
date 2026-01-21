@@ -56,7 +56,7 @@
                     />
                   </svg>
                 </div>
-                
+
                 <!-- Title -->
                 <div class="ml-3 flex-1">
                   <h3 :id="titleId" class="text-lg font-semibold text-gray-900">
@@ -74,8 +74,12 @@
             </div>
 
             <!-- Dialog actions -->
-            <div class="px-4 py-4 sm:px-6 sm:py-5 border-t border-gray-200 bg-gray-50 rounded-b-touch">
-              <div class="flex flex-col-reverse sm:flex-row sm:justify-end space-y-3 space-y-reverse sm:space-y-0 sm:space-x-3">
+            <div
+              class="px-4 py-4 sm:px-6 sm:py-5 border-t border-gray-200 bg-gray-50 rounded-b-touch"
+            >
+              <div
+                class="flex flex-col-reverse sm:flex-row sm:justify-end space-y-3 space-y-reverse sm:space-y-0 sm:space-x-3"
+              >
                 <!-- Cancel button -->
                 <button
                   ref="cancelButtonRef"
@@ -204,10 +208,9 @@ const handleKeydown = (event: KeyboardEvent) => {
 
 // Focus management
 const trapFocus = (event: KeyboardEvent) => {
-  const focusableElements = [
-    confirmButtonRef.value,
-    cancelButtonRef.value,
-  ].filter(Boolean) as HTMLElement[];
+  const focusableElements = [confirmButtonRef.value, cancelButtonRef.value].filter(
+    Boolean
+  ) as HTMLElement[];
 
   if (focusableElements.length === 0) return;
 
@@ -230,19 +233,22 @@ const trapFocus = (event: KeyboardEvent) => {
 };
 
 // Focus management when dialog opens/closes
-watch(() => props.isOpen, async (isOpen) => {
-  if (isOpen) {
-    // Focus the cancel button by default (safer option)
-    await nextTick();
-    cancelButtonRef.value?.focus();
-    
-    // Prevent body scroll
-    document.body.style.overflow = 'hidden';
-  } else {
-    // Restore body scroll
-    document.body.style.overflow = '';
+watch(
+  () => props.isOpen,
+  async isOpen => {
+    if (isOpen) {
+      // Focus the cancel button by default (safer option)
+      await nextTick();
+      cancelButtonRef.value?.focus();
+
+      // Prevent body scroll
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Restore body scroll
+      document.body.style.overflow = '';
+    }
   }
-});
+);
 
 // Lifecycle hooks
 onMounted(() => {
@@ -301,11 +307,11 @@ onUnmounted(() => {
   .bg-white {
     @apply border-2 border-gray-900;
   }
-  
+
   .btn-secondary {
     @apply border-2 border-gray-900;
   }
-  
+
   .btn-danger {
     @apply border-2 border-red-900;
   }
@@ -317,7 +323,7 @@ onUnmounted(() => {
   .transition-all {
     transition: none;
   }
-  
+
   .animate-spin {
     animation: none;
   }

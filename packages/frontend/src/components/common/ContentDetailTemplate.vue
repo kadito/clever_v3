@@ -42,7 +42,7 @@
                   {{ deleteButtonText }}
                 </button>
               </slot>
-              
+
               <!-- Edit button - visible on desktop, hidden on mobile -->
               <button
                 v-if="showEditButton"
@@ -111,7 +111,9 @@
             <!-- Default sections based on item data -->
             <div v-for="section in defaultSections" :key="section.key" class="detail-section">
               <div class="bg-white rounded-touch border border-gray-200">
-                <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+                <div
+                  class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+                >
                   <h2 class="text-lg font-semibold text-gray-900">{{ section.title }}</h2>
                 </div>
                 <div class="p-4 sm:p-6">
@@ -137,7 +139,9 @@
         <!-- Audit trail section -->
         <div v-if="showAuditTrail" class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
               <h2 class="text-lg font-semibold text-gray-900">Histórico</h2>
             </div>
             <div class="p-4 sm:p-6">
@@ -183,15 +187,16 @@
           <div class="text-6xl mb-4">❓</div>
           <h3 class="empty-title">Item não encontrado</h3>
           <p class="empty-message">O item solicitado não existe ou foi removido.</p>
-          <button @click="handleBack" class="btn-primary mt-4">
-            Voltar à lista
-          </button>
+          <button @click="handleBack" class="btn-primary mt-4">Voltar à lista</button>
         </div>
       </div>
     </div>
 
     <!-- Mobile action bar -->
-    <div v-if="item && showMobileActions" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 sm:hidden">
+    <div
+      v-if="item && showMobileActions"
+      class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 sm:hidden"
+    >
       <div class="flex space-x-3">
         <slot name="mobileActions" :item="item">
           <button
@@ -209,7 +214,7 @@
             </svg>
             {{ deleteButtonText }}
           </button>
-          
+
           <button
             v-if="showEditButton"
             @click="handleEdit"
@@ -253,22 +258,22 @@ interface Props {
   item: BaseContent | null;
   isLoading?: boolean;
   error?: string | null;
-  
+
   // Navigation
   backRoute?: string;
-  
+
   // Display configuration
   showEditButton?: boolean;
   showDeleteButton?: boolean;
   showMetaBar?: boolean;
   showAuditTrail?: boolean;
   showMobileActions?: boolean;
-  
+
   // Delete configuration
   deleteButtonText?: string;
   confirmDeleteTitle?: string;
   confirmDeleteMessage?: string;
-  
+
   // Content display functions
   getTitle?: (item: BaseContent) => string;
   getSubtitle?: (item: BaseContent) => string;
@@ -288,7 +293,8 @@ const props = withDefaults(defineProps<Props>(), {
   deleteButtonText: 'Eliminar',
   confirmDeleteTitle: 'Confirmar Eliminação',
   confirmDeleteMessage: 'Tem a certeza que pretende eliminar este item?',
-  getTitle: (item: BaseContent) => item.data.name || item.data.title || `Item #${item.uuid.slice(0, 8)}`,
+  getTitle: (item: BaseContent) =>
+    item.data.name || item.data.title || `Item #${item.uuid.slice(0, 8)}`,
   getSubtitle: (item: BaseContent) => item.data.subtitle || item.data.description || '',
   getStatus: (item: BaseContent) => item.data.status || '',
   getSections: () => [],
@@ -310,11 +316,11 @@ const defaultSections = computed((): DetailSection[] => {
   // Generate default sections from item data
   const sections: DetailSection[] = [];
   const data = props.item.data;
-  
+
   if (data && typeof data === 'object') {
     // Group fields into logical sections
     const basicFields: Array<{ key: string; label: string; value: any }> = [];
-    
+
     Object.entries(data).forEach(([key, value]) => {
       if (value !== null && value !== undefined && value !== '') {
         basicFields.push({
@@ -324,7 +330,7 @@ const defaultSections = computed((): DetailSection[] => {
         });
       }
     });
-    
+
     if (basicFields.length > 0) {
       sections.push({
         key: 'basic',
@@ -333,7 +339,7 @@ const defaultSections = computed((): DetailSection[] => {
       });
     }
   }
-  
+
   return sections;
 });
 
@@ -351,7 +357,7 @@ const formatFieldLabel = (key: string): string => {
     createdAt: 'Criado em',
     updatedAt: 'Atualizado em',
   };
-  
+
   return labelMap[key] || key.charAt(0).toUpperCase() + key.slice(1);
 };
 
@@ -412,12 +418,12 @@ const { user } = useAuth();
 // User display name function
 const getUserDisplayName = (userId: string | undefined): string => {
   if (!userId) return 'Sistema';
-  
+
   // If it's the current user, show their email
   if (user.value && user.value.userId === userId) {
     return user.value.email || user.value.userId;
   }
-  
+
   // For other users, show the user ID for now
   // In the future, this could be enhanced with a user lookup service
   return userId;
@@ -511,12 +517,12 @@ const getUserDisplayName = (userId: string | undefined): string => {
   .content-detail-container {
     background: white;
   }
-  
+
   header,
   .mobile-actions {
     display: none;
   }
-  
+
   .detail-section {
     break-inside: avoid;
     margin-bottom: 1rem;

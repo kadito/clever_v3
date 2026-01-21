@@ -25,7 +25,9 @@
       <!-- Client Information Section -->
       <div class="detail-section">
         <div class="bg-white rounded-touch border border-gray-200">
-          <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+          <div
+            class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+          >
             <h2 class="text-lg font-semibold text-gray-900">Cliente</h2>
           </div>
           <div class="p-4 sm:p-6">
@@ -33,21 +35,34 @@
             <div v-if="isClientError(contract.relations?.client)" class="client-error">
               <div class="flex items-start p-4 bg-red-50 border border-red-200 rounded-touch">
                 <div class="flex-shrink-0">
-                  <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  <svg
+                    class="w-5 h-5 text-red-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                 </div>
                 <div class="ml-3 flex-1">
-                  <h3 class="text-sm font-medium text-red-800">Erro ao carregar informações do cliente</h3>
+                  <h3 class="text-sm font-medium text-red-800">
+                    Erro ao carregar informações do cliente
+                  </h3>
                   <div class="mt-2 text-sm text-red-700">
                     <p>{{ getClientErrorMessage(contract.relations.client) }}</p>
                     <p class="mt-1 text-xs">
-                      ID do Cliente: <code class="bg-red-100 px-1 rounded">{{ contract.data.clientId }}</code>
+                      ID do Cliente:
+                      <code class="bg-red-100 px-1 rounded">{{ contract.data.clientId }}</code>
                     </p>
                   </div>
                   <div class="mt-3">
                     <div class="flex">
-                      <button 
+                      <button
                         @click="retryLoadClient"
                         class="text-sm bg-red-100 text-red-800 px-3 py-1 rounded-md hover:bg-red-200 transition-colors"
                       >
@@ -66,11 +81,15 @@
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Nome Comercial</label>
-                  <div class="detail-value">{{ contract.relations.client.nomeComercial || '-' }}</div>
+                  <div class="detail-value">
+                    {{ contract.relations.client.nomeComercial || '-' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Contribuinte</label>
-                  <div class="detail-value">{{ contract.relations.client.contribuinte || '-' }}</div>
+                  <div class="detail-value">
+                    {{ contract.relations.client.contribuinte || '-' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Localidade</label>
@@ -81,16 +100,31 @@
             <div v-else class="client-missing">
               <div class="flex items-start p-4 bg-yellow-50 border border-yellow-200 rounded-touch">
                 <div class="flex-shrink-0">
-                  <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                  <svg
+                    class="w-5 h-5 text-yellow-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                    />
                   </svg>
                 </div>
                 <div class="ml-3 flex-1">
-                  <h3 class="text-sm font-medium text-yellow-800">Informações do cliente não disponíveis</h3>
+                  <h3 class="text-sm font-medium text-yellow-800">
+                    Informações do cliente não disponíveis
+                  </h3>
                   <div class="mt-2 text-sm text-yellow-700">
                     <p>As informações do cliente não foram carregadas ou não estão disponíveis.</p>
                     <p class="mt-1 text-xs">
-                      ID do Cliente: <code class="bg-yellow-100 px-1 rounded">{{ contract.data.clientId || 'Não especificado' }}</code>
+                      ID do Cliente:
+                      <code class="bg-yellow-100 px-1 rounded">{{
+                        contract.data.clientId || 'Não especificado'
+                      }}</code>
                     </p>
                   </div>
                 </div>
@@ -103,7 +137,9 @@
       <!-- CPA Contract Section -->
       <div v-if="contract?.data.hasCPAContract" class="detail-section">
         <div class="bg-white rounded-touch border border-gray-200">
-          <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-blue-50 rounded-t-touch">
+          <div
+            class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-blue-50 rounded-t-touch"
+          >
             <h2 class="text-lg font-semibold text-blue-900">Contrato CPA</h2>
           </div>
           <div class="p-4 sm:p-6">
@@ -111,12 +147,16 @@
               <div class="detail-item">
                 <label class="detail-label">Tipo de Contrato</label>
                 <div class="detail-value">
-                  <span class="badge badge-blue">{{ formatCPAContractType(contract.data.cpaContractType) }}</span>
+                  <span class="badge badge-blue">{{
+                    formatCPAContractType(contract.data.cpaContractType)
+                  }}</span>
                 </div>
               </div>
               <div class="detail-item">
                 <label class="detail-label">Plano</label>
-                <div class="detail-value">{{ contract.data.planoCPA || contract.data.planIdCPA || '-' }}</div>
+                <div class="detail-value">
+                  {{ contract.data.planoCPA || contract.data.planIdCPA || '-' }}
+                </div>
               </div>
               <div class="detail-item">
                 <label class="detail-label">Distância</label>
@@ -124,7 +164,9 @@
               </div>
               <div class="detail-item">
                 <label class="detail-label">Modalidade de Pagamento</label>
-                <div class="detail-value">{{ formatPaymentMethod(contract.data.modalidadePagamentoCPA) }}</div>
+                <div class="detail-value">
+                  {{ formatPaymentMethod(contract.data.modalidadePagamentoCPA) }}
+                </div>
               </div>
               <div class="detail-item">
                 <label class="detail-label">Início do Contrato</label>
@@ -139,23 +181,38 @@
                 <div class="detail-value">
                   <div class="flex items-center space-x-2">
                     <span class="badge badge-green">
-                      <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                      <svg
+                        class="w-3 h-3 mr-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                       Incluído
                     </span>
-                    <span class="text-xs text-gray-500">Pack de 10h de assistência para POS (+€100/ano)</span>
+                    <span class="text-xs text-gray-500"
+                      >Pack de 10h de assistência para POS (+€100/ano)</span
+                    >
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- CPA Equipment -->
-            <div v-if="contract.data.cpaEquipments && contract.data.cpaEquipments.length > 0" class="mt-6">
+            <div
+              v-if="contract.data.cpaEquipments && contract.data.cpaEquipments.length > 0"
+              class="mt-6"
+            >
               <h3 class="text-md font-semibold text-gray-900 mb-4">Equipamentos CPA</h3>
               <div class="space-y-3">
-                <div 
-                  v-for="(equipment, index) in contract.data.cpaEquipments" 
+                <div
+                  v-for="(equipment, index) in contract.data.cpaEquipments"
                   :key="equipment.id"
                   class="equipment-card"
                 >
@@ -163,7 +220,9 @@
                     <div class="flex-1">
                       <div class="flex items-center space-x-2 mb-2">
                         <span class="equipment-number">{{ index + 1 }}</span>
-                        <h4 class="font-medium text-gray-900">{{ equipment.modelo || 'Modelo não especificado' }}</h4>
+                        <h4 class="font-medium text-gray-900">
+                          {{ equipment.modelo || 'Modelo não especificado' }}
+                        </h4>
                         <span v-if="equipment.desconto > 0" class="badge badge-orange">
                           {{ equipment.desconto }}% desconto
                         </span>
@@ -191,14 +250,18 @@
       <!-- S&H Contract Section -->
       <div v-if="contract?.data.hasSHContract" class="detail-section">
         <div class="bg-white rounded-touch border border-gray-200">
-          <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-green-50 rounded-t-touch">
+          <div
+            class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-green-50 rounded-t-touch"
+          >
             <h2 class="text-lg font-semibold text-green-900">Contrato S&H</h2>
           </div>
           <div class="p-4 sm:p-6">
             <div class="detail-grid">
               <div class="detail-item">
                 <label class="detail-label">Plano</label>
-                <div class="detail-value">{{ contract.data.planoSH || contract.data.planIdSH || '-' }}</div>
+                <div class="detail-value">
+                  {{ contract.data.planoSH || contract.data.planIdSH || '-' }}
+                </div>
               </div>
               <div class="detail-item">
                 <label class="detail-label">Distância</label>
@@ -206,7 +269,9 @@
               </div>
               <div class="detail-item">
                 <label class="detail-label">Modalidade de Pagamento</label>
-                <div class="detail-value">{{ formatPaymentMethod(contract.data.modalidadePagamentoSH) }}</div>
+                <div class="detail-value">
+                  {{ formatPaymentMethod(contract.data.modalidadePagamentoSH) }}
+                </div>
               </div>
               <div class="detail-item">
                 <label class="detail-label">Início do Contrato</label>
@@ -219,11 +284,14 @@
             </div>
 
             <!-- S&H Equipment -->
-            <div v-if="contract.data.shEquipments && contract.data.shEquipments.length > 0" class="mt-6">
+            <div
+              v-if="contract.data.shEquipments && contract.data.shEquipments.length > 0"
+              class="mt-6"
+            >
               <h3 class="text-md font-semibold text-gray-900 mb-4">Equipamentos S&H</h3>
               <div class="space-y-3">
-                <div 
-                  v-for="(equipment, index) in contract.data.shEquipments" 
+                <div
+                  v-for="(equipment, index) in contract.data.shEquipments"
                   :key="equipment.id"
                   class="equipment-card"
                 >
@@ -231,7 +299,9 @@
                     <div class="flex-1">
                       <div class="flex items-center space-x-2 mb-2">
                         <span class="equipment-number">{{ index + 1 }}</span>
-                        <h4 class="font-medium text-gray-900">{{ equipment.modelo || 'Modelo não especificado' }}</h4>
+                        <h4 class="font-medium text-gray-900">
+                          {{ equipment.modelo || 'Modelo não especificado' }}
+                        </h4>
                       </div>
                       <div class="text-sm text-gray-600 space-y-1">
                         <p v-if="equipment.numeroSerie">
@@ -256,26 +326,39 @@
       <!-- CPA Service Details Section -->
       <div v-if="contract?.data.hasCPAContract" class="detail-section">
         <div class="bg-white rounded-touch border border-gray-200">
-          <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+          <div
+            class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+          >
             <h2 class="text-lg font-semibold text-gray-900">Detalhes do Serviço CPA</h2>
           </div>
           <div class="p-4 sm:p-6">
             <div class="detail-grid">
               <div class="detail-item">
                 <label class="detail-label">Horas de Assistência Anual</label>
-                <div class="detail-value">{{ contract?.data.horasAssistenciaAnualCPA || contract?.data.horasAssistenciaAnual || 0 }} horas</div>
+                <div class="detail-value">
+                  {{
+                    contract?.data.horasAssistenciaAnualCPA ||
+                    contract?.data.horasAssistenciaAnual ||
+                    0
+                  }}
+                  horas
+                </div>
               </div>
               <div class="detail-item">
                 <label class="detail-label">Deslocações por Ano</label>
                 <div class="detail-value">
-                  {{ (contract?.data.deslocacoesPorAnoCPA || contract?.data.deslocacoesPorAno) === -1 
-                      ? 'Ilimitado' 
-                      : (contract?.data.deslocacoesPorAnoCPA || contract?.data.deslocacoesPorAno || 0) }}
+                  {{
+                    (contract?.data.deslocacoesPorAnoCPA || contract?.data.deslocacoesPorAno) === -1
+                      ? 'Ilimitado'
+                      : contract?.data.deslocacoesPorAnoCPA || contract?.data.deslocacoesPorAno || 0
+                  }}
                 </div>
               </div>
               <div class="detail-item">
                 <label class="detail-label">Manutenções por Ano</label>
-                <div class="detail-value">{{ contract?.data.manutencoesPorAnoCPA || contract?.data.manutencoesPorAno || 0 }}</div>
+                <div class="detail-value">
+                  {{ contract?.data.manutencoesPorAnoCPA || contract?.data.manutencoesPorAno || 0 }}
+                </div>
               </div>
             </div>
           </div>
@@ -285,26 +368,39 @@
       <!-- S&H Service Details Section -->
       <div v-if="contract?.data.hasSHContract" class="detail-section">
         <div class="bg-white rounded-touch border border-gray-200">
-          <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+          <div
+            class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+          >
             <h2 class="text-lg font-semibold text-gray-900">Detalhes do Serviço S&H</h2>
           </div>
           <div class="p-4 sm:p-6">
             <div class="detail-grid">
               <div class="detail-item">
                 <label class="detail-label">Horas de Assistência Anual</label>
-                <div class="detail-value">{{ contract?.data.horasAssistenciaAnualSH || contract?.data.horasAssistenciaAnual || 0 }} horas</div>
+                <div class="detail-value">
+                  {{
+                    contract?.data.horasAssistenciaAnualSH ||
+                    contract?.data.horasAssistenciaAnual ||
+                    0
+                  }}
+                  horas
+                </div>
               </div>
               <div class="detail-item">
                 <label class="detail-label">Deslocações por Ano</label>
                 <div class="detail-value">
-                  {{ (contract?.data.deslocacoesPorAnoSH || contract?.data.deslocacoesPorAno) === -1 
-                      ? 'Ilimitado' 
-                      : (contract?.data.deslocacoesPorAnoSH || contract?.data.deslocacoesPorAno || 0) }}
+                  {{
+                    (contract?.data.deslocacoesPorAnoSH || contract?.data.deslocacoesPorAno) === -1
+                      ? 'Ilimitado'
+                      : contract?.data.deslocacoesPorAnoSH || contract?.data.deslocacoesPorAno || 0
+                  }}
                 </div>
               </div>
               <div class="detail-item">
                 <label class="detail-label">Manutenções por Ano</label>
-                <div class="detail-value">{{ contract?.data.manutencoesPorAnoSH || contract?.data.manutencoesPorAno || 0 }}</div>
+                <div class="detail-value">
+                  {{ contract?.data.manutencoesPorAnoSH || contract?.data.manutencoesPorAno || 0 }}
+                </div>
               </div>
             </div>
           </div>
@@ -314,14 +410,18 @@
       <!-- Payment Method Section -->
       <div class="detail-section">
         <div class="bg-white rounded-touch border border-gray-200">
-          <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+          <div
+            class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+          >
             <h2 class="text-lg font-semibold text-gray-900">Método de Pagamento</h2>
           </div>
           <div class="p-4 sm:p-6">
             <div class="detail-grid">
               <div v-if="contract?.data.metodoPagamento" class="detail-item">
                 <label class="detail-label">Método de Pagamento</label>
-                <div class="detail-value">{{ formatPaymentMethod(contract.data.metodoPagamento) }}</div>
+                <div class="detail-value">
+                  {{ formatPaymentMethod(contract.data.metodoPagamento) }}
+                </div>
               </div>
             </div>
           </div>
@@ -347,9 +447,7 @@
             <span v-if="item.data.hasCPAContract" class="badge badge-blue">
               {{ item.data.cpaContractType || 'CPA' }}
             </span>
-            <span v-if="item.data.hasSHContract" class="badge badge-green">
-              S&H
-            </span>
+            <span v-if="item.data.hasSHContract" class="badge badge-green"> S&H </span>
           </div>
         </div>
 
@@ -419,90 +517,110 @@ const clearError = () => {
 // Display functions
 const getContractTitle = (item: BaseContent | null): string => {
   if (!item) return 'Contrato';
-  
+
   const contractItem = item as ContentWithRelations<Contract['data']>;
-  
+
   // Check if contractItem has data
   if (!contractItem || !contractItem.data) return 'Contrato';
-  
+
   // Try to get client name from resolved relations first
   if (contractItem.relations?.client) {
     const clientRelation = contractItem.relations.client;
-    
+
     // Check if it's a resolved relation with client data
     if (clientRelation && typeof clientRelation === 'object' && 'nomeEmpresa' in clientRelation) {
       return `Contrato - ${clientRelation.nomeComercial || clientRelation.nomeEmpresa}`;
     }
-    
+
     // Check if it's an error
-    if (clientRelation && typeof clientRelation === 'object' && 'type' in clientRelation && clientRelation.type === 'error') {
+    if (
+      clientRelation &&
+      typeof clientRelation === 'object' &&
+      'type' in clientRelation &&
+      clientRelation.type === 'error'
+    ) {
       return 'Contrato - Cliente não encontrado';
     }
   }
-  
+
   // Fallback to stored client name or default
   return `Contrato - ${contractItem.data.clienteName || 'Cliente desconhecido'}`;
 };
 
 const getContractSubtitle = (item: BaseContent | null): string => {
   if (!item) return '';
-  
+
   const contractItem = item as ContentWithRelations<Contract['data']>;
-  
+
   // Check if contractItem has data
   if (!contractItem || !contractItem.data) return '';
-  
+
   const summary = getContractSummary(contractItem.data);
   const parts = [];
-  
+
   if (summary.contractTypes.length > 0) {
     parts.push(summary.contractTypes.join(' + '));
   }
-  
+
   if (summary.planNames.length > 0) {
     parts.push(summary.planNames.join(', '));
   }
-  
+
   return parts.join(' • ');
 };
 
 const getContractStatus = (item: BaseContent | null): string => {
   if (!item) return 'Carregando...';
-  
+
   const contractItem = item as ContentWithRelations<Contract['data']>;
-  
+
   // Check if contractItem has data
   if (!contractItem || !contractItem.data) return 'Carregando...';
-  
+
   // Check if there's a client relation error
-  if (contractItem.relations?.client && typeof contractItem.relations.client === 'object' && 'type' in contractItem.relations.client && contractItem.relations.client.type === 'error') {
+  if (
+    contractItem.relations?.client &&
+    typeof contractItem.relations.client === 'object' &&
+    'type' in contractItem.relations.client &&
+    contractItem.relations.client.type === 'error'
+  ) {
     return 'Erro Cliente';
   }
-  
+
   const isActive = hasActiveContract(contractItem.data);
   return isActive ? 'Ativo' : 'Inativo';
 };
 
 const getContractStatusBadgeClass = (item: BaseContent | null): string => {
   if (!item) return 'badge-gray';
-  
+
   const contractItem = item as ContentWithRelations<Contract['data']>;
-  
+
   // Check if contractItem has data
   if (!contractItem || !contractItem.data) return 'badge-gray';
-  
+
   // Check if there's a client relation error
-  if (contractItem.relations?.client && typeof contractItem.relations.client === 'object' && 'type' in contractItem.relations.client && contractItem.relations.client.type === 'error') {
+  if (
+    contractItem.relations?.client &&
+    typeof contractItem.relations.client === 'object' &&
+    'type' in contractItem.relations.client &&
+    contractItem.relations.client.type === 'error'
+  ) {
     return 'badge-red';
   }
-  
+
   const isActive = hasActiveContract(contractItem.data);
   return isActive ? 'badge-green' : 'badge-gray';
 };
 
 // Helper functions
 const isClientError = (clientRelation: any): boolean => {
-  return clientRelation && typeof clientRelation === 'object' && 'type' in clientRelation && clientRelation.type === 'error';
+  return (
+    clientRelation &&
+    typeof clientRelation === 'object' &&
+    'type' in clientRelation &&
+    clientRelation.type === 'error'
+  );
 };
 
 const isResolvedClient = (clientRelation: any): boolean => {
@@ -510,10 +628,15 @@ const isResolvedClient = (clientRelation: any): boolean => {
 };
 
 const getClientErrorMessage = (clientRelation: any): string => {
-  if (clientRelation && typeof clientRelation === 'object' && 'code' in clientRelation && 'message' in clientRelation) {
+  if (
+    clientRelation &&
+    typeof clientRelation === 'object' &&
+    'code' in clientRelation &&
+    'message' in clientRelation
+  ) {
     const code = clientRelation.code;
     const message = clientRelation.message;
-    
+
     switch (code) {
       case 404:
         return 'Cliente não encontrado. O cliente pode ter sido removido ou o ID está incorreto.';
@@ -528,42 +651,41 @@ const getClientErrorMessage = (clientRelation: any): string => {
 
 const retryLoadClient = async () => {
   if (!contract.value) return;
-  
 
   await loadContract();
 };
 
 const getEquipmentCount = (item: BaseContent | null): number => {
   if (!item) return 0;
-  
+
   const contractItem = item as ContentWithRelations<Contract['data']>;
-  
+
   // Check if contractItem has data
   if (!contractItem || !contractItem.data) return 0;
-  
+
   let count = 0;
-  
+
   // Count CPA equipments
   if (contractItem.data.cpaEquipments && contractItem.data.cpaEquipments.length > 0) {
     count += contractItem.data.cpaEquipments.length;
   }
-  
+
   // Count S&H equipments
   if (contractItem.data.shEquipments && contractItem.data.shEquipments.length > 0) {
     count += contractItem.data.shEquipments.length;
   }
-  
+
   return count;
 };
 
 const formatCPAContractType = (contractType: string | undefined): string => {
   if (!contractType) return 'CPA';
-  
+
   const typeMap: Record<string, string> = {
-    'CPA': 'CPA - Cashlogy (2023)',
-    'CPA_1500': 'CPA - Cashlogy (1500)'
+    CPA: 'CPA - Cashlogy (2023)',
+    CPA_1500: 'CPA - Cashlogy (1500)',
   };
-  
+
   return typeMap[contractType] || contractType;
 };
 
@@ -579,31 +701,31 @@ const formatDate = (dateString: string | undefined): string => {
 
 const formatDistance = (distance: string | undefined): string => {
   if (!distance) return '-';
-  
+
   const distanceMap: Record<string, string> = {
-    'under180km': 'Até 180km',
-    'over180km': 'Mais de 180km'
+    under180km: 'Até 180km',
+    over180km: 'Mais de 180km',
   };
-  
+
   return distanceMap[distance] || distance;
 };
 
 const formatPaymentMethod = (method: string | undefined): string => {
   if (!method) return '-';
-  
+
   const methodMap: Record<string, string> = {
-    'TRANSFERENCIA_BANCARIA': 'Transferência Bancária',
-    'DEBITO_DIRETO': 'Débito Direto',
-    'MULTIBANCO': 'Multibanco',
-    'CHEQUE': 'Cheque',
-    'NUMERARIO': 'Numerário',
-    'MB_WAY': 'MB WAY',
-    'MENSAL': 'Mensal',
-    'TRIMESTRAL': 'Trimestral',
-    'SEMESTRAL': 'Semestral',
-    'ANUAL': 'Anual'
+    TRANSFERENCIA_BANCARIA: 'Transferência Bancária',
+    DEBITO_DIRETO: 'Débito Direto',
+    MULTIBANCO: 'Multibanco',
+    CHEQUE: 'Cheque',
+    NUMERARIO: 'Numerário',
+    MB_WAY: 'MB WAY',
+    MENSAL: 'Mensal',
+    TRIMESTRAL: 'Trimestral',
+    SEMESTRAL: 'Semestral',
+    ANUAL: 'Anual',
   };
-  
+
   return methodMap[method] || method;
 };
 
@@ -620,56 +742,65 @@ const handleBack = () => {
 // Delete functionality
 const getDeleteConfirmationMessage = (): string => {
   if (!contract.value) return 'Tem a certeza que pretende eliminar este contrato?';
-  
+
   // Try to get client name from resolved relations first
   let clientName = 'Cliente desconhecido';
   if (contract.value.relations?.client) {
     const clientRelation = contract.value.relations.client;
-    
+
     // Check if it's a resolved relation with client data
     if (clientRelation && typeof clientRelation === 'object' && 'nomeEmpresa' in clientRelation) {
-      clientName = clientRelation.nomeComercial || clientRelation.nomeEmpresa || 'Cliente desconhecido';
+      clientName =
+        clientRelation.nomeComercial || clientRelation.nomeEmpresa || 'Cliente desconhecido';
     }
   }
-  
+
   // Fallback to stored client name
   if (clientName === 'Cliente desconhecido' && contract.value.data.clienteName) {
     clientName = contract.value.data.clienteName;
   }
-  
+
   return `Tem a certeza que pretende eliminar o contrato de "${clientName}"? Esta ação não pode ser desfeita.`;
 };
 
 const handleDelete = () => {
   if (!contract.value) return;
-  
+
   confirmDeleteMessage.value = getDeleteConfirmationMessage();
   showDeleteConfirm.value = true;
 };
 
 const confirmDelete = async () => {
   if (!contract.value) return;
-  
+
   try {
     isDeleting.value = true;
-    
-    console.log('Attempting to delete contract:', JSON.stringify({
-      uuid: contract.value.uuid,
-      clientName: contract.value.data.clienteName || 'Unknown'
-    }, null, 2));
-    
+
+    console.log(
+      'Attempting to delete contract:',
+      JSON.stringify(
+        {
+          uuid: contract.value.uuid,
+          clientName: contract.value.data.clienteName || 'Unknown',
+        },
+        null,
+        2
+      )
+    );
+
     const success = await api.remove(contract.value.uuid);
-    
+
     // Check if API returned an error
     if (api.error.value) {
       console.error('API returned error:', JSON.stringify(api.error.value, null, 2));
-      error.value = typeof api.error.value === 'string' 
-        ? api.error.value 
-        : api.error.value.message || 'Erro ao eliminar contrato';
+      error.value =
+        typeof api.error.value === 'string'
+          ? api.error.value
+          : api.error.value.message || 'Erro ao eliminar contrato';
       showDeleteConfirm.value = false;
       return;
     }
-    
+
     if (success) {
       console.log('Contract deleted successfully, navigating to /contracts');
       // Navigate to contracts list after successful deletion
@@ -703,15 +834,11 @@ const loadContract = async () => {
   try {
     isLoading.value = true;
     clearError();
-    
 
     await api.fetchById(uuid);
-    
 
-    
     if (api.currentItem.value) {
       contract.value = api.currentItem.value as ContentWithRelations<Contract['data']>;
-
     } else {
       throw new Error('Contrato não encontrado');
     }
@@ -823,7 +950,7 @@ code {
   .equipment-number {
     @apply w-5 h-5 text-xs;
   }
-  
+
   .badge {
     @apply px-1.5 py-0.5 text-xs;
   }
@@ -835,7 +962,7 @@ code {
     break-inside: avoid;
     margin-bottom: 1rem;
   }
-  
+
   .equipment-card {
     border: 1px solid #ccc;
     background: white;

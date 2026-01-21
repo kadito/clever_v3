@@ -9,10 +9,14 @@ import { extractRelationChanges, hasRelationFields } from './relation-validation
  */
 export interface StorageBucket {
   get(key: string): Promise<StorageObject | null>;
-  put(key: string, value: string, options?: { 
-    httpMetadata?: { contentType?: string; cacheControl?: string; };
-    customMetadata?: Record<string, string>;
-  }): Promise<StorageObject>;
+  put(
+    key: string,
+    value: string,
+    options?: {
+      httpMetadata?: { contentType?: string; cacheControl?: string };
+      customMetadata?: Record<string, string>;
+    }
+  ): Promise<StorageObject>;
   delete(key: string): Promise<void>;
 }
 
@@ -52,10 +56,10 @@ export class ContentStorageService<T extends BaseContent> {
   private async getWithoutRelations(uuid: string): Promise<T | null> {
     const key = `content/${this.contentType}/${uuid}.json`;
     const object = await this.r2Bucket.get(key);
-    
+
     if (!object) return null;
-    
-    const content = await object.json() as T;
+
+    const content = (await object.json()) as T;
     return content.isDeleted ? null : content;
   }
 
@@ -66,9 +70,9 @@ export class ContentStorageService<T extends BaseContent> {
    */
   async get(uuid: string): Promise<ContentWithRelations<T['data']> | null> {
     const content = await this.getWithoutRelations(uuid);
-    
+
     if (!content) return null;
-    
+
     // Resolve relations and return enhanced content
     const contentFetcher = this.createContentFetcher();
     return await resolveContentRelations(content, contentFetcher);
@@ -79,10 +83,13 @@ export class ContentStorageService<T extends BaseContent> {
    * Generates UUID and sets initial audit trail values
    * Requirements: 2.1, 2.4
    */
-  async create(data: T['data'], userContext: { userId: string }): Promise<ContentWithRelations<T['data']>> {
+  async create(
+    data: T['data'],
+    userContext: { userId: string }
+  ): Promise<ContentWithRelations<T['data']>> {
     const uuid = crypto.randomUUID();
     const now = new Date().toISOString();
-    
+
     const content: T = {
       uuid,
       contentType: this.contentType,
@@ -92,12 +99,12 @@ export class ContentStorageService<T extends BaseContent> {
       updatedBy: userContext.userId,
       version: 1,
       isDeleted: false,
-      data
+      data,
     } as T;
 
     await this.save(content);
     await this.updateIndex(content, 'create');
-    
+
     // Resolve relations and return enhanced content
     const contentFetcher = this.createContentFetcher();
     return await resolveContentRelations(content, contentFetcher);
@@ -109,25 +116,28 @@ export class ContentStorageService<T extends BaseContent> {
    * Maintains audit trail for relation changes
    * Requirements: 2.4, 1.5 - Maintain audit trail for relation changes
    */
-  async update(uuid: string, data: Partial<T['data']>, userContext: { userId: string }): Promise<ContentWithRelations<T['data']>> {
+  async update(
+    uuid: string,
+    data: Partial<T['data']>,
+    userContext: { userId: string }
+  ): Promise<ContentWithRelations<T['data']>> {
     const existing = await this.getWithoutRelations(uuid);
     if (!existing) throw new Error('Content not found');
-    
+
     const now = new Date().toISOString();
-    
+
     // Extract relation changes for audit trail
-    const relationChanges = extractRelationChanges(
-      this.contentType,
-      existing.data,
-      { ...existing.data, ...data }
-    );
-    
+    const relationChanges = extractRelationChanges(this.contentType, existing.data, {
+      ...existing.data,
+      ...data,
+    });
+
     const updated: T = {
       ...existing,
       data: { ...existing.data, ...data },
       updatedAt: now,
       updatedBy: userContext.userId,
-      version: existing.version + 1
+      version: existing.version + 1,
     };
 
     // Log relation changes if any occurred
@@ -139,7 +149,7 @@ export class ContentStorageService<T extends BaseContent> {
 
     await this.save(updated);
     await this.updateIndex(updated, 'update');
-    
+
     // Resolve relations and return enhanced content
     const contentFetcher = this.createContentFetcher();
     return await resolveContentRelations(updated, contentFetcher);
@@ -153,15 +163,15 @@ export class ContentStorageService<T extends BaseContent> {
   async delete(uuid: string, userContext: { userId: string }): Promise<void> {
     const existing = await this.getWithoutRelations(uuid);
     if (!existing) throw new Error('Content not found');
-    
+
     const now = new Date().toISOString();
-    
+
     const deleted: T = {
       ...existing,
       isDeleted: true,
       deletedAt: now,
       deletedBy: userContext.userId,
-      version: existing.version + 1
+      version: existing.version + 1,
     };
 
     await this.save(deleted);
@@ -173,29 +183,32 @@ export class ContentStorageService<T extends BaseContent> {
    * Uses search index for efficient querying
    * Requirements: 2.3
    */
-  async list(page: number = 1, limit: number = 50): Promise<{ items: ContentWithRelations<T['data']>[]; total: number }> {
+  async list(
+    page: number = 1,
+    limit: number = 50
+  ): Promise<{ items: ContentWithRelations<T['data']>[]; total: number }> {
     const indexKey = `indexes/${this.contentType}-index.json`;
-    
+
     const indexObject = await this.r2Bucket.get(indexKey);
     if (!indexObject) {
       return { items: [], total: 0 };
     }
-    
-    const index = await indexObject.json() as { items: any[] };
+
+    const index = (await indexObject.json()) as { items: any[] };
     const activeItems = index.items.filter(item => !item.isDeleted);
-    
+
     // Sort by creation date (most recent first) for most content types
     // Clients should be sorted alphabetically (handled in subclasses)
     const sortedItems = this.sortIndexItems(activeItems);
-    
+
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
     const paginatedItems = sortedItems.slice(startIndex, endIndex);
-    
+
     // Fetch full content for paginated items and resolve relations
     const contentFetcher = this.createContentFetcher();
     const items: ContentWithRelations<T['data']>[] = [];
-    
+
     for (const indexItem of paginatedItems) {
       const content = await this.getWithoutRelations(indexItem.uuid);
       if (content) {
@@ -203,7 +216,7 @@ export class ContentStorageService<T extends BaseContent> {
         items.push(contentWithRelations);
       }
     }
-    
+
     return { items, total: activeItems.length };
   }
 
@@ -214,25 +227,23 @@ export class ContentStorageService<T extends BaseContent> {
    */
   async search(query: string): Promise<ContentWithRelations<T['data']>[]> {
     const indexKey = `indexes/${this.contentType}-index.json`;
-    
+
     const indexObject = await this.r2Bucket.get(indexKey);
     if (!indexObject) {
       return [];
     }
-    
-    const index = await indexObject.json() as { items: any[] };
+
+    const index = (await indexObject.json()) as { items: any[] };
     const searchTerm = query.toLowerCase();
-    
-    const matchingItems = index.items.filter(item => 
-      !item.isDeleted && 
-      item.searchableText && 
-      item.searchableText.includes(searchTerm)
+
+    const matchingItems = index.items.filter(
+      item => !item.isDeleted && item.searchableText && item.searchableText.includes(searchTerm)
     );
-    
+
     // Fetch full content for matching items and resolve relations
     const contentFetcher = this.createContentFetcher();
     const items: ContentWithRelations<T['data']>[] = [];
-    
+
     for (const indexItem of matchingItems) {
       const content = await this.getWithoutRelations(indexItem.uuid);
       if (content) {
@@ -240,7 +251,7 @@ export class ContentStorageService<T extends BaseContent> {
         items.push(contentWithRelations);
       }
     }
-    
+
     return items;
   }
 
@@ -255,14 +266,14 @@ export class ContentStorageService<T extends BaseContent> {
     await this.r2Bucket.put(key, JSON.stringify(content, null, 2), {
       httpMetadata: {
         contentType: 'application/json',
-        cacheControl: 'public, max-age=3600'
+        cacheControl: 'public, max-age=3600',
       },
       customMetadata: {
         contentType: this.contentType,
         version: content.version.toString(),
         createdAt: content.createdAt,
-        updatedAt: content.updatedAt
-      }
+        updatedAt: content.updatedAt,
+      },
     });
   }
 
@@ -273,23 +284,25 @@ export class ContentStorageService<T extends BaseContent> {
    */
   private async updateIndex(content: T, operation: 'create' | 'update' | 'delete'): Promise<void> {
     const indexKey = `indexes/${this.contentType}-index.json`;
-    
+
     // Get current index
     const indexObject = await this.r2Bucket.get(indexKey);
-    const index = indexObject ? await indexObject.json() : { 
-      contentType: this.contentType,
-      lastUpdated: new Date().toISOString(),
-      items: [] 
-    };
-    
+    const index = indexObject
+      ? await indexObject.json()
+      : {
+          contentType: this.contentType,
+          lastUpdated: new Date().toISOString(),
+          items: [],
+        };
+
     // Ensure items array exists
     if (!index.items) {
       index.items = [];
     }
-    
+
     // Update index based on operation
     const existingIndex = index.items.findIndex((item: any) => item.uuid === content.uuid);
-    
+
     if (operation === 'delete') {
       if (existingIndex !== -1) {
         index.items[existingIndex].isDeleted = true;
@@ -303,30 +316,30 @@ export class ContentStorageService<T extends BaseContent> {
         isDeleted: content.isDeleted,
         // Searchable fields extracted from data
         searchableText: this.extractSearchableText(content),
-        ...this.extractIndexFields(content)
+        ...this.extractIndexFields(content),
       };
-      
+
       if (existingIndex !== -1) {
         index.items[existingIndex] = indexItem;
       } else {
         index.items.push(indexItem);
       }
     }
-    
+
     // Update index metadata
     index.lastUpdated = new Date().toISOString();
-    
+
     // Save updated index
     await this.r2Bucket.put(indexKey, JSON.stringify(index, null, 2), {
       httpMetadata: {
         contentType: 'application/json',
-        cacheControl: 'public, max-age=300'
+        cacheControl: 'public, max-age=300',
       },
       customMetadata: {
         contentType: `${this.contentType}-index`,
         lastUpdated: index.lastUpdated,
-        itemCount: index.items.length.toString()
-      }
+        itemCount: index.items.length.toString(),
+      },
     });
   }
 

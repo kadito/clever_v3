@@ -9,39 +9,37 @@
       <div class="controls-left">
         <h2>Licenças {{ selectedYear || 'Todos' }} ({{ displayItems.length }})</h2>
       </div>
-      
+
       <div class="controls-right">
-        <YearSelector 
-          v-model="selectedYear" 
+        <YearSelector
+          v-model="selectedYear"
           :years="availableYears"
           :show-all-option="true"
           @change="handleYearChange"
         />
-        
-        <button @click="loadData" :disabled="loading" class="btn btn-refresh">
-          🔄 Atualizar
-        </button>
+
+        <button @click="loadData" :disabled="loading" class="btn btn-refresh">🔄 Atualizar</button>
       </div>
     </div>
 
     <!-- Search -->
     <div class="search-section">
       <div class="search-container">
-        <input 
-          type="text" 
-          v-model="searchQuery" 
+        <input
+          type="text"
+          v-model="searchQuery"
           @input="handleSearch"
-          placeholder="Pesquisar por cliente, software, série..." 
+          placeholder="Pesquisar por cliente, software, série..."
           class="search-input"
-        >
+        />
         <span class="search-icon">🔍</span>
       </div>
-      
+
       <div class="month-filter-container">
         <label for="month-filter" class="month-filter-label">Filtrar por mês de validade:</label>
-        <select 
+        <select
           id="month-filter"
-          v-model="selectedMonth" 
+          v-model="selectedMonth"
           @change="handleMonthChange"
           class="month-filter-select"
         >
@@ -66,8 +64,8 @@
 
     <!-- Licenças List -->
     <div v-else-if="displayItems.length > 0" class="licencas-list">
-      <div 
-        v-for="licenca in displayItems" 
+      <div
+        v-for="licenca in displayItems"
         :key="`${licenca.year || selectedYear}-${licenca.id}`"
         class="licenca-item"
         @click="navigateToDetail(licenca)"
@@ -75,23 +73,29 @@
         <div class="licenca-main">
           <h3>{{ licenca.cliente }}</h3>
           <div class="licenca-meta">
-            <span class="licenca-software">{{ formatSoftwareNames(licenca.tipoSoftware || licenca.software?.name) }}</span>
+            <span class="licenca-software">{{
+              formatSoftwareNames(licenca.tipoSoftware || licenca.software?.name)
+            }}</span>
             <span class="licenca-version">{{ licenca.versao || 'Sem versão' }}</span>
           </div>
           <div class="licenca-details" v-if="licenca.modalidade || licenca.numeroSerie">
-            <span v-if="licenca.modalidade" class="licenca-modalidade">📅 {{ licenca.modalidade }}</span>
-            <span v-if="licenca.numeroSerie" class="licenca-serie">🔐 {{ licenca.numeroSerie }}</span>
+            <span v-if="licenca.modalidade" class="licenca-modalidade"
+              >📅 {{ licenca.modalidade }}</span
+            >
+            <span v-if="licenca.numeroSerie" class="licenca-serie"
+              >🔐 {{ licenca.numeroSerie }}</span
+            >
           </div>
           <div class="licenca-validation" v-if="getValidationDate(licenca)">
             <span class="validation-date">📆 Validade: {{ formatValidationDate(licenca) }}</span>
           </div>
           <div class="licenca-status">
-            <span 
+            <span
               class="status-badge"
               :class="{
-                'expired': isLicenseExpired(licenca),
-                'expiring': isLicenseExpiringSoon(licenca),
-                'active': !isLicenseExpired(licenca) && !isLicenseExpiringSoon(licenca)
+                expired: isLicenseExpired(licenca),
+                expiring: isLicenseExpiringSoon(licenca),
+                active: !isLicenseExpired(licenca) && !isLicenseExpiringSoon(licenca),
               }"
             >
               {{ getLicenseStatus(licenca) }}
@@ -102,9 +106,7 @@
           </div>
         </div>
         <div class="licenca-actions">
-          <button class="action-btn" @click.stop="showActions(licenca)">
-            ⋮
-          </button>
+          <button class="action-btn" @click.stop="showActions(licenca)">⋮</button>
         </div>
       </div>
     </div>
@@ -112,15 +114,9 @@
     <!-- Empty State -->
     <div v-else class="empty-state">
       <h3>Nenhuma licença encontrada</h3>
-      <p v-if="searchQuery">
-        Não foram encontradas licenças com o termo "{{ searchQuery }}".
-      </p>
-      <p v-else-if="selectedYear">
-        Não há licenças para o ano {{ selectedYear }}.
-      </p>
-      <p v-else>
-        Não há licenças cadastradas no sistema.
-      </p>
+      <p v-if="searchQuery">Não foram encontradas licenças com o termo "{{ searchQuery }}".</p>
+      <p v-else-if="selectedYear">Não há licenças para o ano {{ selectedYear }}.</p>
+      <p v-else>Não há licenças cadastradas no sistema.</p>
     </div>
 
     <!-- Search Results Info -->
@@ -128,7 +124,9 @@
       <p>
         {{ searchResults.count || 0 }} resultado(s) encontrado(s)
         <span v-if="searchQuery">para "{{ searchQuery }}"</span>
-        <span v-if="selectedMonth">no mês de {{ months.find(m => m.value === selectedMonth)?.label }}</span>
+        <span v-if="selectedMonth"
+          >no mês de {{ months.find(m => m.value === selectedMonth)?.label }}</span
+        >
         {{ selectedYear ? `no ano ${selectedYear}` : 'em todos os anos' }}
       </p>
     </div>
@@ -155,13 +153,12 @@
       <div class="modal-content" @click.stop>
         <h3>Confirmar Eliminação</h3>
         <p>
-          Tem a certeza que pretende eliminar a licença de 
-          <strong>{{ licencaToDelete?.cliente }}</strong>?
+          Tem a certeza que pretende eliminar a licença de
+          <strong>{{ licencaToDelete?.cliente }}</strong
+          >?
         </p>
         <div class="modal-actions">
-          <button @click="cancelDelete" class="btn btn-secondary">
-            Cancelar
-          </button>
+          <button @click="cancelDelete" class="btn btn-secondary">Cancelar</button>
           <button @click="deleteLicencaAction" class="btn btn-danger" :disabled="loading">
             {{ loading ? 'A eliminar...' : 'Eliminar' }}
           </button>
@@ -170,56 +167,52 @@
     </div>
 
     <!-- Floating Action Button -->
-    <button @click="navigateToCreate" class="fab">
-      ➕
-    </button>
+    <button @click="navigateToCreate" class="fab">➕</button>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import { useLicencasStore } from '@/stores/licencas.js'
-import BackButton from '@/components/BackButton.vue'
-import YearSelector from '@/components/YearSelector.vue'
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import { useLicencasStore } from '@/stores/licencas.js';
+import BackButton from '@/components/BackButton.vue';
+import YearSelector from '@/components/YearSelector.vue';
 
 // Router
-const router = useRouter()
+const router = useRouter();
 
 // Store
-const licencasStore = useLicencasStore()
+const licencasStore = useLicencasStore();
 
 const navigateToCreate = () => {
-  router.push('/licencas/new?from=list')
-}
+  router.push('/licencas/new?from=list');
+};
 
 // Reactive references from store
-const { 
-  licencas, availableYears, currentYear, loading, error
-} = storeToRefs(licencasStore)
-const { 
-  fetchLicencasForYear, 
-  fetchAvailableYears, 
-  searchLicencas, 
+const { licencas, availableYears, currentYear, loading, error } = storeToRefs(licencasStore);
+const {
+  fetchLicencasForYear,
+  fetchAvailableYears,
+  searchLicencas,
   clearError,
   setCurrentYear,
   getLicenseStatus,
   isLicenseExpired,
   isLicenseExpiringSoon,
   formatDate,
-  getValidationDate
-} = licencasStore
+  getValidationDate,
+} = licencasStore;
 
 // Local state
-const selectedYear = ref('')
-const searchQuery = ref('')
-const selectedMonth = ref('')
-const searchResults = ref(null)
-const showDeleteModal = ref(false)
-const licencaToDelete = ref(null)
-const showActionsModal = ref(false)
-const selectedLicencaForActions = ref(null)
+const selectedYear = ref('');
+const searchQuery = ref('');
+const selectedMonth = ref('');
+const searchResults = ref(null);
+const showDeleteModal = ref(false);
+const licencaToDelete = ref(null);
+const showActionsModal = ref(false);
+const selectedLicencaForActions = ref(null);
 
 // Months for filter
 const months = [
@@ -234,197 +227,203 @@ const months = [
   { value: '9', label: 'Setembro' },
   { value: '10', label: 'Outubro' },
   { value: '11', label: 'Novembro' },
-  { value: '12', label: 'Dezembro' }
-]
+  { value: '12', label: 'Dezembro' },
+];
 
 // Computed
 const displayItems = computed(() => {
   if (searchResults.value) {
-    return searchResults.value.results || []
+    return searchResults.value.results || [];
   }
-  return licencas.value || []
-})
+  return licencas.value || [];
+});
 
 // Methods
 const loadData = async () => {
-  await fetchAvailableYears()
-  await fetchLicencasForYear(selectedYear.value || null)
-}
+  await fetchAvailableYears();
+  await fetchLicencasForYear(selectedYear.value || null);
+};
 
-const handleYearChange = (year) => {
-  selectedYear.value = year
+const handleYearChange = year => {
+  selectedYear.value = year;
   if (!searchQuery.value) {
-    setCurrentYear(year || new Date().getFullYear().toString())
-    fetchLicencasForYear(year || null)
+    setCurrentYear(year || new Date().getFullYear().toString());
+    fetchLicencasForYear(year || null);
   } else {
-    handleSearch()
+    handleSearch();
   }
-}
+};
 
-let searchTimeout = null
+let searchTimeout = null;
 const handleSearch = async () => {
   if (searchTimeout) {
-    clearTimeout(searchTimeout)
+    clearTimeout(searchTimeout);
   }
-  
+
   searchTimeout = setTimeout(async () => {
-    await performSearch()
-  }, 300)
-}
+    await performSearch();
+  }, 300);
+};
 
 const handleMonthChange = async () => {
-  await performSearch()
-}
+  await performSearch();
+};
 
 const performSearch = async () => {
   // If no search query and no month filter, clear results
   if (!searchQuery.value.trim() && !selectedMonth.value) {
-    searchResults.value = null
-    return
+    searchResults.value = null;
+    return;
   }
-  
+
   // If search query is too short and no month filter, don't search
-  if (searchQuery.value.trim().length > 0 && searchQuery.value.trim().length < 2 && !selectedMonth.value) {
-    return
+  if (
+    searchQuery.value.trim().length > 0 &&
+    searchQuery.value.trim().length < 2 &&
+    !selectedMonth.value
+  ) {
+    return;
   }
-  
+
   // Build search params
-  const searchParams = new URLSearchParams()
+  const searchParams = new URLSearchParams();
   if (searchQuery.value.trim()) {
-    searchParams.append('q', searchQuery.value.trim())
+    searchParams.append('q', searchQuery.value.trim());
   }
   if (selectedMonth.value) {
-    searchParams.append('month', selectedMonth.value)
+    searchParams.append('month', selectedMonth.value);
   }
   if (selectedYear.value) {
-    searchParams.append('year', selectedYear.value)
+    searchParams.append('year', selectedYear.value);
   }
-  
-  try {
-    const response = await fetch(`/api/licencas/search?${searchParams}`)
-    if (!response.ok) {
-      throw new Error(`Search failed: ${response.status}`)
-    }
-    const data = await response.json()
-    searchResults.value = data
-  } catch (err) {
-    console.error('Error searching licencas:', err)
-    searchResults.value = null
-  }
-}
 
-const formatValidationDate = (licenca) => {
-  const validationDate = getValidationDate(licenca)
-  if (!validationDate) return 'N/A'
-  return formatDate(validationDate.toISOString())
-}
+  try {
+    const response = await fetch(`/api/licencas/search?${searchParams}`);
+    if (!response.ok) {
+      throw new Error(`Search failed: ${response.status}`);
+    }
+    const data = await response.json();
+    searchResults.value = data;
+  } catch (err) {
+    console.error('Error searching licencas:', err);
+    searchResults.value = null;
+  }
+};
+
+const formatValidationDate = licenca => {
+  const validationDate = getValidationDate(licenca);
+  if (!validationDate) return 'N/A';
+  return formatDate(validationDate.toISOString());
+};
 
 const clearSearch = () => {
-  searchQuery.value = ''
-  searchResults.value = null
-  loadData()
-}
+  searchQuery.value = '';
+  searchResults.value = null;
+  loadData();
+};
 
-const viewLicenca = (licenca) => {
-  const year = licenca.year || currentYear.value
-  router.push(`/licencas/${year}/${licenca.id}`)
-}
+const viewLicenca = licenca => {
+  const year = licenca.year || currentYear.value;
+  router.push(`/licencas/${year}/${licenca.id}`);
+};
 
-const showActions = (licenca) => {
-  selectedLicencaForActions.value = licenca
-  showActionsModal.value = true
-}
+const showActions = licenca => {
+  selectedLicencaForActions.value = licenca;
+  showActionsModal.value = true;
+};
 
 const closeActions = () => {
-  showActionsModal.value = false
-  selectedLicencaForActions.value = null
-}
+  showActionsModal.value = false;
+  selectedLicencaForActions.value = null;
+};
 
-const navigateToDetail = (licenca) => {
-  const year = licenca.year || selectedYear.value || currentYear.value
-  router.push(`/licencas/${year}/${licenca.id}`)
-}
+const navigateToDetail = licenca => {
+  const year = licenca.year || selectedYear.value || currentYear.value;
+  router.push(`/licencas/${year}/${licenca.id}`);
+};
 
-const viewDetails = (licenca) => {
-  navigateToDetail(licenca)
-  closeActions()
-}
+const viewDetails = licenca => {
+  navigateToDetail(licenca);
+  closeActions();
+};
 
-const editLicenca = (licenca) => {
-  const year = licenca.year || selectedYear.value || currentYear.value
-  router.push(`/licencas/${year}/${licenca.id}/edit?from=list`)
-  closeActions()
-}
+const editLicenca = licenca => {
+  const year = licenca.year || selectedYear.value || currentYear.value;
+  router.push(`/licencas/${year}/${licenca.id}/edit?from=list`);
+  closeActions();
+};
 
-
-
-const confirmDelete = (licenca) => {
-  licencaToDelete.value = licenca
-  showDeleteModal.value = true
-  closeActions()
-}
+const confirmDelete = licenca => {
+  licencaToDelete.value = licenca;
+  showDeleteModal.value = true;
+  closeActions();
+};
 
 const cancelDelete = () => {
-  licencaToDelete.value = null
-  showDeleteModal.value = false
-}
+  licencaToDelete.value = null;
+  showDeleteModal.value = false;
+};
 
 const deleteLicencaAction = async () => {
-  if (!licencaToDelete.value) return
-  
+  if (!licencaToDelete.value) return;
+
   try {
-    const year = licencaToDelete.value.year || currentYear.value
-    await licencasStore.deleteLicenca(year, licencaToDelete.value.id)
-    
+    const year = licencaToDelete.value.year || currentYear.value;
+    await licencasStore.deleteLicenca(year, licencaToDelete.value.id);
+
     // Refresh data
     if (searchResults.value) {
-      handleSearch()
+      handleSearch();
     } else {
-      loadData()
+      loadData();
     }
-    
-    cancelDelete()
+
+    cancelDelete();
   } catch (err) {
-    console.error('Error deleting licenca:', err)
+    console.error('Error deleting licenca:', err);
     // Error is handled by the store
   }
-}
+};
 
 // Remove this function since it's imported from store
 
-const getLicenseStatusText = (licenca) => {
-  const status = getLicenseStatus(licenca)
+const getLicenseStatusText = licenca => {
+  const status = getLicenseStatus(licenca);
   switch (status) {
-    case 'expired': return 'Expirada'
-    case 'expiring': return 'A Expirar'
-    case 'active': return 'Ativa'
-    default: return 'Indefinida'
+    case 'expired':
+      return 'Expirada';
+    case 'expiring':
+      return 'A Expirar';
+    case 'active':
+      return 'Ativa';
+    default:
+      return 'Indefinida';
   }
-}
+};
 
 // Format software names (handle both array and string formats)
-const formatSoftwareNames = (software) => {
-  if (!software) return 'N/A'
+const formatSoftwareNames = software => {
+  if (!software) return 'N/A';
   if (Array.isArray(software)) {
-    return software.join(', ')
+    return software.join(', ');
   }
-  return software
-}
+  return software;
+};
 
 // Remove this function since it's imported from store
 
 // Watchers
-watch(searchQuery, (newValue) => {
+watch(searchQuery, newValue => {
   if (!newValue.trim() && !selectedMonth.value) {
-    searchResults.value = null
+    searchResults.value = null;
   }
-})
+});
 
 // Lifecycle
 onMounted(() => {
-  selectedYear.value = currentYear.value
-  loadData()
-})
+  selectedYear.value = currentYear.value;
+  loadData();
+});
 </script>
 
 <style scoped>
@@ -920,8 +919,12 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .error-icon,
@@ -1180,49 +1183,49 @@ onMounted(() => {
     height: 50px;
     font-size: 1.25rem;
   }
-  
+
   .licencas-list {
     padding: 0.75rem;
   }
-  
+
   .list-controls {
     flex-direction: column;
     align-items: stretch;
     gap: 1rem;
   }
-  
+
   .controls-left {
     flex-direction: column;
     min-width: unset;
   }
-  
+
   .controls-right {
     justify-content: center;
   }
-  
+
   .search-container {
     max-width: none;
   }
-  
+
   .search-summary {
     flex-direction: column;
     gap: 1rem;
     text-align: center;
   }
-  
+
   .desktop-table {
     display: none;
   }
-  
+
   .mobile-only {
     display: block;
   }
-  
+
   .empty-actions {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .modal-actions {
     flex-direction: column;
   }
@@ -1234,11 +1237,11 @@ onMounted(() => {
     align-items: start;
     gap: 0.25rem;
   }
-  
+
   .field-value {
     text-align: left;
   }
-  
+
   .card-actions {
     flex-direction: column;
   }

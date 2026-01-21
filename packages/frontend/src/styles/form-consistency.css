@@ -270,33 +270,33 @@
       @apply py-3; /* Larger touch targets on mobile */
       font-size: 16px; /* Prevent zoom on iOS */
     }
-    
+
     .btn-consistent {
       @apply py-3 px-5; /* Larger buttons on mobile */
     }
-    
+
     .toggle-switch-consistent {
       width: 44px;
       height: 22px;
     }
-    
+
     .toggle-slider-consistent {
       width: 18px;
       height: 18px;
     }
-    
+
     .toggle-slider-consistent.active {
       transform: translateX(22px);
     }
-    
+
     .form-grid-consistent {
       @apply gap-3;
     }
-    
+
     .form-section-body-consistent {
       @apply p-3;
     }
-    
+
     .form-section-header-consistent {
       @apply px-3 py-2;
     }
@@ -307,11 +307,11 @@
     .form-element-base {
       @apply py-2.5;
     }
-    
+
     .form-grid-consistent {
       @apply gap-5;
     }
-    
+
     .form-section-body-consistent {
       @apply p-5;
     }
@@ -323,15 +323,15 @@
       @apply py-2;
       font-size: 14px;
     }
-    
+
     .btn-consistent {
       @apply py-2 px-4;
     }
-    
+
     .form-section-body-consistent {
       @apply p-6;
     }
-    
+
     .form-section-header-consistent {
       @apply px-6 py-4;
     }
@@ -342,11 +342,11 @@
     .form-element-base {
       @apply border-2 border-gray-600;
     }
-    
+
     .toggle-switch-consistent {
       @apply border-2 border-gray-600;
     }
-    
+
     .toggle-switch-consistent.active {
       @apply border-primary-700;
     }
@@ -361,7 +361,7 @@
     .form-section-consistent {
       @apply transition-none;
     }
-    
+
     .animate-slide-down,
     .animate-slide-up,
     .animate-fade-in,
@@ -376,7 +376,7 @@
     .btn-consistent {
       @apply border border-gray-400 bg-white text-black;
     }
-    
+
     .form-section-consistent {
       @apply border border-gray-400;
       break-inside: avoid;
@@ -417,7 +417,8 @@
 }
 
 @keyframes pulse-primary {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {

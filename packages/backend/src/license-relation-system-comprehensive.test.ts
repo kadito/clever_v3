@@ -1,13 +1,13 @@
 /**
  * Comprehensive License Relation System Tests (Task 10)
- * 
+ *
  * This test suite thoroughly tests the license relation system as specified in task 10:
  * - Test with existing license data that has clientId
  * - Test with licenses that have invalid/missing clientId (verify error handling)
  * - Test license creation with any clientId values (no validation during creation)
  * - Test license updates that change client relations
  * - Verify structured error handling and user experience (404/500 error display)
- * 
+ *
  * Requirements: 8.1, 8.2, 8.3, 8.4, 8.5
  */
 
@@ -15,44 +15,48 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { Hono } from 'hono';
 import type { StorageBucket } from '@clever/shared';
 import { createContentRoutes, createStandardContentConfig } from './routes/content-route-template';
-import { validateLicenseCreation, validateLicenseUpdate, sanitizeLicenseData } from '@clever/shared';
+import {
+  validateLicenseCreation,
+  validateLicenseUpdate,
+  sanitizeLicenseData,
+} from '@clever/shared';
 import type { BaseContent, UserContext, ContentWithRelations, LicenseData } from '@clever/shared';
 
 // Mock storage bucket for testing
 function createMockStorageBucket(): StorageBucket {
   const storage = new Map<string, string>();
-  
+
   return {
     async get(key: string) {
       const data = storage.get(key);
       if (!data) return null;
-      
+
       return {
         async json() {
           return JSON.parse(data);
-        }
+        },
       };
     },
-    
+
     async put(key: string, value: string) {
       storage.set(key, value);
       return {
         async json() {
           return JSON.parse(value);
-        }
+        },
       };
     },
-    
+
     async delete(key: string) {
       storage.delete(key);
-    }
+    },
   };
 }
 
 describe('Comprehensive License Relation System Tests (Task 10)', () => {
   let app: Hono;
   let mockBucket: StorageBucket;
-  
+
   const mockUserContext: UserContext = {
     userId: 'test-user-123',
     email: 'test@example.com',
@@ -60,15 +64,15 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
     lastName: 'User',
     userType: 'Admin',
     sessionId: 'test-session-123',
-    isAuthenticated: true
+    isAuthenticated: true,
   };
 
   beforeEach(() => {
     mockBucket = createMockStorageBucket();
-    
+
     // Create a test app with license routes
     app = new Hono();
-    
+
     // Mock the environment and user context
     app.use('*', async (c, next) => {
       c.env = { R2_BUCKET: mockBucket };
@@ -122,14 +126,11 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
           contribuinte: '123456789',
           localidade: 'Porto',
           telefoneContato: '220123456',
-          emailContato: 'info@existente.pt'
-        }
+          emailContato: 'info@existente.pt',
+        },
       };
 
-      await mockBucket.put(
-        `content/clients/${clientUuid}.json`,
-        JSON.stringify(clientContent)
-      );
+      await mockBucket.put(`content/clients/${clientUuid}.json`, JSON.stringify(clientContent));
 
       // Create license with existing client
       const licenseData = {
@@ -138,32 +139,32 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         numeroSerie: 'EXIST001',
         software: {
           name: ['Vectron'],
-          model: 'Vectron Wide 14"'
+          model: 'Vectron Wide 14"',
         },
-        invoices: []
+        invoices: [],
       };
 
       const createResponse = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       expect(createResponse.status).toBe(201);
       const createResult = await createResponse.json();
       expect(createResult.success).toBe(true);
-      
+
       const licenseUuid = createResult.data.uuid;
 
       // Retrieve license and verify client relation is properly resolved
       const getResponse = await app.request(`/api/content/licenses/${licenseUuid}`);
       expect(getResponse.status).toBe(200);
-      
+
       const getResult = await getResponse.json();
       expect(getResult.success).toBe(true);
       expect(getResult.data.relations).toBeDefined();
       expect(getResult.data.relations.client).toBeDefined();
-      
+
       // Verify basic client fields are properly resolved (only basic fields are included)
       const clientRelation = getResult.data.relations.client;
       expect(clientRelation.uuid).toBe(clientUuid);
@@ -191,27 +192,24 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         deletedBy: 'test-user-123',
         data: {
           nomeEmpresa: 'Empresa Deletada Lda',
-          contribuinte: '987654321'
-        }
+          contribuinte: '987654321',
+        },
       };
 
-      await mockBucket.put(
-        `content/clients/${clientUuid}.json`,
-        JSON.stringify(clientContent)
-      );
+      await mockBucket.put(`content/clients/${clientUuid}.json`, JSON.stringify(clientContent));
 
       // Create license with deleted client
       const licenseData = {
         clientId: clientUuid,
         versao: '2024',
         software: { name: ['Pix'] },
-        invoices: []
+        invoices: [],
       };
 
       const createResponse = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       expect(createResponse.status).toBe(201);
@@ -221,7 +219,7 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
       // Retrieve license and verify client relation shows error for deleted client
       const getResponse = await app.request(`/api/content/licenses/${licenseUuid}`);
       expect(getResponse.status).toBe(200);
-      
+
       const getResult = await getResponse.json();
       expect(getResult.success).toBe(true);
       expect(getResult.data.relations).toBeDefined();
@@ -245,8 +243,8 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         isDeleted: false,
         data: {
           nomeEmpresa: 'Cliente Válido Lda',
-          contribuinte: '111222333'
-        }
+          contribuinte: '111222333',
+        },
       };
 
       await mockBucket.put(
@@ -260,20 +258,20 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
           clientId: validClientUuid, // Valid client
           versao: '2024',
           software: { name: ['Vectron'] },
-          invoices: []
+          invoices: [],
         },
         {
           clientId: '550e8400-e29b-41d4-a716-446655440999', // Non-existent client
           versao: '2024',
           software: { name: ['Pix'] },
-          invoices: []
+          invoices: [],
         },
         {
           // No clientId
           versao: '2024',
           software: { name: ['Zon Soft'] },
-          invoices: []
-        }
+          invoices: [],
+        },
       ];
 
       const createdLicenses = [];
@@ -281,7 +279,7 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         const response = await app.request('/api/content/licenses', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(licenseData)
+          body: JSON.stringify(licenseData),
         });
         expect(response.status).toBe(201);
         const result = await response.json();
@@ -291,7 +289,7 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
       // List all licenses and verify relation states
       const listResponse = await app.request('/api/content/licenses');
       expect(listResponse.status).toBe(200);
-      
+
       const listResult = await listResponse.json();
       expect(listResult.success).toBe(true);
       expect(listResult.data).toHaveLength(3);
@@ -302,7 +300,9 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
       expect(license1.relations.client.nomeEmpresa).toBe('Cliente Válido Lda');
 
       // Verify second license has error relation
-      const license2 = listResult.data.find((l: any) => l.data.clientId === '550e8400-e29b-41d4-a716-446655440999');
+      const license2 = listResult.data.find(
+        (l: any) => l.data.clientId === '550e8400-e29b-41d4-a716-446655440999'
+      );
       expect(license2.relations.client).toBeDefined();
       expect(license2.relations.client.type).toBe('error');
       expect(license2.relations.client.code).toBe(404);
@@ -320,13 +320,13 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         clientId: 'not-a-uuid-at-all',
         versao: '2024',
         software: { name: ['Vectron'] },
-        invoices: []
+        invoices: [],
       };
 
       const response = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       // Should reject invalid UUID format during creation
@@ -338,31 +338,31 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
 
     it('should handle license with valid UUID format but non-existent client', async () => {
       const nonExistentClientId = '550e8400-e29b-41d4-a716-446655440404';
-      
+
       const licenseData = {
         clientId: nonExistentClientId,
         versao: '2024',
         software: { name: ['Pix'] },
-        invoices: []
+        invoices: [],
       };
 
       const createResponse = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       // Should allow creation (no validation during creation)
       expect(createResponse.status).toBe(201);
       const createResult = await createResponse.json();
       expect(createResult.success).toBe(true);
-      
+
       const licenseUuid = createResult.data.uuid;
 
       // But should show error when retrieving
       const getResponse = await app.request(`/api/content/licenses/${licenseUuid}`);
       expect(getResponse.status).toBe(200);
-      
+
       const getResult = await getResponse.json();
       expect(getResult.success).toBe(true);
       expect(getResult.data.relations.client).toBeDefined();
@@ -376,13 +376,13 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         clientId: null,
         versao: '2024',
         software: { name: ['Zon Soft'] },
-        invoices: []
+        invoices: [],
       };
 
       const response = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       expect(response.status).toBe(201);
@@ -397,13 +397,13 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         clientId: '',
         versao: '2024',
         software: { name: ['Pt CERT'] },
-        invoices: []
+        invoices: [],
       };
 
       const response = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       expect(response.status).toBe(201);
@@ -418,13 +418,13 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         clientId: '   ',
         versao: '2024',
         software: { name: ['Dream Soft'] },
-        invoices: []
+        invoices: [],
       };
 
       const response = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       expect(response.status).toBe(201);
@@ -442,7 +442,7 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
         '6ba7b811-9dad-11d1-80b4-00c04fd430c8',
         // Note: Some UUIDs like all zeros might be rejected by validation
-        'ffffffff-ffff-4fff-afff-ffffffffffff' // Valid UUID v4 format
+        'ffffffff-ffff-4fff-afff-ffffffffffff', // Valid UUID v4 format
       ];
 
       for (const clientId of testCases) {
@@ -450,13 +450,13 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
           clientId,
           versao: '2024',
           software: { name: ['Vectron'] },
-          invoices: []
+          invoices: [],
         };
 
         const response = await app.request('/api/content/licenses', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(licenseData)
+          body: JSON.stringify(licenseData),
         });
 
         if (response.status !== 201) {
@@ -469,7 +469,7 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         expect(result.success).toBe(true);
         expect(result.data.data.clientId).toBe(clientId);
         expect(result.data.relations).toBeDefined();
-        
+
         // Since clients don't exist, should show error in relations
         expect(result.data.relations.client).toBeDefined();
         expect(result.data.relations.client.type).toBe('error');
@@ -479,18 +479,18 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
 
     it('should allow creation with mixed case UUID clientId', async () => {
       const clientId = '550E8400-E29B-41D4-A716-446655440000';
-      
+
       const licenseData = {
         clientId,
         versao: '2024',
         software: { name: ['Pix'] },
-        invoices: []
+        invoices: [],
       };
 
       const response = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       expect(response.status).toBe(201);
@@ -501,19 +501,19 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
 
     it('should allow creation with clientId that will be valid later', async () => {
       const futureClientId = '550e8400-e29b-41d4-a716-446655440100';
-      
+
       // Create license first
       const licenseData = {
         clientId: futureClientId,
         versao: '2024',
         software: { name: ['Zon Soft'] },
-        invoices: []
+        invoices: [],
       };
 
       const createLicenseResponse = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       expect(createLicenseResponse.status).toBe(201);
@@ -538,14 +538,11 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         isDeleted: false,
         data: {
           nomeEmpresa: 'Cliente Futuro Lda',
-          contribuinte: '999888777'
-        }
+          contribuinte: '999888777',
+        },
       };
 
-      await mockBucket.put(
-        `content/clients/${futureClientId}.json`,
-        JSON.stringify(clientContent)
-      );
+      await mockBucket.put(`content/clients/${futureClientId}.json`, JSON.stringify(clientContent));
 
       // Verify license now resolves client correctly
       const getResponse2 = await app.request(`/api/content/licenses/${licenseUuid}`);
@@ -561,13 +558,13 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
       const licenseData = {
         versao: '2024',
         software: { name: ['Vectron'] },
-        invoices: []
+        invoices: [],
       };
 
       const createResponse = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       expect(createResponse.status).toBe(201);
@@ -587,24 +584,21 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         isDeleted: false,
         data: {
           nomeEmpresa: 'Cliente Adicionado Lda',
-          contribuinte: '444555666'
-        }
+          contribuinte: '444555666',
+        },
       };
 
-      await mockBucket.put(
-        `content/clients/${clientUuid}.json`,
-        JSON.stringify(clientContent)
-      );
+      await mockBucket.put(`content/clients/${clientUuid}.json`, JSON.stringify(clientContent));
 
       // Update license to add client
       const updateData = {
-        clientId: clientUuid
+        clientId: clientUuid,
       };
 
       const updateResponse = await app.request(`/api/content/licenses/${licenseUuid}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateData)
+        body: JSON.stringify(updateData),
       });
 
       expect(updateResponse.status).toBe(200);
@@ -629,8 +623,8 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         isDeleted: false,
         data: {
           nomeEmpresa: 'Cliente Original Lda',
-          contribuinte: '111111111'
-        }
+          contribuinte: '111111111',
+        },
       };
 
       const client2Uuid = '550e8400-e29b-41d4-a716-446655440202';
@@ -645,8 +639,8 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         isDeleted: false,
         data: {
           nomeEmpresa: 'Cliente Novo Lda',
-          contribuinte: '222222222'
-        }
+          contribuinte: '222222222',
+        },
       };
 
       await mockBucket.put(`content/clients/${client1Uuid}.json`, JSON.stringify(client1Content));
@@ -657,13 +651,13 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         clientId: client1Uuid,
         versao: '2024',
         software: { name: ['Pix'] },
-        invoices: []
+        invoices: [],
       };
 
       const createResponse = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       expect(createResponse.status).toBe(201);
@@ -675,13 +669,13 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
 
       // Update to second client
       const updateData = {
-        clientId: client2Uuid
+        clientId: client2Uuid,
       };
 
       const updateResponse = await app.request(`/api/content/licenses/${licenseUuid}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateData)
+        body: JSON.stringify(updateData),
       });
 
       expect(updateResponse.status).toBe(200);
@@ -706,8 +700,8 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         isDeleted: false,
         data: {
           nomeEmpresa: 'Cliente Para Remover Lda',
-          contribuinte: '333333333'
-        }
+          contribuinte: '333333333',
+        },
       };
 
       await mockBucket.put(`content/clients/${clientUuid}.json`, JSON.stringify(clientContent));
@@ -716,13 +710,13 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         clientId: clientUuid,
         versao: '2024',
         software: { name: ['Zon Soft'] },
-        invoices: []
+        invoices: [],
       };
 
       const createResponse = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       const createResult = await createResponse.json();
@@ -730,13 +724,13 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
 
       // Update to remove client (set to empty string)
       const updateData = {
-        clientId: ''
+        clientId: '',
       };
 
       const updateResponse = await app.request(`/api/content/licenses/${licenseUuid}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateData)
+        body: JSON.stringify(updateData),
       });
 
       expect(updateResponse.status).toBe(200);
@@ -760,23 +754,26 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         isDeleted: false,
         data: {
           nomeEmpresa: 'Cliente Existente Lda',
-          contribuinte: '444444444'
-        }
+          contribuinte: '444444444',
+        },
       };
 
-      await mockBucket.put(`content/clients/${existingClientUuid}.json`, JSON.stringify(clientContent));
+      await mockBucket.put(
+        `content/clients/${existingClientUuid}.json`,
+        JSON.stringify(clientContent)
+      );
 
       const licenseData = {
         clientId: existingClientUuid,
         versao: '2024',
         software: { name: ['Pt CERT'] },
-        invoices: []
+        invoices: [],
       };
 
       const createResponse = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       const createResult = await createResponse.json();
@@ -785,13 +782,13 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
       // Update to non-existent client
       const nonExistentClientUuid = '550e8400-e29b-41d4-a716-446655440999';
       const updateData = {
-        clientId: nonExistentClientUuid
+        clientId: nonExistentClientUuid,
       };
 
       const updateResponse = await app.request(`/api/content/licenses/${licenseUuid}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateData)
+        body: JSON.stringify(updateData),
       });
 
       expect(updateResponse.status).toBe(200);
@@ -808,18 +805,18 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
   describe('Requirement 8.5: Verify structured error handling and user experience (404/500 error display)', () => {
     it('should return structured 404 error for non-existent client relation', async () => {
       const nonExistentClientId = '550e8400-e29b-41d4-a716-446655440404';
-      
+
       const licenseData = {
         clientId: nonExistentClientId,
         versao: '2024',
         software: { name: ['Vectron'] },
-        invoices: []
+        invoices: [],
       };
 
       const createResponse = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       const createResult = await createResponse.json();
@@ -832,7 +829,7 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
       expect(getResult.data.relations.client).toEqual({
         type: 'error',
         code: 404,
-        message: 'Not found'
+        message: 'Not found',
       });
     });
 
@@ -842,13 +839,13 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         clientId: '550e8400-e29b-41d4-a716-446655440404', // Non-existent
         versao: '2024',
         software: { name: ['Pix'] },
-        invoices: []
+        invoices: [],
       };
 
       const createResponse = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       const createResult = await createResponse.json();
@@ -861,7 +858,7 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
       expect(getResult.data.relations.client.type).toBe('error');
       expect(getResult.data.relations.client.code).toBe(404);
       expect(getResult.data.relations.client.message).toBe('Not found');
-      
+
       // Verify the license data itself is still valid
       expect(getResult.data.data.clientId).toBe('550e8400-e29b-41d4-a716-446655440404');
       expect(getResult.data.data.versao).toBe('2024');
@@ -869,19 +866,19 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
 
     it('should maintain consistent error format across different API operations', async () => {
       const nonExistentClientId = '550e8400-e29b-41d4-a716-446655440505';
-      
+
       const licenseData = {
         clientId: nonExistentClientId,
         versao: '2024',
         software: { name: ['Zon Soft'] },
-        invoices: []
+        invoices: [],
       };
 
       // Test CREATE response
       const createResponse = await app.request('/api/content/licenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(licenseData)
+        body: JSON.stringify(licenseData),
       });
 
       const createResult = await createResponse.json();
@@ -891,7 +888,7 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
       expect(createResult.data.relations.client).toEqual({
         type: 'error',
         code: 404,
-        message: 'Not found'
+        message: 'Not found',
       });
 
       // Test GET response
@@ -902,14 +899,14 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
       expect(getResult.data.relations.client).toEqual({
         type: 'error',
         code: 404,
-        message: 'Not found'
+        message: 'Not found',
       });
 
       // Test UPDATE response
       const updateResponse = await app.request(`/api/content/licenses/${licenseUuid}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ versao: '2025' })
+        body: JSON.stringify({ versao: '2025' }),
       });
 
       const updateResult = await updateResponse.json();
@@ -918,7 +915,7 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
       expect(updateResult.data.relations.client).toEqual({
         type: 'error',
         code: 404,
-        message: 'Not found'
+        message: 'Not found',
       });
 
       // Test LIST response
@@ -929,7 +926,7 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
       expect(foundLicense.relations.client).toEqual({
         type: 'error',
         code: 404,
-        message: 'Not found'
+        message: 'Not found',
       });
     });
 
@@ -947,11 +944,14 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         isDeleted: false,
         data: {
           nomeEmpresa: 'Cliente Válido Para Lista',
-          contribuinte: '555666777'
-        }
+          contribuinte: '555666777',
+        },
       };
 
-      await mockBucket.put(`content/clients/${validClientUuid}.json`, JSON.stringify(clientContent));
+      await mockBucket.put(
+        `content/clients/${validClientUuid}.json`,
+        JSON.stringify(clientContent)
+      );
 
       // Create licenses with different relation states
       const licenses = [
@@ -959,20 +959,20 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
           clientId: validClientUuid, // Valid
           versao: '2024',
           software: { name: ['Vectron'] },
-          invoices: []
+          invoices: [],
         },
         {
           clientId: '550e8400-e29b-41d4-a716-446655440404', // Invalid
           versao: '2024',
           software: { name: ['Pix'] },
-          invoices: []
+          invoices: [],
         },
         {
           // No client
           versao: '2024',
           software: { name: ['Zon Soft'] },
-          invoices: []
-        }
+          invoices: [],
+        },
       ];
 
       // Create all licenses
@@ -980,7 +980,7 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
         await app.request('/api/content/licenses', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(licenseData)
+          body: JSON.stringify(licenseData),
         });
       }
 
@@ -994,7 +994,9 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
       const validLicense = listResult.data.find((l: any) => l.data.clientId === validClientUuid);
       expect(validLicense.relations.client.nomeEmpresa).toBe('Cliente Válido Para Lista');
 
-      const errorLicense = listResult.data.find((l: any) => l.data.clientId === '550e8400-e29b-41d4-a716-446655440404');
+      const errorLicense = listResult.data.find(
+        (l: any) => l.data.clientId === '550e8400-e29b-41d4-a716-446655440404'
+      );
       expect(errorLicense.relations.client.type).toBe('error');
       expect(errorLicense.relations.client.code).toBe(404);
 
@@ -1010,8 +1012,8 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
           name: 'Non-existent client',
           clientId: '550e8400-e29b-41d4-a716-446655440404',
           expectedCode: 404,
-          expectedMessage: 'Not found'
-        }
+          expectedMessage: 'Not found',
+        },
       ];
 
       for (const testCase of testCases) {
@@ -1019,13 +1021,13 @@ describe('Comprehensive License Relation System Tests (Task 10)', () => {
           clientId: testCase.clientId,
           versao: '2024',
           software: { name: ['Vectron'] },
-          invoices: []
+          invoices: [],
         };
 
         const createResponse = await app.request('/api/content/licenses', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(licenseData)
+          body: JSON.stringify(licenseData),
         });
 
         const createResult = await createResponse.json();

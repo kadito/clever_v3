@@ -6,14 +6,14 @@ describe('Shared module exports', () => {
     // Test that all expected utilities are exported
     const expectedExports = [
       'detectRelationFields',
-      'getContentTypeFromRelation', 
-      'RELATION_TYPE_MAPPING'
+      'getContentTypeFromRelation',
+      'RELATION_TYPE_MAPPING',
     ];
 
     // Check that the module has exports
     expect(typeof SharedModule).toBe('object');
     expect(SharedModule).toBeDefined();
-    
+
     // Check that relation utilities are exported
     expect(SharedModule.detectRelationFields).toBeDefined();
     expect(SharedModule.getContentTypeFromRelation).toBeDefined();
@@ -47,7 +47,8 @@ describe('Shared module exports', () => {
 describe('Type imports work correctly', () => {
   it('should allow importing utilities from the main module', async () => {
     // Test that we can import utilities through the main index
-    const { detectRelationFields, getContentTypeFromRelation, RELATION_TYPE_MAPPING } = await import('./index.js');
+    const { detectRelationFields, getContentTypeFromRelation, RELATION_TYPE_MAPPING } =
+      await import('./index.js');
     expect(detectRelationFields).toBeDefined();
     expect(getContentTypeFromRelation).toBeDefined();
     expect(RELATION_TYPE_MAPPING).toBeDefined();

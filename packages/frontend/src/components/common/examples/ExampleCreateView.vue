@@ -107,20 +107,20 @@ const createFormSections = computed((): FormSection[] => [
 // Custom validation for creation
 const validateExample = (data: Record<string, any>): Record<string, string> => {
   const errors: Record<string, string> = {};
-  
+
   // Custom business rules for creation
   if (data.name && data.name.length < 3) {
     errors.name = 'Nome deve ter pelo menos 3 caracteres';
   }
-  
+
   if (data.email && !data.email.includes('@')) {
     errors.email = 'Email deve conter @';
   }
-  
+
   if (data.phone && data.phone.length > 0 && data.phone.length < 9) {
     errors.phone = 'Telefone deve ter pelo menos 9 dígitos';
   }
-  
+
   return errors;
 };
 
@@ -129,13 +129,12 @@ const handleCreate = async (data: Record<string, any>) => {
   try {
     isSaving.value = true;
     error.value = null;
-    
+
     // Simulate API call
 
-    
     // Simulate delay
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     // Navigate back to list
     router.push('/examples');
   } catch (err) {

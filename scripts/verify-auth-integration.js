@@ -2,11 +2,11 @@
 
 /**
  * Authentication Integration Verification Script
- * 
+ *
  * This script verifies that the authentication system is properly integrated
  * by checking code structure, configuration, and dependencies without
  * requiring a running server.
- * 
+ *
  * Requirements: All requirements integration
  */
 
@@ -29,13 +29,14 @@ class AuthIntegrationVerifier {
 
   log(message, type = 'info') {
     const timestamp = new Date().toISOString();
-    const prefix = {
-      info: '📋',
-      success: '✅',
-      error: '❌',
-      warning: '⚠️',
-    }[type] || '📋';
-    
+    const prefix =
+      {
+        info: '📋',
+        success: '✅',
+        error: '❌',
+        warning: '⚠️',
+      }[type] || '📋';
+
     console.log(`${prefix} [${timestamp}] ${message}`);
   }
 
@@ -79,20 +80,20 @@ class AuthIntegrationVerifier {
       {
         file: 'packages/backend/package.json',
         search: '@hono/clerk-auth',
-        desc: 'Backend Clerk dependency'
+        desc: 'Backend Clerk dependency',
       },
       // Frontend dependencies
       {
         file: 'packages/frontend/package.json',
         search: '@clerk/vue',
-        desc: 'Frontend Clerk dependency'
+        desc: 'Frontend Clerk dependency',
       },
       // Shared package
       {
         file: 'packages/shared/package.json',
         search: '"name": "@clever/shared"',
-        desc: 'Shared package configuration'
-      }
+        desc: 'Shared package configuration',
+      },
     ];
 
     let allPassed = true;
@@ -116,20 +117,20 @@ class AuthIntegrationVerifier {
       {
         file: 'wrangler.toml',
         search: 'CLERK_PUBLISHABLE_KEY',
-        desc: 'Wrangler Clerk configuration'
+        desc: 'Wrangler Clerk configuration',
       },
       // Frontend environment
       {
         file: 'packages/frontend/.env',
         search: 'VITE_CLERK_PUBLISHABLE_KEY',
-        desc: 'Frontend Clerk configuration'
+        desc: 'Frontend Clerk configuration',
       },
       // Backend test environment
       {
         file: 'packages/backend/.env.test',
         search: 'CLERK_SECRET_KEY',
-        desc: 'Backend test Clerk configuration'
-      }
+        desc: 'Backend test Clerk configuration',
+      },
     ];
 
     let allPassed = true;
@@ -153,26 +154,26 @@ class AuthIntegrationVerifier {
       {
         file: 'packages/backend/src/middleware/clerk.ts',
         search: 'requireAuth',
-        desc: 'Clerk middleware implementation'
+        desc: 'Clerk middleware implementation',
       },
       // API routes protection
       {
         file: 'packages/backend/src/routes/api.ts',
         search: 'requireAuth',
-        desc: 'API routes authentication'
+        desc: 'API routes authentication',
       },
       // Backend types
       {
         file: 'packages/backend/src/types/auth.ts',
         search: 'ClerkBindings',
-        desc: 'Backend authentication types'
+        desc: 'Backend authentication types',
       },
       // Main app integration
       {
         file: 'packages/backend/src/index.ts',
-        search: 'app.route(\'/api\', api)',
-        desc: 'API routes integration'
-      }
+        search: "app.route('/api', api)",
+        desc: 'API routes integration',
+      },
     ];
 
     let allPassed = true;
@@ -196,32 +197,32 @@ class AuthIntegrationVerifier {
       {
         file: 'packages/frontend/src/main.ts',
         search: 'clerkPlugin',
-        desc: 'Clerk plugin integration'
+        desc: 'Clerk plugin integration',
       },
       // Authentication store
       {
         file: 'packages/frontend/src/stores/auth.ts',
         search: 'useAuthStore',
-        desc: 'Authentication store'
+        desc: 'Authentication store',
       },
       // Authentication composable
       {
         file: 'packages/frontend/src/composables/useAuth.ts',
         search: 'useAuth',
-        desc: 'Authentication composable'
+        desc: 'Authentication composable',
       },
       // Router integration
       {
         file: 'packages/frontend/src/router/index.ts',
         search: 'requiresAuth',
-        desc: 'Router authentication guards'
+        desc: 'Router authentication guards',
       },
       // SignIn view
       {
         file: 'packages/frontend/src/views/SignInView.vue',
         search: 'SignIn',
-        desc: 'SignIn view component'
-      }
+        desc: 'SignIn view component',
+      },
     ];
 
     let allPassed = true;
@@ -245,26 +246,26 @@ class AuthIntegrationVerifier {
       {
         file: 'packages/shared/src/types.ts',
         search: 'UserContext',
-        desc: 'UserContext interface'
+        desc: 'UserContext interface',
       },
       // Shared index exports
       {
         file: 'packages/shared/src/index.ts',
         search: 'export',
-        desc: 'Shared package exports'
+        desc: 'Shared package exports',
       },
       // Backend imports shared types
       {
         file: 'packages/backend/src/middleware/clerk.ts',
         search: '@clever/shared',
-        desc: 'Backend imports shared types'
+        desc: 'Backend imports shared types',
       },
       // Frontend imports shared types
       {
         file: 'packages/frontend/src/stores/auth.ts',
         search: '@clever/shared',
-        desc: 'Frontend imports shared types'
-      }
+        desc: 'Frontend imports shared types',
+      },
     ];
 
     let allPassed = true;
@@ -288,26 +289,26 @@ class AuthIntegrationVerifier {
       {
         file: 'packages/frontend/src/router/index.ts',
         search: 'beforeEach',
-        desc: 'Router navigation guards'
+        desc: 'Router navigation guards',
       },
       // Protected routes configuration
       {
         file: 'packages/frontend/src/router/index.ts',
         search: 'requiresAuth: true',
-        desc: 'Protected routes configuration'
+        desc: 'Protected routes configuration',
       },
       // SignIn route configuration
       {
         file: 'packages/frontend/src/router/index.ts',
         search: 'requiresAuth: false',
-        desc: 'SignIn route configuration'
+        desc: 'SignIn route configuration',
       },
       // API route protection
       {
         file: 'packages/backend/src/routes/api.ts',
-        search: 'api.use(\'/content/*\', requireAuth',
-        desc: 'API content routes protection'
-      }
+        search: "api.use('/content/*', requireAuth",
+        desc: 'API content routes protection',
+      },
     ];
 
     let allPassed = true;
@@ -331,26 +332,26 @@ class AuthIntegrationVerifier {
       {
         file: 'packages/backend/src/middleware/error.ts',
         search: 'errorHandler',
-        desc: 'Backend error handling middleware'
+        desc: 'Backend error handling middleware',
       },
       // API error handling
       {
         file: 'packages/backend/src/routes/api.ts',
         search: 'handleAuthError',
-        desc: 'API authentication error handling'
+        desc: 'API authentication error handling',
       },
       // Frontend error notification
       {
         file: 'packages/frontend/src/components/common/ErrorNotification.vue',
         search: '<template>',
-        desc: 'Frontend error notification component'
+        desc: 'Frontend error notification component',
       },
       // App error integration
       {
         file: 'packages/frontend/src/App.vue',
         search: 'ErrorNotification',
-        desc: 'App error notification integration'
-      }
+        desc: 'App error notification integration',
+      },
     ];
 
     let allPassed = true;
@@ -433,7 +434,7 @@ class AuthIntegrationVerifier {
 // Run the verification if this script is executed directly
 if (require.main === module) {
   const verifier = new AuthIntegrationVerifier();
-  
+
   const success = verifier.verifyIntegration();
   process.exit(success ? 0 : 1);
 }

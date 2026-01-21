@@ -6,16 +6,16 @@
         <BackButton to="/instalacoes-programacoes" variant="inline" />
         <h1>Lista de Instalações</h1>
       </div>
-      
+
       <!-- Controls -->
       <div class="list-controls">
         <!-- Year Selector -->
-        <YearSelector 
+        <YearSelector
           :available-years="instalacoesStore.availableYears"
           :current-year="instalacoesStore.currentYear"
           @year-changed="handleYearChange"
         />
-        
+
         <!-- Search -->
         <div class="search-container">
           <input
@@ -27,21 +27,16 @@
           />
           <button v-if="searchQuery" @click="clearSearch" class="clear-search">✕</button>
         </div>
-        
+
         <!-- Add Button -->
-        <router-link 
-          :to="{ name: 'instalacao-form' }" 
-          class="btn btn-success"
-        >
+        <router-link :to="{ name: 'instalacao-form' }" class="btn btn-success">
           ➕ Nova Instalação
         </router-link>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div v-if="instalacoesStore.loading" class="loading">
-      Carregando instalações...
-    </div>
+    <div v-if="instalacoesStore.loading" class="loading">Carregando instalações...</div>
 
     <!-- Error State -->
     <div v-else-if="instalacoesStore.error" class="error">
@@ -53,8 +48,8 @@
     <div v-else-if="isSearching && searchResults.length > 0" class="search-results">
       <h3>Resultados da pesquisa "{{ searchQuery }}" ({{ searchResults.length }})</h3>
       <div class="instalacoes-grid">
-        <div 
-          v-for="instalacao in searchResults" 
+        <div
+          v-for="instalacao in searchResults"
           :key="`search-${instalacao.id}-${instalacao.year || instalacoesStore.currentYear}`"
           class="instalacao-card"
           @click="navigateToDetail(instalacao)"
@@ -72,12 +67,15 @@
     <!-- Regular List -->
     <div v-else-if="instalacoesStore.instalacoes.length > 0" class="instalacoes-container">
       <div class="list-info">
-        <p>{{ instalacoesStore.getInstalacoesCount }} instalações em {{ instalacoesStore.currentYear }}</p>
+        <p>
+          {{ instalacoesStore.getInstalacoesCount }} instalações em
+          {{ instalacoesStore.currentYear }}
+        </p>
       </div>
-      
+
       <div class="instalacoes-grid">
-        <div 
-          v-for="instalacao in instalacoesStore.instalacoes" 
+        <div
+          v-for="instalacao in instalacoesStore.instalacoes"
           :key="instalacao.id"
           class="instalacao-card"
           @click="navigateToDetail(instalacao)"
@@ -93,10 +91,7 @@
         <div class="no-data-icon">📦</div>
         <h3>Nenhuma instalação encontrada</h3>
         <p>Não existem instalações registadas para o ano {{ instalacoesStore.currentYear }}.</p>
-        <router-link 
-          :to="{ name: 'instalacao-form' }" 
-          class="btn btn-success"
-        >
+        <router-link :to="{ name: 'instalacao-form' }" class="btn btn-success">
           ➕ Criar primeira instalação
         </router-link>
       </div>
@@ -105,11 +100,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { useInstalacoesStore } from '@/stores/instalacoes-programacoes'
-import BackButton from '@/components/BackButton.vue'
-import YearSelector from '@/components/YearSelector.vue'
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { useInstalacoesStore } from '@/stores/instalacoes-programacoes';
+import BackButton from '@/components/BackButton.vue';
+import YearSelector from '@/components/YearSelector.vue';
 
 // Components
 const InstallationCard = {
@@ -117,8 +112,8 @@ const InstallationCard = {
     instalacao: Object,
     showYear: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   template: `
     <div class="card-content">
@@ -163,133 +158,141 @@ const InstallationCard = {
     </div>
   `,
   setup(props) {
-    const instalacoesStore = useInstalacoesStore()
-    
-    const getStatusClass = (instalacao) => {
-      const status = instalacoesStore.getInstallationStatus(instalacao)
+    const instalacoesStore = useInstalacoesStore();
+
+    const getStatusClass = instalacao => {
+      const status = instalacoesStore.getInstallationStatus(instalacao);
       switch (status) {
-        case 'completed': return 'status-completed'
-        case 'in-progress': return 'status-in-progress'
-        default: return 'status-not-started'
+        case 'completed':
+          return 'status-completed';
+        case 'in-progress':
+          return 'status-in-progress';
+        default:
+          return 'status-not-started';
       }
-    }
-    
-    const getStatusText = (instalacao) => {
+    };
+
+    const getStatusText = instalacao => {
       if (instalacao.dataFinalInstalacao) {
-        return 'Concluída'
+        return 'Concluída';
       } else if (instalacao.dataInstalacao) {
-        return 'Em Progresso'
+        return 'Em Progresso';
       }
-      return 'Agendada'
-    }
-    
-    const formatDate = (dateString) => {
-      return instalacoesStore.formatDate(dateString)
-    }
-    
+      return 'Agendada';
+    };
+
+    const formatDate = dateString => {
+      return instalacoesStore.formatDate(dateString);
+    };
+
     return {
       getStatusClass,
       getStatusText,
-      formatDate
-    }
-  }
-}
+      formatDate,
+    };
+  },
+};
 
 // Router
-const router = useRouter()
+const router = useRouter();
 
 // Store
-const instalacoesStore = useInstalacoesStore()
+const instalacoesStore = useInstalacoesStore();
 
 // Reactive data
-const searchQuery = ref('')
-const searchResults = ref([])
-const isSearching = ref(false)
-const searchTimeout = ref(null)
+const searchQuery = ref('');
+const searchResults = ref([]);
+const isSearching = ref(false);
+const searchTimeout = ref(null);
 
 // Computed
 const searchYear = computed(() => {
-  return searchQuery.value ? instalacoesStore.currentYear : null
-})
+  return searchQuery.value ? instalacoesStore.currentYear : null;
+});
 
 // Methods
-const handleYearChange = async (year) => {
-  instalacoesStore.setCurrentYear(year)
-  clearSearch()
-  await loadInstalacoes()
-}
+const handleYearChange = async year => {
+  instalacoesStore.setCurrentYear(year);
+  clearSearch();
+  await loadInstalacoes();
+};
 
 const handleSearch = () => {
   if (searchTimeout.value) {
-    clearTimeout(searchTimeout.value)
+    clearTimeout(searchTimeout.value);
   }
-  
+
   searchTimeout.value = setTimeout(async () => {
     if (searchQuery.value.trim().length >= 2) {
-      await performSearch()
+      await performSearch();
     } else {
-      clearSearch()
+      clearSearch();
     }
-  }, 300)
-}
+  }, 300);
+};
 
 const performSearch = async () => {
   try {
-    isSearching.value = true
+    isSearching.value = true;
     const results = await instalacoesStore.searchInstalacoes(
-      searchQuery.value, 
+      searchQuery.value,
       instalacoesStore.currentYear
-    )
-    searchResults.value = results.results || []
+    );
+    searchResults.value = results.results || [];
   } catch (error) {
-    console.error('Search error:', error)
+    console.error('Search error:', error);
   }
-}
+};
 
 const clearSearch = () => {
-  searchQuery.value = ''
-  searchResults.value = []
-  isSearching.value = false
+  searchQuery.value = '';
+  searchResults.value = [];
+  isSearching.value = false;
   if (searchTimeout.value) {
-    clearTimeout(searchTimeout.value)
+    clearTimeout(searchTimeout.value);
   }
-}
+};
 
-const navigateToDetail = (instalacao) => {
-  const year = instalacao.year || instalacoesStore.getYearFromDate(instalacao.dataInstalacao || instalacao.createdAt)
-  router.push({ 
-    name: 'instalacao-detail', 
-    params: { year, id: instalacao.id } 
-  })
-}
+const navigateToDetail = instalacao => {
+  const year =
+    instalacao.year ||
+    instalacoesStore.getYearFromDate(instalacao.dataInstalacao || instalacao.createdAt);
+  router.push({
+    name: 'instalacao-detail',
+    params: { year, id: instalacao.id },
+  });
+};
 
 const loadInstalacoes = async () => {
   try {
-    await instalacoesStore.fetchInstalacoesForYear(instalacoesStore.currentYear)
+    await instalacoesStore.fetchInstalacoesForYear(instalacoesStore.currentYear);
   } catch (error) {
-    console.error('Error loading instalacoes:', error)
+    console.error('Error loading instalacoes:', error);
   }
-}
+};
 
 const retry = async () => {
-  instalacoesStore.clearError()
-  await loadInstalacoes()
-}
+  instalacoesStore.clearError();
+  await loadInstalacoes();
+};
 
 // Lifecycle
 onMounted(async () => {
   try {
-    await instalacoesStore.fetchAvailableYears()
-    await loadInstalacoes()
+    await instalacoesStore.fetchAvailableYears();
+    await loadInstalacoes();
   } catch (error) {
-    console.error('Error loading instalacoes list:', error)
+    console.error('Error loading instalacoes list:', error);
   }
-})
+});
 
 // Watch for year changes
-watch(() => instalacoesStore.currentYear, () => {
-  clearSearch()
-})
+watch(
+  () => instalacoesStore.currentYear,
+  () => {
+    clearSearch();
+  }
+);
 </script>
 
 <style scoped>
@@ -392,7 +395,9 @@ watch(() => instalacoesStore.currentYear, () => {
   font-size: 0.85rem;
 }
 
-.loading, .error, .no-data {
+.loading,
+.error,
+.no-data {
   text-align: center;
   padding: 3rem 1rem;
   color: #7f8c8d;
@@ -416,7 +421,7 @@ watch(() => instalacoesStore.currentYear, () => {
   background: white;
   border-radius: 8px;
   padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .instalacoes-grid {
@@ -436,7 +441,7 @@ watch(() => instalacoesStore.currentYear, () => {
 
 .instalacao-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-color: var(--primary-color);
 }
 
@@ -543,35 +548,35 @@ watch(() => instalacoesStore.currentYear, () => {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .header-top h1 {
     font-size: 1.5rem;
   }
-  
+
   .list-controls {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .search-container {
     min-width: auto;
   }
-  
+
   .instalacoes-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .card-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .info-row {
     flex-direction: column;
     gap: 0.25rem;
   }
-  
+
   .value {
     text-align: left;
     margin-left: 0;
@@ -582,11 +587,11 @@ watch(() => instalacoesStore.currentYear, () => {
   .instalacoes-list {
     padding: 0.75rem;
   }
-  
+
   .instalacoes-container {
     padding: 1rem;
   }
-  
+
   .instalacao-card {
     padding: 0.75rem;
   }

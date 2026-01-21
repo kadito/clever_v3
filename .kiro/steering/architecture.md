@@ -38,24 +38,34 @@ and R2 for JSON document storage.
 - **Mobile-First Design**: Optimized for mobile devices with responsive
   breakpoints
 - **Color Palette**: Based on old_src (#75AE93 primary, #2c3e50 secondary)
-- **5-View Pattern**: Home (dashboard) → List (search) → Detail → Create → Update
-  for all content types (separate Create/Update components)
+- **5-View Pattern**: Home (dashboard) → List (search) → Detail → Create →
+  Update for all content types (separate Create/Update components)
 
 ### Form Architecture
 
-- **Shared Form Data**: Use `useSharedFormData` composable to handle Vue component recreation issues
-- **Component Split**: `ContentFormTemplate.vue` (core rendering) + `ContentCreateTemplate.vue` (wrapper)
-- **Data Persistence**: Form data persists across component recreation during navigation
-- **Multiselect Dropdowns**: Replace individual checkboxes with touch-friendly multiselect interfaces
-- **Conditional Fields**: Dynamic field visibility based on form selections via JSON configuration
-- **Dynamic Configuration**: Add/remove/edit functionality for complex configuration items
-- **Mobile Input Types**: Use proper HTML5 input types (tel, email, url) for mobile keyboards
+- **Shared Form Data**: Use `useSharedFormData` composable to handle Vue
+  component recreation issues
+- **Component Split**: `ContentFormTemplate.vue` (core rendering) +
+  `ContentCreateTemplate.vue` (wrapper)
+- **Data Persistence**: Form data persists across component recreation during
+  navigation
+- **Multiselect Dropdowns**: Replace individual checkboxes with touch-friendly
+  multiselect interfaces
+- **Conditional Fields**: Dynamic field visibility based on form selections via
+  JSON configuration
+- **Dynamic Configuration**: Add/remove/edit functionality for complex
+  configuration items
+- **Mobile Input Types**: Use proper HTML5 input types (tel, email, url) for
+  mobile keyboards
 
 ### Audit Trail Enhancement
 
-- **User Email Display**: Show user email addresses instead of user IDs in audit trails
-- **Current User Recognition**: Use `useAuth()` composable to identify current user
-- **Fallback Handling**: Show "Sistema" for system actions, user ID for unknown users
+- **User Email Display**: Show user email addresses instead of user IDs in audit
+  trails
+- **Current User Recognition**: Use `useAuth()` composable to identify current
+  user
+- **Fallback Handling**: Show "Sistema" for system actions, user ID for unknown
+  users
 
 ### Backend
 
@@ -138,21 +148,34 @@ interface BaseContent {
 
 ### Content Relations System
 
-CLEVER implements a simple content relations system that automatically resolves relationships between content types:
+CLEVER implements a simple content relations system that automatically resolves
+relationships between content types:
 
-- **Relation Storage**: Content stores only relation IDs (e.g., `clientId`) in the data field
-- **No Creation Validation**: Relation IDs can be stored without validating referenced content exists
-- **Display-Time Validation**: Relations are validated and resolved when serving API responses
-- **Structured Error Handling**: Failed relations return error objects with type, code (404/500), and message
-- **Automatic Resolution**: All API responses include resolved relation data under a `relations` field
-- **Pattern Detection**: Relations are detected by field naming patterns (fields ending in 'Id')
-- **Hard-coded Mappings**: Relation type to content type mappings are explicitly defined in shared files
+- **Relation Storage**: Content stores only relation IDs (e.g., `clientId`) in
+  the data field
+- **No Creation Validation**: Relation IDs can be stored without validating
+  referenced content exists
+- **Display-Time Validation**: Relations are validated and resolved when serving
+  API responses
+- **Structured Error Handling**: Failed relations return error objects with
+  type, code (404/500), and message
+- **Automatic Resolution**: All API responses include resolved relation data
+  under a `relations` field
+- **Pattern Detection**: Relations are detected by field naming patterns (fields
+  ending in 'Id')
+- **Hard-coded Mappings**: Relation type to content type mappings are explicitly
+  defined in shared files
 - **Sequential Resolution**: Relations resolved one by one for simplicity
-- **No Caching**: Always fetch fresh data - no caching for relations, detail views, or list views
-- **Basic Data Only**: Only essential fields from related content are included (company name, tax number, etc.)
-- **No Configuration**: System uses simple conventions without complex schema configuration
-- **Explicit Integration**: Each content type explicitly includes relation display where needed
-- **Consistent UI**: Same relation type uses identical layout across all content types
+- **No Caching**: Always fetch fresh data - no caching for relations, detail
+  views, or list views
+- **Basic Data Only**: Only essential fields from related content are included
+  (company name, tax number, etc.)
+- **No Configuration**: System uses simple conventions without complex schema
+  configuration
+- **Explicit Integration**: Each content type explicitly includes relation
+  display where needed
+- **Consistent UI**: Same relation type uses identical layout across all content
+  types
 
 ```typescript
 // Enhanced API response with relations and error handling
@@ -177,31 +200,31 @@ interface RelationError {
 
 // Example: License with resolved client relation
 const licenseResponse = {
-  uuid: "license-uuid",
-  contentType: "licenses",
-  data: { clientId: "client-uuid", versao: "2024" },
+  uuid: 'license-uuid',
+  contentType: 'licenses',
+  data: { clientId: 'client-uuid', versao: '2024' },
   relations: {
     client: {
-      uuid: "client-uuid",
-      contentType: "clients",
-      nomeEmpresa: "Empresa ABC Lda",
-      contribuinte: "123456789"
-    }
-  }
+      uuid: 'client-uuid',
+      contentType: 'clients',
+      nomeEmpresa: 'Empresa ABC Lda',
+      contribuinte: '123456789',
+    },
+  },
 };
 
 // Example: License with client resolution error
 const licenseWithErrorResponse = {
-  uuid: "license-uuid",
-  contentType: "licenses",
-  data: { clientId: "invalid-uuid", versao: "2024" },
+  uuid: 'license-uuid',
+  contentType: 'licenses',
+  data: { clientId: 'invalid-uuid', versao: '2024' },
   relations: {
     client: {
       type: 'error',
       code: 404,
-      message: 'Not found'
-    }
-  }
+      message: 'Not found',
+    },
+  },
 };
 ```
 
@@ -254,7 +277,8 @@ DELETE /api/content/{type}/{uuid}    # Soft delete item
 POST   /api/migrate/{type}           # Import old data
 ```
 
-All content API responses automatically include resolved relations in the `relations` field.
+All content API responses automatically include resolved relations in the
+`relations` field.
 
 ### Static Asset Serving
 

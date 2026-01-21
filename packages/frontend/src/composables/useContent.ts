@@ -23,7 +23,7 @@ export function useContent<T extends BaseContent>(options: UseContentOptions): a
   // Computed properties
   const filteredItems = computed(() => {
     if (!searchQuery.value) return items.value;
-    
+
     const query = searchQuery.value.toLowerCase();
     return items.value.filter(item => {
       const searchableText = JSON.stringify(item.data).toLowerCase();
@@ -37,9 +37,7 @@ export function useContent<T extends BaseContent>(options: UseContentOptions): a
     return filteredItems.value.slice(start, end);
   });
 
-  const totalPages = computed(() => 
-    Math.ceil(filteredItems.value.length / itemsPerPage.value)
-  );
+  const totalPages = computed(() => Math.ceil(filteredItems.value.length / itemsPerPage.value));
 
   // Methods
   const loadItems = async () => {

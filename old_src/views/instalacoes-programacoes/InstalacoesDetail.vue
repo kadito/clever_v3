@@ -13,22 +13,18 @@
         </div>
       </div>
       <div v-if="instalacao" class="header-actions">
-        <router-link 
-          :to="{ name: 'instalacao-form', params: { year, id } }" 
+        <router-link
+          :to="{ name: 'instalacao-form', params: { year, id } }"
           class="btn btn-primary"
         >
           ✏️ Editar
         </router-link>
-        <button @click="confirmDelete" class="btn btn-danger">
-          🗑️ Eliminar
-        </button>
+        <button @click="confirmDelete" class="btn btn-danger">🗑️ Eliminar</button>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div v-if="instalacoesStore.loading" class="loading">
-      Carregando instalação...
-    </div>
+    <div v-if="instalacoesStore.loading" class="loading">Carregando instalação...</div>
 
     <!-- Error State -->
     <div v-else-if="instalacoesStore.error" class="error">
@@ -291,7 +287,9 @@
         </div>
         <div class="modal-body">
           <p>Tem a certeza que deseja eliminar esta instalação?</p>
-          <p><strong>{{ instalacao?.nomeCliente }}</strong></p>
+          <p>
+            <strong>{{ instalacao?.nomeCliente }}</strong>
+          </p>
           <p class="warning">Esta ação não pode ser desfeita.</p>
         </div>
         <div class="modal-footer">
@@ -306,161 +304,168 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useInstalacoesStore } from '@/stores/instalacoes-programacoes'
-import BackButton from '@/components/BackButton.vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useInstalacoesStore } from '@/stores/instalacoes-programacoes';
+import BackButton from '@/components/BackButton.vue';
 
 // Router
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
 // Store
-const instalacoesStore = useInstalacoesStore()
+const instalacoesStore = useInstalacoesStore();
 
 // Reactive data
-const showDeleteModal = ref(false)
-const deleting = ref(false)
+const showDeleteModal = ref(false);
+const deleting = ref(false);
 
 // Auto-retry state
-const autoRetryCountdown = ref(0)
-const userInteractionCancelled = ref(false)
-const retryTimeoutId = ref(null)
+const autoRetryCountdown = ref(0);
+const userInteractionCancelled = ref(false);
+const retryTimeoutId = ref(null);
 
 // Computed
-const year = computed(() => route.params.year)
-const id = computed(() => route.params.id)
-const instalacao = computed(() => instalacoesStore.selectedInstalacao)
+const year = computed(() => route.params.year);
+const id = computed(() => route.params.id);
+const instalacao = computed(() => instalacoesStore.selectedInstalacao);
 
 // Methods
-const getStatusClass = (instalacao) => {
-  const status = instalacoesStore.getInstallationStatus(instalacao)
+const getStatusClass = instalacao => {
+  const status = instalacoesStore.getInstallationStatus(instalacao);
   switch (status) {
-    case 'completed': return 'status-completed'
-    case 'in-progress': return 'status-in-progress'
-    default: return 'status-not-started'
+    case 'completed':
+      return 'status-completed';
+    case 'in-progress':
+      return 'status-in-progress';
+    default:
+      return 'status-not-started';
   }
-}
+};
 
-const getStatusText = (instalacao) => {
+const getStatusText = instalacao => {
   if (instalacao.dataFinalInstalacao) {
-    return 'Concluída'
+    return 'Concluída';
   } else if (instalacao.dataInstalacao) {
-    return 'Em Progresso'
+    return 'Em Progresso';
   }
-  return 'Agendada'
-}
+  return 'Agendada';
+};
 
-const formatDateTime = (dateString) => {
-  return instalacoesStore.formatDateTime(dateString)
-}
+const formatDateTime = dateString => {
+  return instalacoesStore.formatDateTime(dateString);
+};
 
 const confirmDelete = () => {
-  showDeleteModal.value = true
-}
+  showDeleteModal.value = true;
+};
 
 const cancelDelete = () => {
-  showDeleteModal.value = false
-}
+  showDeleteModal.value = false;
+};
 
 const deleteInstalacao = async () => {
   try {
-    deleting.value = true
-    await instalacoesStore.deleteInstalacao(year.value, id.value)
-    router.push('/instalacoes-programacoes')
+    deleting.value = true;
+    await instalacoesStore.deleteInstalacao(year.value, id.value);
+    router.push('/instalacoes-programacoes');
   } catch (error) {
-    console.error('Error deleting instalacao:', error)
+    console.error('Error deleting instalacao:', error);
     // Error is already handled by the store
   } finally {
-    deleting.value = false
-    showDeleteModal.value = false
+    deleting.value = false;
+    showDeleteModal.value = false;
   }
-}
+};
 
 const retry = async () => {
-  instalacoesStore.clearError()
-  await loadInstalacao()
-}
+  instalacoesStore.clearError();
+  await loadInstalacao();
+};
 
 const retryLoad = () => {
-  userInteractionCancelled.value = true
-  cancelAutoRetry()
-  loadInstalacao()
-}
+  userInteractionCancelled.value = true;
+  cancelAutoRetry();
+  loadInstalacao();
+};
 
 const startAutoRetry = () => {
-  cancelAutoRetry()
-  autoRetryCountdown.value = 10
-  
+  cancelAutoRetry();
+  autoRetryCountdown.value = 10;
+
   const updateCountdown = () => {
     if (autoRetryCountdown.value > 0 && !userInteractionCancelled.value) {
-      autoRetryCountdown.value--
-      retryTimeoutId.value = setTimeout(updateCountdown, 1000)
+      autoRetryCountdown.value--;
+      retryTimeoutId.value = setTimeout(updateCountdown, 1000);
     } else if (autoRetryCountdown.value === 0 && !userInteractionCancelled.value) {
       // Auto-retry after countdown
-      loadInstalacao()
+      loadInstalacao();
     }
-  }
-  
-  retryTimeoutId.value = setTimeout(updateCountdown, 1000)
-}
+  };
+
+  retryTimeoutId.value = setTimeout(updateCountdown, 1000);
+};
 
 const cancelAutoRetry = () => {
   if (retryTimeoutId.value) {
-    clearTimeout(retryTimeoutId.value)
-    retryTimeoutId.value = null
+    clearTimeout(retryTimeoutId.value);
+    retryTimeoutId.value = null;
   }
-  autoRetryCountdown.value = 0
-}
+  autoRetryCountdown.value = 0;
+};
 
 const handleUserInteraction = () => {
-  userInteractionCancelled.value = true
-  cancelAutoRetry()
-}
+  userInteractionCancelled.value = true;
+  cancelAutoRetry();
+};
 
 const loadInstalacao = async () => {
   try {
-    instalacoesStore.clearError()
-    await instalacoesStore.fetchInstalacaoById(year.value, id.value)
+    instalacoesStore.clearError();
+    await instalacoesStore.fetchInstalacaoById(year.value, id.value);
     // If successful, cancel any pending retries
-    cancelAutoRetry()
+    cancelAutoRetry();
   } catch (error) {
-    console.error('Error loading instalacao:', error)
+    console.error('Error loading instalacao:', error);
     // Check if it's a 404 or "not found" error
-    const isNotFound = error?.message?.toLowerCase().includes('not found') || 
-                       instalacoesStore.error?.toLowerCase().includes('not found')
-    
+    const isNotFound =
+      error?.message?.toLowerCase().includes('not found') ||
+      instalacoesStore.error?.toLowerCase().includes('not found');
+
     if (isNotFound && !userInteractionCancelled.value) {
       // Start auto-retry countdown
-      startAutoRetry()
+      startAutoRetry();
     }
   }
-}
+};
 
 // Watch for successful data load to cancel retries
-watch(() => instalacao.value?.id, (newId) => {
-  if (newId) {
-    cancelAutoRetry()
-    userInteractionCancelled.value = false
+watch(
+  () => instalacao.value?.id,
+  newId => {
+    if (newId) {
+      cancelAutoRetry();
+      userInteractionCancelled.value = false;
+    }
   }
-})
+);
 
 // Lifecycle
 onMounted(async () => {
   // Add event listeners for user interaction
-  window.addEventListener('click', handleUserInteraction)
-  window.addEventListener('scroll', handleUserInteraction)
-  window.addEventListener('keydown', handleUserInteraction)
-  
-  await loadInstalacao()
-})
+  window.addEventListener('click', handleUserInteraction);
+  window.addEventListener('scroll', handleUserInteraction);
+  window.addEventListener('keydown', handleUserInteraction);
+
+  await loadInstalacao();
+});
 
 onBeforeUnmount(() => {
-  cancelAutoRetry()
-  window.removeEventListener('click', handleUserInteraction)
-  window.removeEventListener('scroll', handleUserInteraction)
-  window.removeEventListener('keydown', handleUserInteraction)
-})
+  cancelAutoRetry();
+  window.removeEventListener('click', handleUserInteraction);
+  window.removeEventListener('scroll', handleUserInteraction);
+  window.removeEventListener('keydown', handleUserInteraction);
+});
 </script>
 
 <style scoped>
@@ -579,7 +584,9 @@ onBeforeUnmount(() => {
   font-size: 0.8rem;
 }
 
-.loading, .error, .no-data {
+.loading,
+.error,
+.no-data {
   text-align: center;
   padding: 3rem 1rem;
   color: #7f8c8d;
@@ -599,7 +606,7 @@ onBeforeUnmount(() => {
   background: white;
   border-radius: 8px;
   padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .detail-section h2 {
@@ -810,28 +817,28 @@ onBeforeUnmount(() => {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .header-content h1 {
     font-size: 1.5rem;
   }
-  
+
   .header-actions {
     justify-content: stretch;
   }
-  
+
   .header-actions .btn {
     flex: 1;
     justify-content: center;
   }
-  
+
   .info-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .features-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .feature-card {
     flex-direction: column;
     text-align: center;
@@ -843,11 +850,11 @@ onBeforeUnmount(() => {
   .instalacao-detail {
     padding: 0.75rem;
   }
-  
+
   .detail-section {
     padding: 1rem;
   }
-  
+
   .modal {
     margin: 1rem;
     width: calc(100% - 2rem);

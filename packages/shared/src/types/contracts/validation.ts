@@ -1,4 +1,9 @@
-import type { ContractData, ContractCreationData, ContractUpdateData, ContractEquipment } from './types';
+import type {
+  ContractData,
+  ContractCreationData,
+  ContractUpdateData,
+  ContractEquipment,
+} from './types';
 
 /**
  * Validation functions for contract data
@@ -25,7 +30,11 @@ export function validateContractEquipment(equipment: ContractEquipment): string[
   }
 
   // Discount validation
-  if (typeof equipment.desconto !== 'number' || equipment.desconto < 0 || equipment.desconto > 100) {
+  if (
+    typeof equipment.desconto !== 'number' ||
+    equipment.desconto < 0 ||
+    equipment.desconto > 100
+  ) {
     errors.push('Desconto deve ser um número entre 0 e 100');
   }
 
@@ -144,7 +153,10 @@ export function validateContractCreation(data: ContractCreationData): string[] {
       errors.push('As horas de assistência anual CPA devem ser um número positivo');
     }
 
-    if (typeof data.deslocacoesPorAnoCPA !== 'number' || (data.deslocacoesPorAnoCPA !== -1 && data.deslocacoesPorAnoCPA <= 0)) {
+    if (
+      typeof data.deslocacoesPorAnoCPA !== 'number' ||
+      (data.deslocacoesPorAnoCPA !== -1 && data.deslocacoesPorAnoCPA <= 0)
+    ) {
       errors.push('As deslocações por ano CPA devem ser um número positivo ou -1 para ilimitado');
     }
 
@@ -158,7 +170,10 @@ export function validateContractCreation(data: ContractCreationData): string[] {
       errors.push('As horas de assistência anual S&H devem ser um número positivo');
     }
 
-    if (typeof data.deslocacoesPorAnoSH !== 'number' || (data.deslocacoesPorAnoSH !== -1 && data.deslocacoesPorAnoSH <= 0)) {
+    if (
+      typeof data.deslocacoesPorAnoSH !== 'number' ||
+      (data.deslocacoesPorAnoSH !== -1 && data.deslocacoesPorAnoSH <= 0)
+    ) {
       errors.push('As deslocações por ano S&H devem ser um número positivo ou -1 para ilimitado');
     }
 
@@ -185,7 +200,7 @@ export function validateContractUpdate(data: ContractUpdateData): string[] {
   if (data.hasCPAContract !== undefined || data.hasSHContract !== undefined) {
     const hasCPA = data.hasCPAContract ?? false;
     const hasSH = data.hasSHContract ?? false;
-    
+
     if (!hasCPA && !hasSH) {
       errors.push('Deve manter pelo menos um tipo de contrato (CPA e/ou S&H)');
     }
@@ -290,7 +305,10 @@ export function validateContractUpdate(data: ContractUpdateData): string[] {
     }
 
     if (data.deslocacoesPorAnoCPA !== undefined) {
-      if (typeof data.deslocacoesPorAnoCPA !== 'number' || (data.deslocacoesPorAnoCPA !== -1 && data.deslocacoesPorAnoCPA <= 0)) {
+      if (
+        typeof data.deslocacoesPorAnoCPA !== 'number' ||
+        (data.deslocacoesPorAnoCPA !== -1 && data.deslocacoesPorAnoCPA <= 0)
+      ) {
         errors.push('Deslocações por ano CPA deve ser um número positivo ou -1 para ilimitado');
       }
     }
@@ -310,7 +328,10 @@ export function validateContractUpdate(data: ContractUpdateData): string[] {
     }
 
     if (data.deslocacoesPorAnoSH !== undefined) {
-      if (typeof data.deslocacoesPorAnoSH !== 'number' || (data.deslocacoesPorAnoSH !== -1 && data.deslocacoesPorAnoSH <= 0)) {
+      if (
+        typeof data.deslocacoesPorAnoSH !== 'number' ||
+        (data.deslocacoesPorAnoSH !== -1 && data.deslocacoesPorAnoSH <= 0)
+      ) {
         errors.push('Deslocações por ano S&H deve ser um número positivo ou -1 para ilimitado');
       }
     }
@@ -347,7 +368,7 @@ export function validateContractForDisplay(data: ContractData): string[] {
  */
 export function hasActiveContract(data: ContractData): boolean {
   const now = new Date();
-  
+
   // Check CPA contract
   if (data.hasCPAContract) {
     if (data.inicioContratoCPA && data.fimContratoCPA) {
@@ -434,16 +455,18 @@ export function getContractSummary(data: ContractData): {
   }
 
   // Get earliest start date and latest end date
-  const startDate = dates.length > 0 ? 
-    new Date(Math.min(...dates.map(d => d.getTime()))).toISOString() : null;
-  const endDate = endDates.length > 0 ? 
-    new Date(Math.max(...endDates.map(d => d.getTime()))).toISOString() : null;
+  const startDate =
+    dates.length > 0 ? new Date(Math.min(...dates.map(d => d.getTime()))).toISOString() : null;
+  const endDate =
+    endDates.length > 0
+      ? new Date(Math.max(...endDates.map(d => d.getTime()))).toISOString()
+      : null;
 
   return {
     contractTypes,
     planNames,
     paymentMethods,
     startDate,
-    endDate
+    endDate,
   };
 }

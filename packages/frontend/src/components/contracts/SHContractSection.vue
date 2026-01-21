@@ -4,9 +4,9 @@
     <div class="contract-config-grid-sh">
       <div class="config-field">
         <label class="config-label required">PLANO S&H</label>
-        <select 
-          :value="formData?.planIdSH || ''" 
-          @change="(event) => handlePlanSelection((event.target as HTMLSelectElement).value)"
+        <select
+          :value="formData?.planIdSH || ''"
+          @change="event => handlePlanSelection((event.target as HTMLSelectElement).value)"
           class="config-select"
           data-testid="plan-select"
         >
@@ -19,12 +19,14 @@
           <option value="sh_platinum">PLATINUM</option>
         </select>
       </div>
-      
+
       <div class="config-field">
         <label class="config-label required">DISTÂNCIA</label>
-        <select 
-          :value="formData?.distanceSH || ''" 
-          @change="(event) => $emit('update-field', 'distanceSH', (event.target as HTMLSelectElement).value)"
+        <select
+          :value="formData?.distanceSH || ''"
+          @change="
+            event => $emit('update-field', 'distanceSH', (event.target as HTMLSelectElement).value)
+          "
           class="config-select"
           data-testid="distance-select"
         >
@@ -34,25 +36,24 @@
         </select>
       </div>
     </div>
-    
+
     <!-- Equipment Management -->
     <div class="equipment-section">
       <div class="equipment-header">
         <h4>EQUIPAMENTOS S&H</h4>
-        <button
-          type="button"
-          class="add-equipment-btn"
-          @click="addEquipment"
-        >
+        <button type="button" class="add-equipment-btn" @click="addEquipment">
           + ADICIONAR EQUIPAMENTO
         </button>
       </div>
-      
+
       <div class="equipment-info-callout">
         <span class="info-icon">ℹ️</span>
-        <span>Pode adicionar múltiplos equipamentos para o contrato S&H. Cada equipamento pode ter modelo, número de série e software específicos.</span>
+        <span
+          >Pode adicionar múltiplos equipamentos para o contrato S&H. Cada equipamento pode ter
+          modelo, número de série e software específicos.</span
+        >
       </div>
-      
+
       <div class="equipment-list">
         <SHEquipmentCard
           v-for="(equipment, index) in shEquipments"
@@ -64,7 +65,7 @@
         />
       </div>
     </div>
-    
+
     <!-- Contract Dates -->
     <ContractDatesSection
       :start-date="formData?.inicioContratoSH || ''"
@@ -72,7 +73,7 @@
       @update:start-date="$emit('update-field', 'inicioContratoSH', $event)"
       @update:end-date="$emit('update-field', 'fimContratoSH', $event)"
     />
-    
+
     <!-- Dynamic Plan Details Display -->
     <div v-if="props.isLoadingPlan" class="plan-loading-state">
       <div class="loading-spinner">
@@ -80,9 +81,7 @@
         <span class="loading-text">A carregar detalhes do plano...</span>
       </div>
     </div>
-    
 
-    
     <DynamicPlanDetails
       v-if="shouldShowPlanDetails"
       data-testid="dynamic-plan-details"
@@ -97,38 +96,38 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import ContractDatesSection from './ContractDatesSection.vue'
-import DynamicPlanDetails from './DynamicPlanDetails.vue'
-import SHEquipmentCard from './SHEquipmentCard.vue'
+import { ref, computed } from 'vue';
+import ContractDatesSection from './ContractDatesSection.vue';
+import DynamicPlanDetails from './DynamicPlanDetails.vue';
+import SHEquipmentCard from './SHEquipmentCard.vue';
 
 interface SHEquipment {
-  id: string
-  modelo: string
-  numeroSerie: string
-  software: string
-  observacoes: string
+  id: string;
+  modelo: string;
+  numeroSerie: string;
+  software: string;
+  observacoes: string;
 }
 
 interface Props {
-  formData: Record<string, any>
-  selectedPlanDetails: any
-  isLoadingPlan?: boolean
-  shEquipments: SHEquipment[]
+  formData: Record<string, any>;
+  selectedPlanDetails: any;
+  isLoadingPlan?: boolean;
+  shEquipments: SHEquipment[];
 }
 
 interface Emits {
-  (e: 'update-field', field: string, value: any): void
-  (e: 'plan-selected', planId: string): void
-  (e: 'equipment-updated', data: { action: string, index?: number, equipment?: SHEquipment }): void
+  (e: 'update-field', field: string, value: any): void;
+  (e: 'plan-selected', planId: string): void;
+  (e: 'equipment-updated', data: { action: string; index?: number; equipment?: SHEquipment }): void;
 }
 
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
 
 const handlePlanSelection = (planId: string) => {
-  emit('plan-selected', planId)
-}
+  emit('plan-selected', planId);
+};
 
 // Equipment management functions
 const addEquipment = () => {
@@ -137,36 +136,36 @@ const addEquipment = () => {
     modelo: '',
     numeroSerie: '',
     software: '',
-    observacoes: ''
-  }
-  
-  emit('equipment-updated', { action: 'add', equipment: newEquipment })
-}
+    observacoes: '',
+  };
+
+  emit('equipment-updated', { action: 'add', equipment: newEquipment });
+};
 
 const updateEquipment = (index: number, equipment: SHEquipment) => {
-  emit('equipment-updated', { action: 'update', index, equipment })
-}
+  emit('equipment-updated', { action: 'update', index, equipment });
+};
 
 const removeEquipment = (index: number) => {
-  emit('equipment-updated', { action: 'remove', index })
-}
+  emit('equipment-updated', { action: 'remove', index });
+};
 
 // Determine if plan details should be shown - S&H always requires distance
 const shouldShowPlanDetails = computed(() => {
   if (!props.selectedPlanDetails) {
-    return false
+    return false;
   }
-  
+
   // If we don't have form data (e.g., in tests), show plan details when selectedPlanDetails is provided
   if (!props.formData?.planIdSH) {
-    return true
+    return true;
   }
-  
+
   // S&H plans always require distance for pricing
   const shouldShow = !!(props.formData?.planIdSH && props.formData?.distanceSH);
-  
+
   return shouldShow;
-})
+});
 
 // Convert S&H equipments to the format expected by DynamicPlanDetails
 // S&H equipments don't have discounts, so we set discount to 0
@@ -176,9 +175,9 @@ const shEquipmentsForPricing = computed(() => {
     modelo: equipment.modelo,
     numeroSerie: equipment.numeroSerie,
     desconto: 0, // S&H equipments don't have discounts
-    observacoes: equipment.observacoes
-  }))
-})
+    observacoes: equipment.observacoes,
+  }));
+});
 </script>
 
 <style scoped>
@@ -308,24 +307,24 @@ const shEquipmentsForPricing = computed(() => {
   .contract-config-grid-sh {
     @apply gap-3;
   }
-  
+
   .equipment-fields-grid {
     @apply gap-3;
   }
-  
+
   .config-select,
   .form-input {
     @apply py-3;
   }
-  
+
   .equipment-header {
     @apply flex-col gap-3 items-start;
   }
-  
+
   .add-equipment-btn {
     @apply w-full justify-center;
   }
-  
+
   .equipment-info-callout {
     @apply p-2;
   }

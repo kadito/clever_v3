@@ -1,11 +1,22 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { requireAuth, getUserContext, requireUserContext, extractJwtToken, verifyClerkJwt } from '../middleware/clerk';
-import { createContentRoutes, createStandardContentConfig, contentErrorHandler } from './content-route-template';
+import {
+  requireAuth,
+  getUserContext,
+  requireUserContext,
+  extractJwtToken,
+  verifyClerkJwt,
+} from '../middleware/clerk';
+import {
+  createContentRoutes,
+  createStandardContentConfig,
+  contentErrorHandler,
+} from './content-route-template';
 import clientsRouter from './clients';
 import licensesRouter from './licenses';
 import contractsRouter from './contracts';
 import workSheetsRouter from './work-sheets';
+import remoteAssistanceRouter from './remote-assistance';
 import type { AppContext } from '../types/auth';
 import type {
   BaseContent,
@@ -14,7 +25,7 @@ import type {
   ContentType,
   CreateContentRequest,
   UpdateContentRequest,
-  UserContext
+  UserContext,
 } from '@clever/shared';
 import {
   validateContractCreation,
@@ -23,12 +34,8 @@ import {
   validateWorkSheetUpdate,
   validateRemoteAssistanceCreation,
   validateRemoteAssistanceUpdate,
-  validateDailyRecordCreation,
-  validateDailyRecordUpdate,
-  validateReminderCreation,
-  validateReminderUpdate,
-  validatePendingCreation,
-  validatePendingUpdate
+  // Note: Daily records, reminders, and pending items validation functions
+  // will be added when those content types are implemented
 } from '@clever/shared';
 
 // Create API router with proper typing
@@ -63,10 +70,10 @@ api.use('/*', async (c, next) => {
     await next();
     return;
   }
-  
+
   // Extract JWT token from request
   const token = extractJwtToken(c);
-  
+
   if (!token) {
     const response: ApiResponse = {
       success: false,
@@ -78,7 +85,7 @@ api.use('/*', async (c, next) => {
 
   try {
     const payload = await verifyClerkJwt(token);
-    
+
     // Extract user information from JWT payload
     const userContext: UserContext = {
       userId: payload.sub || '',
@@ -92,7 +99,7 @@ api.use('/*', async (c, next) => {
 
     // Make user context available to route handlers
     c.set('user', userContext);
-    
+
     await next();
   } catch (error) {
     console.error('Error extracting user context:', error);
@@ -120,53 +127,47 @@ api.route('/content/contracts', contractsRouter);
 // Work Sheets route with date-based sorting and custom validation
 api.route('/content/work-sheets', workSheetsRouter);
 
+// Remote Assistance route with date-based sorting and custom validation
+api.route('/content/remote-assistance', remoteAssistanceRouter);
+
 // Generic routes for other content types using standard configuration with relation validation
 
 const dailyRecordsConfig = createStandardContentConfig('daily-records', 'date-desc');
-dailyRecordsConfig.validateCreate = (data: any) => {
-  const errors = validateDailyRecordCreation(data.data || data);
-  if (errors.length > 0) throw new Error(errors[0]);
-};
-dailyRecordsConfig.validateUpdate = (data: any) => {
-  const errors = validateDailyRecordUpdate(data.data || data);
-  if (errors.length > 0) throw new Error(errors[0]);
-};
+// TODO: Implement daily records validation when the content type is fully implemented
+// dailyRecordsConfig.validateCreate = (data: any) => {
+//   const errors = validateDailyRecordCreation(data.data || data);
+//   if (errors.length > 0) throw new Error(errors[0]);
+// };
+// dailyRecordsConfig.validateUpdate = (data: any) => {
+//   const errors = validateDailyRecordUpdate(data.data || data);
+//   if (errors.length > 0) throw new Error(errors[0]);
+// };
 const dailyRecordsRouter = createContentRoutes<BaseContent>(dailyRecordsConfig);
 api.route('/content/daily-records', dailyRecordsRouter);
 
-const remoteAssistanceConfig = createStandardContentConfig('remote-assistance', 'date-desc');
-remoteAssistanceConfig.validateCreate = (data: any) => {
-  const errors = validateRemoteAssistanceCreation(data.data || data);
-  if (errors.length > 0) throw new Error(errors[0]);
-};
-remoteAssistanceConfig.validateUpdate = (data: any) => {
-  const errors = validateRemoteAssistanceUpdate(data.data || data);
-  if (errors.length > 0) throw new Error(errors[0]);
-};
-const remoteAssistanceRouter = createContentRoutes<BaseContent>(remoteAssistanceConfig);
-api.route('/content/remote-assistance', remoteAssistanceRouter);
-
 const remindersConfig = createStandardContentConfig('reminders', 'date-desc');
-remindersConfig.validateCreate = (data: any) => {
-  const errors = validateReminderCreation(data.data || data);
-  if (errors.length > 0) throw new Error(errors[0]);
-};
-remindersConfig.validateUpdate = (data: any) => {
-  const errors = validateReminderUpdate(data.data || data);
-  if (errors.length > 0) throw new Error(errors[0]);
-};
+// TODO: Implement reminders validation when the content type is fully implemented
+// remindersConfig.validateCreate = (data: any) => {
+//   const errors = validateReminderCreation(data.data || data);
+//   if (errors.length > 0) throw new Error(errors[0]);
+// };
+// remindersConfig.validateUpdate = (data: any) => {
+//   const errors = validateReminderUpdate(data.data || data);
+//   if (errors.length > 0) throw new Error(errors[0]);
+// };
 const remindersRouter = createContentRoutes<BaseContent>(remindersConfig);
 api.route('/content/reminders', remindersRouter);
 
 const pendingConfig = createStandardContentConfig('pending', 'date-desc');
-pendingConfig.validateCreate = (data: any) => {
-  const errors = validatePendingCreation(data.data || data);
-  if (errors.length > 0) throw new Error(errors[0]);
-};
-pendingConfig.validateUpdate = (data: any) => {
-  const errors = validatePendingUpdate(data.data || data);
-  if (errors.length > 0) throw new Error(errors[0]);
-};
+// TODO: Implement pending items validation when the content type is fully implemented
+// pendingConfig.validateCreate = (data: any) => {
+//   const errors = validatePendingCreation(data.data || data);
+//   if (errors.length > 0) throw new Error(errors[0]);
+// };
+// pendingConfig.validateUpdate = (data: any) => {
+//   const errors = validatePendingUpdate(data.data || data);
+//   if (errors.length > 0) throw new Error(errors[0]);
+// };
 const pendingRouter = createContentRoutes<BaseContent>(pendingConfig);
 api.route('/content/pending', pendingRouter);
 
@@ -177,7 +178,7 @@ api.route('/content/pending', pendingRouter);
 api.get('/user/profile', async c => {
   try {
     const user = requireUserContext(c);
-    
+
     const response: ApiResponse<typeof user> = {
       success: true,
       data: user,
@@ -200,7 +201,7 @@ api.put('/user/preferences', async c => {
   try {
     const user = requireUserContext(c);
     const body = await c.req.json();
-    
+
     // TODO: Implement user preferences storage
     const response: ApiResponse = {
       success: true,
@@ -218,7 +219,7 @@ api.put('/user/preferences', async c => {
       };
       return c.json(response, 400);
     }
-    
+
     const response: ApiResponse = {
       success: false,
       error: 'Failed to update preferences',

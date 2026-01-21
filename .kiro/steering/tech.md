@@ -20,12 +20,14 @@
 
 - **Mobile-First**: All components designed for mobile screens first, then
   enhanced for larger screens with 44px minimum touch targets
-- **5-View Pattern**: Home (dashboard) → List (search) → Detail → Create → Update
-  for all content types (separate Create/Update components)
+- **5-View Pattern**: Home (dashboard) → List (search) → Detail → Create →
+  Update for all content types (separate Create/Update components)
 - **Color Palette**: Based on old_src (#75AE93 primary, #2c3e50 secondary)
 - **Touch-Friendly**: Optimized for mobile interactions with proper tap targets
-- **Form Architecture**: Shared form data composable with component recreation handling
-- **UI Patterns**: Multiselect dropdowns, conditional fields, dynamic configuration management
+- **Form Architecture**: Shared form data composable with component recreation
+  handling
+- **UI Patterns**: Multiselect dropdowns, conditional fields, dynamic
+  configuration management
 
 ## Backend Stack
 
@@ -46,11 +48,13 @@
 **IMPORTANT: The development server is ALWAYS RUNNING.**
 
 **Access URLs:**
+
 - **Application**: http://localhost:8787/
-- **API Endpoints**: http://localhost:8787/api/*
+- **API Endpoints**: http://localhost:8787/api/\*
 - **Vue SPA**: All non-API routes served by Vue Router
 
 **Development Server Assumptions:**
+
 - **DO NOT run `pnpm dev`** - the server is already running
 - **DO NOT start any development servers** - they are already active
 - If server doesn't respond, inform the user to restart it manually
@@ -68,7 +72,8 @@ pnpm --filter @clever/frontend dev
 pnpm --filter @clever/backend dev
 ```
 
-**Note:** Use `pnpm dev` from root for normal development as it provides the complete integrated experience.
+**Note:** Use `pnpm dev` from root for normal development as it provides the
+complete integrated experience.
 
 ### Building
 

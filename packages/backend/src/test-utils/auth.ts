@@ -57,7 +57,7 @@ export const mockJwtToken = 'Bearer test-jwt-token-123';
  */
 export function createAuthHeaders(token: string = mockJwtToken) {
   return {
-    'Authorization': token,
+    Authorization: token,
     'Content-Type': 'application/json',
   };
 }

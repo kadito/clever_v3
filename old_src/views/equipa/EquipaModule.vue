@@ -10,14 +10,14 @@
         </div>
       </div>
     </div>
-    
+
     <div class="module-actions">
       <button @click="navigateToList" class="action-btn primary">
         <span class="action-icon">📋</span>
         <span class="action-label">CONSULTAR</span>
         <span class="action-description">Ver lista de colaboradores</span>
       </button>
-      
+
       <button @click="navigateToCreate" class="action-btn secondary">
         <span class="action-icon">➕</span>
         <span class="action-label">NOVO COLABORADOR</span>
@@ -28,18 +28,18 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
-import BackButton from '@/components/BackButton.vue'
+import { useRouter } from 'vue-router';
+import BackButton from '@/components/BackButton.vue';
 
-const router = useRouter()
+const router = useRouter();
 
 const navigateToList = () => {
-  router.push('/equipa/list')
-}
+  router.push('/equipa/list');
+};
 
 const navigateToCreate = () => {
-  router.push('/equipa/new')
-}
+  router.push('/equipa/new');
+};
 </script>
 
 <style scoped>
@@ -163,4 +163,3 @@ const navigateToCreate = () => {
   }
 }
 </style>
-

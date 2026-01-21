@@ -23,7 +23,7 @@ describe('Property 11: User Context Structure', () => {
     .record({
       username: fc.string({ minLength: 1, maxLength: 20 }).filter(s => /^[a-zA-Z0-9._-]+$/.test(s)),
       domain: fc.string({ minLength: 2, maxLength: 15 }).filter(s => /^[a-zA-Z0-9.-]+$/.test(s)),
-      tld: fc.constantFrom('com', 'org', 'net', 'edu', 'gov')
+      tld: fc.constantFrom('com', 'org', 'net', 'edu', 'gov'),
     })
     .map(({ username, domain, tld }) => `${username}@${domain}.${tld}`);
 
@@ -49,14 +49,14 @@ describe('Property 11: User Context Structure', () => {
     lastName: nameArb,
     userType: userTypeArb,
     sessionId: sessionIdArb,
-    isAuthenticated: fc.boolean()
+    isAuthenticated: fc.boolean(),
   });
 
   it('should contain all required fields with correct types', () => {
     fc.assert(
       fc.property(userContextArb, (userContext: UserContext) => {
         // Property assertion: UserContext should contain all required fields
-        
+
         // Check that all required fields exist
         expect(userContext).toHaveProperty('userId');
         expect(userContext).toHaveProperty('email');
@@ -104,30 +104,33 @@ describe('Property 11: User Context Structure', () => {
 
   it('should maintain field consistency across different user contexts', () => {
     fc.assert(
-      fc.property(fc.array(userContextArb, { minLength: 2, maxLength: 10 }), (userContexts: UserContext[]) => {
-        // Property assertion: All UserContext objects should have the same structure
-        
-        const firstContext = userContexts[0];
-        const firstContextKeys = Object.keys(firstContext).sort();
+      fc.property(
+        fc.array(userContextArb, { minLength: 2, maxLength: 10 }),
+        (userContexts: UserContext[]) => {
+          // Property assertion: All UserContext objects should have the same structure
 
-        for (const context of userContexts) {
-          const contextKeys = Object.keys(context).sort();
-          
-          // All contexts should have the same keys
-          expect(contextKeys).toEqual(firstContextKeys);
-          
-          // All contexts should have the same field types
-          expect(typeof context.userId).toBe(typeof firstContext.userId);
-          expect(typeof context.email).toBe(typeof firstContext.email);
-          expect(typeof context.firstName).toBe(typeof firstContext.firstName);
-          expect(typeof context.lastName).toBe(typeof firstContext.lastName);
-          expect(typeof context.userType).toBe(typeof firstContext.userType);
-          expect(typeof context.sessionId).toBe(typeof firstContext.sessionId);
-          expect(typeof context.isAuthenticated).toBe(typeof firstContext.isAuthenticated);
+          const firstContext = userContexts[0];
+          const firstContextKeys = Object.keys(firstContext).sort();
+
+          for (const context of userContexts) {
+            const contextKeys = Object.keys(context).sort();
+
+            // All contexts should have the same keys
+            expect(contextKeys).toEqual(firstContextKeys);
+
+            // All contexts should have the same field types
+            expect(typeof context.userId).toBe(typeof firstContext.userId);
+            expect(typeof context.email).toBe(typeof firstContext.email);
+            expect(typeof context.firstName).toBe(typeof firstContext.firstName);
+            expect(typeof context.lastName).toBe(typeof firstContext.lastName);
+            expect(typeof context.userType).toBe(typeof firstContext.userType);
+            expect(typeof context.sessionId).toBe(typeof firstContext.sessionId);
+            expect(typeof context.isAuthenticated).toBe(typeof firstContext.isAuthenticated);
+          }
+
+          return true;
         }
-
-        return true;
-      }),
+      ),
       {
         numRuns: 50,
         timeout: 10000,
@@ -140,14 +143,20 @@ describe('Property 11: User Context Structure', () => {
     fc.assert(
       fc.property(userContextArb, (userContext: UserContext) => {
         // Property assertion: UserContext should satisfy TypeScript interface requirements
-        
+
         // Create a function that would fail at compile time if UserContext doesn't match interface
         const validateUserContext = (ctx: UserContext): boolean => {
           // This function will only compile if ctx matches UserContext interface exactly
           const requiredFields: (keyof UserContext)[] = [
-            'userId', 'email', 'firstName', 'lastName', 'userType', 'sessionId', 'isAuthenticated'
+            'userId',
+            'email',
+            'firstName',
+            'lastName',
+            'userType',
+            'sessionId',
+            'isAuthenticated',
           ];
-          
+
           return requiredFields.every(field => field in ctx);
         };
 

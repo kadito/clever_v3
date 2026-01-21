@@ -4,17 +4,17 @@
     <div class="dates-grid">
       <div class="form-field">
         <label class="form-label">DATA DE INÍCIO</label>
-        <input 
+        <input
           :value="startDate"
           @input="$emit('update:start-date', $event.target.value)"
           type="date"
           class="form-input"
         />
       </div>
-      
+
       <div class="form-field">
         <label class="form-label">DATA DE FIM</label>
-        <input 
+        <input
           :value="endDate"
           @input="$emit('update:end-date', $event.target.value)"
           type="date"
@@ -27,17 +27,17 @@
 
 <script setup lang="ts">
 interface Props {
-  startDate: string
-  endDate: string
+  startDate: string;
+  endDate: string;
 }
 
 interface Emits {
-  (e: 'update:start-date', date: string): void
-  (e: 'update:end-date', date: string): void
+  (e: 'update:start-date', date: string): void;
+  (e: 'update:end-date', date: string): void;
 }
 
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
 </script>
 
 <style scoped>
