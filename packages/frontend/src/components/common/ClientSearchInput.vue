@@ -32,7 +32,7 @@
 
       <!-- Dropdown Results - positioned relative to this input container -->
       <div 
-        v-if="!readonly && !disabled && showDropdown && (searchResults.length > 0 || isLoading || (searchQuery && searchQuery.length >= 2) || !searchQuery)"
+        v-if="!readonly && !disabled && showDropdown"
         class="search-dropdown"
       >
         <!-- Loading State -->
@@ -47,7 +47,7 @@
         </div>
 
         <!-- No Results -->
-        <div v-else-if="searchQuery && searchQuery.length >= 2 && searchResults.length === 0" class="search-option no-results">
+        <div v-else-if="searchQuery && searchQuery.length >= 1 && searchResults.length === 0" class="search-option no-results">
           <div class="flex items-center justify-center py-2">
             <svg class="h-5 w-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -56,13 +56,13 @@
           </div>
         </div>
 
-        <!-- Instruction when query has 1 character -->
-        <div v-else-if="searchQuery && searchQuery.length === 1" class="search-option instruction">
+        <!-- Empty state when no query and no results -->
+        <div v-else-if="!searchQuery && searchResults.length === 0 && !isLoading" class="search-option instruction">
           <div class="flex items-center justify-center py-2">
             <svg class="h-5 w-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
             </svg>
-            <span class="text-gray-500">Digite pelo menos 2 caracteres para pesquisar</span>
+            <span class="text-gray-500">Digite para pesquisar clientes</span>
           </div>
         </div>
 
@@ -197,16 +197,9 @@ const searchTimeout = ref<number | null>(null);
 
 // Methods
 const searchClients = async (query: string) => {
-  // For empty queries, fetch recent clients (limit to 10)
-  // For queries with less than 2 characters, don't search
-  if (query && query.length < 2) {
-    searchResults.value = [];
-    isLoading.value = false;
-    return;
-  }
-
-  // Use search parameter only if query is provided and has 2+ characters
-  const searchParams = query && query.length >= 2 
+  // Always make the API call, but use search parameter only if query has 1+ characters
+  // This ensures we always get results, even when deleting characters
+  const searchParams = query && query.length >= 1 
     ? { search: query, limit: 10 }
     : { limit: 10 }; // No search parameter = get recent clients
 
@@ -219,7 +212,7 @@ const searchClients = async (query: string) => {
       }
     })
     .catch((error) => {
-      console.error('Error searching clients:', error);
+      console.error('Error searching clients:', JSON.stringify(error, null, 2));
       searchResults.value = [];
     })
     .finally(() => {
@@ -238,24 +231,26 @@ const onSearchInput = () => {
     clearTimeout(searchTimeout.value);
   }
 
-  // If the search query is completely empty, clear the selection
+  // If the search query is completely empty, clear the selection but keep dropdown open if focused
   if (!searchQuery.value || searchQuery.value.trim() === '') {
     selectedClient.value = null;
     emit('update:modelValue', '');
     emit('clientSelected', null);
-    searchResults.value = [];
-    isLoading.value = false;
+    
+    // If dropdown is open (user is focused), show recent clients
+    if (showDropdown.value) {
+      isLoading.value = true;
+      searchTimeout.value = setTimeout(() => {
+        searchClients(''); // Empty query = recent clients
+      }, 100); // Shorter delay for empty query
+    } else {
+      searchResults.value = [];
+      isLoading.value = false;
+    }
     return;
   }
 
-  // If query is less than 2 characters (but not empty), clear results
-  if (searchQuery.value && searchQuery.value.length < 2) {
-    searchResults.value = [];
-    isLoading.value = false;
-    return;
-  }
-
-  // Show loading immediately if we have enough characters or empty query
+  // Always show loading and trigger search for any non-empty query
   isLoading.value = true;
 
   // Debounce search with 300ms delay
@@ -269,10 +264,10 @@ const onFocus = () => {
     showDropdown.value = true;
     
     // Always make a search request on focus to show recent clients
-    // If there's an existing query with 2+ characters, search with it
+    // If there's an existing query with 1+ characters, search with it
     // Otherwise, search without query to get recent clients
     isLoading.value = true;
-    if (searchQuery.value && searchQuery.value.length >= 2) {
+    if (searchQuery.value && searchQuery.value.length >= 1) {
       searchClients(searchQuery.value);
     } else {
       searchClients(''); // Empty query = recent clients
