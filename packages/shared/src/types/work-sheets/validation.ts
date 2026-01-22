@@ -22,9 +22,8 @@ export function validateWorkSheetCreation(data: WorkSheetCreationData): string[]
     errors.push('Data da assistência é obrigatória');
   }
 
-  if (!data.otherData?.technician || !data.otherData.technician.firstName?.trim() || !data.otherData.technician.lastName?.trim()) {
-    errors.push('Técnico responsável é obrigatório');
-  }
+  // Note: Technician field is automatically assigned by backend based on authenticated user
+  // No need to validate this field during creation as it will be populated by auto-assignment
 
   // Date validation
   if (data.request?.assistanceDate) {
@@ -121,9 +120,8 @@ export function validateWorkSheetUpdate(data: WorkSheetUpdateData): string[] {
     }
   }
 
-  if (data.otherData?.technician !== undefined && (!data.otherData.technician || !data.otherData.technician.firstName?.trim() || !data.otherData.technician.lastName?.trim())) {
-    errors.push('Técnico responsável não pode estar vazio');
-  }
+  // Note: Technician field is automatically assigned by backend based on authenticated user
+  // No need to validate this field during updates as it will be populated by auto-assignment
 
   // Time format validation if provided
   if (

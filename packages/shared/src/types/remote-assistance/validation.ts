@@ -282,9 +282,8 @@ export function validateRemoteAssistanceCreation(data: RemoteAssistanceCreationD
     errors.push('Tipo de assistência inválido');
   }
 
-  if (!data.tecnicoResponsavel || !data.tecnicoResponsavel.firstName?.trim() || !data.tecnicoResponsavel.lastName?.trim()) {
-    errors.push('Por favor, selecione o técnico responsável');
-  }
+  // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
+  // No need to validate this field during creation as it will be populated by auto-assignment
 
   if (!data.dataAssistencia) {
     errors.push('Por favor, selecione a data da assistência');
@@ -342,9 +341,8 @@ export function validateRemoteAssistanceUpdate(data: RemoteAssistanceUpdateData)
     }
   }
 
-  if (data.tecnicoResponsavel !== undefined && (!data.tecnicoResponsavel || !data.tecnicoResponsavel.firstName?.trim() || !data.tecnicoResponsavel.lastName?.trim())) {
-    errors.push('Técnico responsável não pode estar vazio');
-  }
+  // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
+  // No need to validate this field during updates as it will be populated by auto-assignment
 
   if (data.dataAssistencia !== undefined && !data.dataAssistencia) {
     errors.push('Data da assistência não pode estar vazia');
