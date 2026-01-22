@@ -201,7 +201,6 @@ function createRemoteAssistanceSearchText(data: RemoteAssistanceData): string {
     const technician = data.tecnicoResponsavel;
     if (technician.firstName) searchTerms.push(technician.firstName.toLowerCase());
     if (technician.lastName) searchTerms.push(technician.lastName.toLowerCase());
-    if (technician.email) searchTerms.push(technician.email.toLowerCase());
     if (technician.firstName && technician.lastName) {
       searchTerms.push(`${technician.firstName} ${technician.lastName}`.toLowerCase());
     }

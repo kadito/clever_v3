@@ -213,7 +213,6 @@ function createWorkSheetSearchText(data: WorkSheetData): string {
     const technician = data.otherData.technician;
     if (technician.firstName) searchTerms.push(technician.firstName.toLowerCase());
     if (technician.lastName) searchTerms.push(technician.lastName.toLowerCase());
-    if (technician.email) searchTerms.push(technician.email.toLowerCase());
     if (technician.firstName && technician.lastName) {
       searchTerms.push(`${technician.firstName} ${technician.lastName}`.toLowerCase());
     }
