@@ -39,22 +39,7 @@ function validateWorkSheetCreate(requestData: any, userContext?: UserContext): v
   if (userContext) {
     try {
       workSheetData = autoAssignTechnician(workSheetData, userContext);
-      console.log(
-        'Auto-assigned technician during work sheet creation:',
-        JSON.stringify(
-          {
-            userId: userContext.userId,
-            technicianAssigned: workSheetData.otherData?.technician,
-          },
-          null,
-          2
-        )
-      );
     } catch (error) {
-      console.error(
-        'Error during technician auto-assignment:',
-        JSON.stringify(error, null, 2)
-      );
       throw new Error(
         `Failed to assign technician: ${
           error instanceof Error ? error.message : 'Unknown error'
@@ -141,22 +126,7 @@ function validateWorkSheetUpdateData(requestData: any, existingContent?: WorkShe
   if (userContext) {
     try {
       workSheetData = autoAssignTechnician(workSheetData, userContext);
-      console.log(
-        'Auto-assigned technician during work sheet update:',
-        JSON.stringify(
-          {
-            userId: userContext.userId,
-            technicianAssigned: workSheetData.otherData?.technician,
-          },
-          null,
-          2
-        )
-      );
     } catch (error) {
-      console.error(
-        'Error during technician auto-assignment:',
-        JSON.stringify(error, null, 2)
-      );
       throw new Error(
         `Failed to assign technician: ${
           error instanceof Error ? error.message : 'Unknown error'

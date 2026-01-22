@@ -24,13 +24,7 @@
     <template #content="{ item }">
       <div v-if="item && item.data" class="space-y-6">
         <!-- Client Information Section -->
-        <RelationInfoDisplay
-          v-if="item.relations?.client"
-          :relation-data="item.relations.client"
-          relation-type="client"
-          :relation-id="item.data.clientId"
-          custom-display-name="Informação do Cliente"
-        />
+        <ClientInfoSection :client-relation="remoteAssistance?.relations?.client" />
 
         <!-- Basic Information Section -->
         <div class="detail-section">
@@ -393,7 +387,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { RemoteAssistance, BaseContent, TechnicianUser, ContentWithRelations } from '@clever/shared';
 import ContentDetailTemplate from '@/components/common/ContentDetailTemplate.vue';
-import RelationInfoDisplay from '@/components/common/RelationInfoDisplay.vue';
+import ClientInfoSection from '@/components/common/ClientInfoSection.vue';
 import ConfirmationDialog from '@/components/common/ConfirmationDialog.vue';
 import { useApi } from '@/composables/useApi';
 import { useErrorHandler } from '@/composables/useErrorHandler';
@@ -404,7 +398,7 @@ import {
   calculateAssistanceValue,
   hasBillableValue,
   REMOTE_ASSISTANCE_CONSTANTS,
-} from '@clever/shared/types/remote-assistance';
+} from '@clever/shared';
 
 // Router
 const route = useRoute();

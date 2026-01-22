@@ -45,10 +45,6 @@ function validateRemoteAssistanceCreate(requestData: any, userContext?: UserCont
     try {
       remoteAssistanceData = autoAssignTechnician(remoteAssistanceData, userContext);
     } catch (error) {
-      console.error(
-        'Error during technician auto-assignment:',
-        JSON.stringify(error, null, 2)
-      );
       throw new Error(
         `Failed to assign technician: ${
           error instanceof Error ? error.message : 'Unknown error'
@@ -120,10 +116,6 @@ function validateRemoteAssistanceUpdateData(
     try {
       remoteAssistanceData = autoAssignTechnician(remoteAssistanceData, userContext);
     } catch (error) {
-      console.error(
-        'Error during technician auto-assignment:',
-        JSON.stringify(error, null, 2)
-      );
       throw new Error(
         `Failed to assign technician: ${
           error instanceof Error ? error.message : 'Unknown error'

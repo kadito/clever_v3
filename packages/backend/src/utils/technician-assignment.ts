@@ -90,10 +90,6 @@ export function autoAssignTechnician(
 
     return updatedData;
   } catch (error) {
-    console.error(
-      'Error in technician auto-assignment:',
-      JSON.stringify(error, null, 2)
-    );
     throw new Error(
       `Failed to auto-assign technician: ${
         error instanceof Error ? error.message : 'Unknown error'

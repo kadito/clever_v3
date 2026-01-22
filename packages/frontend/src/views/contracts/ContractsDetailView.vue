@@ -23,116 +23,7 @@
     <!-- Custom content sections -->
     <template #content="{ item }">
       <!-- Client Information Section -->
-      <div class="detail-section">
-        <div class="bg-white rounded-touch border border-gray-200">
-          <div
-            class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
-          >
-            <h2 class="text-lg font-semibold text-gray-900">Cliente</h2>
-          </div>
-          <div class="p-4 sm:p-6">
-            <!-- Client relation display with error handling -->
-            <div v-if="isClientError(contract.relations?.client)" class="client-error">
-              <div class="flex items-start p-4 bg-red-50 border border-red-200 rounded-touch">
-                <div class="flex-shrink-0">
-                  <svg
-                    class="w-5 h-5 text-red-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </div>
-                <div class="ml-3 flex-1">
-                  <h3 class="text-sm font-medium text-red-800">
-                    Erro ao carregar informações do cliente
-                  </h3>
-                  <div class="mt-2 text-sm text-red-700">
-                    <p>{{ getClientErrorMessage(contract.relations.client) }}</p>
-                    <p class="mt-1 text-xs">
-                      ID do Cliente:
-                      <code class="bg-red-100 px-1 rounded">{{ contract.data.clientId }}</code>
-                    </p>
-                  </div>
-                  <div class="mt-3">
-                    <div class="flex">
-                      <button
-                        @click="retryLoadClient"
-                        class="text-sm bg-red-100 text-red-800 px-3 py-1 rounded-md hover:bg-red-200 transition-colors"
-                      >
-                        Tentar novamente
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div v-else-if="isResolvedClient(contract.relations?.client)" class="client-info">
-              <div class="detail-grid">
-                <div class="detail-item">
-                  <label class="detail-label">Nome da Empresa</label>
-                  <div class="detail-value">{{ contract.relations.client.nomeEmpresa || '-' }}</div>
-                </div>
-                <div class="detail-item">
-                  <label class="detail-label">Nome Comercial</label>
-                  <div class="detail-value">
-                    {{ contract.relations.client.nomeComercial || '-' }}
-                  </div>
-                </div>
-                <div class="detail-item">
-                  <label class="detail-label">Contribuinte</label>
-                  <div class="detail-value">
-                    {{ contract.relations.client.contribuinte || '-' }}
-                  </div>
-                </div>
-                <div class="detail-item">
-                  <label class="detail-label">Localidade</label>
-                  <div class="detail-value">{{ contract.relations.client.localidade || '-' }}</div>
-                </div>
-              </div>
-            </div>
-            <div v-else class="client-missing">
-              <div class="flex items-start p-4 bg-yellow-50 border border-yellow-200 rounded-touch">
-                <div class="flex-shrink-0">
-                  <svg
-                    class="w-5 h-5 text-yellow-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-                    />
-                  </svg>
-                </div>
-                <div class="ml-3 flex-1">
-                  <h3 class="text-sm font-medium text-yellow-800">
-                    Informações do cliente não disponíveis
-                  </h3>
-                  <div class="mt-2 text-sm text-yellow-700">
-                    <p>As informações do cliente não foram carregadas ou não estão disponíveis.</p>
-                    <p class="mt-1 text-xs">
-                      ID do Cliente:
-                      <code class="bg-yellow-100 px-1 rounded">{{
-                        contract.data.clientId || 'Não especificado'
-                      }}</code>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ClientInfoSection :client-relation="contract.relations?.client" />
 
       <!-- CPA Contract Section -->
       <div v-if="contract?.data.hasCPAContract" class="detail-section">
@@ -487,6 +378,7 @@ import type { Contract, BaseContent, ContentWithRelations } from '@clever/shared
 import { hasActiveContract, getContractSummary } from '@clever/shared';
 import ContentDetailTemplate from '@/components/common/ContentDetailTemplate.vue';
 import ConfirmationDialog from '@/components/common/ConfirmationDialog.vue';
+import ClientInfoSection from '@/components/common/ClientInfoSection.vue';
 import { useApi } from '@/composables/useApi';
 import { useErrorHandler } from '@/composables/useErrorHandler';
 
@@ -614,47 +506,6 @@ const getContractStatusBadgeClass = (item: BaseContent | null): string => {
 };
 
 // Helper functions
-const isClientError = (clientRelation: any): boolean => {
-  return (
-    clientRelation &&
-    typeof clientRelation === 'object' &&
-    'type' in clientRelation &&
-    clientRelation.type === 'error'
-  );
-};
-
-const isResolvedClient = (clientRelation: any): boolean => {
-  return clientRelation && typeof clientRelation === 'object' && 'nomeEmpresa' in clientRelation;
-};
-
-const getClientErrorMessage = (clientRelation: any): string => {
-  if (
-    clientRelation &&
-    typeof clientRelation === 'object' &&
-    'code' in clientRelation &&
-    'message' in clientRelation
-  ) {
-    const code = clientRelation.code;
-    const message = clientRelation.message;
-
-    switch (code) {
-      case 404:
-        return 'Cliente não encontrado. O cliente pode ter sido removido ou o ID está incorreto.';
-      case 500:
-        return 'Erro interno do servidor ao carregar o cliente. Tente novamente mais tarde.';
-      default:
-        return `Erro ${code}: ${message}`;
-    }
-  }
-  return 'Erro desconhecido ao carregar o cliente';
-};
-
-const retryLoadClient = async () => {
-  if (!contract.value) return;
-
-  await loadContract();
-};
-
 const getEquipmentCount = (item: BaseContent | null): number => {
   if (!item) return 0;
 
@@ -899,15 +750,6 @@ onMounted(() => {
   @apply inline-flex items-center justify-center w-6 h-6 bg-blue-100 text-blue-800 text-xs font-medium rounded-full;
 }
 
-/* Client error styling */
-.client-error {
-  @apply mb-4;
-}
-
-.client-missing {
-  @apply mb-4;
-}
-
 /* Code styling for error messages */
 code {
   @apply font-mono text-xs;
@@ -940,8 +782,7 @@ code {
 
 /* Portuguese text optimization */
 .detail-value,
-.equipment-card,
-.client-error {
+.equipment-card {
   @apply text-portuguese;
 }
 
