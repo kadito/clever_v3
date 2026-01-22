@@ -67,6 +67,14 @@ and R2 for JSON document storage.
 - **Fallback Handling**: Show "Sistema" for system actions, user ID for unknown
   users
 
+### Automatic Technician Assignment
+
+- **User Context Integration**: Leverage Clerk authentication context to automatically assign technicians
+- **TechnicianUser Object Pattern**: Store complete user objects (userId, email, firstName, lastName, userType) instead of simple strings
+- **Middleware Enhancement**: Extract user context from JWT tokens for automatic assignment
+- **Form Simplification**: Remove manual technician selection fields from forms while preserving display functionality
+- **Backward Compatibility**: Handle both string and object formats during data transitions
+
 ### Backend
 
 - **Cloudflare Workers** serverless runtime

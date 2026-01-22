@@ -50,6 +50,14 @@
 - Touch-friendly card interface for configuration management
 - Type-specific options with conditional suboptions based on configuration type
 
+### Automatic Technician Assignment
+
+- Remove manual technician selection fields from form configurations
+- Technician assignment handled automatically in backend middleware
+- Form sections should exclude technician input fields for work sheets and remote assistance
+- Preserve technician display in detail views and list views
+- Use TechnicianUser object structure for comprehensive user information
+
 ## Form Section Standards
 
 ### Section Ordering
@@ -165,3 +173,6 @@ interface ConditionalRule {
 8. **Ensure 44px minimum touch targets** for all interactive elements
 9. **Test on mobile devices** regularly during development
 10. **Handle component recreation gracefully** with persistent form data
+11. **Remove manual technician fields** from work sheets and remote assistance forms
+12. **Preserve technician display functionality** in all view components
+13. **Use TechnicianUser objects** instead of simple strings for technician data

@@ -67,6 +67,16 @@ Content Structure:
 - Version tracking
 - Soft delete support
 
+Automatic Technician Assignment Patterns:
+
+- Use TechnicianUser objects instead of simple strings for technician fields
+- Automatically populate technician data from authenticated user context during create/update operations
+- Remove manual technician selection fields from forms while preserving display functionality
+- Handle both string and TechnicianUser object formats for backward compatibility
+- Extract user context (firstName, lastName, userId, email, userType) from Clerk JWT tokens
+- Apply auto-assignment in backend middleware before validation
+- Validate TechnicianUser object structure in addition to business logic validation
+
 Content Relations:
 
 - Store only relation IDs in content data (e.g., `clientId`)
