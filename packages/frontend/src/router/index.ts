@@ -2,15 +2,16 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useAuthStore } from '@/stores/auth';
 
 // Content types based on the CLEVER system modules (English for API, Portuguese for UI)
+// Ordered according to dashboard priority: Clientes, Folhas de Obra, Assistências Remotas, Contratos, Licenças
 const contentTypes = [
   'clients',
+  'work-sheets',
+  'remote-assistance',
+  'daily-records',
   'contracts',
   'licenses',
-  'work-sheets',
-  'daily-records',
-  'remote-assistance',
-  'reminders',
-  'pending',
+  // 'reminders',
+  // 'pending',
 ] as const;
 
 // Helper function to get content type display name

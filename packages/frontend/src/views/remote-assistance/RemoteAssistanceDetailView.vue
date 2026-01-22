@@ -607,19 +607,6 @@ const confirmDelete = async () => {
   try {
     isDeleting.value = true;
 
-    console.log(
-      'Attempting to delete remote assistance:',
-      JSON.stringify(
-        {
-          uuid: remoteAssistance.value.uuid,
-          type: remoteAssistance.value.data.tipoAssistencia,
-          client: remoteAssistance.value.data.clientId,
-        },
-        null,
-        2
-      )
-    );
-
     const success = await api.remove(remoteAssistance.value.uuid);
 
     if (api.error.value) {
@@ -636,7 +623,6 @@ const confirmDelete = async () => {
     }
 
     if (success) {
-      console.log('Remote assistance deleted successfully, navigating to list view');
       router.push('/remote-assistance');
     } else {
       console.error('Delete operation failed - useApi returned false');
@@ -669,24 +655,10 @@ const loadRemoteAssistance = async () => {
     isLoading.value = true;
     clearError();
 
-    console.log('Loading remote assistance:', JSON.stringify({ assistanceId }, null, 2));
-
     await api.fetchById(assistanceId);
 
     if (api.currentItem.value) {
       remoteAssistance.value = api.currentItem.value;
-      console.log(
-        'Remote assistance loaded successfully:',
-        JSON.stringify(
-          {
-            uuid: remoteAssistance.value.uuid,
-            type: remoteAssistance.value.data.tipoAssistencia,
-            hasClientRelation: !!remoteAssistance.value.relations?.client,
-          },
-          null,
-          2
-        )
-      );
     } else {
       throw new Error('Assistência remota não encontrada');
     }

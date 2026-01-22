@@ -520,7 +520,6 @@ const loadRemoteAssistance = async () => {
     isLoading.value = true;
     clearError();
 
-    console.log('Loading remote assistance...');
     await api.fetchList();
 
     if (api.items.value) {
@@ -540,8 +539,6 @@ const loadRemoteAssistance = async () => {
         const createdB = new Date(b.createdAt);
         return createdB.getTime() - createdA.getTime();
       });
-
-      console.log(`Loaded ${remoteAssistance.value.length} remote assistance records`);
     } else {
       throw new Error('Erro ao carregar assistências remotas');
     }
@@ -555,7 +552,6 @@ const loadRemoteAssistance = async () => {
 
 // Lifecycle
 onMounted(() => {
-  console.log('RemoteAssistanceListView mounted');
   loadRemoteAssistance();
 });
 </script>

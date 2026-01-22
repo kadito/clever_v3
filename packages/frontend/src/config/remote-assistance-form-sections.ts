@@ -103,23 +103,7 @@ export const remoteAssistanceFormSections: FormSection[] = [
       },
     ],
   },
-  {
-    key: 'values',
-    title: 'Valores',
-    description: 'Valor da assistência (calculado automaticamente baseado no tempo)',
-    fields: [
-      {
-        key: 'valorAssist',
-        label: 'Valor da Assistência (€)',
-        type: 'number',
-        fullWidth: false,
-        min: 0,
-        step: 0.01,
-        disabled: true,
-        placeholder: 'Calculado automaticamente',
-      },
-    ],
-  },
+
   {
     key: 'status',
     title: 'Estado',

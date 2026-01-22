@@ -164,6 +164,55 @@ export function calculateTotalHours(startTime: string, endTime: string): string 
 }
 
 /**
+ * Calculate total hours between start and end time and round UP to the next 15-minute interval
+ * This is used for billing purposes where time is billed in 15-minute increments (00, 15, 30, 45)
+ * Examples: 1min → 0:15, 16min → 0:30, 31min → 0:45, 46min → 1:00, 1:01 → 1:15
+ */
+export function calculateRoundedTotalHours(startTime: string, endTime: string): string {
+  if (!startTime || !endTime) {
+    return '';
+  }
+
+  try {
+    const [startHour, startMin] = startTime.split(':').map(Number);
+    const [endHour, endMin] = endTime.split(':').map(Number);
+
+    if (isNaN(startHour) || isNaN(startMin) || isNaN(endHour) || isNaN(endMin)) {
+      return '';
+    }
+
+    // Convert to minutes since midnight
+    const startMinutes = startHour * 60 + startMin;
+    let endMinutes = endHour * 60 + endMin;
+
+    // Handle case where end time is next day
+    if (endMinutes <= startMinutes) {
+      endMinutes += 24 * 60; // Add 24 hours
+    }
+
+    // Calculate duration in minutes
+    const durationMinutes = endMinutes - startMinutes;
+
+    if (durationMinutes <= 0) {
+      return '00:00';
+    }
+
+    // Round UP to the next 15-minute interval
+    // Valid intervals: 0, 15, 30, 45 minutes
+    const roundedMinutes = Math.ceil(durationMinutes / 15) * 15;
+    
+    // Convert back to hours and minutes
+    const hours = Math.floor(roundedMinutes / 60);
+    const minutes = roundedMinutes % 60;
+
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  } catch (error) {
+    console.warn('Error calculating rounded total hours:', error);
+    return '';
+  }
+}
+
+/**
  * Determine if a time is within business hours (09:00-18:00)
  */
 export function isBusinessHours(hour: number): boolean {
@@ -171,6 +220,91 @@ export function isBusinessHours(hour: number): boolean {
     hour >= REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_START &&
     hour < REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_END
   );
+}
+
+/**
+ * Calculate assistance value with proper business hours logic
+ * If either start time OR end time is outside business hours (09:00-18:00), 
+ * charge the after-hours rate for the entire duration
+ */
+export function calculateAssistanceValueWithBusinessHours(
+  startTime: string,
+  endTime: string,
+  isContract: boolean = false,
+  isWarranty: boolean = false
+): ValueCalculationResult {
+  const result: ValueCalculationResult = {
+    totalValue: 0,
+    businessHoursValue: 0,
+    afterHoursValue: 0,
+    totalHours: 0,
+    businessHours: 0,
+    afterHours: 0,
+    breakdown: [],
+  };
+
+  // If contract or warranty, value should be 0
+  if (isContract || isWarranty) {
+    return result;
+  }
+
+  if (!startTime || !endTime) {
+    return result;
+  }
+
+  try {
+    // Calculate the actual duration and round up to next 15-minute interval
+    const actualDuration = calculateTotalHours(startTime, endTime);
+    if (!actualDuration) return result;
+
+    const [hours, minutes] = actualDuration.split(':').map(Number);
+    const totalMinutes = hours * 60 + minutes;
+    
+    // Round up to next 15-minute interval for billing
+    const billingMinutes = Math.ceil(totalMinutes / 15) * 15;
+    const billingHours = billingMinutes / 60;
+    
+    result.totalHours = billingHours;
+
+    // Parse start and end times
+    const [startHour, startMin] = startTime.split(':').map(Number);
+    const [endHour, endMin] = endTime.split(':').map(Number);
+
+    // Check if either start time OR end time is outside business hours (09:00-18:00)
+    const isStartOutsideBusinessHours = startHour < 9 || startHour >= 18;
+    const isEndOutsideBusinessHours = endHour < 9 || endHour >= 18;
+    
+    // If either time is outside business hours, charge after-hours rate for entire duration
+    if (isStartOutsideBusinessHours || isEndOutsideBusinessHours) {
+      // Charge after-hours rate for entire duration
+      result.afterHours = billingHours;
+      result.afterHoursValue = billingHours * REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS;
+      result.totalValue = result.afterHoursValue;
+      
+      result.breakdown.push({
+        hour: startHour,
+        rate: REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS,
+        value: result.afterHoursValue,
+        isBusinessHours: false,
+      });
+    } else {
+      // Both times are within business hours, charge business rate
+      result.businessHours = billingHours;
+      result.businessHoursValue = billingHours * REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS;
+      result.totalValue = result.businessHoursValue;
+      
+      result.breakdown.push({
+        hour: startHour,
+        rate: REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS,
+        value: result.businessHoursValue,
+        isBusinessHours: true,
+      });
+    }
+  } catch (error) {
+    console.warn('Error calculating assistance value with business hours:', error);
+  }
+
+  return result;
 }
 
 /**

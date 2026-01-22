@@ -1,21 +1,16 @@
 <template>
-  <div class="work-sheet-create-container">
-    <!-- Header -->
-    <div class="create-header">
-      <BackButton to="/work-sheets" variant="inline" />
-      <h1>Nova Folha de Obra</h1>
-    </div>
-
-    <!-- Form -->
-    <ContentCreateTemplate
-      content-type="work-sheets"
-      :form-sections="workSheetsFormSections"
-      :custom-validator="validateCreateForm"
-      :is-saving="isSaving"
-      :error="error"
-      @create="handleCreateSuccess"
-      @clear-error="clearError"
-    >
+  <ContentCreateTemplate
+    content-type="work-sheets"
+    create-title="Nova Folha de Obra"
+    subtitle="Criar uma nova folha de obra no sistema"
+    cancel-route="/work-sheets"
+    :form-sections="workSheetsFormSections"
+    :custom-validator="validateCreateForm"
+    :is-saving="isSaving"
+    :error="error"
+    @create="handleCreateSuccess"
+    @clear-error="clearError"
+  >
       <!-- Custom field templates -->
       <template #field-clientId="{ formData, error, updateFieldValue }">
         <ClientSearchInput
@@ -155,7 +150,6 @@
         </div>
       </template>
     </ContentCreateTemplate>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -163,7 +157,6 @@ import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import type { WorkSheetCreationData, Client } from '@clever/shared';
 import { validateWorkSheetCreation } from '@clever/shared';
-import BackButton from '@/components/common/BackButton.vue';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
 import ContentCreateTemplate from '@/components/common/ContentCreateTemplate.vue';
 import { workSheetsFormSections } from '@/config/work-sheets-form-sections';
@@ -585,32 +578,6 @@ watch(
 </script>
 
 <style scoped>
-.work-sheet-create-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1rem;
-  background-color: #f5f5f5;
-  min-height: 100vh;
-}
-
-.create-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.create-header h1 {
-  color: #2c3e50;
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin: 0;
-}
-
 .form-error {
   color: #dc3545;
   font-size: 0.875rem;
@@ -815,19 +782,6 @@ watch(
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
-  .work-sheet-create-container {
-    padding: 0.5rem;
-  }
-
-  .create-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-
-  .create-header h1 {
-    font-size: 1.3rem;
-  }
 
   .payment-options {
     flex-direction: column;
@@ -857,16 +811,8 @@ watch(
 }
 
 @media (max-width: 480px) {
-  .work-sheet-create-container {
-    padding: 0.25rem;
-  }
-
-  .create-header {
-    padding: 0.75rem;
-  }
-
-  .create-header h1 {
-    font-size: 1.2rem;
+  .payment-option {
+    min-width: auto;
   }
 }
 </style>

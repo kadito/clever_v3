@@ -1,21 +1,16 @@
 <template>
-  <div class="remote-assistance-create-container">
-    <!-- Header -->
-    <div class="create-header">
-      <BackButton to="/remote-assistance" variant="inline" />
-      <h1>Nova Assistência Remota</h1>
-    </div>
-
-    <!-- Form -->
-    <ContentCreateTemplate
-      content-type="remote-assistance"
-      :form-sections="remoteAssistanceFormSections"
-      :custom-validator="validateCreateForm"
-      :is-saving="isSaving"
-      :error="error"
-      @create="handleCreateSuccess"
-      @clear-error="clearError"
-    >
+  <ContentCreateTemplate
+    content-type="remote-assistance"
+    create-title="Nova Assistência Remota"
+    subtitle="Criar uma nova assistência remota no sistema"
+    cancel-route="/remote-assistance"
+    :form-sections="remoteAssistanceFormSections"
+    :custom-validator="validateCreateForm"
+    :is-saving="isSaving"
+    :error="error"
+    @create="handleCreateSuccess"
+    @clear-error="clearError"
+  >
       <!-- Custom field templates -->
       <template #field-clientId="{ formData, error, updateFieldValue }">
         <ClientSearchInput
@@ -58,7 +53,7 @@
               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          Formato HH:MM. Será arredondado para intervalos de 15 minutos.
+          Formato HH:MM. As horas totais serão arredondadas para intervalos de 15 minutos.
         </p>
       </template>
 
@@ -90,7 +85,7 @@
               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          Formato HH:MM. Será arredondado para intervalos de 15 minutos.
+          Formato HH:MM. As horas totais serão arredondadas para intervalos de 15 minutos.
         </p>
       </template>
 
@@ -118,7 +113,7 @@
               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          Calculado automaticamente com base no início e fim da assistência.
+          Calculado automaticamente com base no início e fim da assistência. Arredondado para intervalos de 15 minutos.
         </p>
       </template>
 
@@ -228,16 +223,12 @@
               />
             </svg>
             <span class="text-sm text-gray-600">
-              Tarifário: {{ formatCurrency(REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS) }}/hora
-              (horário comercial),
-              {{ formatCurrency(REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS) }}/hora (fora do
-              horário comercial)
+              💶 Preço: 30€/hora (09:00-18:00) | 45€/hora (outras horas) - sem IVA
             </span>
           </div>
         </div>
       </template>
     </ContentCreateTemplate>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -248,10 +239,10 @@ import {
   validateAndFormatTime,
   validateTimeSequence,
   calculateTotalHours,
-  calculateAssistanceValue,
+  calculateRoundedTotalHours,
+  calculateAssistanceValueWithBusinessHours,
   REMOTE_ASSISTANCE_CONSTANTS,
 } from '@clever/shared';
-import BackButton from '@/components/common/BackButton.vue';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
 import ContentCreateTemplate from '@/components/common/ContentCreateTemplate.vue';
 import { remoteAssistanceFormSections } from '@/config/remote-assistance-form-sections';
@@ -280,7 +271,6 @@ const selectedClient = ref<Client | null>(null);
 
 // Methods
 const handleClientSelected = (client: Client | null) => {
-  console.log('Client selected:', JSON.stringify(client, null, 2));
   selectedClient.value = client;
   // Client data will be handled on the backend side when creating the remote assistance
 };
@@ -320,17 +310,14 @@ const handleTimeBlur = (
   const value = target.value;
 
   if (value) {
-    // Validate and format time with 15-minute rounding
+    // Only validate time format, don't round the input values
     const timeValidation = validateAndFormatTime(value);
 
-    if (timeValidation.isValid && timeValidation.formattedTime) {
-      target.value = timeValidation.formattedTime;
-      updateFieldValue(fieldKey, timeValidation.formattedTime);
-
-      // Show user if time was rounded
-      if (timeValidation.formattedTime !== value) {
-        console.log(`Time rounded from ${value} to ${timeValidation.formattedTime}`);
-      }
+    if (!timeValidation.isValid) {
+      // If invalid, show the validation errors but don't change the input
+    } else {
+      // Valid time format - keep the original user input, don't round it
+      updateFieldValue(fieldKey, value);
     }
   }
 };
@@ -342,7 +329,8 @@ const calculatedDuration = computed(() => {
     return null;
   }
 
-  return calculateTotalHours(currentFormData.inicioAssistencia, currentFormData.fimAssistencia);
+  // Use the new rounded total hours calculation for billing purposes
+  return calculateRoundedTotalHours(currentFormData.inicioAssistencia, currentFormData.fimAssistencia);
 });
 
 const pricingBreakdown = computed(() => {
@@ -351,7 +339,8 @@ const pricingBreakdown = computed(() => {
     return null;
   }
 
-  return calculateAssistanceValue(
+  // Use the new business hours calculation logic
+  return calculateAssistanceValueWithBusinessHours(
     currentFormData.inicioAssistencia,
     currentFormData.fimAssistencia,
     currentFormData.contrato || false,
@@ -381,8 +370,6 @@ const formatHours = (hours: number): string => {
 };
 
 const validateCreateForm = (data: Record<string, any>): Record<string, string> => {
-  console.log('Validating remote assistance creation data:', JSON.stringify(data, null, 2));
-
   try {
     // Transform form data to RemoteAssistanceCreationData format
     const remoteAssistanceData: RemoteAssistanceCreationData = {
@@ -403,11 +390,6 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
       resolvido: data.resolvido,
       anexos: data.anexos || '',
     };
-
-    console.log(
-      'Transformed remote assistance data for validation:',
-      JSON.stringify(remoteAssistanceData, null, 2)
-    );
 
     // Manual validation with business logic
     const errors: string[] = [];
@@ -485,8 +467,6 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
       }
     }
 
-    console.log('Validation errors:', errors);
-
     // Convert array of error messages to field-specific errors
     const fieldErrors: Record<string, string> = {};
 
@@ -519,8 +499,6 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
       }
     });
 
-    console.log('Field errors:', JSON.stringify(fieldErrors, null, 2));
-    console.log('Form validation result - has errors:', Object.keys(fieldErrors).length > 0);
     return fieldErrors;
   } catch (err) {
     console.error('Error in remote assistance validation:', JSON.stringify(err, null, 2));
@@ -529,20 +507,16 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
 };
 
 const handleCreateSuccess = async (formData: Record<string, any>) => {
-  console.log('🚀 handleCreateSuccess called with form data:', JSON.stringify(formData, null, 2));
-
   try {
     isSaving.value = true;
     clearError();
-
-    console.log('Creating remote assistance with form data:', JSON.stringify(formData, null, 2));
 
     // Transform form data to RemoteAssistanceCreationData format
     const remoteAssistanceData: RemoteAssistanceCreationData = {
       clientId: formData.clientId || '',
       tipoAssistencia: formData.tipoAssistencia || '',
       // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
-      tecnicoResponsavel: '', // Will be populated by backend auto-assignment
+      tecnicoResponsavel: {} as any, // Will be populated by backend auto-assignment
       dataPedido: formData.dataPedido || '',
       dataAssistencia: formData.dataAssistencia || '',
       inicioAssistencia: formData.inicioAssistencia || '',
@@ -558,15 +532,9 @@ const handleCreateSuccess = async (formData: Record<string, any>) => {
       anexos: formData.anexos || '',
     };
 
-    console.log(
-      'Transformed remote assistance data:',
-      JSON.stringify(remoteAssistanceData, null, 2)
-    );
-
     const response = await api.create({ data: remoteAssistanceData } as any);
 
     if (response) {
-      console.log('Remote assistance created successfully:', JSON.stringify(response, null, 2));
       // Navigate to the created remote assistance's detail page
       router.push(`/remote-assistance/${response.uuid}`);
     } else {
@@ -590,8 +558,8 @@ watch(
   ],
   ([startTime, endTime, isContract, isWarranty]) => {
     if (startTime && endTime) {
-      // Calculate and update the value automatically
-      const calculationResult = calculateAssistanceValue(
+      // Use the new business hours calculation logic
+      const calculationResult = calculateAssistanceValueWithBusinessHours(
         startTime,
         endTime,
         isContract || false,
@@ -600,26 +568,9 @@ watch(
 
       updateFieldValue('valorAssist', calculationResult.totalValue);
 
-      // Update total hours field
-      const totalHours = calculateTotalHours(startTime, endTime);
-      updateFieldValue('horasTotais', totalHours);
-
-      console.log(
-        'Value calculation updated:',
-        JSON.stringify(
-          {
-            startTime,
-            endTime,
-            isContract,
-            isWarranty,
-            calculatedValue: calculationResult.totalValue,
-            totalHours,
-            breakdown: calculationResult,
-          },
-          null,
-          2
-        )
-      );
+      // Update total hours field with rounded hours
+      const roundedDuration = calculateRoundedTotalHours(startTime, endTime);
+      updateFieldValue('horasTotais', roundedDuration);
     } else {
       // Clear value and hours if times are not set
       updateFieldValue('valorAssist', 0);
@@ -644,8 +595,8 @@ watch(
   ([isContract, isWarranty]) => {
     const currentFormData = formData.value;
     if (currentFormData?.inicioAssistencia && currentFormData?.fimAssistencia) {
-      // Recalculate value based on new contract/warranty status
-      const calculationResult = calculateAssistanceValue(
+      // Use the new business hours calculation logic
+      const calculationResult = calculateAssistanceValueWithBusinessHours(
         currentFormData.inicioAssistencia,
         currentFormData.fimAssistencia,
         isContract || false,
@@ -659,32 +610,6 @@ watch(
 </script>
 
 <style scoped>
-.remote-assistance-create-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1rem;
-  background-color: #f5f5f5;
-  min-height: 100vh;
-}
-
-.create-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.create-header h1 {
-  color: #2c3e50;
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin: 0;
-}
-
 .form-error {
   color: #dc3545;
   font-size: 0.875rem;
@@ -824,19 +749,6 @@ watch(
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
-  .remote-assistance-create-container {
-    padding: 0.5rem;
-  }
-
-  .create-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-
-  .create-header h1 {
-    font-size: 1.3rem;
-  }
 
   .calculation-section {
     padding: 0.75rem;
@@ -870,17 +782,6 @@ watch(
 }
 
 @media (max-width: 480px) {
-  .remote-assistance-create-container {
-    padding: 0.25rem;
-  }
-
-  .create-header {
-    padding: 0.75rem;
-  }
-
-  .create-header h1 {
-    font-size: 1.2rem;
-  }
 
   .pricing-value {
     font-size: 0.8rem;

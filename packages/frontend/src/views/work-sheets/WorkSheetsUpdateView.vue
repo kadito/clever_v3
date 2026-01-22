@@ -12,11 +12,12 @@
     <div v-if="!loading && workSheet" class="update-content">
       <!-- Form -->
       <ContentUpdateTemplate
+        :item="workSheet"
         content-type="work-sheets"
         :form-sections="workSheetsFormSections"
         :initial-data="initialFormData"
         :custom-validator="validateUpdateForm"
-        :is-saving="apiLoading.updating"
+        :is-saving="apiLoading.updating.value"
         :error="error"
         edit-title="Atualizar Folha de Obra"
         subtitle="Editar informações da folha de obra"
