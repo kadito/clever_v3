@@ -276,7 +276,8 @@ const initialFormData = computed(() => {
 
     // Assistance information
     tipoAssistencia: data.tipoAssistencia || '',
-    tecnicoResponsavel: data.tecnicoResponsavel || '',
+    // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
+    tecnicoResponsavel: '', // Will be populated by backend auto-assignment
     quemAtendeu: data.quemAtendeu || '',
 
     // Date and time information
@@ -420,7 +421,8 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
     const remoteAssistanceData: RemoteAssistanceUpdateData = {
       clientId: data.clientId || '',
       tipoAssistencia: data.tipoAssistencia || '',
-      tecnicoResponsavel: data.tecnicoResponsavel || '',
+      // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
+      tecnicoResponsavel: '', // Will be populated by backend auto-assignment
       quemAtendeu: data.quemAtendeu || '',
       dataPedido: data.dataPedido || '',
       dataAssistencia: data.dataAssistencia || '',
@@ -459,9 +461,8 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
       errors.push('Tipo de assistência inválido');
     }
 
-    if (!remoteAssistanceData.tecnicoResponsavel?.trim()) {
-      errors.push('Por favor, selecione o técnico responsável');
-    }
+    // Note: tecnicoResponsavel is automatically assigned by the backend based on authenticated user
+    // No need to validate this field on the frontend
 
     if (!remoteAssistanceData.dataAssistencia) {
       errors.push('Por favor, selecione a data da assistência');
@@ -513,8 +514,6 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
         fieldErrors.tipoAssistencia = errorMessage;
       } else if (errorMessage.includes('Tipo de assistência inválido')) {
         fieldErrors.tipoAssistencia = errorMessage;
-      } else if (errorMessage.includes('selecione o técnico responsável')) {
-        fieldErrors.tecnicoResponsavel = errorMessage;
       } else if (errorMessage.includes('selecione a data da assistência')) {
         fieldErrors.dataAssistencia = errorMessage;
       } else if (errorMessage.includes('Início da assistência:')) {
@@ -550,7 +549,8 @@ const handleUpdate = async (formData: Record<string, any>) => {
     const updateData: RemoteAssistanceUpdateData = {
       clientId: formData.clientId || '',
       tipoAssistencia: formData.tipoAssistencia || '',
-      tecnicoResponsavel: formData.tecnicoResponsavel || '',
+      // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
+      tecnicoResponsavel: '', // Will be populated by backend auto-assignment
       quemAtendeu: formData.quemAtendeu || '',
       dataPedido: formData.dataPedido || '',
       dataAssistencia: formData.dataAssistencia || '',

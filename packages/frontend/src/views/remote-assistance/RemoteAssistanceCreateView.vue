@@ -399,9 +399,8 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
       errors.push('Tipo de assistência inválido');
     }
 
-    if (!remoteAssistanceData.tecnicoResponsavel?.trim()) {
-      errors.push('Por favor, selecione o técnico responsável');
-    }
+    // Note: tecnicoResponsavel is automatically assigned by the backend based on authenticated user
+    // No need to validate this field on the frontend
 
     if (!remoteAssistanceData.dataAssistencia) {
       errors.push('Por favor, selecione a data da assistência');
@@ -453,8 +452,6 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
         fieldErrors.tipoAssistencia = errorMessage;
       } else if (errorMessage.includes('Tipo de assistência inválido')) {
         fieldErrors.tipoAssistencia = errorMessage;
-      } else if (errorMessage.includes('selecione o técnico responsável')) {
-        fieldErrors.tecnicoResponsavel = errorMessage;
       } else if (errorMessage.includes('selecione a data da assistência')) {
         fieldErrors.dataAssistencia = errorMessage;
       } else if (errorMessage.includes('Início da assistência:')) {
@@ -493,7 +490,8 @@ const handleCreateSuccess = async (formData: Record<string, any>) => {
     const remoteAssistanceData: RemoteAssistanceCreationData = {
       clientId: formData.clientId || '',
       tipoAssistencia: formData.tipoAssistencia || '',
-      tecnicoResponsavel: formData.tecnicoResponsavel || '',
+      // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
+      tecnicoResponsavel: '', // Will be populated by backend auto-assignment
       quemAtendeu: formData.quemAtendeu || '',
       dataPedido: formData.dataPedido || '',
       dataAssistencia: formData.dataAssistencia || '',
