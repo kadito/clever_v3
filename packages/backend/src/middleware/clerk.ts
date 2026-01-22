@@ -26,9 +26,6 @@ export function extractJwtToken(c: Context): string | null {
   return null;
 }
 
-/**
- * Verify Clerk JWT token
- */
 export async function verifyClerkJwt(token: string): Promise<any> {
   try {
     // For now, we'll decode the JWT without verification for development
@@ -75,9 +72,9 @@ export const extractUserContext = createMiddleware(async (c, next) => {
     // Extract user information from JWT payload
     const userContext: UserContext = {
       userId: payload.sub || '',
-      email: '', // Email not available in session JWT, would need separate API call
-      firstName: '', // Name not available in session JWT
-      lastName: '', // Name not available in session JWT
+      email: '', // Email not included in this token structure
+      firstName: payload.firstName || '', // Extract firstName from token
+      lastName: payload.lastName || '', // Extract lastName from token
       userType: (payload.o?.rol === 'admin' ? 'Admin' : 'User') as 'Admin' | 'User',
       sessionId: payload.sid || '',
       isAuthenticated: true,

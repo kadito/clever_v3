@@ -37,7 +37,6 @@ export function extractTechnicianUser(userContext: UserContext): TechnicianUser 
   // Create TechnicianUser object from UserContext
   const technicianUser: TechnicianUser = {
     userId: userContext.userId,
-    email: userContext.email || '',
     firstName: userContext.firstName || '',
     lastName: userContext.lastName || '',
     userType: userContext.userType,
@@ -201,9 +200,9 @@ export function getTechnicianDisplayName(technicianUser: TechnicianUser): string
     return lastName;
   }
 
-  // Fallback to email if no name available
-  if (technicianUser.email) {
-    return technicianUser.email;
+  // Fallback if no name available
+  if (technicianUser.userId) {
+    return `User ${technicianUser.userId.slice(-8)}`; // Show last 8 chars of userId
   }
 
   // Final fallback
@@ -267,10 +266,6 @@ function validateTechnicianUser(technician: any, fieldPath: string): string[] {
 
   if (!technician.userId || typeof technician.userId !== 'string') {
     errors.push(`${fieldPath}.userId is required and must be a string`);
-  }
-
-  if (technician.email !== undefined && typeof technician.email !== 'string') {
-    errors.push(`${fieldPath}.email must be a string if provided`);
   }
 
   if (technician.firstName !== undefined && typeof technician.firstName !== 'string') {

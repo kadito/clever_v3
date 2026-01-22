@@ -479,7 +479,8 @@ const getTechnicianDisplayName = (technician: TechnicianUser | string | undefine
   if (typeof technician === 'object') {
     if (technician.firstName) return technician.firstName;
     if (technician.lastName) return technician.lastName;
-    if (technician.email) return technician.email; // Fallback to email
+    // Fallback to userId if no names available
+    if (technician.userId) return `User ${technician.userId.slice(-8)}`;
   }
   
   // Handle legacy string format (backward compatibility)

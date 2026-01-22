@@ -66,8 +66,6 @@ export const USER_TYPE_DISPLAY_NAMES: Record<UserType, string> = {
 export interface TechnicianUser {
   /** Unique user identifier from Clerk */
   userId: string;
-  /** User's primary email address */
-  email: string;
   /** User's first name */
   firstName: string;
   /** User's last name */
