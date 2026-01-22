@@ -166,54 +166,6 @@ export const workSheetsFormSections: FormSection[] = [
     ],
   },
   {
-    key: 'contract',
-    title: 'Garantia e Contrato',
-    description: 'Informação sobre garantia e contrato (apenas para pagamento por contrato)',
-    fields: [
-      {
-        key: 'warranty',
-        label: 'Garantia',
-        type: 'switch',
-        fullWidth: false,
-        switchLabel: 'Serviço coberto por garantia',
-        defaultValue: false,
-        conditional: {
-          dependsOn: 'paymentMethod',
-          showWhen: (value: any) => value === 'CONTRATO',
-        },
-      },
-      {
-        key: 'contract',
-        label: 'Contrato',
-        type: 'switch',
-        fullWidth: false,
-        switchLabel: 'Serviço coberto por contrato',
-        defaultValue: false,
-        conditional: {
-          dependsOn: 'paymentMethod',
-          showWhen: (value: any) => value === 'CONTRATO',
-        },
-      },
-      {
-        key: 'contractYear',
-        label: 'Ano de Contrato',
-        type: 'select',
-        fullWidth: false,
-        options: [
-          { value: '2023', label: '2023' },
-          { value: '2024', label: '2024' },
-          { value: '2025', label: '2025' },
-          { value: '2026', label: '2026' },
-        ],
-        defaultValue: new Date().getFullYear().toString(),
-        conditional: {
-          dependsOn: 'paymentMethod',
-          showWhen: (value: any) => value === 'CONTRATO',
-        },
-      },
-    ],
-  },
-  {
     key: 'materials',
     title: 'Material e Equipamentos',
     description: 'Informação sobre material e equipamentos utilizados',
@@ -334,6 +286,21 @@ export const workSheetsFormSections: FormSection[] = [
         fullWidth: true,
         rows: 5,
         placeholder: 'Descrição detalhada do serviço realizado...',
+      },
+    ],
+  },
+  {
+    key: 'clientSignature',
+    title: 'Assinatura Cliente',
+    description: 'Capture a assinatura do cliente para aprovação do serviço',
+    fields: [
+      {
+        key: 'clientSignature',
+        label: 'Assinatura',
+        type: 'custom',
+        required: false,
+        fullWidth: true,
+        helpText: 'Capture a assinatura do cliente usando o painel abaixo',
       },
     ],
   },

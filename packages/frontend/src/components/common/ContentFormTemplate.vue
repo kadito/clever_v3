@@ -529,6 +529,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import type { BaseContent, Client } from '@clever/shared';
 import BackButton from './BackButton.vue';
 import ErrorComponent from './ErrorComponent.vue';
@@ -578,6 +579,9 @@ const emit = defineEmits<{
   clearError: [];
   clientSelected: [client: Client | null];
 }>();
+
+// Router for navigation
+const router = useRouter();
 
 // Form state - use shared form data to handle component recreation
 const formKey = 'content-form'; // Could be made dynamic if needed
@@ -869,7 +873,13 @@ const handleSubmit = () => {
 };
 
 const handleCancel = () => {
-  emit('cancel');
+  // If cancelRoute is provided, navigate to it
+  if (props.cancelRoute) {
+    router.push(props.cancelRoute);
+  } else {
+    // Otherwise emit cancel event for custom handling
+    emit('cancel');
+  }
 };
 
 const clearError = () => {

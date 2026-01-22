@@ -149,6 +149,18 @@
           </div>
         </div>
       </template>
+
+      <!-- Signature field template -->
+      <template #field-clientSignature="{ formData, error, updateFieldValue }">
+        <SignaturePad
+          :model-value="formData?.clientSignature || ''"
+          :has-error="!!error"
+          @update:model-value="value => handleSignatureUpdate(value, updateFieldValue)"
+        />
+        <p v-if="error" class="form-error text-red-600 text-sm mt-1">
+          {{ error }}
+        </p>
+      </template>
     </ContentCreateTemplate>
 </template>
 
@@ -158,6 +170,7 @@ import { useRouter } from 'vue-router';
 import type { WorkSheetCreationData, Client } from '@clever/shared';
 import { validateWorkSheetCreation } from '@clever/shared';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
+import SignaturePad from '@/components/forms/SignaturePad.vue';
 import ContentCreateTemplate from '@/components/common/ContentCreateTemplate.vue';
 import { workSheetsFormSections } from '@/config/work-sheets-form-sections';
 import { useSharedFormData } from '@/composables/useSharedFormData';
@@ -197,6 +210,14 @@ const handleClientSelected = (client: Client | null) => {
   console.log('Client selected:', JSON.stringify(client, null, 2));
   selectedClient.value = client;
   // Client data will be handled on the backend side when creating the work sheet
+};
+
+// Signature handling
+const handleSignatureUpdate = (
+  value: string,
+  updateFieldValue: (key: string, value: any) => void
+) => {
+  updateFieldValue('clientSignature', value);
 };
 
 // Time input formatting functions

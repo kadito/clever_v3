@@ -203,37 +203,6 @@
           </div>
         </div>
 
-        <!-- Contract Information Section (only if payment method is CONTRATO) -->
-        <div v-if="item.data.displacement?.paymentMethod === 'CONTRATO'" class="detail-section">
-          <div class="bg-white rounded-touch border border-gray-200">
-            <div
-              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
-            >
-              <h2 class="text-lg font-semibold text-gray-900">Garantia e Contrato</h2>
-            </div>
-            <div class="p-4 sm:p-6">
-              <div class="detail-grid">
-                <div class="detail-item">
-                  <label class="detail-label">Garantia</label>
-                  <div class="detail-value">
-                    {{ item.data.otherData?.warranty ? 'Sim' : 'Não' }}
-                  </div>
-                </div>
-                <div class="detail-item">
-                  <label class="detail-label">Contrato</label>
-                  <div class="detail-value">
-                    {{ item.data.otherData?.contract ? 'Sim' : 'Não' }}
-                  </div>
-                </div>
-                <div class="detail-item">
-                  <label class="detail-label">Ano de Contrato</label>
-                  <div class="detail-value">{{ item.data.otherData?.contractYear || '-' }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- Material and Equipment Section -->
         <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
@@ -350,16 +319,31 @@
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Assinatura do Cliente</h2>
+              <h2 class="text-lg font-semibold text-gray-900">Assinatura Cliente</h2>
             </div>
             <div class="p-4 sm:p-6">
-              <div class="flex justify-center">
+              <div class="signature-display w-full">
+                <!-- Signature Image at 100% width -->
                 <img
                   :src="item.data.otherData.clientSignature"
                   alt="Assinatura do Cliente"
-                  class="max-w-full max-h-48 border-2 border-gray-200 rounded bg-white"
+                  class="w-full h-auto border-2 border-gray-300 rounded bg-white"
                 />
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Signature State -->
+        <div v-else class="detail-section">
+          <div class="bg-white rounded-touch border border-gray-200">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
+              <h2 class="text-lg font-semibold text-gray-900">Assinatura Cliente</h2>
+            </div>
+            <div class="p-4 sm:p-6">
+              <p class="text-gray-500 italic">Sem assinatura</p>
             </div>
           </div>
         </div>

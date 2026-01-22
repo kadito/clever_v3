@@ -61,7 +61,7 @@ export interface WorkSheetOtherData {
   serviceReport: string; // DESCRIÇÃO DETALHADA DO SERVIÇO
 
   // Client Signature
-  clientSignature?: string; // ASSINATURA DO CLIENTE (base64 image data)
+  clientSignature?: string; // ASSINATURA DO CLIENTE (base64 PNG image data)
 }
 
 /**

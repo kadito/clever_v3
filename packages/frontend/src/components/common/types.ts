@@ -16,9 +16,11 @@ export interface FormField {
     | 'checkbox'
     | 'switch'
     | 'date'
+    | 'signature'
     | 'custom';
   placeholder?: string;
   help?: string;
+  helpText?: string; // Alternative to help for consistency
   required?: boolean;
   disabled?: boolean;
   readonly?: boolean;

@@ -166,6 +166,18 @@
             </div>
           </div>
         </template>
+
+        <!-- Signature field template -->
+        <template #field-clientSignature="{ formData, error, updateFieldValue }">
+          <SignaturePad
+            :model-value="formData?.clientSignature || ''"
+            :has-error="!!error"
+            @update:model-value="value => handleSignatureUpdate(value, updateFieldValue)"
+          />
+          <p v-if="error" class="form-error text-red-600 text-sm mt-1">
+            {{ error }}
+          </p>
+        </template>
       </ContentUpdateTemplate>
     </div>
   </div>
@@ -177,6 +189,7 @@ import { useRoute, useRouter } from 'vue-router';
 import type { WorkSheet, WorkSheetUpdateData, Client } from '@clever/shared';
 import { validateWorkSheetUpdate } from '@clever/shared';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
+import SignaturePad from '@/components/forms/SignaturePad.vue';
 import ErrorComponent from '@/components/common/ErrorComponent.vue';
 import ContentUpdateTemplate from '@/components/common/ContentUpdateTemplate.vue';
 import { workSheetsFormSections } from '@/config/work-sheets-form-sections';
@@ -339,6 +352,14 @@ const handleClientSelected = (client: Client | null) => {
   selectedClient.value = client;
 
   // Client data is now handled through relations, no need to auto-populate
+};
+
+// Signature handling
+const handleSignatureUpdate = (
+  value: string,
+  updateFieldValue: (key: string, value: any) => void
+) => {
+  updateFieldValue('clientSignature', value);
 };
 
 const validateUpdateForm = (data: Record<string, any>): Record<string, string> => {
