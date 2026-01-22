@@ -90,8 +90,8 @@ api.use('/*', async (c, next) => {
     const userContext: UserContext = {
       userId: payload.sub || '',
       email: '', // Email not available in session JWT, would need separate API call
-      firstName: '', // Name not available in session JWT
-      lastName: '', // Name not available in session JWT
+      firstName: payload.firstName || '', // Extract firstName from token payload
+      lastName: payload.lastName || '', // Extract lastName from token payload
       userType: (payload.o?.rol === 'admin' ? 'Admin' : 'User') as 'Admin' | 'User',
       sessionId: payload.sid || '',
       isAuthenticated: true,

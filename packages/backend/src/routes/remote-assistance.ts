@@ -44,17 +44,6 @@ function validateRemoteAssistanceCreate(requestData: any, userContext?: UserCont
   if (userContext) {
     try {
       remoteAssistanceData = autoAssignTechnician(remoteAssistanceData, userContext);
-      console.log(
-        'Auto-assigned technician during remote assistance creation:',
-        JSON.stringify(
-          {
-            userId: userContext.userId,
-            technicianAssigned: remoteAssistanceData.tecnicoResponsavel,
-          },
-          null,
-          2
-        )
-      );
     } catch (error) {
       console.error(
         'Error during technician auto-assignment:',
@@ -130,17 +119,6 @@ function validateRemoteAssistanceUpdateData(
   if (userContext) {
     try {
       remoteAssistanceData = autoAssignTechnician(remoteAssistanceData, userContext);
-      console.log(
-        'Auto-assigned technician during remote assistance update:',
-        JSON.stringify(
-          {
-            userId: userContext.userId,
-            technicianAssigned: remoteAssistanceData.tecnicoResponsavel,
-          },
-          null,
-          2
-        )
-      );
     } catch (error) {
       console.error(
         'Error during technician auto-assignment:',

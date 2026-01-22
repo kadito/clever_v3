@@ -42,11 +42,6 @@ export function extractTechnicianUser(userContext: UserContext): TechnicianUser 
     userType: userContext.userType,
   };
 
-  console.log(
-    'Extracted technician user:',
-    JSON.stringify(technicianUser, null, 2)
-  );
-
   return technicianUser;
 }
 
@@ -86,35 +81,11 @@ export function autoAssignTechnician(
         updatedData.otherData = {};
       }
       updatedData.otherData.technician = technicianUser;
-      
-      console.log(
-        'Auto-assigned technician to work sheet:',
-        JSON.stringify(
-          {
-            contentType: 'work-sheets',
-            technicianAssigned: technicianUser,
-          },
-          null,
-          2
-        )
-      );
     }
 
     if (hasRemoteAssistanceTechnicianField(updatedData)) {
       // Remote assistance: assign to tecnicoResponsavel
       updatedData.tecnicoResponsavel = technicianUser;
-      
-      console.log(
-        'Auto-assigned technician to remote assistance:',
-        JSON.stringify(
-          {
-            contentType: 'remote-assistance',
-            technicianAssigned: technicianUser,
-          },
-          null,
-          2
-        )
-      );
     }
 
     return updatedData;
