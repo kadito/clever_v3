@@ -49,6 +49,12 @@ export interface FormField {
     showWhen: (value: any) => boolean;
   };
 
+  // Conditional required support
+  conditionalRequired?: {
+    dependsOn: string;
+    requiredWhen: (value: any) => boolean;
+  };
+
   // Validation
   validator?: (value: any) => string | null;
 }

@@ -107,10 +107,10 @@
                         <label
                           :for="field.key"
                           class="form-label"
-                          :class="{ required: field.required }"
+                          :class="{ required: field.required || isConditionallyRequired(field, formData || {}) }"
                         >
                           {{ field.label }}
-                          <span v-if="field.required" class="text-red-500 ml-1">*</span>
+                          <span v-if="field.required || isConditionallyRequired(field, formData || {})" class="text-red-500 ml-1">*</span>
                         </label>
 
                         <!-- Field input based on type -->
@@ -609,6 +609,17 @@ const getVisibleFields = (
   });
 };
 
+// Helper function to check if a field is conditionally required
+const isConditionallyRequired = (
+  field: FormField,
+  formData: Record<string, any>
+): boolean => {
+  if (!field.conditionalRequired) return false;
+
+  const dependentValue = formData[field.conditionalRequired.dependsOn];
+  return field.conditionalRequired.requiredWhen(dependentValue);
+};
+
 // Computed property for form validity (after formData is initialized)
 const isFormValidSimple = computed(() => {
   // Ensure formData is available
@@ -627,12 +638,28 @@ const isFormValidSimple = computed(() => {
   for (const section of props.formSections) {
     const visibleFields = getVisibleFields(section.fields, currentFormData);
     for (const field of visibleFields) {
+      // Check regular required fields
       if (field.required) {
         const value = currentFormData[field.key];
         const isEmpty = !value || (typeof value === 'string' && value.trim() === '');
 
         if (isEmpty) {
           return false;
+        }
+      }
+
+      // Check conditionally required fields
+      if (field.conditionalRequired) {
+        const dependentValue = currentFormData[field.conditionalRequired.dependsOn];
+        const isRequired = field.conditionalRequired.requiredWhen(dependentValue);
+        
+        if (isRequired) {
+          const value = currentFormData[field.key];
+          const isEmpty = !value || (typeof value === 'string' && value.trim() === '');
+
+          if (isEmpty) {
+            return false;
+          }
         }
       }
     }

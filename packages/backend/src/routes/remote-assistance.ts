@@ -59,11 +59,11 @@ function validateRemoteAssistanceCreate(requestData: any, userContext?: UserCont
     clienteName: remoteAssistanceData.clienteName || '',
     tipoAssistencia: remoteAssistanceData.tipoAssistencia || '',
     tecnicoResponsavel: remoteAssistanceData.tecnicoResponsavel || '',
-    quemAtendeu: remoteAssistanceData.quemAtendeu || '',
     dataPedido: remoteAssistanceData.dataPedido || '',
     dataAssistencia: remoteAssistanceData.dataAssistencia || '',
     inicioAssistencia: remoteAssistanceData.inicioAssistencia || '',
     fimAssistencia: remoteAssistanceData.fimAssistencia || '',
+    horasTotais: remoteAssistanceData.horasTotais || '',
     motivoPedido: remoteAssistanceData.motivoPedido || '',
     relatorioAssistencia: remoteAssistanceData.relatorioAssistencia || '',
     relatorio: remoteAssistanceData.relatorio || '',
@@ -175,8 +175,6 @@ function createRemoteAssistanceSearchText(data: RemoteAssistanceData): string {
       searchTerms.push(`${technician.firstName} ${technician.lastName}`.toLowerCase());
     }
   }
-  
-  if (data.quemAtendeu) searchTerms.push(data.quemAtendeu.toLowerCase());
 
   // Description fields
   if (data.motivoPedido) searchTerms.push(data.motivoPedido.toLowerCase());
@@ -264,13 +262,13 @@ remoteAssistanceConfig.extractIndexFields = (content: RemoteAssistance) => {
     // Assistance details
     tipoAssistencia: data.tipoAssistencia || '',
     tecnicoResponsavel: data.tecnicoResponsavel || '',
-    quemAtendeu: data.quemAtendeu || '',
 
     // Date and time information
     dataPedido: data.dataPedido || '',
     dataAssistencia: data.dataAssistencia || '',
     inicioAssistencia: data.inicioAssistencia || '',
     fimAssistencia: data.fimAssistencia || '',
+    horasTotais: data.horasTotais || '',
     year: getYearFromAssistanceDate(data.dataAssistencia),
 
     // Value and billing information

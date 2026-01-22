@@ -285,6 +285,11 @@ export function validateRemoteAssistanceCreation(data: RemoteAssistanceCreationD
   // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
   // No need to validate this field during creation as it will be populated by auto-assignment
 
+  // Data do Pedido is now required
+  if (!data.dataPedido) {
+    errors.push('Por favor, selecione a data do pedido');
+  }
+
   if (!data.dataAssistencia) {
     errors.push('Por favor, selecione a data da assistência');
   }
@@ -308,6 +313,18 @@ export function validateRemoteAssistanceCreation(data: RemoteAssistanceCreationD
   if (data.inicioAssistencia && data.fimAssistencia) {
     const sequenceErrors = validateTimeSequence(data.inicioAssistencia, data.fimAssistencia);
     errors.push(...sequenceErrors);
+  }
+
+  // Validate resolvido field (required)
+  if (data.resolvido === undefined || data.resolvido === null) {
+    errors.push('Por favor, indique se o problema foi resolvido');
+  }
+
+  // Validate relatorio field (required when resolvido is false)
+  if (data.resolvido === false) {
+    if (!data.relatorio?.trim()) {
+      errors.push('Relatório final é obrigatório quando o problema não foi resolvido');
+    }
   }
 
   // Validate value if provided
@@ -344,6 +361,11 @@ export function validateRemoteAssistanceUpdate(data: RemoteAssistanceUpdateData)
   // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
   // No need to validate this field during updates as it will be populated by auto-assignment
 
+  // Data do Pedido is now required
+  if (data.dataPedido !== undefined && !data.dataPedido) {
+    errors.push('Data do pedido não pode estar vazia');
+  }
+
   if (data.dataAssistencia !== undefined && !data.dataAssistencia) {
     errors.push('Data da assistência não pode estar vazia');
   }
@@ -367,6 +389,18 @@ export function validateRemoteAssistanceUpdate(data: RemoteAssistanceUpdateData)
   if (data.inicioAssistencia !== undefined && data.fimAssistencia !== undefined) {
     const sequenceErrors = validateTimeSequence(data.inicioAssistencia, data.fimAssistencia);
     errors.push(...sequenceErrors);
+  }
+
+  // Validate resolvido field (required if being updated)
+  if (data.resolvido !== undefined && data.resolvido === null) {
+    errors.push('Estado de resolução não pode estar vazio');
+  }
+
+  // Validate relatorio field (required when resolvido is false)
+  if (data.resolvido === false) {
+    if (!data.relatorio?.trim()) {
+      errors.push('Relatório final é obrigatório quando o problema não foi resolvido');
+    }
   }
 
   // Validate value if provided

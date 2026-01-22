@@ -103,6 +103,34 @@
           </p>
         </template>
 
+        <!-- Total hours display field -->
+        <template #field-horasTotais="{ formData }">
+          <input
+            type="text"
+            :value="calculatedDuration || ''"
+            placeholder="Calculado automaticamente"
+            class="form-input bg-gray-100"
+            disabled
+            readonly
+          />
+          <p class="form-help text-xs text-gray-500 mt-1">
+            <svg
+              class="w-4 h-4 text-gray-400 inline mr-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            Calculado automaticamente com base no início e fim da assistência.
+          </p>
+        </template>
+
         <!-- Value calculation display section -->
         <template #after-section-dateTime="{ formData: slotFormData }">
           <div
@@ -278,13 +306,13 @@ const initialFormData = computed(() => {
     tipoAssistencia: data.tipoAssistencia || '',
     // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
     tecnicoResponsavel: '', // Will be populated by backend auto-assignment
-    quemAtendeu: data.quemAtendeu || '',
 
     // Date and time information
     dataPedido: data.dataPedido || '',
     dataAssistencia: data.dataAssistencia || '',
     inicioAssistencia: data.inicioAssistencia || '',
     fimAssistencia: data.fimAssistencia || '',
+    horasTotais: data.horasTotais || '',
 
     // Description
     motivoPedido: data.motivoPedido || '',
@@ -423,18 +451,18 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
       tipoAssistencia: data.tipoAssistencia || '',
       // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
       tecnicoResponsavel: '', // Will be populated by backend auto-assignment
-      quemAtendeu: data.quemAtendeu || '',
       dataPedido: data.dataPedido || '',
       dataAssistencia: data.dataAssistencia || '',
       inicioAssistencia: data.inicioAssistencia || '',
       fimAssistencia: data.fimAssistencia || '',
+      horasTotais: data.horasTotais || '',
       motivoPedido: data.motivoPedido || '',
       relatorioAssistencia: data.relatorioAssistencia || '',
       relatorio: data.relatorio || '',
       valorAssist: data.valorAssist || 0,
       contrato: data.contrato || false,
       garantia: data.garantia || false,
-      resolvido: data.resolvido || false,
+      resolvido: data.resolvido,
       anexos: data.anexos || '',
     };
 
@@ -464,6 +492,11 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
     // Note: tecnicoResponsavel is automatically assigned by the backend based on authenticated user
     // No need to validate this field on the frontend
 
+    // Data do Pedido is now required
+    if (!remoteAssistanceData.dataPedido) {
+      errors.push('Por favor, selecione a data do pedido');
+    }
+
     if (!remoteAssistanceData.dataAssistencia) {
       errors.push('Por favor, selecione a data da assistência');
     }
@@ -492,6 +525,18 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
       errors.push(...sequenceErrors);
     }
 
+    // Validate resolvido field (required)
+    if (remoteAssistanceData.resolvido === undefined || remoteAssistanceData.resolvido === null) {
+      errors.push('Por favor, indique se o problema foi resolvido');
+    }
+
+    // Validate relatorio field (required when resolvido is false)
+    if (remoteAssistanceData.resolvido === false) {
+      if (!remoteAssistanceData.relatorio?.trim()) {
+        errors.push('Relatório final é obrigatório quando o problema não foi resolvido');
+      }
+    }
+
     // Validate value if provided
     if (remoteAssistanceData.valorAssist !== undefined) {
       if (
@@ -514,6 +559,8 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
         fieldErrors.tipoAssistencia = errorMessage;
       } else if (errorMessage.includes('Tipo de assistência inválido')) {
         fieldErrors.tipoAssistencia = errorMessage;
+      } else if (errorMessage.includes('selecione a data do pedido')) {
+        fieldErrors.dataPedido = errorMessage;
       } else if (errorMessage.includes('selecione a data da assistência')) {
         fieldErrors.dataAssistencia = errorMessage;
       } else if (errorMessage.includes('Início da assistência:')) {
@@ -522,6 +569,10 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
         fieldErrors.fimAssistencia = errorMessage.replace('Fim da assistência: ', '');
       } else if (errorMessage.includes('Fim da assistência deve ser posterior ao início')) {
         fieldErrors.fimAssistencia = errorMessage;
+      } else if (errorMessage.includes('indique se o problema foi resolvido')) {
+        fieldErrors.resolvido = errorMessage;
+      } else if (errorMessage.includes('Relatório final é obrigatório')) {
+        fieldErrors.relatorio = errorMessage;
       } else if (errorMessage.includes('Valor da assistência deve ser um número positivo')) {
         fieldErrors.valorAssist = errorMessage;
       } else {
@@ -551,11 +602,11 @@ const handleUpdate = async (formData: Record<string, any>) => {
       tipoAssistencia: formData.tipoAssistencia || '',
       // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
       tecnicoResponsavel: '', // Will be populated by backend auto-assignment
-      quemAtendeu: formData.quemAtendeu || '',
       dataPedido: formData.dataPedido || '',
       dataAssistencia: formData.dataAssistencia || '',
       inicioAssistencia: formData.inicioAssistencia || '',
       fimAssistencia: formData.fimAssistencia || '',
+      horasTotais: calculatedDuration.value || '',
       motivoPedido: formData.motivoPedido || '',
       relatorioAssistencia: formData.relatorioAssistencia || '',
       relatorio: formData.relatorio || '',
@@ -662,6 +713,10 @@ watch(
 
       updateFieldValue('valorAssist', calculationResult.totalValue);
 
+      // Update total hours field
+      const totalHours = calculateTotalHours(startTime, endTime);
+      updateFieldValue('horasTotais', totalHours);
+
       console.log(
         'Value calculation updated:',
         JSON.stringify(
@@ -671,6 +726,7 @@ watch(
             isContract,
             isWarranty,
             calculatedValue: calculationResult.totalValue,
+            totalHours,
             breakdown: calculationResult,
           },
           null,
@@ -678,8 +734,9 @@ watch(
         )
       );
     } else {
-      // Clear value if times are not set
+      // Clear value and hours if times are not set
       updateFieldValue('valorAssist', 0);
+      updateFieldValue('horasTotais', '');
     }
   }
 );

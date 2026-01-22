@@ -15,18 +15,17 @@ export interface RemoteAssistanceData {
   // Basic Information
   tipoAssistencia: 'REMOTA' | 'TELEFÓNICA' | 'TELEMÓVEL' | '';
   tecnicoResponsavel: TechnicianUser; // Changed from string to TechnicianUser object
-  quemAtendeu: string;
 
   // Date and Time Information
-  dataPedido: string; // ISO date string
+  dataPedido: string; // ISO date string - required
   dataAssistencia: string; // ISO date string - required
   inicioAssistencia: string; // ISO date string with time
   fimAssistencia: string; // ISO date string with time
+  horasTotais?: string; // Calculated field - format HH:MM
 
   // Description Fields
   motivoPedido: string;
   relatorioAssistencia: string;
-  relatorio: string; // Conditional field - shown when resolvido is true
 
   // Value Fields
   valorAssist: number; // Calculated value based on time and business rules
@@ -34,7 +33,8 @@ export interface RemoteAssistanceData {
   // Status Fields
   contrato: boolean;
   garantia: boolean;
-  resolvido: boolean;
+  resolvido: boolean; // Required field
+  relatorio?: string; // Conditional field - required when resolvido is false
   anexos: string;
 }
 
