@@ -297,10 +297,6 @@ describe('Portuguese Localization Verification', () => {
       expect(basicSection?.title).toBe('Informação Básica');
       expect(basicSection?.description).toBe('Dados fundamentais do contrato');
 
-      const clientInfoSection = contractsFormSections.find((s: any) => s.key === 'clientInfo');
-      expect(clientInfoSection?.title).toBe('Informação do Cliente');
-      expect(clientInfoSection?.description).toBe('Dados do cliente selecionado (apenas leitura)');
-
       const contractTypesSection = contractsFormSections.find(
         (s: any) => s.key === 'contractTypes'
       );

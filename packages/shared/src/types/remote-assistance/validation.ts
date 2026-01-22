@@ -282,7 +282,7 @@ export function validateRemoteAssistanceCreation(data: RemoteAssistanceCreationD
     errors.push('Tipo de assistência inválido');
   }
 
-  if (!data.tecnicoResponsavel?.trim()) {
+  if (!data.tecnicoResponsavel || !data.tecnicoResponsavel.firstName?.trim() || !data.tecnicoResponsavel.lastName?.trim()) {
     errors.push('Por favor, selecione o técnico responsável');
   }
 
@@ -342,7 +342,7 @@ export function validateRemoteAssistanceUpdate(data: RemoteAssistanceUpdateData)
     }
   }
 
-  if (data.tecnicoResponsavel !== undefined && !data.tecnicoResponsavel?.trim()) {
+  if (data.tecnicoResponsavel !== undefined && (!data.tecnicoResponsavel || !data.tecnicoResponsavel.firstName?.trim() || !data.tecnicoResponsavel.lastName?.trim())) {
     errors.push('Técnico responsável não pode estar vazio');
   }
 
@@ -444,7 +444,7 @@ export function getRemoteAssistanceSummary(data: RemoteAssistanceData): {
 
   return {
     assistanceType: data.tipoAssistencia || 'N/A',
-    technician: data.tecnicoResponsavel || 'N/A',
+    technician: data.tecnicoResponsavel ? `${data.tecnicoResponsavel.firstName} ${data.tecnicoResponsavel.lastName}` : 'N/A',
     date: data.dataAssistencia || 'N/A',
     value: data.valorAssist || 0,
     status,

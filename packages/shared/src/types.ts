@@ -58,6 +58,24 @@ export const USER_TYPE_DISPLAY_NAMES: Record<UserType, string> = {
   User: 'Utilizador',
 } as const;
 
+/**
+ * Technician User Interface
+ * Represents a technician user with complete user information for automatic assignment
+ * Requirements: 1.1, 1.2, 1.3
+ */
+export interface TechnicianUser {
+  /** Unique user identifier from Clerk */
+  userId: string;
+  /** User's primary email address */
+  email: string;
+  /** User's first name */
+  firstName: string;
+  /** User's last name */
+  lastName: string;
+  /** User type from Clerk metadata */
+  userType: 'Admin' | 'User';
+}
+
 // API Response types
 export interface ApiResponse<T = any> {
   success: boolean;

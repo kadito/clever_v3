@@ -1,4 +1,5 @@
 import type { BaseContent } from '../base';
+import type { TechnicianUser } from '../../types';
 
 // Client information is now handled through relations (clientId -> resolved client data)
 
@@ -34,7 +35,7 @@ export interface WorkSheetDisplacementData {
  */
 export interface WorkSheetOtherData {
   serviceType: 'ASSISTÊNCIA PRESENCIAL' | 'MANUTENÇÃO' | 'INSTALAÇÃO' | ''; // TIPO DE SERVIÇO
-  technician: string; // TÉCNICO RESPONSÁVEL
+  technician: TechnicianUser; // TÉCNICO RESPONSÁVEL - Changed from string to TechnicianUser object
   serviceObservations?: string; // OBSERVAÇÕES DO SERVIÇO
 
   // Warranty & Contract (shown only when payment method is CONTRATO)
@@ -111,7 +112,7 @@ export interface WorkSheetDisplayData {
   uuid: string;
   clientName: string;
   serviceType: string;
-  technician: string;
+  technician: string; // Display name extracted from TechnicianUser object
   assistanceDate: string;
   totalHours: string;
   hasDisplacement: boolean;

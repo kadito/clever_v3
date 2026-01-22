@@ -102,7 +102,7 @@
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Técnico Responsável</label>
-                  <div class="detail-value">{{ item.data.otherData?.technician || '-' }}</div>
+                  <div class="detail-value">{{ getTechnicianDisplayName(item.data.otherData?.technician) }}</div>
                 </div>
                 <div
                   v-if="item.data.otherData?.serviceObservations"
@@ -388,7 +388,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import type { WorkSheet, ContentWithRelations, WorkSheetData, BaseContent } from '@clever/shared';
+import type { WorkSheet, ContentWithRelations, WorkSheetData, BaseContent, TechnicianUser } from '@clever/shared';
 import ContentDetailTemplate from '@/components/common/ContentDetailTemplate.vue';
 import ClientInfoSection from '@/components/common/ClientInfoSection.vue';
 import ConfirmationDialog from '@/components/common/ConfirmationDialog.vue';
@@ -584,6 +584,30 @@ const formatDate = (dateString: string | undefined): string => {
   } catch {
     return 'Data inválida';
   }
+};
+
+// Helper function to extract technician display name from TechnicianUser object
+const getTechnicianDisplayName = (technician: TechnicianUser | string | undefined): string => {
+  if (!technician) return '-';
+  
+  // Handle TechnicianUser object structure
+  if (typeof technician === 'object' && technician.firstName && technician.lastName) {
+    return `${technician.firstName} ${technician.lastName}`;
+  }
+  
+  // Handle TechnicianUser object with only one name
+  if (typeof technician === 'object') {
+    if (technician.firstName) return technician.firstName;
+    if (technician.lastName) return technician.lastName;
+    if (technician.email) return technician.email; // Fallback to email
+  }
+  
+  // Handle legacy string format (backward compatibility)
+  if (typeof technician === 'string') {
+    return technician;
+  }
+  
+  return '-';
 };
 
 // Pricing calculation methods (based on legacy logic)

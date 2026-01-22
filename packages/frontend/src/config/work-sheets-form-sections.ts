@@ -1,5 +1,7 @@
 import type { FormSection } from '@/components/common/types';
 
+// Note: Technician field is not included in form sections as it's automatically
+// assigned from the authenticated user context in the backend (Requirements 2.1)
 export const workSheetsFormSections: FormSection[] = [
   {
     key: 'basic',

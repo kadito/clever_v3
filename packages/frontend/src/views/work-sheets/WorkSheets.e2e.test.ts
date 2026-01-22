@@ -49,7 +49,13 @@ const mockWorkSheets: WorkSheet[] = [
       },
       otherData: {
         serviceType: 'ASSISTÊNCIA PRESENCIAL',
-        technician: 'Pedro Santos',
+        technician: {
+          userId: 'user-pedro-santos',
+          email: 'pedro.santos@example.com',
+          firstName: 'Pedro',
+          lastName: 'Santos',
+          userType: 'User' as const,
+        },
         serviceObservations: 'Sistema funcionando corretamente após intervenção',
         warranty: true,
         contract: true,
@@ -98,7 +104,13 @@ const mockWorkSheets: WorkSheet[] = [
       },
       otherData: {
         serviceType: 'INSTALAÇÃO',
-        technician: 'Ana Ferreira',
+        technician: {
+          userId: 'user-ana-ferreira',
+          email: 'ana.ferreira@example.com',
+          firstName: 'Ana',
+          lastName: 'Ferreira',
+          userType: 'User' as const,
+        },
         serviceObservations: 'Instalação concluída com sucesso',
         warranty: false,
         contract: false,
@@ -177,7 +189,13 @@ const mockFormData = {
   value: {
     clientId: 'client-1',
     assistanceDate: '2024-01-15',
-    technician: 'Pedro Santos',
+    technician: {
+      userId: 'user-pedro-santos',
+      email: 'pedro.santos@example.com',
+      firstName: 'Pedro',
+      lastName: 'Santos',
+      userType: 'User' as const,
+    },
     serviceType: 'ASSISTÊNCIA PRESENCIAL',
     hasDisplacement: true,
     paymentMethod: 'CONTRATO',
@@ -435,7 +453,7 @@ describe('Work Sheets End-to-End Tests', () => {
         expect(wrapper.text()).toContain('Dados do Cliente');
         expect(wrapper.text()).toContain('Informação do Pedido');
         expect(wrapper.text()).toContain('Controlo de Tempo');
-        expect(wrapper.text()).toContain('Tipo de Serviço e Técnico');
+        expect(wrapper.text()).toContain('Tipo de Serviço');
         expect(wrapper.text()).toContain('Deslocação');
         expect(wrapper.text()).toContain('Método de Pagamento');
       });
@@ -531,7 +549,7 @@ describe('Work Sheets End-to-End Tests', () => {
         // Clear required fields
         mockFormData.value.clientId = '';
         mockFormData.value.assistanceDate = '';
-        mockFormData.value.technician = '';
+        mockFormData.value.technician = null;
 
         await wrapper.vm.$nextTick();
 
@@ -855,13 +873,20 @@ describe('Work Sheets End-to-End Tests', () => {
       });
 
       // Set form data
-      mockFormData.value.technician = 'João Silva';
+      mockFormData.value.technician = {
+        userId: 'user-joao-silva',
+        email: 'joao.silva@example.com',
+        firstName: 'João',
+        lastName: 'Silva',
+        userType: 'User' as const,
+      };
       mockFormData.value.serviceType = 'MANUTENÇÃO';
 
       await wrapper.vm.$nextTick();
 
       // Data should persist
-      expect(mockFormData.value.technician).toBe('João Silva');
+      expect(mockFormData.value.technician.firstName).toBe('João');
+      expect(mockFormData.value.technician.lastName).toBe('Silva');
       expect(mockFormData.value.serviceType).toBe('MANUTENÇÃO');
     });
 

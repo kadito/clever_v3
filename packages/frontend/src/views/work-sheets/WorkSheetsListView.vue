@@ -131,7 +131,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import type { WorkSheet, BaseContent, ContentWithRelations } from '@clever/shared';
+import type { WorkSheet, BaseContent, ContentWithRelations, TechnicianUser } from '@clever/shared';
 import ContentListTemplate from '@/components/common/ContentListTemplate.vue';
 import { useApi } from '@/composables/useApi';
 import { useErrorHandler } from '@/composables/useErrorHandler';
@@ -163,8 +163,9 @@ const displayedWorkSheets = computed(() => {
   const query = searchQuery.value.toLowerCase();
   return workSheets.value.filter(workSheet => {
     const data = workSheet.data;
+    const technicianName = getTechnicianDisplayName(data.otherData?.technician).toLowerCase();
     return (
-      data.otherData?.technician?.toLowerCase().includes(query) ||
+      technicianName.includes(query) ||
       data.otherData?.serviceType?.toLowerCase().includes(query) ||
       data.request?.reason?.toLowerCase().includes(query) ||
       data.displacement?.paymentMethod?.toLowerCase().includes(query)
@@ -208,8 +209,9 @@ const getWorkSheetSubtitle = (item: BaseContent): string => {
     parts.push(workSheet.data.otherData.serviceType);
   }
 
-  if (workSheet.data.otherData?.technician) {
-    parts.push(workSheet.data.otherData.technician);
+  const technicianName = getTechnicianDisplayName(workSheet.data.otherData?.technician);
+  if (technicianName) {
+    parts.push(technicianName);
   }
 
   return parts.join(' • ');
@@ -315,6 +317,30 @@ const formatDate = (dateString: string): string => {
   if (!dateString) return '';
   const date = new Date(dateString);
   return date.toLocaleDateString('pt-PT');
+};
+
+// Helper function to extract technician display name from TechnicianUser object
+const getTechnicianDisplayName = (technician: TechnicianUser | string | undefined): string => {
+  if (!technician) return '';
+  
+  // Handle TechnicianUser object structure
+  if (typeof technician === 'object' && technician.firstName && technician.lastName) {
+    return `${technician.firstName} ${technician.lastName}`;
+  }
+  
+  // Handle TechnicianUser object with only one name
+  if (typeof technician === 'object') {
+    if (technician.firstName) return technician.firstName;
+    if (technician.lastName) return technician.lastName;
+    if (technician.email) return technician.email; // Fallback to email
+  }
+  
+  // Handle legacy string format (backward compatibility)
+  if (typeof technician === 'string') {
+    return technician;
+  }
+  
+  return '';
 };
 
 // Event handlers

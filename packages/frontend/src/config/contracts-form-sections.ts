@@ -15,6 +15,7 @@ export const contractsFormSections: FormSection[] = [
       },
     ],
   },
+
   {
     key: 'contractTypes',
     title: 'Tipos de Contrato',

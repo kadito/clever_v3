@@ -55,7 +55,7 @@
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Técnico Responsável</label>
-                  <div class="detail-value">{{ item.data.tecnicoResponsavel || '-' }}</div>
+                  <div class="detail-value">{{ getTechnicianDisplayName(item.data.tecnicoResponsavel) }}</div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Quem Atendeu</label>
@@ -391,7 +391,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import type { RemoteAssistance, BaseContent } from '@clever/shared';
+import type { RemoteAssistance, BaseContent, TechnicianUser, ContentWithRelations } from '@clever/shared';
 import ContentDetailTemplate from '@/components/common/ContentDetailTemplate.vue';
 import RelationInfoDisplay from '@/components/common/RelationInfoDisplay.vue';
 import ConfirmationDialog from '@/components/common/ConfirmationDialog.vue';
@@ -404,18 +404,18 @@ import {
   calculateAssistanceValue,
   hasBillableValue,
   REMOTE_ASSISTANCE_CONSTANTS,
-} from '@clever/shared/types/remote-assistance/validation';
+} from '@clever/shared/types/remote-assistance';
 
 // Router
 const route = useRoute();
 const router = useRouter();
 
 // Composables
-const api = useApi<RemoteAssistance>('remote-assistance');
+const api = useApi<ContentWithRelations<any>>('remote-assistance');
 const errorHandler = useErrorHandler();
 
 // State
-const remoteAssistance = ref<RemoteAssistance | null>(null);
+const remoteAssistance = ref<ContentWithRelations<any> | null>(null);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
 
@@ -433,7 +433,7 @@ const clearError = () => {
 // Display functions for ContentDetailTemplate
 const getRemoteAssistanceTitle = (item: BaseContent | null): string => {
   if (!item || !item.data) return 'Assistência Remota';
-  const assistance = item as RemoteAssistance;
+  const assistance = item as ContentWithRelations<any>;
 
   // Generate assistance number based on date and UUID
   const year = assistance.data.dataAssistencia
@@ -446,7 +446,7 @@ const getRemoteAssistanceTitle = (item: BaseContent | null): string => {
 
 const getRemoteAssistanceSubtitle = (item: BaseContent | null): string => {
   if (!item || !item.data) return '';
-  const assistance = item as RemoteAssistance;
+  const assistance = item as ContentWithRelations<any>;
   const parts = [];
 
   if (assistance.data.tipoAssistencia) {
@@ -458,7 +458,7 @@ const getRemoteAssistanceSubtitle = (item: BaseContent | null): string => {
   }
 
   if (assistance.data.tecnicoResponsavel) {
-    parts.push(assistance.data.tecnicoResponsavel);
+    parts.push(getTechnicianDisplayName(assistance.data.tecnicoResponsavel));
   }
 
   return parts.join(' • ');
@@ -466,7 +466,7 @@ const getRemoteAssistanceSubtitle = (item: BaseContent | null): string => {
 
 const getRemoteAssistanceStatus = (item: BaseContent | null): string => {
   if (!item || !item.data) return 'Assistência';
-  const assistance = item as RemoteAssistance;
+  const assistance = item as ContentWithRelations<any>;
   const status = [];
 
   if (assistance.data.resolvido) {
@@ -528,6 +528,30 @@ const getAssistanceTypeClass = (type: string): string => {
   return typeClasses[type] || 'assistance-type-badge--default';
 };
 
+// Helper function to extract technician display name from TechnicianUser object
+const getTechnicianDisplayName = (technician: TechnicianUser | string | undefined): string => {
+  if (!technician) return '-';
+  
+  // Handle TechnicianUser object structure
+  if (typeof technician === 'object' && technician.firstName && technician.lastName) {
+    return `${technician.firstName} ${technician.lastName}`;
+  }
+  
+  // Handle TechnicianUser object with only one name
+  if (typeof technician === 'object') {
+    if (technician.firstName) return technician.firstName;
+    if (technician.lastName) return technician.lastName;
+    if (technician.email) return technician.email; // Fallback to email
+  }
+  
+  // Handle legacy string format (backward compatibility)
+  if (typeof technician === 'string') {
+    return technician;
+  }
+  
+  return '-';
+};
+
 const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('pt-PT', {
     style: 'currency',
@@ -551,7 +575,7 @@ const formatHours = (hours: number): string => {
 // Event handlers
 const handleEdit = (item: BaseContent | null) => {
   if (!item) return;
-  const assistance = item as RemoteAssistance;
+  const assistance = item as ContentWithRelations<any>;
   router.push(`/remote-assistance/${assistance.uuid}/editar`);
 };
 

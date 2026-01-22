@@ -34,8 +34,8 @@ export interface ContentRouteConfig<T extends BaseContent> {
   contentType: ContentType;
   sortStrategy: SortStrategy;
   searchFields?: string[];
-  validateCreate?: (data: any) => Promise<void> | void;
-  validateUpdate?: (data: any, existingContent?: T) => Promise<void> | void;
+  validateCreate?: (data: any, userContext?: UserContext) => Promise<void> | void;
+  validateUpdate?: (data: any, existingContent?: T, userContext?: UserContext) => Promise<void> | void;
   extractSearchableText?: (content: T) => string;
   extractIndexFields?: (content: T) => Record<string, any>;
 }
@@ -288,7 +288,7 @@ export function createContentRoutes<T extends BaseContent>(config: ContentRouteC
       // Validate request data if validator is provided
       if (config.validateCreate) {
         try {
-          await config.validateCreate(requestData);
+          await config.validateCreate(requestData, user);
         } catch (validationError) {
           const response: ApiResponse = {
             success: false,
@@ -393,7 +393,7 @@ export function createContentRoutes<T extends BaseContent>(config: ContentRouteC
             existingContent = undefined;
           }
 
-          await config.validateUpdate(requestData, existingContent);
+          await config.validateUpdate(requestData, existingContent, user);
         } catch (validationError) {
           const response: ApiResponse = {
             success: false,

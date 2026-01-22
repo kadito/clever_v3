@@ -1,7 +1,7 @@
 /**
  * Remote Assistance API routes using the generic content route template
  * Implements full CRUD operations with remote assistance-specific validation and sorting
- * Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6
+ * Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 1.2, 1.3
  */
 
 import { Hono } from 'hono';
@@ -15,6 +15,7 @@ import type {
   RemoteAssistanceData,
   RemoteAssistanceCreationData,
   RemoteAssistanceUpdateData,
+  UserContext,
 } from '@clever/shared';
 import {
   validateRemoteAssistanceCreation,
@@ -27,15 +28,45 @@ import {
   hasBillableValue,
   REMOTE_ASSISTANCE_CONSTANTS,
 } from '@clever/shared';
+import { autoAssignTechnician, validateTechnicianAssignment } from '../utils/technician-assignment';
 
 /**
  * Remote assistance-specific validation for create operations
- * Uses the comprehensive validation from shared package
- * Requirements: 8.2 - Content-specific validation logic with time inputs and business rules
+ * Uses the comprehensive validation from shared package with automatic technician assignment
+ * Requirements: 8.2 - Content-specific validation logic with time inputs and business rules, 1.2 - Automatic technician assignment
  */
-function validateRemoteAssistanceCreate(requestData: any): void {
+function validateRemoteAssistanceCreate(requestData: any, userContext?: UserContext): void {
   // Extract the actual remote assistance data from the request
-  const remoteAssistanceData = requestData.data || requestData;
+  let remoteAssistanceData = requestData.data || requestData;
+
+  // Auto-assign technician if user context is available
+  // Requirements: 1.2 - Automatic technician assignment on creation
+  if (userContext) {
+    try {
+      remoteAssistanceData = autoAssignTechnician(remoteAssistanceData, userContext);
+      console.log(
+        'Auto-assigned technician during remote assistance creation:',
+        JSON.stringify(
+          {
+            userId: userContext.userId,
+            technicianAssigned: remoteAssistanceData.tecnicoResponsavel,
+          },
+          null,
+          2
+        )
+      );
+    } catch (error) {
+      console.error(
+        'Error during technician auto-assignment:',
+        JSON.stringify(error, null, 2)
+      );
+      throw new Error(
+        `Failed to assign technician: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`
+      );
+    }
+  }
 
   // Create a proper RemoteAssistanceCreationData object with defaults
   const remoteAssistanceCreationData: RemoteAssistanceCreationData = {
@@ -64,20 +95,64 @@ function validateRemoteAssistanceCreate(requestData: any): void {
   if (errors.length > 0) {
     throw new Error(errors[0]); // Return first error for API response
   }
+
+  // Validate technician assignment structure
+  // Requirements: 1.2 - Validate TechnicianUser object structure
+  const technicianValidation = validateTechnicianAssignment(remoteAssistanceData);
+  if (!technicianValidation.isValid) {
+    throw new Error(`Technician assignment validation failed: ${technicianValidation.errors[0]}`);
+  }
+
+  // Update the original request data with auto-assigned technician
+  if (requestData.data) {
+    requestData.data = remoteAssistanceData;
+  } else {
+    Object.assign(requestData, remoteAssistanceData);
+  }
 }
 
 /**
  * Remote assistance-specific validation for update operations
- * Uses the comprehensive validation from shared package
- * Requirements: 8.2 - Content-specific validation logic with time inputs and business rules
+ * Uses the comprehensive validation from shared package with automatic technician assignment
+ * Requirements: 8.2 - Content-specific validation logic with time inputs and business rules, 1.3 - Automatic technician assignment on update
  * Note: Remote assistance allows client changes during updates (unlike contracts/licenses)
  */
 function validateRemoteAssistanceUpdateData(
   requestData: any,
-  existingContent?: RemoteAssistance
+  existingContent?: RemoteAssistance,
+  userContext?: UserContext
 ): void {
   // Extract the actual remote assistance data from the request
-  const remoteAssistanceData = requestData.data || requestData;
+  let remoteAssistanceData = requestData.data || requestData;
+
+  // Auto-assign technician if user context is available
+  // Requirements: 1.3 - Automatic technician assignment on update
+  if (userContext) {
+    try {
+      remoteAssistanceData = autoAssignTechnician(remoteAssistanceData, userContext);
+      console.log(
+        'Auto-assigned technician during remote assistance update:',
+        JSON.stringify(
+          {
+            userId: userContext.userId,
+            technicianAssigned: remoteAssistanceData.tecnicoResponsavel,
+          },
+          null,
+          2
+        )
+      );
+    } catch (error) {
+      console.error(
+        'Error during technician auto-assignment:',
+        JSON.stringify(error, null, 2)
+      );
+      throw new Error(
+        `Failed to assign technician: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`
+      );
+    }
+  }
 
   // Remote assistance allows client changes during updates (unlike contracts/licenses)
   // This is because assistance records may need client corrections or reassignments
@@ -90,11 +165,26 @@ function validateRemoteAssistanceUpdateData(
   if (errors.length > 0) {
     throw new Error(errors[0]); // Return first error for API response
   }
+
+  // Validate technician assignment structure
+  // Requirements: 1.3 - Validate TechnicianUser object structure
+  const technicianValidation = validateTechnicianAssignment(remoteAssistanceData);
+  if (!technicianValidation.isValid) {
+    throw new Error(`Technician assignment validation failed: ${technicianValidation.errors[0]}`);
+  }
+
+  // Update the original request data with auto-assigned technician
+  if (requestData.data) {
+    requestData.data = remoteAssistanceData;
+  } else {
+    Object.assign(requestData, remoteAssistanceData);
+  }
 }
 
 /**
  * Creates searchable text for remote assistance content
  * Requirements: 8.5 - Search index with content-specific searchable fields (client, assistance number, technician, type)
+ * Updated to handle TechnicianUser object structure
  */
 function createRemoteAssistanceSearchText(data: RemoteAssistanceData): string {
   const searchTerms: string[] = [];
@@ -105,7 +195,18 @@ function createRemoteAssistanceSearchText(data: RemoteAssistanceData): string {
 
   // Assistance type and technician information
   if (data.tipoAssistencia) searchTerms.push(data.tipoAssistencia.toLowerCase());
-  if (data.tecnicoResponsavel) searchTerms.push(data.tecnicoResponsavel.toLowerCase());
+  
+  // Handle TechnicianUser object for technician
+  if (data.tecnicoResponsavel) {
+    const technician = data.tecnicoResponsavel;
+    if (technician.firstName) searchTerms.push(technician.firstName.toLowerCase());
+    if (technician.lastName) searchTerms.push(technician.lastName.toLowerCase());
+    if (technician.email) searchTerms.push(technician.email.toLowerCase());
+    if (technician.firstName && technician.lastName) {
+      searchTerms.push(`${technician.firstName} ${technician.lastName}`.toLowerCase());
+    }
+  }
+  
   if (data.quemAtendeu) searchTerms.push(data.quemAtendeu.toLowerCase());
 
   // Description fields

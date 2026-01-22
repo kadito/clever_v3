@@ -16,7 +16,7 @@
         :form-sections="workSheetsFormSections"
         :initial-data="initialFormData"
         :custom-validator="validateUpdateForm"
-        :is-saving="apiLoading.updating.value"
+        :is-saving="apiLoading.updating"
         :error="error"
         edit-title="Atualizar Folha de Obra"
         subtitle="Editar informações da folha de obra"
@@ -234,7 +234,6 @@ const initialFormData = computed(() => {
 
     // Service information
     serviceType: data.otherData?.serviceType || '',
-    technician: data.otherData?.technician || '',
     serviceObservations: data.otherData?.serviceObservations || '',
 
     // Displacement
@@ -459,7 +458,6 @@ const handleUpdate = async (formData: Record<string, any>) => {
     },
     otherData: {
       serviceType: formData.serviceType || '',
-      technician: formData.technician || '',
       serviceObservations: formData.serviceObservations || '',
       warranty: formData.warranty || false,
       contract: formData.contract || false,

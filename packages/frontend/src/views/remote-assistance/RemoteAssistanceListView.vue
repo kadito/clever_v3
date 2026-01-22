@@ -142,7 +142,7 @@
 
         <!-- Technician -->
         <span
-          v-if="item.data.tecnicoResponsavel"
+          v-if="getTechnicianDisplayName(item.data.tecnicoResponsavel)"
           class="flex items-center before:content-['•'] before:mx-1"
         >
           <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,7 +153,7 @@
               d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
             />
           </svg>
-          {{ item.data.tecnicoResponsavel }}
+          {{ getTechnicianDisplayName(item.data.tecnicoResponsavel) }}
         </span>
       </div>
     </template>
@@ -163,7 +163,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import type { RemoteAssistance, BaseContent, ContentWithRelations } from '@clever/shared';
+import type { RemoteAssistance, BaseContent, ContentWithRelations, TechnicianUser } from '@clever/shared';
 import {
   getRemoteAssistanceSummary,
   hasBillableValue,
@@ -221,7 +221,7 @@ const displayedRemoteAssistance = computed(() => {
     // Search in assistance data
     return (
       data.tipoAssistencia?.toLowerCase().includes(query) ||
-      data.tecnicoResponsavel?.toLowerCase().includes(query) ||
+      getTechnicianDisplayName(data.tecnicoResponsavel)?.toLowerCase().includes(query) ||
       data.quemAtendeu?.toLowerCase().includes(query) ||
       data.motivoPedido?.toLowerCase().includes(query) ||
       data.relatorioAssistencia?.toLowerCase().includes(query) ||
@@ -277,7 +277,7 @@ const getRemoteAssistanceSubtitle = (item: BaseContent): string => {
   if (assistance.data.motivoPedido) {
     const reason =
       assistance.data.motivoPedido.length > 50
-        ? assistance.data.motivoPedido.substring(0, 50) + '...'
+        ? `${assistance.data.motivoPedido.substring(0, 50)}...`
         : assistance.data.motivoPedido;
     parts.push(reason);
   }
@@ -325,8 +325,9 @@ const getRemoteAssistanceMeta2 = (item: BaseContent): string => {
   }
 
   // Show technician
-  if (assistance.data.tecnicoResponsavel) {
-    return assistance.data.tecnicoResponsavel;
+  const technicianName = getTechnicianDisplayName(assistance.data.tecnicoResponsavel);
+  if (technicianName) {
+    return technicianName;
   }
 
   return '';
@@ -463,6 +464,30 @@ const getValueBadgeClass = (item: BaseContent): string => {
 const formatDate = (dateString: string): string => {
   if (!dateString) return '';
   return formatDateForDisplay(dateString);
+};
+
+// Helper function to extract technician display name from TechnicianUser object
+const getTechnicianDisplayName = (technician: TechnicianUser | string | undefined): string => {
+  if (!technician) return '';
+  
+  // Handle TechnicianUser object structure
+  if (typeof technician === 'object' && technician.firstName && technician.lastName) {
+    return `${technician.firstName} ${technician.lastName}`;
+  }
+  
+  // Handle TechnicianUser object with only one name
+  if (typeof technician === 'object') {
+    if (technician.firstName) return technician.firstName;
+    if (technician.lastName) return technician.lastName;
+    if (technician.email) return technician.email; // Fallback to email
+  }
+  
+  // Handle legacy string format (backward compatibility)
+  if (typeof technician === 'string') {
+    return technician;
+  }
+  
+  return '';
 };
 
 // Event handlers

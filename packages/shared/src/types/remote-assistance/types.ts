@@ -1,4 +1,5 @@
 import type { BaseContent } from '../base';
+import type { TechnicianUser } from '../../types';
 
 /**
  * Remote Assistance Data Interface
@@ -13,7 +14,7 @@ export interface RemoteAssistanceData {
 
   // Basic Information
   tipoAssistencia: 'REMOTA' | 'TELEFÓNICA' | 'TELEMÓVEL' | '';
-  tecnicoResponsavel: string;
+  tecnicoResponsavel: TechnicianUser; // Changed from string to TechnicianUser object
   quemAtendeu: string;
 
   // Date and Time Information
@@ -72,7 +73,7 @@ export interface RemoteAssistanceDisplayData {
   assistNumero: string; // Generated assistance number for display
   clienteName?: string; // Optional - should be resolved through relations
   tipoAssistencia: string;
-  tecnicoResponsavel: string;
+  tecnicoResponsavel: string; // Display name extracted from TechnicianUser object
   dataAssistencia: string;
   valorAssist: number;
   contrato: boolean;

@@ -18,7 +18,7 @@ export const remoteAssistanceFormSections: FormSection[] = [
   {
     key: 'assistanceInfo',
     title: 'Informação da Assistência',
-    description: 'Detalhes sobre o tipo e responsável pela assistência',
+    description: 'Detalhes sobre o tipo de assistência',
     fields: [
       {
         key: 'tipoAssistencia',
@@ -32,14 +32,6 @@ export const remoteAssistanceFormSections: FormSection[] = [
           { value: 'TELEFÓNICA', label: 'TELEFÓNICA' },
           { value: 'TELEMÓVEL', label: 'TELEMÓVEL' },
         ],
-      },
-      {
-        key: 'tecnicoResponsavel',
-        label: 'Técnico Responsável',
-        type: 'text',
-        required: true,
-        fullWidth: false,
-        placeholder: 'Nome do técnico',
       },
       {
         key: 'quemAtendeu',

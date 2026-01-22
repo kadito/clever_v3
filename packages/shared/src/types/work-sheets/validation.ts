@@ -22,7 +22,7 @@ export function validateWorkSheetCreation(data: WorkSheetCreationData): string[]
     errors.push('Data da assistência é obrigatória');
   }
 
-  if (!data.otherData?.technician?.trim()) {
+  if (!data.otherData?.technician || !data.otherData.technician.firstName?.trim() || !data.otherData.technician.lastName?.trim()) {
     errors.push('Técnico responsável é obrigatório');
   }
 
@@ -121,7 +121,7 @@ export function validateWorkSheetUpdate(data: WorkSheetUpdateData): string[] {
     }
   }
 
-  if (data.otherData?.technician !== undefined && !data.otherData.technician.trim()) {
+  if (data.otherData?.technician !== undefined && (!data.otherData.technician || !data.otherData.technician.firstName?.trim() || !data.otherData.technician.lastName?.trim())) {
     errors.push('Técnico responsável não pode estar vazio');
   }
 
@@ -164,7 +164,9 @@ export function validateWorkSheetForDisplay(workSheet: WorkSheet): WorkSheetDisp
       uuid: workSheet.uuid,
       clientName: 'Cliente não especificado', // Will be resolved from relations
       serviceType: workSheet.data.otherData?.serviceType || 'Não especificado',
-      technician: workSheet.data.otherData?.technician || 'Não especificado',
+      technician: workSheet.data.otherData?.technician 
+        ? `${workSheet.data.otherData.technician.firstName} ${workSheet.data.otherData.technician.lastName}` 
+        : 'Não especificado',
       assistanceDate: workSheet.data.request?.assistanceDate || '',
       totalHours: workSheet.data.request?.totalHours || '0:00',
       hasDisplacement: workSheet.data.displacement?.hasDisplacement || false,

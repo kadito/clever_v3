@@ -16,7 +16,7 @@
         :form-sections="remoteAssistanceFormSections"
         :initial-data="initialFormData"
         :custom-validator="validateUpdateForm"
-        :is-saving="apiLoading.updating.value"
+        :is-saving="apiLoading.updating"
         :error="error"
         edit-title="Atualizar Assistência Remota"
         subtitle="Editar informações da assistência remota"
