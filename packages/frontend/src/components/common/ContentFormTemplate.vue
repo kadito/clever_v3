@@ -319,7 +319,10 @@
                             v-else-if="field.type === 'switch'"
                             class="flex items-center justify-between"
                           >
-                            <label :for="field.key" class="text-sm font-medium text-gray-700">
+                            <label
+                              :for="field.key"
+                              class="text-sm font-medium text-gray-700 switch-label"
+                            >
                               {{ field.switchLabel || field.label }}
                             </label>
                             <div class="relative inline-flex items-center">
@@ -1176,9 +1179,19 @@ const getSelectedOptions = (field: FormField, selectedValues: any) => {
 }
 
 /* Switch component styling */
+.switch-label {
+  /* Prevent required asterisk on switch labels */
+}
+
+.switch-label.required::after {
+  content: none !important;
+}
+
 .switch-track {
   @apply w-11 h-6 bg-gray-200 rounded-full cursor-pointer transition-colors duration-200 ease-in-out relative;
   @apply touch-target; /* Ensure 44px minimum touch target */
+  width: 50px;
+  height: 26px;
 }
 
 .switch-track-active {
@@ -1190,25 +1203,36 @@ const getSelectedOptions = (field: FormField, selectedValues: any) => {
 }
 
 .switch-thumb {
-  @apply absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out;
+  @apply absolute left-0.5 bg-white w-5 h-5 rounded-full shadow-md transition-transform duration-200 ease-in-out;
+  top: 50%;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  transform: translateY(-50%) translateX(0);
 }
 
 .switch-thumb-active {
-  @apply translate-x-5;
+  transform: translateY(-50%) translateX(24px);
 }
 
 /* Mobile optimizations for switches */
 @media (max-width: 640px) {
   .switch-track {
     @apply w-12 h-7; /* Slightly larger on mobile */
+    width: 48px;
+    height: 28px;
   }
 
   .switch-thumb {
-    @apply w-6 h-6 top-0.5 left-0.5;
+    @apply w-6 h-6 left-0.5;
+    top: 50%;
+    left: 3px;
+    width: 22px;
+    height: 22px;
   }
 
   .switch-thumb-active {
-    @apply translate-x-5;
+    transform: translateY(-50%) translateX(20px);
   }
 }
 </style>

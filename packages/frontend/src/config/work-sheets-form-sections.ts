@@ -29,13 +29,7 @@ export const workSheetsFormSections: FormSection[] = [
         fullWidth: false,
         defaultValue: new Date().toISOString().split('T')[0],
       },
-      {
-        key: 'receivedBy',
-        label: 'Receção do Pedido',
-        type: 'text',
-        fullWidth: false,
-        placeholder: 'Nome do colaborador',
-      },
+
       {
         key: 'assistanceDate',
         label: 'Data da Assistência',

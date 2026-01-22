@@ -63,6 +63,8 @@ const handleToggle = () => {
 .toggle-switch {
   @apply toggle-switch-consistent;
   @apply active:scale-95;
+  width: 50px;
+  height: 26px;
 }
 
 .toggle-switch:disabled {
@@ -79,15 +81,15 @@ const handleToggle = () => {
 
 .toggle-slider {
   @apply absolute bg-white rounded-full transition-all duration-300 ease-in-out shadow-sm;
-  top: 2px;
-  left: 2px;
+  top: 50%;
+  left: 3px;
   width: 20px;
   height: 20px;
-  transform: translateX(0);
+  transform: translateY(-50%) translateX(0);
 }
 
 .toggle-slider.active {
-  transform: translateX(26px);
+  transform: translateY(-50%) translateX(24px);
 }
 
 /* Enhanced hover states using consistent styling */
@@ -138,17 +140,18 @@ const handleToggle = () => {
   }
 
   .toggle-switch {
-    width: 44px;
-    height: 22px;
+    width: 48px;
+    height: 28px;
   }
 
   .toggle-slider {
-    width: 18px;
-    height: 18px;
+    width: 22px;
+    height: 22px;
+    left: 3px;
   }
 
   .toggle-slider.active {
-    transform: translateX(22px);
+    transform: translateY(-50%) translateX(20px);
   }
 }
 </style>

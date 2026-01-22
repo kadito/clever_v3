@@ -41,10 +41,6 @@
                   <div class="detail-value">{{ formatDate(item.data.request?.date) }}</div>
                 </div>
                 <div class="detail-item">
-                  <label class="detail-label">Receção do Pedido</label>
-                  <div class="detail-value">{{ item.data.request?.receivedBy || '-' }}</div>
-                </div>
-                <div class="detail-item">
                   <label class="detail-label">Data da Assistência</label>
                   <div class="detail-value">
                     {{ formatDate(item.data.request?.assistanceDate) }}
@@ -157,8 +153,8 @@
           </div>
         </div>
 
-        <!-- Pricing Section (only if displacement is enabled) -->
-        <div v-if="item.data.displacement?.hasDisplacement" class="detail-section">
+        <!-- Pricing Section (always shown) -->
+        <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
@@ -619,7 +615,8 @@ const getDisplacementRate = (): number => {
 };
 
 const getHourlyRate = (): number => {
-  if (!workSheet.value?.data?.displacement?.hasDisplacement) return 0;
+  // Always show hourly rate, even without displacement
+  if (!workSheet.value?.data?.displacement) return 45; // Default rate
   return workSheet.value.data.displacement.weekendHoliday ? 60 : 45;
 };
 
@@ -631,10 +628,9 @@ const getKmsPrice = (): number => {
 };
 
 const getLaborPrice = (): number => {
-  if (!workSheet.value?.data?.displacement?.hasDisplacement) return 0;
-
-  const arrivalTime = workSheet.value.data.request?.arrivalTime;
-  const departureTime = workSheet.value.data.request?.departureTime;
+  // Calculate labor price even without displacement
+  const arrivalTime = workSheet.value?.data?.request?.arrivalTime;
+  const departureTime = workSheet.value?.data?.request?.departureTime;
 
   if (!arrivalTime || !departureTime) return 0;
 
@@ -661,10 +657,9 @@ const getLaborPrice = (): number => {
 };
 
 const getTotalPrice = (): number => {
-  if (!workSheet.value?.data?.displacement?.hasDisplacement) return 0;
-
-  const displacementRate = getDisplacementRate();
-  const kmsPrice = getKmsPrice();
+  // Calculate total price always, including displacement costs only when applicable
+  const displacementRate = workSheet.value?.data?.displacement?.hasDisplacement ? getDisplacementRate() : 0;
+  const kmsPrice = workSheet.value?.data?.displacement?.hasDisplacement ? getKmsPrice() : 0;
   const laborPrice = getLaborPrice();
 
   return Math.round((displacementRate + kmsPrice + laborPrice) * 100) / 100;

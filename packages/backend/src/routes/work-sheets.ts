@@ -172,7 +172,6 @@ function createWorkSheetSearchText(data: WorkSheetData): string {
   if (data.clientId) searchTerms.push(data.clientId.toLowerCase());
 
   // Request information
-  if (data.request?.receivedBy) searchTerms.push(data.request.receivedBy.toLowerCase());
   if (data.request?.reason) searchTerms.push(data.request.reason.toLowerCase());
 
   // Service information
@@ -247,7 +246,6 @@ workSheetConfig.extractIndexFields = (content: WorkSheet) => {
     // Request information
     assistanceDate: data.request?.assistanceDate || '',
     requestDate: data.request?.date || '',
-    receivedBy: data.request?.receivedBy || '',
     reason: data.request?.reason || '',
     arrivalTime: data.request?.arrivalTime || '',
     departureTime: data.request?.departureTime || '',

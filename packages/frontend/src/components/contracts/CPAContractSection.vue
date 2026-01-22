@@ -205,8 +205,7 @@ const shouldShowPlanDetails = computed(() => {
 }
 
 .config-label.required::after {
-  content: ' *';
-  @apply text-red-500;
+  content: none;
 }
 
 .config-select {

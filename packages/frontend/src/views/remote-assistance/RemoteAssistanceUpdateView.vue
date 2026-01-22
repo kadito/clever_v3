@@ -476,6 +476,15 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
       errors.push('Por favor, selecione a data da assistência');
     }
 
+    // Time fields are now required
+    if (!remoteAssistanceData.inicioAssistencia) {
+      errors.push('Por favor, informe o início da assistência');
+    }
+
+    if (!remoteAssistanceData.fimAssistencia) {
+      errors.push('Por favor, informe o fim da assistência');
+    }
+
     // Validate time inputs format
     if (remoteAssistanceData.inicioAssistencia) {
       const startTimeValidation = validateAndFormatTime(remoteAssistanceData.inicioAssistencia);

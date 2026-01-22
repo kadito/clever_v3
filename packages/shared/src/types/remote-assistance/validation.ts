@@ -428,6 +428,15 @@ export function validateRemoteAssistanceCreation(data: RemoteAssistanceCreationD
     errors.push('Por favor, selecione a data da assistência');
   }
 
+  // Time fields are now required
+  if (!data.inicioAssistencia) {
+    errors.push('Por favor, informe o início da assistência');
+  }
+
+  if (!data.fimAssistencia) {
+    errors.push('Por favor, informe o fim da assistência');
+  }
+
   // Validate time inputs format
   if (data.inicioAssistencia) {
     const startTimeValidation = validateAndFormatTime(data.inicioAssistencia);
@@ -504,15 +513,24 @@ export function validateRemoteAssistanceUpdate(data: RemoteAssistanceUpdateData)
     errors.push('Data da assistência não pode estar vazia');
   }
 
+  // Time fields are now required
+  if (data.inicioAssistencia !== undefined && !data.inicioAssistencia) {
+    errors.push('Início da assistência não pode estar vazio');
+  }
+
+  if (data.fimAssistencia !== undefined && !data.fimAssistencia) {
+    errors.push('Fim da assistência não pode estar vazio');
+  }
+
   // Validate time inputs format (if provided)
-  if (data.inicioAssistencia !== undefined) {
+  if (data.inicioAssistencia !== undefined && data.inicioAssistencia) {
     const startTimeValidation = validateAndFormatTime(data.inicioAssistencia);
     if (!startTimeValidation.isValid) {
       errors.push(...startTimeValidation.errors.map(error => `Início da assistência: ${error}`));
     }
   }
 
-  if (data.fimAssistencia !== undefined) {
+  if (data.fimAssistencia !== undefined && data.fimAssistencia) {
     const endTimeValidation = validateAndFormatTime(data.fimAssistencia);
     if (!endTimeValidation.isValid) {
       errors.push(...endTimeValidation.errors.map(error => `Fim da assistência: ${error}`));

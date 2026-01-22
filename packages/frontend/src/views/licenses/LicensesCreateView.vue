@@ -882,8 +882,7 @@ onBeforeUnmount(() => {
 }
 
 .form-label.required::after {
-  @apply text-red-500 ml-1;
-  content: '*';
+  content: none;
 }
 
 .form-input,
