@@ -72,6 +72,9 @@ export interface WorkSheetData {
   // Client relationship
   clientId: string;
 
+  // Contract relationship (optional - only when payment method is CONTRATO)
+  contractId?: string;
+
   // Main data sections
   request: WorkSheetRequestData;
   displacement: WorkSheetDisplacementData;
@@ -131,6 +134,7 @@ export interface WorkSheetSearchFilters {
   technician?: string;
   serviceType?: 'ASSISTÊNCIA PRESENCIAL' | 'MANUTENÇÃO' | 'INSTALAÇÃO';
   paymentMethod?: 'PENDENTE' | 'CARTÃO MB' | 'DINHEIRO' | 'TRANSFERÊNCIA BANCÁRIA' | 'CONTRATO';
+  contractId?: string;
   assistanceDateFrom?: string;
   assistanceDateTo?: string;
   hasDisplacement?: boolean;

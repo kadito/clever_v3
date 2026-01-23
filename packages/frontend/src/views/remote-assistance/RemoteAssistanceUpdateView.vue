@@ -245,6 +245,20 @@
             </div>
           </div>
         </template>
+
+        <template #field-contractId="{ formData, error, updateFieldValue }">
+          <ContractSearchInput
+            :model-value="formData?.contractId || ''"
+            :client-id="formData?.clientId || ''"
+            :has-error="!!error"
+            @update:model-value="value => updateFieldValue('contractId', value)"
+            @contract-selected="handleContractSelected"
+          />
+          <p v-if="error" class="form-error text-red-600 text-sm mt-1">{{ error }}</p>
+          <p v-if="!formData?.clientId" class="form-help text-xs text-gray-500 mt-1">
+            Selecione um cliente primeiro para escolher um contrato
+          </p>
+        </template>
       </ContentUpdateTemplate>
     </div>
   </div>
@@ -261,8 +275,10 @@ import {
   calculateRoundedTotalHours,
   calculateAssistanceValueWithBusinessHours,
   REMOTE_ASSISTANCE_CONSTANTS,
+  type Contract,
 } from '@clever/shared';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
+import ContractSearchInput from '@/components/common/ContractSearchInput.vue';
 import ErrorComponent from '@/components/common/ErrorComponent.vue';
 import ContentUpdateTemplate from '@/components/common/ContentUpdateTemplate.vue';
 import { remoteAssistanceFormSections } from '@/config/remote-assistance-form-sections';
@@ -300,6 +316,9 @@ const initialFormData = computed(() => {
   return {
     // Client information
     clientId: data.clientId || '',
+
+    // Contract information (for payment method Contrato)
+    contractId: data.contractId || '',
 
     // Assistance information
     tipoAssistencia: data.tipoAssistencia || '',
@@ -421,6 +440,11 @@ const clearError = () => {
 const handleClientSelected = (client: Client | null) => {
   selectedClient.value = client;
   // Client data is now handled through relations, no need to auto-populate
+};
+
+const handleContractSelected = (contract: Contract | null) => {
+  console.log('Contract selected:', JSON.stringify(contract, null, 2));
+  // Contract ID is already updated via v-model
 };
 
 const validateUpdateForm = (data: Record<string, any>): Record<string, string> => {
@@ -577,11 +601,12 @@ const handleUpdate = async (formData: Record<string, any>) => {
     // Transform form data to RemoteAssistanceUpdateData format
     const updateData: RemoteAssistanceUpdateData = {
       clientId: formData.clientId || '',
+      contractId: formData.contractId, // Include contractId
       tipoAssistencia: formData.tipoAssistencia || '',
       // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
       tecnicoResponsavel: '', // Will be populated by backend auto-assignment
       dataPedido: formData.dataPedido || '',
-      dataAssistencia: formData.dataAssistencia || '',
+      dataAssistencia: formData.dataAssistancia || '',
       inicioAssistencia: formData.inicioAssistencia || '',
       fimAssistencia: formData.fimAssistencia || '',
       horasTotais: calculatedDuration.value || '',

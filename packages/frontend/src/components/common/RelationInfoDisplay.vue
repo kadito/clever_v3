@@ -25,6 +25,22 @@
             />
           </svg>
         </div>
+        <!-- Navigate to relation detail icon (top-right) -->
+        <button
+          v-if="!isError && !isMissing && navigationRoute"
+          @click="navigateToRelation"
+          class="relation-info-navigate"
+          :title="`Ver detalhes de ${relationDisplayName.toLowerCase()}`"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+            />
+          </svg>
+        </button>
       </div>
 
       <!-- Content -->
@@ -69,6 +85,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 import type { RelationResult, RelationError, ResolvedRelation } from '@clever/shared';
 
 interface Props {
@@ -89,6 +106,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   showDebugInfo: false,
 });
+
+const router = useRouter();
 
 // Relation type configurations
 const RELATION_CONFIGS = {
@@ -169,6 +188,51 @@ const errorMessage = computed(() => {
   return errorMessages[errorData.code] || errorData.message || 'Erro desconhecido';
 });
 
+// Navigation route mapping
+const navigationRoute = computed(() => {
+  console.log('RelationInfoDisplay navigationRoute computed:', {
+    isError: isError.value,
+    isMissing: isMissing.value,
+    relationData: props.relationData,
+    relationType: props.relationType,
+  });
+
+  if (isError.value || isMissing.value || !props.relationData) {
+    console.log('navigationRoute returning null - error or missing');
+    return null;
+  }
+
+  const resolvedData = props.relationData as ResolvedRelation;
+  const relationUuid = resolvedData.uuid;
+
+  console.log('relationUuid:', relationUuid);
+
+  if (!relationUuid) {
+    console.log('navigationRoute returning null - no uuid');
+    return null;
+  }
+
+  // Map relation types to routes
+  const routeMap: Record<string, string> = {
+    client: `/clients/${relationUuid}`,
+    contract: `/contracts/${relationUuid}`,
+    license: `/licenses/${relationUuid}`,
+    'work-sheet': `/work-sheets/${relationUuid}`,
+    'remote-assistance': `/remote-assistance/${relationUuid}`,
+  };
+
+  const route = routeMap[props.relationType] || null;
+  console.log('navigationRoute result:', route);
+  return route;
+});
+
+// Navigation handler
+const navigateToRelation = () => {
+  if (navigationRoute.value) {
+    router.push(navigationRoute.value);
+  }
+};
+
 // Helper functions
 const getFieldValue = (fieldKey: string): string => {
   if (!props.relationData || isError.value || isMissing.value) {
@@ -237,7 +301,7 @@ const DocumentIcon = {
 }
 
 .relation-info-header {
-  @apply flex items-center px-4 py-3 border-b border-gray-200 bg-gray-50;
+  @apply flex items-center px-4 py-3 border-b border-gray-200 bg-gray-50 relative;
 }
 
 .relation-info-card--error .relation-info-header {
@@ -274,6 +338,15 @@ const DocumentIcon = {
 
 .relation-info-status {
   @apply flex-shrink-0;
+}
+
+.relation-info-navigate {
+  @apply ml-auto flex-shrink-0 p-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-full transition-colors;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .relation-info-content {

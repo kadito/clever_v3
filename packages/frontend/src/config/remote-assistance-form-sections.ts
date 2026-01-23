@@ -155,6 +155,37 @@ export const remoteAssistanceFormSections: FormSection[] = [
     ],
   },
   {
+    key: 'payment',
+    title: 'Método de Pagamento',
+    description: 'Forma de pagamento da assistência',
+    fields: [
+      {
+        key: 'paymentMethod',
+        label: 'Método de Pagamento',
+        type: 'select',
+        required: true,
+        fullWidth: false,
+        options: [
+          { value: '', label: 'Selecionar método...' },
+          { value: 'Contrato', label: 'Contrato' },
+          { value: 'Faturação', label: 'Faturação' },
+          { value: 'Garantia', label: 'Garantia' },
+        ],
+      },
+      {
+        key: 'contractId',
+        label: 'Contrato',
+        type: 'custom',
+        required: true,
+        fullWidth: true,
+        conditional: {
+          dependsOn: 'paymentMethod',
+          showWhen: (value: any) => value === 'Contrato',
+        },
+      },
+    ],
+  },
+  {
     key: 'observations',
     title: 'Anexos',
     description: 'Informações adicionais e anexos',

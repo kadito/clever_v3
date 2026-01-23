@@ -12,6 +12,9 @@ export interface RemoteAssistanceData {
   clientId: string;
   clienteName?: string; // Optional - client data should be resolved through relations
 
+  // Contract relationship (optional - only when payment method is Contrato)
+  contractId?: string;
+
   // Basic Information
   tipoAssistencia: 'REMOTA' | 'TELEFÓNICA' | 'TELEMÓVEL' | '';
   tecnicoResponsavel: TechnicianUser; // Changed from string to TechnicianUser object
@@ -29,6 +32,9 @@ export interface RemoteAssistanceData {
 
   // Value Fields
   valorAssist: number; // Calculated value based on time and business rules
+
+  // Payment Method (new field)
+  paymentMethod?: 'Contrato' | 'Faturação' | 'Garantia' | '';
 
   // Status Fields
   contrato: boolean;
@@ -94,6 +100,8 @@ export interface RemoteAssistanceSearchFilters {
   tecnicoResponsavel?: string;
   dataAssistenciaFrom?: string;
   dataAssistenciaTo?: string;
+  paymentMethod?: 'Contrato' | 'Faturação' | 'Garantia';
+  contractId?: string;
   contrato?: boolean;
   garantia?: boolean;
   resolvido?: boolean;

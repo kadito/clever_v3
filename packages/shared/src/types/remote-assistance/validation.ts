@@ -458,6 +458,23 @@ export function validateRemoteAssistanceCreation(data: RemoteAssistanceCreationD
     errors.push(...sequenceErrors);
   }
 
+  // Payment method validation
+  if (data.paymentMethod) {
+    const validPaymentMethods = ['Contrato', 'Faturação', 'Garantia', ''];
+    if (!validPaymentMethods.includes(data.paymentMethod)) {
+      errors.push('Método de pagamento inválido');
+    }
+  }
+
+  // Contract validation
+  if (data.paymentMethod === 'Contrato') {
+    if (!data.contractId) {
+      errors.push('O contrato é obrigatório quando o método de pagamento é Contrato');
+    } else if (!isValidUUID(data.contractId)) {
+      errors.push('O ID do contrato deve ser um UUID válido');
+    }
+  }
+
   // Validate resolvido field (required)
   if (data.resolvido === undefined || data.resolvido === null) {
     errors.push('Por favor, indique se o problema foi resolvido');
@@ -700,4 +717,12 @@ export function formatDateTimeForDisplay(dateString: string): string {
   } catch (error) {
     return 'Data inválida';
   }
+}
+
+/**
+ * Helper function for UUID validation
+ */
+function isValidUUID(uuid: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
 }

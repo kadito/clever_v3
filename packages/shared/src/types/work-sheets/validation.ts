@@ -71,6 +71,15 @@ export function validateWorkSheetCreation(data: WorkSheetCreationData): string[]
     errors.push('Método de pagamento inválido');
   }
 
+  // Contract validation
+  if (data.displacement?.paymentMethod === 'CONTRATO') {
+    if (!data.contractId) {
+      errors.push('O contrato é obrigatório quando o método de pagamento é CONTRATO');
+    } else if (!isValidUUID(data.contractId)) {
+      errors.push('O ID do contrato deve ser um UUID válido');
+    }
+  }
+
   // Service type validation
   const validServiceTypes = ['ASSISTÊNCIA PRESENCIAL', 'MANUTENÇÃO', 'INSTALAÇÃO', ''];
   if (data.otherData?.serviceType && !validServiceTypes.includes(data.otherData.serviceType)) {
@@ -290,4 +299,12 @@ export function getWorkSheetSummary(workSheet: WorkSheet): string {
 function isValidTimeFormat(time: string): boolean {
   const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
   return timeRegex.test(time);
+}
+
+/**
+ * Helper function for UUID validation
+ */
+function isValidUUID(uuid: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
 }

@@ -128,6 +128,20 @@
           </div>
         </template>
 
+        <template #field-contractId="{ formData, error, updateFieldValue }">
+          <ContractSearchInput
+            :model-value="formData?.contractId || ''"
+            :client-id="formData?.clientId || ''"
+            :has-error="!!error"
+            @update:model-value="value => updateFieldValue('contractId', value)"
+            @contract-selected="handleContractSelected"
+          />
+          <p v-if="error" class="form-error text-red-600 text-sm mt-1">{{ error }}</p>
+          <p v-if="!formData?.clientId" class="form-help text-xs text-gray-500 mt-1">
+            Selecione um cliente primeiro para escolher um contrato
+          </p>
+        </template>
+
         <!-- Pricing display section (only shown when hasDisplacement is true) -->
         <template #after-section-displacement="{ formData: slotFormData }">
           <div v-if="formData?.hasDisplacement === true" class="pricing-section">
@@ -186,9 +200,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import type { WorkSheet, WorkSheetUpdateData, Client } from '@clever/shared';
+import type { WorkSheet, WorkSheetUpdateData, Client, Contract } from '@clever/shared';
 import { validateWorkSheetUpdate } from '@clever/shared';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
+import ContractSearchInput from '@/components/common/ContractSearchInput.vue';
 import SignaturePad from '@/components/forms/SignaturePad.vue';
 import ErrorComponent from '@/components/common/ErrorComponent.vue';
 import ContentUpdateTemplate from '@/components/common/ContentUpdateTemplate.vue';
@@ -234,6 +249,9 @@ const initialFormData = computed(() => {
   return {
     // Client information
     clientId: data.clientId || '',
+
+    // Contract information (for payment method CONTRATO)
+    contractId: data.contractId || '',
 
     // Request information
     requestDate: data.request?.date || '',
@@ -354,6 +372,11 @@ const handleClientSelected = (client: Client | null) => {
   // Client data is now handled through relations, no need to auto-populate
 };
 
+const handleContractSelected = (contract: Contract | null) => {
+  console.log('Contract selected:', JSON.stringify(contract, null, 2));
+  // Contract ID is already updated via v-model
+};
+
 // Signature handling
 const handleSignatureUpdate = (
   value: string,
@@ -461,6 +484,7 @@ const handleUpdate = async (formData: Record<string, any>) => {
   // Transform form data to API format
   const updateData = {
     clientId: formData.clientId,
+    contractId: formData.contractId, // Include contractId
     request: {
       date: formData.requestDate || '',
       receivedBy: '', // Field removed from form, set to empty string

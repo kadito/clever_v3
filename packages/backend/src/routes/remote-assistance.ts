@@ -57,6 +57,7 @@ function validateRemoteAssistanceCreate(requestData: any, userContext?: UserCont
   const remoteAssistanceCreationData: RemoteAssistanceCreationData = {
     clientId: remoteAssistanceData.clientId || '',
     clienteName: remoteAssistanceData.clienteName || '',
+    contractId: remoteAssistanceData.contractId, // Include contractId field
     tipoAssistencia: remoteAssistanceData.tipoAssistencia || '',
     tecnicoResponsavel: remoteAssistanceData.tecnicoResponsavel || '',
     dataPedido: remoteAssistanceData.dataPedido || '',
@@ -65,9 +66,10 @@ function validateRemoteAssistanceCreate(requestData: any, userContext?: UserCont
     fimAssistencia: remoteAssistanceData.fimAssistencia || '',
     horasTotais: remoteAssistanceData.horasTotais || '',
     motivoPedido: remoteAssistanceData.motivoPedido || '',
-    relatorioAssistencia: remoteAssistanceData.relatorioAssistencia || '',
+    relatorioAssistencia: remoteAssistanceData.relatorioAssistancia || '',
     relatorio: remoteAssistanceData.relatorio || '',
     valorAssist: remoteAssistanceData.valorAssist || 0,
+    paymentMethod: remoteAssistanceData.paymentMethod, // Include paymentMethod field
     contrato: remoteAssistanceData.contrato || false,
     garantia: remoteAssistanceData.garantia || false,
     resolvido: remoteAssistanceData.resolvido || false,

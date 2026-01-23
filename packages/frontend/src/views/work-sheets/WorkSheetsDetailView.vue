@@ -153,6 +153,118 @@
           </div>
         </div>
 
+        <!-- Contract Information Section (when payment method is CONTRATO) -->
+        <div v-if="item.data.displacement?.paymentMethod === 'CONTRATO'" class="detail-section">
+          <div class="bg-white rounded-touch border border-gray-200"
+               :class="{
+                 'border-red-200 bg-red-50': workSheet?.relations?.contract && isRelationError(workSheet.relations.contract),
+                 'border-yellow-200 bg-yellow-50': !item.data.contractId
+               }">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+              :class="{
+                'border-red-200 bg-red-100': workSheet?.relations?.contract && isRelationError(workSheet.relations.contract),
+                'border-yellow-200 bg-yellow-100': !item.data.contractId
+              }"
+            >
+              <div class="flex items-center justify-between w-full">
+                <div class="flex items-center flex-1 min-w-0">
+                  <div class="flex-shrink-0 mr-3 text-gray-600"
+                       :class="{
+                         'text-red-600': workSheet?.relations?.contract && isRelationError(workSheet.relations.contract),
+                         'text-yellow-600': !item.data.contractId
+                       }">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                  </div>
+                  <h2 class="text-lg font-semibold text-gray-900"
+                      :class="{
+                        'text-red-900': workSheet?.relations?.contract && isRelationError(workSheet.relations.contract),
+                        'text-yellow-900': !item.data.contractId
+                      }">
+                    Informação do Contrato
+                  </h2>
+                  <div v-if="workSheet?.relations?.contract && isRelationError(workSheet.relations.contract)" class="ml-2">
+                    <svg
+                      class="w-4 h-4 text-red-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                      />
+                    </svg>
+                  </div>
+                </div>
+                
+                <!-- Navigate to contract icon -->
+                <button
+                  v-if="workSheet?.relations?.contract && !isRelationError(workSheet.relations.contract)"
+                  @click="navigateToContract"
+                  class="flex-shrink-0 p-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-full transition-colors"
+                  style="min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center;"
+                  title="Ver detalhes do contrato"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="p-4 sm:p-6">
+              <!-- Contract not specified -->
+              <div v-if="!item.data.contractId" class="text-center py-2">
+                <p class="text-yellow-800 font-medium">Contrato não especificado</p>
+              </div>
+              
+              <!-- Contract error -->
+              <div v-else-if="workSheet?.relations?.contract && isRelationError(workSheet.relations.contract)" class="text-center py-2">
+                <p class="text-red-800 font-medium mb-1">
+                  {{ workSheet.relations.contract.code === 404 ? 'Contrato não encontrado' : 'Erro ao carregar contrato' }}
+                </p>
+                <p class="text-red-600 text-sm">Código: {{ workSheet.relations.contract.code }}</p>
+              </div>
+              
+              <!-- Contract information -->
+              <div v-else-if="workSheet?.relations?.contract" class="detail-grid">
+                <div class="detail-item col-span-full">
+                  <label class="detail-label">Tipo de Contrato</label>
+                  <div class="detail-value font-medium">
+                    {{ getContractDisplayName(workSheet.relations.contract) }}
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <label class="detail-label">Período do Contrato</label>
+                  <div class="detail-value">
+                    {{ getContractDates(workSheet.relations.contract) }}
+                  </div>
+                </div>
+                <div v-if="workSheet.relations.contract.paymentFrequency" class="detail-item">
+                  <label class="detail-label">Frequência de Pagamento</label>
+                  <div class="detail-value">
+                    {{ workSheet.relations.contract.paymentFrequency }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Pricing Section (always shown) -->
         <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
@@ -369,10 +481,12 @@
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { WorkSheet, ContentWithRelations, WorkSheetData, BaseContent, TechnicianUser } from '@clever/shared';
+import { isRelationError } from '@clever/shared';
 import ContentDetailTemplate from '@/components/common/ContentDetailTemplate.vue';
 import ClientInfoSection from '@/components/common/ClientInfoSection.vue';
 import ConfirmationDialog from '@/components/common/ConfirmationDialog.vue';
 import { useApi } from '@/composables/useApi';
+import contractPlansConfig from '@/config/contract-plans.json';
 
 const route = useRoute();
 const router = useRouter();
@@ -647,6 +761,73 @@ const getTotalPrice = (): number => {
   const laborPrice = getLaborPrice();
 
   return Math.round((displacementRate + kmsPrice + laborPrice) * 100) / 100;
+};
+
+// Contract helper functions
+const getPlanName = (contractType: string, planId: string): string => {
+  const config = contractPlansConfig as any;
+  const typeConfig = config[contractType];
+  if (!typeConfig || !typeConfig.plans) return planId;
+  
+  const plan = typeConfig.plans.find((p: any) => p.id === planId);
+  return plan?.name || planId;
+};
+
+const getContractDisplayName = (contract: any): string => {
+  if (!contract || typeof contract !== 'object') return 'Contrato não especificado';
+  
+  const parts: string[] = [];
+  
+  // Add CPA contract info if exists
+  if (contract.hasCPAContract && contract.cpaContractType && contract.planIdCPA) {
+    const planName = getPlanName(contract.cpaContractType, contract.planIdCPA);
+    parts.push(`CPA: ${planName}`);
+  }
+  
+  // Add S&H contract info if exists
+  if (contract.hasSHContract && contract.shContractType && contract.planIdSH) {
+    const planName = getPlanName(contract.shContractType, contract.planIdSH);
+    parts.push(`S&H: ${planName}`);
+  }
+  
+  return parts.length > 0 ? parts.join(' | ') : 'Contrato não especificado';
+};
+
+const getContractDates = (contract: any): string => {
+  if (!contract || typeof contract !== 'object') return '-';
+  
+  // Try CPA contract dates first
+  if (contract.hasCPAContract && contract.inicioContratoCPA) {
+    const startDate = formatDate(contract.inicioContratoCPA);
+    const endDate = contract.fimContratoCPA ? formatDate(contract.fimContratoCPA) : '';
+    
+    if (startDate && endDate) {
+      return `${startDate} - ${endDate}`;
+    } else if (startDate) {
+      return `Início: ${startDate}`;
+    }
+  }
+  
+  // Try S&H contract dates
+  if (contract.hasSHContract && contract.inicioContratoSH) {
+    const startDate = formatDate(contract.inicioContratoSH);
+    const endDate = contract.fimContratoSH ? formatDate(contract.fimContratoSH) : '';
+    
+    if (startDate && endDate) {
+      return `${startDate} - ${endDate}`;
+    } else if (startDate) {
+      return `Início: ${startDate}`;
+    }
+  }
+  
+  return '-';
+};
+
+// Navigation handler for contract button
+const navigateToContract = () => {
+  if (workSheet.value?.data?.contractId) {
+    router.push(`/contracts/${workSheet.value.data.contractId}`);
+  }
 };
 
 // Lifecycle

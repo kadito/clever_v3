@@ -47,7 +47,20 @@ export function getContentTypeFromRelation(relationField: string): string | null
  */
 export const BASIC_FIELD_DEFINITIONS: Record<string, string[]> = {
   clients: ['nomeEmpresa', 'nomeComercial', 'contribuinte', 'localidade'],
-  contracts: ['numeroContrato', 'dataInicio', 'dataFim'],
+  contracts: [
+    'numeroContrato',
+    'paymentFrequency',
+    'hasCPAContract',
+    'cpaContractType',
+    'planIdCPA',
+    'inicioContratoCPA',
+    'fimContratoCPA',
+    'hasSHContract',
+    'shContractType',
+    'planIdSH',
+    'inicioContratoSH',
+    'fimContratoSH',
+  ],
   licenses: ['versao', 'numeroSerie', 'dataVencimento'],
   'work-sheets': ['numeroFolha', 'dataInicio', 'dataFim'],
   'daily-records': ['data', 'atividade', 'duracao'],

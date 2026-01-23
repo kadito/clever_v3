@@ -228,6 +228,20 @@
           </div>
         </div>
       </template>
+
+      <template #field-contractId="{ formData, error, updateFieldValue }">
+        <ContractSearchInput
+          :model-value="formData?.contractId || ''"
+          :client-id="formData?.clientId || ''"
+          :has-error="!!error"
+          @update:model-value="value => updateFieldValue('contractId', value)"
+          @contract-selected="handleContractSelected"
+        />
+        <p v-if="error" class="form-error text-red-600 text-sm mt-1">{{ error }}</p>
+        <p v-if="!formData?.clientId" class="form-help text-xs text-gray-500 mt-1">
+          Selecione um cliente primeiro para escolher um contrato
+        </p>
+      </template>
     </ContentCreateTemplate>
 </template>
 
@@ -242,8 +256,10 @@ import {
   calculateRoundedTotalHours,
   calculateAssistanceValueWithBusinessHours,
   REMOTE_ASSISTANCE_CONSTANTS,
+  type Contract,
 } from '@clever/shared';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
+import ContractSearchInput from '@/components/common/ContractSearchInput.vue';
 import ContentCreateTemplate from '@/components/common/ContentCreateTemplate.vue';
 import { remoteAssistanceFormSections } from '@/config/remote-assistance-form-sections';
 import { useSharedFormData } from '@/composables/useSharedFormData';
@@ -273,6 +289,11 @@ const selectedClient = ref<Client | null>(null);
 const handleClientSelected = (client: Client | null) => {
   selectedClient.value = client;
   // Client data will be handled on the backend side when creating the remote assistance
+};
+
+const handleContractSelected = (contract: Contract | null) => {
+  console.log('Contract selected:', JSON.stringify(contract, null, 2));
+  // Contract ID is already updated via v-model
 };
 
 // Time input formatting functions with 15-minute rounding

@@ -16,7 +16,7 @@
         @click="toggleClientDetails"
       >
         <div class="flex items-center justify-between w-full">
-          <div class="flex items-center">
+          <div class="flex items-center flex-1 min-w-0">
             <div
               class="flex-shrink-0 mr-3 text-gray-600"
               :class="{
@@ -58,7 +58,26 @@
               </svg>
             </div>
           </div>
-          <div class="flex items-center">
+          
+          <!-- Navigate to client detail icon -->
+          <button
+            v-if="!isClientError && !isClientMissing && clientUuid"
+            @click.stop="navigateToClient"
+            class="flex-shrink-0 p-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-full transition-colors mr-2"
+            style="min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center;"
+            title="Ver detalhes do cliente"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+              />
+            </svg>
+          </button>
+          
+          <div class="flex items-center flex-shrink-0">
             <span class="text-sm text-gray-500 mr-2">
               {{ showClientDetails ? 'Ocultar' : 'Ver mais' }}
             </span>
@@ -156,6 +175,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import type { RelationResult } from '@clever/shared';
 
 // Props
@@ -165,6 +185,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const router = useRouter();
 
 // State
 const showClientDetails = ref(false);
@@ -193,6 +215,13 @@ const isClientMissing = computed(() => {
   return props.clientRelation === null;
 });
 
+const clientUuid = computed(() => {
+  if (isClientError.value || isClientMissing.value || !clientData.value) {
+    return null;
+  }
+  return (clientData.value as any).uuid || null;
+});
+
 const hasAdditionalClientFields = computed(() => {
   if (!clientData.value || isClientError.value || isClientMissing.value) {
     return false;
@@ -210,6 +239,12 @@ const hasAdditionalClientFields = computed(() => {
 // Methods
 const toggleClientDetails = () => {
   showClientDetails.value = !showClientDetails.value;
+};
+
+const navigateToClient = () => {
+  if (clientUuid.value) {
+    router.push(`/clients/${clientUuid.value}`);
+  }
 };
 
 const getClientErrorMessage = () => {

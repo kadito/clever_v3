@@ -51,6 +51,7 @@ function validateWorkSheetCreate(requestData: any, userContext?: UserContext): v
   // Create a proper WorkSheetCreationData object with defaults
   const workSheetCreationData: WorkSheetCreationData = {
     clientId: workSheetData.clientId || '',
+    contractId: workSheetData.contractId, // Include contractId field
     request: {
       date: workSheetData.request?.date || '',
       receivedBy: workSheetData.request?.receivedBy || '',
