@@ -111,9 +111,9 @@
         </div>
       </template>
 
-      <!-- Pricing display section (always shown) -->
+      <!-- Pricing display section (only shown when hasDisplacement is true) -->
       <template #after-section-displacement="{ formData: slotFormData }">
-        <div class="pricing-section">
+        <div v-if="formData?.hasDisplacement === true" class="pricing-section">
           <h3>Cálculo de Preços <span class="vat-note">(sem IVA)</span></h3>
           <div class="pricing-table">
             <div class="pricing-row">
