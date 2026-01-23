@@ -76,12 +76,31 @@ const initializeApp = async () => {
       const isSignedIn = !!user;
 
       if (user && isSignedIn) {
+        // Try to get userType from multiple sources
+        let userType: 'Admin' | 'User' = 'User';
+        
+        // 1. Check publicMetadata first
+        if (user.publicMetadata?.userType) {
+          userType = user.publicMetadata.userType as 'Admin' | 'User';
+        }
+        // 2. Check organization membership role
+        else if (user.organizationMemberships && user.organizationMemberships.length > 0) {
+          const orgMembership = user.organizationMemberships[0];
+          if (orgMembership.role === 'admin' || orgMembership.role === 'org:admin') {
+            userType = 'Admin';
+          }
+        }
+        // 3. Check unsafeMetadata as fallback
+        else if (user.unsafeMetadata?.userType) {
+          userType = user.unsafeMetadata.userType as 'Admin' | 'User';
+        }
+
         const userContext = {
           userId: user.id,
           email: user.primaryEmailAddress?.emailAddress || '',
           firstName: user.firstName || '',
           lastName: user.lastName || '',
-          userType: (user.publicMetadata?.userType as 'Admin' | 'User') || 'User',
+          userType: userType,
           sessionId: user.id,
           isAuthenticated: true,
         };

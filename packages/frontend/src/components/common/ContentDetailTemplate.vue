@@ -27,7 +27,7 @@
               <slot name="deleteButton" :item="item" :handleDelete="handleDelete">
                 <!-- Delete button - visible on desktop, hidden on mobile -->
                 <button
-                  v-if="showDeleteButton"
+                  v-if="shouldShowDeleteButton"
                   @click="handleDelete"
                   class="hidden sm:inline-flex btn-danger text-sm"
                 >
@@ -137,7 +137,7 @@
         <slot name="customSections" :item="item" />
 
         <!-- Audit trail section -->
-        <div v-if="showAuditTrail" class="detail-section">
+        <div v-if="showAuditTrail && permissions.canViewAuditTrail" class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
@@ -200,7 +200,7 @@
       <div class="flex space-x-3">
         <slot name="mobileActions" :item="item">
           <button
-            v-if="showDeleteButton"
+            v-if="shouldShowDeleteButton"
             @click="handleDelete"
             class="btn-danger flex-1 justify-center"
           >
@@ -242,6 +242,7 @@ import type { BaseContent } from '@clever/shared';
 import BackButton from './BackButton.vue';
 import ErrorComponent from './ErrorComponent.vue';
 import { useAuth } from '@/composables/useAuth';
+import { usePermissions } from '@/composables/usePermissions';
 
 interface DetailSection {
   key: string;
@@ -414,6 +415,14 @@ const clearError = () => {
 
 // Auth composable
 const { user } = useAuth();
+
+// Permissions composable
+const { permissions } = usePermissions();
+
+// Modify showDeleteButton to respect permissions
+const shouldShowDeleteButton = computed(() => {
+  return props.showDeleteButton && permissions.value.canDelete;
+});
 
 // User display name function
 const getUserDisplayName = (userId: string | undefined): string => {

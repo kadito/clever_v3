@@ -7,6 +7,7 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
 import { requireAuth, requireUserContext } from '../middleware/clerk';
+import { requireDeletePermission } from '../middleware/permissions';
 import { ContentStorageService } from '@clever/shared';
 import type { StorageBucket } from '@clever/shared';
 import type {
@@ -452,7 +453,7 @@ export function createContentRoutes<T extends BaseContent>(config: ContentRouteC
    * DELETE /api/content/{type}/{uuid}
    * Requirements: 4.5 - DELETE /api/content/{type}/{uuid} endpoint for soft deleting items
    */
-  router.delete('/:uuid', async (c: Context) => {
+  router.delete('/:uuid', requireDeletePermission, async (c: Context) => {
     try {
       const user = requireUserContext(c);
       const uuid = c.req.param('uuid');
