@@ -209,8 +209,6 @@ describe('Relation Detection Utilities', () => {
 
         expect(result).toEqual({
           numeroContrato: 'CT-2024-001',
-          dataInicio: '2024-01-01',
-          dataFim: '2024-12-31',
         });
       });
 
@@ -372,8 +370,6 @@ describe('Relation Detection Utilities', () => {
 
         const contractResult = extractBasicFields(testData, 'contracts');
         expect(contractResult).toHaveProperty('numeroContrato');
-        expect(contractResult).toHaveProperty('dataInicio');
-        expect(contractResult).toHaveProperty('dataFim');
 
         const licenseResult = extractBasicFields(testData, 'licenses');
         expect(licenseResult).toHaveProperty('versao');
@@ -414,8 +410,17 @@ describe('Relation Detection Utilities', () => {
     it('should have correct field definitions for contracts', () => {
       expect(BASIC_FIELD_DEFINITIONS.contracts).toEqual([
         'numeroContrato',
-        'dataInicio',
-        'dataFim',
+        'paymentFrequency',
+        'hasCPAContract',
+        'cpaContractType',
+        'planIdCPA',
+        'inicioContratoCPA',
+        'fimContratoCPA',
+        'hasSHContract',
+        'shContractType',
+        'planIdSH',
+        'inicioContratoSH',
+        'fimContratoSH',
       ]);
     });
   });
@@ -551,8 +556,6 @@ describe('Relation Resolution Utilities', () => {
         uuid: 'contract-uuid-456',
         contentType: 'contracts',
         numeroContrato: 'CT-2024-001',
-        dataInicio: '2024-01-01',
-        dataFim: '2024-12-31',
       });
     });
 

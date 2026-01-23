@@ -33,12 +33,10 @@ export interface RemoteAssistanceData {
   // Value Fields
   valorAssist: number; // Calculated value based on time and business rules
 
-  // Payment Method (new field)
-  paymentMethod?: 'Contrato' | 'Faturação' | 'Garantia' | '';
+  // Payment Method (required field)
+  paymentMethod: 'Contrato' | 'Faturação' | 'Garantia' | '';
 
   // Status Fields
-  contrato: boolean;
-  garantia: boolean;
   resolvido: boolean; // Required field
   relatorio?: string; // Conditional field - required when resolvido is false
   anexos: string;
@@ -82,8 +80,7 @@ export interface RemoteAssistanceDisplayData {
   tecnicoResponsavel: string; // Display name extracted from TechnicianUser object
   dataAssistencia: string;
   valorAssist: number;
-  contrato: boolean;
-  garantia: boolean;
+  paymentMethod: string; // Display payment method
   resolvido: boolean;
   motivoPedido: string;
   createdAt: string;
@@ -102,8 +99,6 @@ export interface RemoteAssistanceSearchFilters {
   dataAssistenciaTo?: string;
   paymentMethod?: 'Contrato' | 'Faturação' | 'Garantia';
   contractId?: string;
-  contrato?: boolean;
-  garantia?: boolean;
   resolvido?: boolean;
   valorMin?: number;
   valorMax?: number;

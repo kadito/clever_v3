@@ -230,8 +230,7 @@ export function isBusinessHours(hour: number): boolean {
 export function calculateAssistanceValueWithBusinessHours(
   startTime: string,
   endTime: string,
-  isContract: boolean = false,
-  isWarranty: boolean = false
+  paymentMethod?: 'Contrato' | 'Faturação' | 'Garantia' | ''
 ): ValueCalculationResult {
   const result: ValueCalculationResult = {
     totalValue: 0,
@@ -243,8 +242,8 @@ export function calculateAssistanceValueWithBusinessHours(
     breakdown: [],
   };
 
-  // If contract or warranty, value should be 0
-  if (isContract || isWarranty) {
+  // If payment method is Contrato or Garantia, value should be 0
+  if (paymentMethod === 'Contrato' || paymentMethod === 'Garantia') {
     return result;
   }
 
@@ -313,8 +312,7 @@ export function calculateAssistanceValueWithBusinessHours(
 export function calculateAssistanceValue(
   startTime: string,
   endTime: string,
-  isContract: boolean = false,
-  isWarranty: boolean = false
+  paymentMethod?: 'Contrato' | 'Faturação' | 'Garantia' | ''
 ): ValueCalculationResult {
   const result: ValueCalculationResult = {
     totalValue: 0,
@@ -326,8 +324,8 @@ export function calculateAssistanceValue(
     breakdown: [],
   };
 
-  // If contract or warranty, value should be 0
-  if (isContract || isWarranty) {
+  // If payment method is Contrato or Garantia, value should be 0
+  if (paymentMethod === 'Contrato' || paymentMethod === 'Garantia') {
     return result;
   }
 
@@ -458,12 +456,11 @@ export function validateRemoteAssistanceCreation(data: RemoteAssistanceCreationD
     errors.push(...sequenceErrors);
   }
 
-  // Payment method validation
-  if (data.paymentMethod) {
-    const validPaymentMethods = ['Contrato', 'Faturação', 'Garantia', ''];
-    if (!validPaymentMethods.includes(data.paymentMethod)) {
-      errors.push('Método de pagamento inválido');
-    }
+  // Payment method validation (required field)
+  if (!data.paymentMethod) {
+    errors.push('Método de pagamento é obrigatório');
+  } else if (data.paymentMethod !== 'Contrato' && data.paymentMethod !== 'Faturação' && data.paymentMethod !== 'Garantia') {
+    errors.push('Método de pagamento inválido. Deve ser: Contrato, Faturação ou Garantia');
   }
 
   // Contract validation
@@ -560,6 +557,24 @@ export function validateRemoteAssistanceUpdate(data: RemoteAssistanceUpdateData)
     errors.push(...sequenceErrors);
   }
 
+  // Payment method validation (required field if being updated)
+  if (data.paymentMethod !== undefined) {
+    if (!data.paymentMethod) {
+      errors.push('Método de pagamento é obrigatório');
+    } else if (data.paymentMethod !== 'Contrato' && data.paymentMethod !== 'Faturação' && data.paymentMethod !== 'Garantia') {
+      errors.push('Método de pagamento inválido. Deve ser: Contrato, Faturação ou Garantia');
+    }
+  }
+
+  // Contract ID validation (conditional - required when payment method is Contrato)
+  if (data.paymentMethod === 'Contrato') {
+    if (!data.contractId || data.contractId.trim() === '') {
+      errors.push('Contrato é obrigatório quando o método de pagamento é "Contrato"');
+    } else if (!isValidUUID(data.contractId)) {
+      errors.push('ID do contrato inválido');
+    }
+  }
+
   // Validate resolvido field (required if being updated)
   if (data.resolvido !== undefined && data.resolvido === null) {
     errors.push('Estado de resolução não pode estar vazio');
@@ -637,8 +652,11 @@ export function getRemoteAssistanceSummary(data: RemoteAssistanceData): {
 } {
   const status: string[] = [];
 
-  if (data.contrato) status.push('Contrato');
-  if (data.garantia) status.push('Garantia');
+  // Add payment method to status (only if it's a valid value)
+  if (data.paymentMethod === 'Contrato' || data.paymentMethod === 'Faturação' || data.paymentMethod === 'Garantia') {
+    status.push(data.paymentMethod);
+  }
+  
   if (data.resolvido) status.push('Resolvido');
 
   const duration = calculateTotalHours(data.inicioAssistencia, data.fimAssistencia);
@@ -655,9 +673,10 @@ export function getRemoteAssistanceSummary(data: RemoteAssistanceData): {
 
 /**
  * Check if assistance has billable value
+ * Assistance is billable when payment method is "Faturação" and has a value > 0
  */
 export function hasBillableValue(data: RemoteAssistanceData): boolean {
-  return !data.contrato && !data.garantia && data.valorAssist > 0;
+  return data.paymentMethod === 'Faturação' && data.valorAssist > 0;
 }
 
 /**
@@ -666,16 +685,21 @@ export function hasBillableValue(data: RemoteAssistanceData): boolean {
 export function formatTimeForDisplay(timeString: string): string {
   if (!timeString) return 'N/A';
 
+  // If it's already in HH:MM format, return as is
+  if (/^([01]?[0-9]|2[0-3]):([0-5][0-9])$/.test(timeString)) {
+    return timeString;
+  }
+
+  // Try to parse as a date string
   try {
     const date = new Date(timeString);
+    if (isNaN(date.getTime())) {
+      return 'N/A';
+    }
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
   } catch (error) {
-    // If it's already in HH:MM format, return as is
-    if (/^([01]?[0-9]|2[0-4]):([0-5][0-9])$/.test(timeString)) {
-      return timeString;
-    }
     return 'N/A';
   }
 }

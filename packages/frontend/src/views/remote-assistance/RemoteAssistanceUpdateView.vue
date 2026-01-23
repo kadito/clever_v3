@@ -167,7 +167,7 @@
 
             <!-- Pricing breakdown (only if not contract/warranty) -->
             <div
-              v-if="!slotFormData?.contrato && !slotFormData?.garantia && pricingBreakdown"
+              v-if="slotFormData?.paymentMethod !== 'Contrato' && slotFormData?.paymentMethod !== 'Garantia' && pricingBreakdown"
               class="pricing-breakdown"
             >
               <div class="pricing-table">
@@ -198,7 +198,7 @@
 
             <!-- Contract/Warranty notice -->
             <div
-              v-else-if="slotFormData?.contrato || slotFormData?.garantia"
+              v-else-if="slotFormData?.paymentMethod === 'Contrato' || slotFormData?.paymentMethod === 'Garantia'"
               class="no-charge-notice"
             >
               <svg
@@ -216,7 +216,7 @@
               </svg>
               <span class="text-green-700 font-medium">
                 {{
-                  slotFormData?.contrato
+                  slotFormData?.paymentMethod === 'Contrato'
                     ? 'Assistência coberta por contrato'
                     : 'Assistência coberta por garantia'
                 }}
@@ -250,6 +250,7 @@
           <ContractSearchInput
             :model-value="formData?.contractId || ''"
             :client-id="formData?.clientId || ''"
+            :selected-contract="selectedContract"
             :has-error="!!error"
             @update:model-value="value => updateFieldValue('contractId', value)"
             @contract-selected="handleContractSelected"
@@ -267,7 +268,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import type { RemoteAssistance, RemoteAssistanceUpdateData, Client } from '@clever/shared';
+import type { Client, ContentWithRelations } from '@clever/shared';
+import type { RemoteAssistance, RemoteAssistanceUpdateData } from '@clever/shared';
 import {
   validateAndFormatTime,
   validateTimeSequence,
@@ -293,7 +295,7 @@ const {
   currentItem,
   loading: apiLoading,
   error: apiError,
-} = useApi<RemoteAssistance>('remote-assistance');
+} = useApi<ContentWithRelations<RemoteAssistance['data']>>('remote-assistance');
 
 // Form data management
 const { formData: currentFormData, updateFieldValue } = useSharedFormData(
@@ -302,6 +304,7 @@ const { formData: currentFormData, updateFieldValue } = useSharedFormData(
 
 // State - use API composable state
 const selectedClient = ref<Client | null>(null);
+const selectedContract = ref<Contract | null>(null);
 
 // Computed - use currentItem from API composable
 const remoteAssistance = computed(() => currentItem.value);
@@ -340,9 +343,10 @@ const initialFormData = computed(() => {
     // Values
     valorAssist: data.valorAssist || 0,
 
+    // Payment method
+    paymentMethod: data.paymentMethod || '',
+
     // Status
-    contrato: data.contrato || false,
-    garantia: data.garantia || false,
     resolvido: data.resolvido || false,
 
     // Attachments
@@ -366,22 +370,16 @@ const loadRemoteAssistance = async () => {
       typeof currentItem.value.relations.client === 'object' &&
       'nomeEmpresa' in currentItem.value.relations.client
     ) {
-      selectedClient.value = {
-        uuid: currentItem.value.relations.client.uuid,
-        nomeEmpresa: currentItem.value.relations.client.nomeEmpresa,
-        contribuinte: currentItem.value.relations.client.contribuinte || '',
-        // Add other required Client fields with defaults
-        contacto: '',
-        email: '',
-        morada: '',
-        codigoPostal: '',
-        localidade: '',
-        telefone: '',
-        telemovel: '',
-        fax: '',
-        website: '',
-        observacoes: '',
-      } as Client;
+      selectedClient.value = currentItem.value.relations.client as unknown as Client;
+    }
+
+    // Set selected contract if relation exists
+    if (
+      currentItem.value.relations?.contract &&
+      typeof currentItem.value.relations.contract === 'object' &&
+      'uuid' in currentItem.value.relations.contract
+    ) {
+      selectedContract.value = currentItem.value.relations.contract as Contract;
     }
   }
 };
@@ -444,6 +442,7 @@ const handleClientSelected = (client: Client | null) => {
 
 const handleContractSelected = (contract: Contract | null) => {
   console.log('Contract selected:', JSON.stringify(contract, null, 2));
+  selectedContract.value = contract;
   // Contract ID is already updated via v-model
 };
 
@@ -452,9 +451,10 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
     // Transform form data to RemoteAssistanceUpdateData format for validation
     const remoteAssistanceData: RemoteAssistanceUpdateData = {
       clientId: data.clientId || '',
+      contractId: data.contractId,
       tipoAssistencia: data.tipoAssistencia || '',
       // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
-      tecnicoResponsavel: '', // Will be populated by backend auto-assignment
+      // We don't include it in the validation data as it will be populated by backend
       dataPedido: data.dataPedido || '',
       dataAssistencia: data.dataAssistencia || '',
       inicioAssistencia: data.inicioAssistencia || '',
@@ -464,8 +464,7 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
       relatorioAssistencia: data.relatorioAssistencia || '',
       relatorio: data.relatorio || '',
       valorAssist: data.valorAssist || 0,
-      contrato: data.contrato || false,
-      garantia: data.garantia || false,
+      paymentMethod: data.paymentMethod || '',
       resolvido: data.resolvido,
       anexos: data.anexos || '',
     };
@@ -604,7 +603,7 @@ const handleUpdate = async (formData: Record<string, any>) => {
       contractId: formData.contractId, // Include contractId
       tipoAssistencia: formData.tipoAssistencia || '',
       // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
-      tecnicoResponsavel: '', // Will be populated by backend auto-assignment
+      // We don't include it in the update data as it will be populated by backend
       dataPedido: formData.dataPedido || '',
       dataAssistencia: formData.dataAssistancia || '',
       inicioAssistencia: formData.inicioAssistencia || '',
@@ -614,15 +613,14 @@ const handleUpdate = async (formData: Record<string, any>) => {
       relatorioAssistencia: formData.relatorioAssistencia || '',
       relatorio: formData.relatorio || '',
       valorAssist: formData.valorAssist || 0,
-      contrato: formData.contrato || false,
-      garantia: formData.garantia || false,
+      paymentMethod: formData.paymentMethod || '',
       resolvido: formData.resolvido || false,
       anexos: formData.anexos || '',
     };
 
     const updatedRemoteAssistance = await update(remoteAssistance.value.uuid, {
       data: updateData,
-    } as Partial<RemoteAssistance>);
+    } as Partial<ContentWithRelations<RemoteAssistance['data']>>);
 
     if (updatedRemoteAssistance) {
       router.push(`/remote-assistance/${remoteAssistance.value.uuid}`);
@@ -656,8 +654,7 @@ const pricingBreakdown = computed(() => {
   return calculateAssistanceValueWithBusinessHours(
     currentFormDataValue.inicioAssistencia,
     currentFormDataValue.fimAssistencia,
-    currentFormDataValue.contrato || false,
-    currentFormDataValue.garantia || false
+    currentFormDataValue.paymentMethod
   );
 });
 
@@ -687,17 +684,15 @@ watch(
   () => [
     currentFormData.value?.inicioAssistencia,
     currentFormData.value?.fimAssistencia,
-    currentFormData.value?.contrato,
-    currentFormData.value?.garantia,
+    currentFormData.value?.paymentMethod,
   ],
-  ([startTime, endTime, isContract, isWarranty]) => {
+  ([startTime, endTime, paymentMethod]) => {
     if (startTime && endTime) {
       // Use the new business hours calculation logic
       const valueCalculation = calculateAssistanceValueWithBusinessHours(
         startTime,
         endTime,
-        isContract || false,
-        isWarranty || false
+        paymentMethod
       );
 
       updateFieldValue('valorAssist', valueCalculation.totalValue);
@@ -723,18 +718,24 @@ watch(
   }
 );
 
-// Clear value when contract/warranty status changes
+// Clear value when payment method changes
 watch(
-  () => [currentFormData.value?.contrato, currentFormData.value?.garantia],
-  ([isContract, isWarranty]) => {
+  () => currentFormData.value?.paymentMethod,
+  (paymentMethod, oldPaymentMethod) => {
     const currentFormDataValue = currentFormData.value;
+    
+    // Clear contractId when payment method changes from "Contrato" to other values
+    if (oldPaymentMethod === 'Contrato' && paymentMethod !== 'Contrato') {
+      updateFieldValue('contractId', '');
+      selectedContract.value = null;
+    }
+    
     if (currentFormDataValue?.inicioAssistencia && currentFormDataValue?.fimAssistencia) {
       // Use the new business hours calculation logic
       const valueCalculation = calculateAssistanceValueWithBusinessHours(
         currentFormDataValue.inicioAssistencia,
         currentFormDataValue.fimAssistencia,
-        isContract || false,
-        isWarranty || false
+        paymentMethod
       );
 
       updateFieldValue('valorAssist', valueCalculation.totalValue);

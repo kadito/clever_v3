@@ -57,6 +57,12 @@ export const CONTENT_RELATION_CONFIGS: Record<string, RelationFieldConfig[]> = {
       required: false, // Optional - work sheets can exist without client reference
       displayName: 'Cliente',
     },
+    {
+      fieldName: 'contractId',
+      targetType: 'contracts',
+      required: false, // Optional - only required when payment method is "CONTRATO"
+      displayName: 'Contrato',
+    },
   ],
   'remote-assistance': [
     {
@@ -64,6 +70,12 @@ export const CONTENT_RELATION_CONFIGS: Record<string, RelationFieldConfig[]> = {
       targetType: 'clients',
       required: false, // Optional - remote assistance can exist without client reference
       displayName: 'Cliente',
+    },
+    {
+      fieldName: 'contractId',
+      targetType: 'contracts',
+      required: false, // Optional - only required when paymentMethod is "Contrato"
+      displayName: 'Contrato',
     },
   ],
   'daily-records': [

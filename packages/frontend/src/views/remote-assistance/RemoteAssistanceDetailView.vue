@@ -157,6 +157,19 @@
             </div>
             <div class="p-4 sm:p-6">
               <div class="space-y-4">
+                <!-- Payment Method Display -->
+                <div v-if="item.data.paymentMethod" class="detail-item">
+                  <label class="detail-label">Método de Pagamento</label>
+                  <div class="detail-value">
+                    <span
+                      class="payment-method-badge"
+                      :class="getPaymentMethodClass(item.data.paymentMethod)"
+                    >
+                      {{ item.data.paymentMethod }}
+                    </span>
+                  </div>
+                </div>
+
                 <!-- Main value display -->
                 <div class="value-display-card">
                   <div class="flex items-center justify-between">
@@ -168,14 +181,6 @@
                           >(sem custo)</span
                         >
                       </div>
-                    </div>
-                    <div class="value-status">
-                      <span v-if="item.data.contrato" class="status-badge status-badge--contract">
-                        Contrato
-                      </span>
-                      <span v-if="item.data.garantia" class="status-badge status-badge--warranty">
-                        Garantia
-                      </span>
                     </div>
                   </div>
                 </div>
@@ -228,6 +233,55 @@
                     {{ formatCurrency(REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS) }}/hora (fora
                     do horário comercial)
                   </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Section -->
+        <div class="detail-section">
+          <div class="bg-white rounded-touch border border-gray-200">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+            >
+              <h2 class="text-lg font-semibold text-gray-900">Estado</h2>
+            </div>
+            <div class="p-4 sm:p-6">
+              <div class="status-grid">
+                <div class="status-item">
+                  <label class="status-label">Resolvido</label>
+                  <div class="status-value" :class="{ active: item.data.resolvido }">
+                    <svg
+                      v-if="item.data.resolvido"
+                      class="w-4 h-4 text-green-500 inline mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    <svg
+                      v-else
+                      class="w-4 h-4 text-orange-500 inline mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    {{ item.data.resolvido ? 'Sim' : 'Pendente' }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -339,123 +393,6 @@
                   <label class="detail-label">Frequência de Pagamento</label>
                   <div class="detail-value">
                     {{ remoteAssistance.relations.contract.paymentFrequency }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Status Section -->
-        <div class="detail-section">
-          <div class="bg-white rounded-touch border border-gray-200">
-            <div
-              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
-            >
-              <h2 class="text-lg font-semibold text-gray-900">Estado</h2>
-            </div>
-            <div class="p-4 sm:p-6">
-              <div class="status-grid">
-                <div class="status-item">
-                  <label class="status-label">Contrato</label>
-                  <div class="status-value" :class="{ active: item.data.contrato }">
-                    <svg
-                      v-if="item.data.contrato"
-                      class="w-4 h-4 text-green-500 inline mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <svg
-                      v-else
-                      class="w-4 h-4 text-gray-400 inline mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                    {{ item.data.contrato ? 'Sim' : 'Não' }}
-                  </div>
-                </div>
-                <div class="status-item">
-                  <label class="status-label">Garantia</label>
-                  <div class="status-value" :class="{ active: item.data.garantia }">
-                    <svg
-                      v-if="item.data.garantia"
-                      class="w-4 h-4 text-green-500 inline mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <svg
-                      v-else
-                      class="w-4 h-4 text-gray-400 inline mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                    {{ item.data.garantia ? 'Sim' : 'Não' }}
-                  </div>
-                </div>
-                <div class="status-item">
-                  <label class="status-label">Resolvido</label>
-                  <div class="status-value" :class="{ active: item.data.resolvido }">
-                    <svg
-                      v-if="item.data.resolvido"
-                      class="w-4 h-4 text-green-500 inline mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <svg
-                      v-else
-                      class="w-4 h-4 text-orange-500 inline mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    {{ item.data.resolvido ? 'Sim' : 'Pendente' }}
                   </div>
                 </div>
               </div>
@@ -583,12 +520,8 @@ const getRemoteAssistanceStatus = (item: BaseContent | null): string => {
     status.push('Pendente');
   }
 
-  if (assistance.data.contrato) {
-    status.push('Contrato');
-  } else if (assistance.data.garantia) {
-    status.push('Garantia');
-  } else {
-    status.push('Faturável');
+  if (assistance.data.paymentMethod) {
+    status.push(assistance.data.paymentMethod);
   }
 
   return status.join(' • ');
@@ -634,6 +567,16 @@ const getAssistanceTypeClass = (type: string): string => {
   };
 
   return typeClasses[type] || 'assistance-type-badge--default';
+};
+
+const getPaymentMethodClass = (method: string): string => {
+  const methodClasses: Record<string, string> = {
+    Contrato: 'payment-method-badge--contract',
+    Faturação: 'payment-method-badge--billing',
+    Garantia: 'payment-method-badge--warranty',
+  };
+
+  return methodClasses[method] || 'payment-method-badge--default';
 };
 
 // Helper function to extract technician display name from TechnicianUser object
@@ -877,6 +820,26 @@ onMounted(() => {
 
 .assistance-type-badge--default {
   @apply bg-gray-100 text-gray-800;
+}
+
+.payment-method-badge {
+  @apply px-3 py-1 rounded-full text-sm font-medium inline-flex items-center;
+}
+
+.payment-method-badge--contract {
+  @apply bg-green-100 text-green-800 border border-green-200;
+}
+
+.payment-method-badge--billing {
+  @apply bg-blue-100 text-blue-800 border border-blue-200;
+}
+
+.payment-method-badge--warranty {
+  @apply bg-purple-100 text-purple-800 border border-purple-200;
+}
+
+.payment-method-badge--default {
+  @apply bg-gray-100 text-gray-800 border border-gray-200;
 }
 
 .duration-display {

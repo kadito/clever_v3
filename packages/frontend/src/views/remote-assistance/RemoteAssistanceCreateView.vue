@@ -150,9 +150,9 @@
             </div>
           </div>
 
-          <!-- Pricing breakdown (only if not contract/warranty) -->
+          <!-- Pricing breakdown (only if payment method is Faturação) -->
           <div
-            v-if="!slotFormData?.contrato && !slotFormData?.garantia && pricingBreakdown"
+            v-if="slotFormData?.paymentMethod === 'Faturação' && pricingBreakdown"
             class="pricing-breakdown"
           >
             <div class="pricing-table">
@@ -181,7 +181,7 @@
 
           <!-- Contract/Warranty notice -->
           <div
-            v-else-if="slotFormData?.contrato || slotFormData?.garantia"
+            v-else-if="slotFormData?.paymentMethod === 'Contrato' || slotFormData?.paymentMethod === 'Garantia'"
             class="no-charge-notice"
           >
             <svg
@@ -199,7 +199,7 @@
             </svg>
             <span class="text-green-700 font-medium">
               {{
-                slotFormData?.contrato
+                slotFormData?.paymentMethod === 'Contrato'
                   ? 'Assistência coberta por contrato'
                   : 'Assistência coberta por garantia'
               }}
@@ -252,7 +252,6 @@ import type { RemoteAssistanceCreationData, Client } from '@clever/shared';
 import {
   validateAndFormatTime,
   validateTimeSequence,
-  calculateTotalHours,
   calculateRoundedTotalHours,
   calculateAssistanceValueWithBusinessHours,
   REMOTE_ASSISTANCE_CONSTANTS,
@@ -360,12 +359,11 @@ const pricingBreakdown = computed(() => {
     return null;
   }
 
-  // Use the new business hours calculation logic
+  // Use the new business hours calculation logic with payment method
   return calculateAssistanceValueWithBusinessHours(
     currentFormData.inicioAssistencia,
     currentFormData.fimAssistencia,
-    currentFormData.contrato || false,
-    currentFormData.garantia || false
+    currentFormData.paymentMethod
   );
 });
 
@@ -406,8 +404,8 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
       relatorioAssistencia: data.relatorioAssistencia || '',
       relatorio: data.relatorio || '',
       valorAssist: data.valorAssist || 0,
-      contrato: data.contrato || false,
-      garantia: data.garantia || false,
+      paymentMethod: data.paymentMethod || '',
+      contractId: data.contractId || '',
       resolvido: data.resolvido,
       anexos: data.anexos || '',
     };
@@ -475,6 +473,24 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
       errors.push(...sequenceErrors);
     }
 
+    // Payment method validation
+    if (!remoteAssistanceData.paymentMethod) {
+      errors.push('Método de pagamento é obrigatório');
+    } else if (
+      remoteAssistanceData.paymentMethod !== 'Contrato' &&
+      remoteAssistanceData.paymentMethod !== 'Faturação' &&
+      remoteAssistanceData.paymentMethod !== 'Garantia'
+    ) {
+      errors.push('Método de pagamento inválido. Deve ser: Contrato, Faturação ou Garantia');
+    }
+
+    // Contract ID validation (conditional - required when payment method is Contrato)
+    if (remoteAssistanceData.paymentMethod === 'Contrato') {
+      if (!remoteAssistanceData.contractId || remoteAssistanceData.contractId.trim() === '') {
+        errors.push('Contrato é obrigatório quando o método de pagamento é "Contrato"');
+      }
+    }
+
     // Validate resolvido field (required)
     if (remoteAssistanceData.resolvido === undefined || remoteAssistanceData.resolvido === null) {
       errors.push('Por favor, indique se o problema foi resolvido');
@@ -517,6 +533,12 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
         fieldErrors.fimAssistencia = errorMessage.replace('Fim da assistência: ', '');
       } else if (errorMessage.includes('Fim da assistência deve ser posterior ao início')) {
         fieldErrors.fimAssistencia = errorMessage;
+      } else if (errorMessage.includes('Método de pagamento é obrigatório')) {
+        fieldErrors.paymentMethod = errorMessage;
+      } else if (errorMessage.includes('Método de pagamento inválido')) {
+        fieldErrors.paymentMethod = errorMessage;
+      } else if (errorMessage.includes('Contrato é obrigatório')) {
+        fieldErrors.contractId = errorMessage;
       } else if (errorMessage.includes('indique se o problema foi resolvido')) {
         fieldErrors.resolvido = errorMessage;
       } else if (errorMessage.includes('Relatório final é obrigatório')) {
@@ -556,8 +578,8 @@ const handleCreateSuccess = async (formData: Record<string, any>) => {
       relatorioAssistencia: formData.relatorioAssistencia || '',
       relatorio: formData.relatorio || '',
       valorAssist: formData.valorAssist || 0,
-      contrato: formData.contrato || false,
-      garantia: formData.garantia || false,
+      paymentMethod: formData.paymentMethod || '',
+      contractId: formData.contractId || '',
       resolvido: formData.resolvido || false,
       anexos: formData.anexos || '',
     };
@@ -583,17 +605,15 @@ watch(
   () => [
     formData.value?.inicioAssistencia,
     formData.value?.fimAssistencia,
-    formData.value?.contrato,
-    formData.value?.garantia,
+    formData.value?.paymentMethod,
   ],
-  ([startTime, endTime, isContract, isWarranty]) => {
+  ([startTime, endTime, paymentMethod]) => {
     if (startTime && endTime) {
-      // Use the new business hours calculation logic
+      // Use the new business hours calculation logic with payment method
       const calculationResult = calculateAssistanceValueWithBusinessHours(
         startTime,
         endTime,
-        isContract || false,
-        isWarranty || false
+        paymentMethod as 'Contrato' | 'Faturação' | 'Garantia' | ''
       );
 
       updateFieldValue('valorAssist', calculationResult.totalValue);
@@ -613,27 +633,18 @@ watch(
 watch(
   () => formData.value?.resolvido,
   newValue => {
-    if (!newValue) {
+    if (newValue !== false) {
       updateFieldValue('relatorio', '');
     }
   }
 );
 
-// Clear value when contract/warranty status changes
+// Clear contractId when payment method changes from Contrato to other values
 watch(
-  () => [formData.value?.contrato, formData.value?.garantia],
-  ([isContract, isWarranty]) => {
-    const currentFormData = formData.value;
-    if (currentFormData?.inicioAssistencia && currentFormData?.fimAssistencia) {
-      // Use the new business hours calculation logic
-      const calculationResult = calculateAssistanceValueWithBusinessHours(
-        currentFormData.inicioAssistencia,
-        currentFormData.fimAssistencia,
-        isContract || false,
-        isWarranty || false
-      );
-
-      updateFieldValue('valorAssist', calculationResult.totalValue);
+  () => formData.value?.paymentMethod,
+  (newValue, oldValue) => {
+    if (oldValue === 'Contrato' && newValue !== 'Contrato') {
+      updateFieldValue('contractId', '');
     }
   }
 );

@@ -109,24 +109,8 @@ export const remoteAssistanceFormSections: FormSection[] = [
   {
     key: 'status',
     title: 'Estado',
-    description: 'Estado da assistência e tipo de cobrança',
+    description: 'Estado da assistência',
     fields: [
-      {
-        key: 'contrato',
-        label: 'Contrato',
-        type: 'switch',
-        fullWidth: false,
-        switchLabel: 'Assistência coberta por contrato',
-        defaultValue: false,
-      },
-      {
-        key: 'garantia',
-        label: 'Garantia',
-        type: 'switch',
-        fullWidth: false,
-        switchLabel: 'Assistência coberta por garantia',
-        defaultValue: false,
-      },
       {
         key: 'resolvido',
         label: 'Resolvido',
@@ -176,11 +160,14 @@ export const remoteAssistanceFormSections: FormSection[] = [
         key: 'contractId',
         label: 'Contrato',
         type: 'custom',
-        required: true,
         fullWidth: true,
         conditional: {
           dependsOn: 'paymentMethod',
           showWhen: (value: any) => value === 'Contrato',
+        },
+        conditionalRequired: {
+          dependsOn: 'paymentMethod',
+          requiredWhen: (value: any) => value === 'Contrato',
         },
       },
     ],

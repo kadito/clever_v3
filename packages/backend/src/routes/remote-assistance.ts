@@ -70,8 +70,6 @@ function validateRemoteAssistanceCreate(requestData: any, userContext?: UserCont
     relatorio: remoteAssistanceData.relatorio || '',
     valorAssist: remoteAssistanceData.valorAssist || 0,
     paymentMethod: remoteAssistanceData.paymentMethod, // Include paymentMethod field
-    contrato: remoteAssistanceData.contrato || false,
-    garantia: remoteAssistanceData.garantia || false,
     resolvido: remoteAssistanceData.resolvido || false,
     anexos: remoteAssistanceData.anexos || '',
   };
@@ -184,8 +182,8 @@ function createRemoteAssistanceSearchText(data: RemoteAssistanceData): string {
   if (data.relatorio) searchTerms.push(data.relatorio.toLowerCase());
 
   // Status indicators
-  if (data.contrato) searchTerms.push('contrato');
-  if (data.garantia) searchTerms.push('garantia');
+  if (data.paymentMethod === 'Contrato') searchTerms.push('contrato');
+  if (data.paymentMethod === 'Garantia') searchTerms.push('garantia');
   if (data.resolvido) searchTerms.push('resolvido', 'completo');
 
   // Value-related terms
@@ -278,8 +276,7 @@ remoteAssistanceConfig.extractIndexFields = (content: RemoteAssistance) => {
     hasBillableValue: hasBillableValue(data),
 
     // Status flags
-    contrato: data.contrato || false,
-    garantia: data.garantia || false,
+    paymentMethod: data.paymentMethod || '',
     resolvido: data.resolvido || false,
 
     // Summary information
@@ -291,8 +288,8 @@ remoteAssistanceConfig.extractIndexFields = (content: RemoteAssistance) => {
     duration: summary.duration,
 
     // Calculated fields for filtering
-    isContract: data.contrato,
-    isWarranty: data.garantia,
+    isContract: data.paymentMethod === 'Contrato',
+    isWarranty: data.paymentMethod === 'Garantia',
     isResolved: data.resolvido,
     isBillable: hasBillableValue(data),
 
@@ -305,8 +302,7 @@ remoteAssistanceConfig.extractIndexFields = (content: RemoteAssistance) => {
         ? calculateAssistanceValue(
             data.inicioAssistencia,
             data.fimAssistencia,
-            data.contrato,
-            data.garantia
+            data.paymentMethod
           ).businessHoursValue
         : 0,
     afterHoursValue:
@@ -314,8 +310,7 @@ remoteAssistanceConfig.extractIndexFields = (content: RemoteAssistance) => {
         ? calculateAssistanceValue(
             data.inicioAssistencia,
             data.fimAssistencia,
-            data.contrato,
-            data.garantia
+            data.paymentMethod
           ).afterHoursValue
         : 0,
   };
@@ -337,7 +332,7 @@ remoteAssistanceRouter.route('/', crudRoutes);
 remoteAssistanceRouter.post('/calculate-value', async c => {
   try {
     const requestData = await c.req.json();
-    const { inicioAssistencia, fimAssistencia, contrato = false, garantia = false } = requestData;
+    const { inicioAssistencia, fimAssistencia, paymentMethod = '' } = requestData;
 
     if (!inicioAssistencia || !fimAssistencia) {
       return c.json(
@@ -370,8 +365,7 @@ remoteAssistanceRouter.post('/calculate-value', async c => {
     const calculation = calculateAssistanceValue(
       startTimeValidation.formattedTime || inicioAssistencia,
       endTimeValidation.formattedTime || fimAssistencia,
-      contrato,
-      garantia
+      paymentMethod
     );
 
     return c.json({
