@@ -75,6 +75,18 @@ and R2 for JSON document storage.
 - **Form Simplification**: Remove manual technician selection fields from forms while preserving display functionality
 - **Backward Compatibility**: Handle both string and object formats during data transitions
 
+### User Permissions System
+
+- **Role-Based Access Control**: Two roles - Admin (full access) and User/Employee (restricted access)
+- **Shared Permission Logic**: All permission checks use utilities from @clever/shared package
+- **Frontend Integration**: `usePermissions()` composable provides reactive permission checks for UI
+- **Backend Protection**: Middleware functions enforce permissions at API level
+- **Defense in Depth**: Permissions enforced at both UI layer (UX) and API layer (security)
+- **Fail Closed**: Deny all permissions when userType is unavailable or null
+- **Current Restrictions**: Users cannot delete content or view audit trails (Histórico sections)
+- **No Data Migration**: Uses existing userType field from Clerk authentication
+- **Consistent Enforcement**: Same permission logic applied across all content types
+
 ### Backend
 
 - **Cloudflare Workers** serverless runtime

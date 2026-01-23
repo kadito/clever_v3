@@ -28,7 +28,14 @@ Phase 2: Core Features
   - Remote Assistance → Client relations
 - Schema validation
 - Comprehensive testing
-- User permissions (Admin/Employee)
+- User Permissions System:
+  - Role-based access control (Admin/User)
+  - Delete operation restrictions for User role
+  - Audit trail visibility restrictions for User role
+  - Shared permission utilities in @clever/shared
+  - Frontend usePermissions composable
+  - Backend permission middleware
+  - Consistent enforcement across all content types
 
 Phase 3: Advanced Features
 

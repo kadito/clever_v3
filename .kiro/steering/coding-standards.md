@@ -154,3 +154,19 @@ Delete Functionality Patterns:
 - Use comprehensive error handling with structured logging (JSON.stringify for
   objects)
 - Follow established ConfirmationDialog component patterns for consistency
+
+User Permissions Patterns:
+
+- Use shared permission utilities from @clever/shared for all permission checks
+- Frontend uses `usePermissions()` composable for reactive permission checks
+- Backend uses middleware functions for API endpoint protection
+- All permission logic centralized in shared package for consistency
+- Fail closed: deny permissions when userType is unavailable or null
+- Defense in depth: enforce permissions at both UI and API levels
+- Use v-if directives to completely remove restricted UI elements from DOM
+- Log all permission denials in backend for security auditing
+- Use Portuguese error messages for permission denials ("Não tem permissão...")
+- No additional API calls required - leverage existing authentication context
+- Current permissions: canDelete (Admin only), canViewAuditTrail (Admin only)
+- Apply permissions consistently across all content types
+- Combine permission checks with existing component props for backward compatibility
