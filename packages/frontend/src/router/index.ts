@@ -202,6 +202,17 @@ const router = createRouter({
     // Generate all content type routes
     ...generateContentRoutes(),
 
+    // Balance routes
+    {
+      path: '/balance/:clientId/transactions',
+      name: 'transaction-history',
+      component: () => import('../views/balance/TransactionHistoryView.vue'),
+      meta: {
+        title: 'Histórico de Transações',
+        requiresAuth: true,
+      },
+    },
+
     // Redirect old English routes to Portuguese routes for better UX
     {
       path: '/clients/create',

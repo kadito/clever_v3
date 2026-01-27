@@ -54,6 +54,36 @@
           </div>
         </div>
 
+        <!-- Balance Section -->
+        <div class="detail-section">
+          <div class="bg-white rounded-touch border border-gray-200">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch flex justify-between items-center"
+            >
+              <h2 class="text-lg font-semibold text-gray-900">Saldo e Contratos</h2>
+              <div class="flex gap-2">
+                <button
+                  v-if="permissions.canDelete"
+                  @click="handleRecalculateBalance"
+                  class="text-sm px-3 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700 transition-colors"
+                  :disabled="isRecalculating"
+                >
+                  {{ isRecalculating ? 'A recalcular...' : 'Recalcular' }}
+                </button>
+                <router-link
+                  :to="`/balance/${item.uuid}/transactions`"
+                  class="text-sm text-primary-600 hover:text-primary-800 underline"
+                >
+                  Ver Histórico
+                </router-link>
+              </div>
+            </div>
+            <div class="p-0">
+              <ClientBalanceDisplay :client-id="item.uuid" :key="balanceKey" />
+            </div>
+          </div>
+        </div>
+
         <!-- Contact Information Section -->
         <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
@@ -447,8 +477,10 @@ import { useRoute, useRouter } from 'vue-router';
 import type { Client, BaseContent } from '@clever/shared';
 import ContentDetailTemplate from '@/components/common/ContentDetailTemplate.vue';
 import ConfirmationDialog from '@/components/common/ConfirmationDialog.vue';
+import ClientBalanceDisplay from '@/components/balance/ClientBalanceDisplay.vue';
 import { useApi } from '@/composables/useApi';
 import { useErrorHandler } from '@/composables/useErrorHandler';
+import { usePermissions } from '@/composables/usePermissions';
 
 // Router
 const route = useRoute();
@@ -457,11 +489,13 @@ const router = useRouter();
 // Composables
 const api = useApi<Client>('clients');
 const errorHandler = useErrorHandler();
+const { permissions } = usePermissions();
 
 // State
 const client = ref<Client | null>(null);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
+const balanceKey = ref(0); // Key to force balance component refresh
 
 // AT Password visibility toggle
 const showATPassword = ref(false);
@@ -471,6 +505,9 @@ const isDeleting = ref(false);
 const showDeleteConfirm = ref(false);
 const confirmDeleteTitle = ref('Confirmar Eliminação');
 const confirmDeleteMessage = ref('');
+
+// Recalculation state
+const isRecalculating = ref(false);
 
 // Clear error function
 const clearError = () => {
@@ -606,6 +643,43 @@ const confirmDelete = async () => {
 
 const cancelDelete = () => {
   showDeleteConfirm.value = false;
+};
+
+// Balance recalculation
+const handleRecalculateBalance = async () => {
+  if (!client.value) return;
+
+  const confirmed = window.confirm(
+    'Tem a certeza que pretende recalcular o saldo deste cliente? Esta operação irá recalcular o saldo a partir de todas as transações.'
+  );
+
+  if (!confirmed) return;
+
+  isRecalculating.value = true;
+  error.value = null;
+
+  await fetch(`/api/balance/${client.value.uuid}/recalculate`, {
+    method: 'POST',
+  })
+    .then(async response => {
+      if (!response.ok) {
+        throw new Error('Erro ao recalcular saldo');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Balance recalculated:', JSON.stringify(data, null, 2));
+      // Force balance component to refresh
+      balanceKey.value++;
+      alert('Saldo recalculado com sucesso!');
+    })
+    .catch(err => {
+      console.error('Error recalculating balance:', JSON.stringify(err, null, 2));
+      error.value = err instanceof Error ? err.message : 'Erro ao recalcular saldo';
+    })
+    .finally(() => {
+      isRecalculating.value = false;
+    });
 };
 
 // Data loading

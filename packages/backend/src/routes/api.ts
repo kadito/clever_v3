@@ -18,6 +18,7 @@ import contractsRouter from './contracts';
 import workSheetsRouter from './work-sheets';
 import remoteAssistanceRouter from './remote-assistance';
 import dailyRecordsRouter from './daily-records';
+import balanceRouter from './balance-routes';
 import type { AppContext } from '../types/auth';
 import type {
   BaseContent,
@@ -135,6 +136,10 @@ api.route('/content/remote-assistance', remoteAssistanceRouter);
 
 // Daily Records route with date-based sorting and custom validation
 api.route('/content/daily-records', dailyRecordsRouter);
+
+// Balance routes for client balance information and reporting
+// Requirements: 8.1, 8.2, 8.3, 8.4, 9.1, 9.2, 9.3, 9.4, 9.5, 15.1, 15.2, 15.3, 15.4
+api.route('/balance', balanceRouter);
 
 // Generic routes for other content types using standard configuration with relation validation
 

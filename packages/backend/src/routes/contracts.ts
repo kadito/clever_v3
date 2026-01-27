@@ -1,10 +1,12 @@
 /**
  * Contracts API routes using the generic content route template
  * Implements full CRUD operations with contract-specific validation and sorting
- * Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6
+ * Integrates with balance system for automatic transaction processing
+ * Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 12.1, 12.2
  */
 
 import { Hono } from 'hono';
+import type { Context } from 'hono';
 import {
   createContentRoutes,
   createStandardContentConfig,
@@ -15,12 +17,18 @@ import type {
   ContractData,
   ContractCreationData,
   ContractUpdateData,
+  StorageBucket,
+  ApiResponse,
+  ContentWithRelations,
 } from '@clever/shared';
 import {
   getContractSummary,
   hasActiveContract,
   // Note: sanitizeContractData will be added when contract validation is fully implemented
 } from '@clever/shared';
+import { createBalanceService } from '../services/balance-service';
+import { createBalanceMiddleware } from '../middleware/balance-middleware';
+import { requireUserContext } from '../middleware/clerk';
 
 /**
  * Temporary direct implementation of contract validation to avoid import conflicts
@@ -313,5 +321,235 @@ contractConfig.validateUpdate = validateContractUpdateData;
 // Create and mount the generic CRUD routes
 const crudRoutes = createContentRoutes<Contract>(contractConfig);
 contractsRouter.route('/', crudRoutes);
+
+// ============================================================================
+// Balance System Integration
+// ============================================================================
+
+/**
+ * Override POST handler to integrate balance middleware
+ * Calls balance middleware after successful contract creation
+ * Requirements: 12.1 - Automatic balance processing on contract creation
+ */
+contractsRouter.post('/', async (c: Context) => {
+  try {
+    const user = requireUserContext(c);
+    const r2Bucket = c.env?.R2_BUCKET as StorageBucket;
+
+    if (!r2Bucket) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Storage not available',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 500);
+    }
+
+    // Parse and validate request
+    let requestData;
+    try {
+      requestData = await c.req.json();
+    } catch (error) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Invalid JSON body',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 400);
+    }
+
+    // Validate contract data
+    if (contractConfig.validateCreate) {
+      try {
+        await contractConfig.validateCreate(requestData, user);
+      } catch (validationError) {
+        const response: ApiResponse = {
+          success: false,
+          error: validationError instanceof Error ? validationError.message : 'Validation failed',
+          timestamp: new Date().toISOString(),
+        };
+        return c.json(response, 400);
+      }
+    }
+
+    // Create contract using storage service
+    const { ContentStorageService } = await import('@clever/shared');
+    const storage = new ContentStorageService<Contract>(r2Bucket, 'contracts');
+    const contentData = requestData.data || requestData;
+    const newContract = await storage.create(contentData, { userId: user.userId });
+
+    // Process balance update asynchronously (don't await - fire and forget)
+    // Requirements: 12.5 - Async processing doesn't block content creation
+    const balanceService = createBalanceService(r2Bucket);
+    const balanceMiddleware = createBalanceMiddleware(balanceService);
+    
+    console.log('CONTRACT CREATED - About to call balance middleware:', JSON.stringify({
+      contractId: newContract.uuid,
+      clientId: newContract.data.clientId,
+      userId: user.userId,
+      contractData: {
+        hasCPAContract: newContract.data.hasCPAContract,
+        hasSHContract: newContract.data.hasSHContract,
+        manutencoesPorAnoCPA: newContract.data.manutencoesPorAnoCPA,
+        deslocacoesPorAnoCPA: newContract.data.deslocacoesPorAnoCPA,
+        horasAssistenciaAnualCPA: newContract.data.horasAssistenciaAnualCPA,
+        manutencoesPorAnoSH: newContract.data.manutencoesPorAnoSH,
+        deslocacoesPorAnoSH: newContract.data.deslocacoesPorAnoSH,
+        horasAssistenciaAnualSH: newContract.data.horasAssistenciaAnualSH,
+      },
+    }, null, 2));
+    
+    // Call balance middleware hook without awaiting
+    balanceMiddleware.onContractCreated(newContract as unknown as Contract, user.userId)
+      .then(() => {
+        console.log('Balance middleware completed successfully for contract:', newContract.uuid);
+      })
+      .catch(error => {
+        console.error('Balance middleware error (contract creation):', JSON.stringify({
+          contractId: newContract.uuid,
+          clientId: newContract.data.clientId,
+          error: error instanceof Error ? {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+          } : String(error),
+        }, null, 2));
+      });
+
+    const response: ApiResponse<ContentWithRelations<any>> = {
+      success: true,
+      data: newContract,
+      timestamp: new Date().toISOString(),
+    };
+    return c.json(response, 201);
+  } catch (error) {
+    console.error('Error creating contract:', error);
+    const response: ApiResponse = {
+      success: false,
+      error: 'Failed to create contract',
+      timestamp: new Date().toISOString(),
+    };
+    return c.json(response, 500);
+  }
+});
+
+/**
+ * Override PUT handler to integrate balance middleware
+ * Calls balance middleware after successful contract update (for renovations)
+ * Requirements: 12.2 - Automatic balance processing on contract renovation
+ */
+contractsRouter.put('/:uuid', async (c: Context) => {
+  try {
+    const user = requireUserContext(c);
+    const uuid = c.req.param('uuid');
+    const r2Bucket = c.env?.R2_BUCKET as StorageBucket;
+
+    if (!r2Bucket) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Storage not available',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 500);
+    }
+
+    // Validate UUID format
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(uuid)) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Invalid UUID format',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 400);
+    }
+
+    // Parse request
+    let requestData;
+    try {
+      requestData = await c.req.json();
+    } catch (error) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Invalid JSON body',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 400);
+    }
+
+    // Get existing contract for validation and balance comparison
+    const { ContentStorageService } = await import('@clever/shared');
+    const storage = new ContentStorageService<Contract>(r2Bucket, 'contracts');
+    
+    let existingContract: Contract | undefined;
+    try {
+      const contentWithRelations = await storage.get(uuid);
+      existingContract = contentWithRelations as unknown as Contract;
+    } catch (error) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Contract not found',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 404);
+    }
+
+    // Validate contract update
+    if (contractConfig.validateUpdate) {
+      try {
+        await contractConfig.validateUpdate(requestData, existingContract, user);
+      } catch (validationError) {
+        const response: ApiResponse = {
+          success: false,
+          error: validationError instanceof Error ? validationError.message : 'Validation failed',
+          timestamp: new Date().toISOString(),
+        };
+        return c.json(response, 400);
+      }
+    }
+
+    // Update contract
+    const contentData = requestData.data || requestData;
+    const updatedContract = await storage.update(uuid, contentData, { userId: user.userId });
+
+    // Process balance update asynchronously (don't await - fire and forget)
+    // Requirements: 12.5 - Async processing doesn't block content creation
+    const balanceService = createBalanceService(r2Bucket);
+    const balanceMiddleware = createBalanceMiddleware(balanceService);
+    
+    // Call balance middleware hook without awaiting
+    // Pass both current and previous contract for renovation detection
+    balanceMiddleware.onContractUpdated(
+      updatedContract as unknown as Contract,
+      existingContract,
+      user.userId
+    ).catch(error => {
+      console.error('Balance middleware error (contract update):', JSON.stringify({
+        contractId: updatedContract.uuid,
+        error: error instanceof Error ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+        } : String(error),
+      }, null, 2));
+    });
+
+    const response: ApiResponse<ContentWithRelations<any>> = {
+      success: true,
+      data: updatedContract,
+      timestamp: new Date().toISOString(),
+    };
+    return c.json(response);
+  } catch (error) {
+    console.error('Error updating contract:', error);
+    const response: ApiResponse = {
+      success: false,
+      error: 'Failed to update contract',
+      timestamp: new Date().toISOString(),
+    };
+    return c.json(response, 500);
+  }
+});
 
 export default contractsRouter;
