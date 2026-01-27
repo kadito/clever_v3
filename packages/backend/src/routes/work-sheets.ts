@@ -1,10 +1,12 @@
 /**
  * Work Sheets API routes using the generic content route template
  * Implements full CRUD operations with work-sheet-specific validation and sorting
- * Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 1.1, 1.3
+ * Integrates with balance system for automatic transaction processing
+ * Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 1.1, 1.3, 12.3
  */
 
 import { Hono } from 'hono';
+import type { Context } from 'hono';
 import {
   createContentRoutes,
   createStandardContentConfig,
@@ -16,6 +18,9 @@ import type {
   WorkSheetCreationData,
   WorkSheetUpdateData,
   UserContext,
+  StorageBucket,
+  ApiResponse,
+  ContentWithRelations,
 } from '@clever/shared';
 import {
   validateWorkSheetCreation,
@@ -24,6 +29,9 @@ import {
   calculateWorkSheetTotals,
 } from '@clever/shared';
 import { autoAssignTechnician, validateTechnicianAssignment } from '../utils/technician-assignment';
+import { createBalanceService } from '../services/balance-service';
+import { createBalanceMiddleware } from '../middleware/balance-middleware';
+import { requireUserContext } from '../middleware/clerk';
 
 /**
  * Work sheet-specific validation for create operations
@@ -298,5 +306,96 @@ workSheetConfig.validateUpdate = validateWorkSheetUpdateData;
 // Create and mount the generic CRUD routes
 const crudRoutes = createContentRoutes<WorkSheet>(workSheetConfig);
 workSheetsRouter.route('/', crudRoutes);
+
+// ============================================================================
+// Balance System Integration
+// ============================================================================
+
+/**
+ * Override POST handler to integrate balance middleware
+ * Calls balance middleware after successful work sheet creation
+ * Requirements: 12.3 - Automatic balance processing on work sheet creation
+ */
+workSheetsRouter.post('/', async (c: Context) => {
+  try {
+    const user = requireUserContext(c);
+    const r2Bucket = c.env?.R2_BUCKET as StorageBucket;
+
+    if (!r2Bucket) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Storage not available',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 500);
+    }
+
+    // Parse and validate request
+    let requestData;
+    try {
+      requestData = await c.req.json();
+    } catch (error) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Invalid JSON body',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 400);
+    }
+
+    // Validate work sheet data
+    if (workSheetConfig.validateCreate) {
+      try {
+        await workSheetConfig.validateCreate(requestData, user);
+      } catch (validationError) {
+        const response: ApiResponse = {
+          success: false,
+          error: validationError instanceof Error ? validationError.message : 'Validation failed',
+          timestamp: new Date().toISOString(),
+        };
+        return c.json(response, 400);
+      }
+    }
+
+    // Create work sheet using storage service
+    const { ContentStorageService } = await import('@clever/shared');
+    const storage = new ContentStorageService<WorkSheet>(r2Bucket, 'work-sheets');
+    const contentData = requestData.data || requestData;
+    const newWorkSheet = await storage.create(contentData, { userId: user.userId });
+
+    // Process balance update asynchronously (don't await - fire and forget)
+    // Requirements: 12.5 - Async processing doesn't block content creation
+    const balanceService = createBalanceService(r2Bucket);
+    const balanceMiddleware = createBalanceMiddleware(balanceService);
+    
+    // Call balance middleware hook without awaiting
+    balanceMiddleware.onWorkSheetCreated(newWorkSheet as unknown as WorkSheet, user.userId)
+      .catch(error => {
+        console.error('Balance middleware error (work sheet creation):', JSON.stringify({
+          workSheetId: newWorkSheet.uuid,
+          error: error instanceof Error ? {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+          } : String(error),
+        }, null, 2));
+      });
+
+    const response: ApiResponse<ContentWithRelations<any>> = {
+      success: true,
+      data: newWorkSheet,
+      timestamp: new Date().toISOString(),
+    };
+    return c.json(response, 201);
+  } catch (error) {
+    console.error('Error creating work sheet:', error);
+    const response: ApiResponse = {
+      success: false,
+      error: 'Failed to create work sheet',
+      timestamp: new Date().toISOString(),
+    };
+    return c.json(response, 500);
+  }
+});
 
 export default workSheetsRouter;

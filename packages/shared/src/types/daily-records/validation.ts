@@ -87,9 +87,11 @@ export function validateActivity(activity: Activity, index: number): string[] {
     errors.push(`${prefix} Tipo de atividade inválido`);
   }
 
-  // Subject validation
-  if (!activity.assunto || activity.assunto.trim() === '') {
-    errors.push(`${prefix} Assunto é obrigatório`);
+  // Subject validation - only required for Remote Assistance
+  if (activity.tipoLigacao === 'Assistência Remota') {
+    if (!activity.assunto || activity.assunto.trim() === '') {
+      errors.push(`${prefix} Assunto é obrigatório para assistências remotas`);
+    }
   }
 
   // Start time validation

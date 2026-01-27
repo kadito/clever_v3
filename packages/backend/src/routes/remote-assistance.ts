@@ -1,10 +1,12 @@
 /**
  * Remote Assistance API routes using the generic content route template
  * Implements full CRUD operations with remote assistance-specific validation and sorting
- * Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 1.2, 1.3
+ * Integrates with balance system for automatic transaction processing
+ * Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 1.2, 1.3, 12.4
  */
 
 import { Hono } from 'hono';
+import type { Context } from 'hono';
 import {
   createContentRoutes,
   createStandardContentConfig,
@@ -16,6 +18,9 @@ import type {
   RemoteAssistanceCreationData,
   RemoteAssistanceUpdateData,
   UserContext,
+  StorageBucket,
+  ApiResponse,
+  ContentWithRelations,
 } from '@clever/shared';
 import {
   validateRemoteAssistanceCreation,
@@ -29,6 +34,9 @@ import {
   REMOTE_ASSISTANCE_CONSTANTS,
 } from '@clever/shared';
 import { autoAssignTechnician, validateTechnicianAssignment } from '../utils/technician-assignment';
+import { createBalanceService } from '../services/balance-service';
+import { createBalanceMiddleware } from '../middleware/balance-middleware';
+import { requireUserContext } from '../middleware/clerk';
 
 /**
  * Remote assistance-specific validation for create operations
@@ -323,6 +331,97 @@ remoteAssistanceConfig.validateUpdate = validateRemoteAssistanceUpdateData;
 // Create and mount the generic CRUD routes
 const crudRoutes = createContentRoutes<RemoteAssistance>(remoteAssistanceConfig);
 remoteAssistanceRouter.route('/', crudRoutes);
+
+// ============================================================================
+// Balance System Integration
+// ============================================================================
+
+/**
+ * Override POST handler to integrate balance middleware
+ * Calls balance middleware after successful remote assistance creation
+ * Requirements: 12.4 - Automatic balance processing on remote assistance creation
+ */
+remoteAssistanceRouter.post('/', async (c: Context) => {
+  try {
+    const user = requireUserContext(c);
+    const r2Bucket = c.env?.R2_BUCKET as StorageBucket;
+
+    if (!r2Bucket) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Storage not available',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 500);
+    }
+
+    // Parse and validate request
+    let requestData;
+    try {
+      requestData = await c.req.json();
+    } catch (error) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Invalid JSON body',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 400);
+    }
+
+    // Validate remote assistance data
+    if (remoteAssistanceConfig.validateCreate) {
+      try {
+        await remoteAssistanceConfig.validateCreate(requestData, user);
+      } catch (validationError) {
+        const response: ApiResponse = {
+          success: false,
+          error: validationError instanceof Error ? validationError.message : 'Validation failed',
+          timestamp: new Date().toISOString(),
+        };
+        return c.json(response, 400);
+      }
+    }
+
+    // Create remote assistance using storage service
+    const { ContentStorageService } = await import('@clever/shared');
+    const storage = new ContentStorageService<RemoteAssistance>(r2Bucket, 'remote-assistance');
+    const contentData = requestData.data || requestData;
+    const newRemoteAssistance = await storage.create(contentData, { userId: user.userId });
+
+    // Process balance update asynchronously (don't await - fire and forget)
+    // Requirements: 12.5 - Async processing doesn't block content creation
+    const balanceService = createBalanceService(r2Bucket);
+    const balanceMiddleware = createBalanceMiddleware(balanceService);
+    
+    // Call balance middleware hook without awaiting
+    balanceMiddleware.onRemoteAssistanceCreated(newRemoteAssistance as unknown as RemoteAssistance, user.userId)
+      .catch(error => {
+        console.error('Balance middleware error (remote assistance creation):', JSON.stringify({
+          remoteAssistanceId: newRemoteAssistance.uuid,
+          error: error instanceof Error ? {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+          } : String(error),
+        }, null, 2));
+      });
+
+    const response: ApiResponse<ContentWithRelations<any>> = {
+      success: true,
+      data: newRemoteAssistance,
+      timestamp: new Date().toISOString(),
+    };
+    return c.json(response, 201);
+  } catch (error) {
+    console.error('Error creating remote assistance:', error);
+    const response: ApiResponse = {
+      success: false,
+      error: 'Failed to create remote assistance',
+      timestamp: new Date().toISOString(),
+    };
+    return c.json(response, 500);
+  }
+});
 
 /**
  * Additional endpoint for automatic value calculation
