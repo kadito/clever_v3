@@ -393,11 +393,23 @@ remoteAssistanceRouter.post('/', async (c: Context) => {
     const balanceService = createBalanceService(r2Bucket);
     const balanceMiddleware = createBalanceMiddleware(balanceService);
     
+    console.log('REMOTE ASSISTANCE CREATED - About to call balance middleware:', JSON.stringify({
+      remoteAssistanceId: newRemoteAssistance.uuid,
+      clientId: newRemoteAssistance.data.clientId,
+      userId: user.userId,
+      paymentMethod: newRemoteAssistance.data.paymentMethod,
+      horasTotais: newRemoteAssistance.data.horasTotais,
+    }, null, 2));
+    
     // Call balance middleware hook without awaiting
     balanceMiddleware.onRemoteAssistanceCreated(newRemoteAssistance as unknown as RemoteAssistance, user.userId)
+      .then(() => {
+        console.log('Balance middleware completed successfully for remote assistance:', newRemoteAssistance.uuid);
+      })
       .catch(error => {
         console.error('Balance middleware error (remote assistance creation):', JSON.stringify({
           remoteAssistanceId: newRemoteAssistance.uuid,
+          clientId: newRemoteAssistance.data.clientId,
           error: error instanceof Error ? {
             name: error.name,
             message: error.message,

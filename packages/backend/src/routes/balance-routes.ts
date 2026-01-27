@@ -294,6 +294,99 @@ balanceRouter.get('/:clientId/transactions', async (c: Context) => {
 });
 
 // ============================================================================
+// POST /api/balance/:clientId/recalculate - Recalculate Balance (Admin Only)
+// ============================================================================
+
+/**
+ * Recalculate balance from scratch by reading all transactions.
+ * This is an administrative operation for verifying balance integrity.
+ * 
+ * If no balance exists, this will initialize it by:
+ * 1. Finding all contracts for the client
+ * 2. Creating ADD transactions for each contract
+ * 3. Calculating the final balance
+ * 
+ * Requirements: 18.1, 18.2, 18.3
+ * 
+ * Response:
+ * - 200: Balance recalculated successfully
+ * - 400: Invalid client ID
+ * - 401: Not authenticated
+ * - 403: Not authorized (admin only)
+ * - 500: Server error
+ */
+balanceRouter.post('/:clientId/recalculate', requireAdminAccess, async (c: Context) => {
+  try {
+    const user = requireUserContext(c);
+    const clientId = c.req.param('clientId');
+    const r2Bucket = c.env?.R2_BUCKET as StorageBucket;
+
+    if (!r2Bucket) {
+      console.error('Balance recalculation failed: R2 bucket not available');
+      const response: ApiResponse = {
+        success: false,
+        error: 'Armazenamento não disponível',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 500);
+    }
+
+    // Validate clientId format (UUID)
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(clientId)) {
+      console.warn('Invalid clientId format:', JSON.stringify({ clientId, userId: user.userId }, null, 2));
+      const response: ApiResponse = {
+        success: false,
+        error: 'Formato de ID de cliente inválido',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 400);
+    }
+
+    console.log('Recalculating balance:', JSON.stringify({
+      clientId,
+      userId: user.userId,
+    }, null, 2));
+
+    // Get balance service
+    const balanceService = createBalanceService(r2Bucket);
+    
+    // Recalculate balance (this will initialize if no balance exists)
+    // Pass userId so missing transactions are attributed to the admin user
+    const balance = await balanceService.recalculateBalance(clientId, user.userId);
+
+    console.log('Balance recalculated successfully:', JSON.stringify({
+      clientId,
+      balance: balance.balance,
+      version: balance.version,
+    }, null, 2));
+
+    const response: ApiResponse<BalanceIndex> = {
+      success: true,
+      data: balance,
+      timestamp: new Date().toISOString(),
+    };
+    return c.json(response, 200);
+  } catch (error) {
+    console.error('Error recalculating balance:', JSON.stringify({
+      error: error instanceof Error ? {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      } : String(error),
+    }, null, 2));
+
+    const response: ApiResponse = {
+      success: false,
+      error: 'Erro ao recalcular saldo',
+      timestamp: new Date().toISOString(),
+    };
+    return c.json(response, 500);
+  }
+});
+
+// ============================================================================
 // GET /api/balance/report - Get Balance Report (Admin Only)
 // ============================================================================
 

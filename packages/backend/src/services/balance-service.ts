@@ -960,26 +960,171 @@ export class BalanceService {
    * Recalculate balance from scratch by reading all transactions.
    * This is an administrative operation that should be used sparingly.
    * 
+   * If no transactions exist, this will initialize the balance by:
+   * 1. Finding all contracts for the client
+   * 2. Creating ADD transactions for contracts that don't have transactions
+   * 3. Calculating the final balance
+   * 
    * Use cases:
+   * - Initialize balance for existing clients with contracts
    * - Verify balance integrity
    * - Recover from data corruption
    * - Audit balance calculations
    * 
    * @param clientId - Client UUID
+   * @param userId - User ID for creating missing transactions (optional, defaults to 'system')
    * @returns Recalculated balance index
    */
-  async recalculateBalance(clientId: string): Promise<BalanceIndex> {
+  async recalculateBalance(clientId: string, userId: string = 'system'): Promise<BalanceIndex> {
     try {
       console.log('Starting balance recalculation:', JSON.stringify({ clientId }, null, 2));
 
-      // Read all transactions for the client
-      const transactions = await this.getTransactionHistory(clientId);
+      // Step 1: Read all existing transactions for the client
+      let transactions = await this.getTransactionHistory(clientId);
 
-      if (transactions.length === 0) {
-        console.log('No transactions found for recalculation:', JSON.stringify({ clientId }, null, 2));
+      console.log('Existing transactions found:', JSON.stringify({
+        clientId,
+        transactionCount: transactions.length,
+      }, null, 2));
+
+      // Step 2: Get all contracts for this client from R2
+      console.log('Fetching contracts for client:', clientId);
+      
+      // Read contracts index to get list of all contract UUIDs
+      const contractsKey = 'indexes/contracts-index.json';
+      const contractsIndexObj = await this.r2Bucket.get(contractsKey);
+      
+      if (contractsIndexObj) {
+        const contractsIndex = await contractsIndexObj.json() as any;
         
-        // Return zero balance if no transactions
-        return {
+        console.log('Contracts index structure:', JSON.stringify({
+          hasItems: !!contractsIndex.items,
+          itemCount: contractsIndex.items?.length || 0,
+          firstItem: contractsIndex.items?.[0] ? {
+            uuid: contractsIndex.items[0].uuid,
+            hasData: !!contractsIndex.items[0].data,
+            dataKeys: contractsIndex.items[0].data ? Object.keys(contractsIndex.items[0].data) : [],
+          } : null,
+        }, null, 2));
+        
+        // The index contains minimal data - we need to read full contracts
+        // Filter by clientId from index data
+        const clientContractIds = contractsIndex.items
+          ?.filter((item: any) => item.clientId === clientId)
+          .map((item: any) => item.uuid) || [];
+
+        console.log('Client contract IDs from index:', JSON.stringify({
+          clientId,
+          contractIds: clientContractIds,
+        }, null, 2));
+
+        // Step 3: Check which contracts don't have transactions
+        const existingTransactionSources = new Set(
+          transactions
+            .filter(t => t.source === 'contract' || t.source === 'contract-renovation')
+            .map(t => t.sourceId)
+        );
+
+        const contractIdsWithoutTransactions = clientContractIds.filter(
+          (contractId: string) => !existingTransactionSources.has(contractId)
+        );
+
+        console.log('Contracts without transactions:', JSON.stringify({
+          clientId,
+          count: contractIdsWithoutTransactions.length,
+          contractIds: contractIdsWithoutTransactions,
+        }, null, 2));
+
+        // Step 4: Create missing transactions for contracts
+        for (const contractId of contractIdsWithoutTransactions) {
+          try {
+            console.log('Creating missing transaction for contract:', JSON.stringify({
+              contractId,
+              clientId,
+            }, null, 2));
+
+            // Read full contract data from R2
+            const contractKey = `content/contracts/${contractId}.json`;
+            const contractObj = await this.r2Bucket.get(contractKey);
+            
+            if (!contractObj) {
+              console.warn('Contract not found in R2:', contractId);
+              continue;
+            }
+
+            const contract = await contractObj.json() as any;
+
+            console.log('Contract data loaded:', JSON.stringify({
+              contractId,
+              hasCPAContract: contract.data?.hasCPAContract,
+              hasSHContract: contract.data?.hasSHContract,
+              manutencoesPorAnoCPA: contract.data?.manutencoesPorAnoCPA,
+              deslocacoesPorAnoCPA: contract.data?.deslocacoesPorAnoCPA,
+              horasAssistenciaAnualCPA: contract.data?.horasAssistenciaAnualCPA,
+            }, null, 2));
+
+            // Extract transaction changes from contract
+            const { extractContractAddTransaction, hasTransactionChanges } = await import('@clever/shared');
+            const changes = extractContractAddTransaction(contract);
+
+            console.log('Extracted changes from contract:', JSON.stringify({
+              contractId,
+              changes,
+              hasChanges: hasTransactionChanges(changes),
+            }, null, 2));
+
+            if (!hasTransactionChanges(changes)) {
+              console.log('No balance changes in contract, skipping:', contractId);
+              continue;
+            }
+
+            // Create ADD transaction for this contract
+            const transaction = await this.createAddTransaction(
+              clientId,
+              contract.uuid,
+              'contract',
+              changes.contractUsageChanges || {},
+              userId,
+              {
+                contractType: this.getContractTypeDescription(contract),
+                serviceDetails: {
+                  hasCPAContract: contract.data?.hasCPAContract,
+                  hasSHContract: contract.data?.hasSHContract,
+                  createdDuringRecalculation: true,
+                },
+              }
+            );
+
+            console.log('Created missing transaction:', JSON.stringify({
+              contractId: contract.uuid,
+              transactionId: transaction.uuid,
+              changes: transaction.changes,
+            }, null, 2));
+
+            // Add to transactions list for recalculation
+            transactions.push(transaction);
+          } catch (error) {
+            console.error('Error creating transaction for contract:', JSON.stringify({
+              contractId,
+              error: error instanceof Error ? {
+                name: error.name,
+                message: error.message,
+                stack: error.stack,
+              } : String(error),
+            }, null, 2));
+            // Continue with other contracts even if one fails
+          }
+        }
+      } else {
+        console.log('No contracts index found in R2');
+      }
+
+      // Step 5: Recalculate balance from all transactions
+      if (transactions.length === 0) {
+        console.log('No transactions found after checking contracts, initializing zero balance:', 
+          JSON.stringify({ clientId }, null, 2));
+        
+        const zeroBalance: BalanceIndex = {
           clientId,
           balance: 0,
           contracts: {
@@ -991,6 +1136,16 @@ export class BalanceService {
           lastTransactionId: '',
           version: 0,
         };
+
+        // Write the zero balance to R2
+        await this.writeBalanceIndex(zeroBalance);
+
+        console.log('Zero balance initialized:', JSON.stringify({
+          clientId,
+          balance: zeroBalance.balance,
+        }, null, 2));
+
+        return zeroBalance;
       }
 
       // Sort transactions by timestamp
@@ -1043,6 +1198,7 @@ export class BalanceService {
       console.log('Balance recalculation completed:', JSON.stringify({
         clientId,
         balance: recalculatedBalance.balance,
+        contracts: recalculatedBalance.contracts,
         version: recalculatedBalance.version,
         transactionCount: sortedTransactions.length,
       }, null, 2));
@@ -1051,10 +1207,35 @@ export class BalanceService {
     } catch (error) {
       console.error('Error recalculating balance:', JSON.stringify({
         clientId,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+        } : String(error),
       }, null, 2));
       throw error;
     }
+  }
+
+  /**
+   * Get contract type description for transaction metadata.
+   * Helper method for creating transaction metadata.
+   * 
+   * @param contract - Contract content
+   * @returns Contract type description
+   */
+  private getContractTypeDescription(contract: any): string {
+    const types: string[] = [];
+
+    if (contract.data?.hasCPAContract) {
+      types.push(contract.data.cpaContractType || 'CPA');
+    }
+
+    if (contract.data?.hasSHContract) {
+      types.push('S&H');
+    }
+
+    return types.join(' + ') || 'Unknown';
   }
 }
 

@@ -658,12 +658,20 @@ const handleRecalculateBalance = async () => {
   isRecalculating.value = true;
   error.value = null;
 
+  // Get auth token
+  const token = await window.Clerk?.session?.getToken();
+
   await fetch(`/api/balance/${client.value.uuid}/recalculate`, {
     method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
   })
     .then(async response => {
       if (!response.ok) {
-        throw new Error('Erro ao recalcular saldo');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Erro ao recalcular saldo');
       }
       return response.json();
     })

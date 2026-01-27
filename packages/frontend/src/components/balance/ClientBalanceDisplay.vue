@@ -112,18 +112,33 @@ const loadBalance = async () => {
           // No balance found - this is expected for new clients
           console.log('ClientBalanceDisplay: No balance found (404) - client may not have contracts yet');
           balance.value = null;
-          return;
+          return null;
         }
-        throw new Error('Erro ao carregar saldo');
+        
+        // Try to get error message from response
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Erro ao carregar saldo');
       }
       return response.json();
     })
     .then(data => {
-      if (data) {
-        console.log('ClientBalanceDisplay: Balance data received:', JSON.stringify(data, null, 2));
-        balance.value = data;
+      if (data && data.data) {
+        console.log('ClientBalanceDisplay: Balance data received:', JSON.stringify(data.data, null, 2));
+        balance.value = data.data;
         
         // Store initial balances for low usage calculation
+        if (data.data && !Object.keys(initialBalances.value).length) {
+          initialBalances.value = {
+            manutencoesPorAno: data.data.contracts.manutencoesPorAno,
+            deslocacoesPorAno: data.data.contracts.deslocacoesPorAno,
+            horasAssistenciaAnuais: data.data.contracts.horasAssistenciaAnuais,
+          };
+        }
+      } else if (data) {
+        // Handle case where data is returned directly without wrapper
+        console.log('ClientBalanceDisplay: Balance data received (direct):', JSON.stringify(data, null, 2));
+        balance.value = data;
+        
         if (data && !Object.keys(initialBalances.value).length) {
           initialBalances.value = {
             manutencoesPorAno: data.contracts.manutencoesPorAno,

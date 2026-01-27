@@ -368,11 +368,23 @@ workSheetsRouter.post('/', async (c: Context) => {
     const balanceService = createBalanceService(r2Bucket);
     const balanceMiddleware = createBalanceMiddleware(balanceService);
     
+    console.log('WORK SHEET CREATED - About to call balance middleware:', JSON.stringify({
+      workSheetId: newWorkSheet.uuid,
+      clientId: newWorkSheet.data.clientId,
+      userId: user.userId,
+      paymentMethod: newWorkSheet.data.displacement?.paymentMethod,
+      warranty: newWorkSheet.data.otherData?.warranty,
+    }, null, 2));
+    
     // Call balance middleware hook without awaiting
     balanceMiddleware.onWorkSheetCreated(newWorkSheet as unknown as WorkSheet, user.userId)
+      .then(() => {
+        console.log('Balance middleware completed successfully for work sheet:', newWorkSheet.uuid);
+      })
       .catch(error => {
         console.error('Balance middleware error (work sheet creation):', JSON.stringify({
           workSheetId: newWorkSheet.uuid,
+          clientId: newWorkSheet.data.clientId,
           error: error instanceof Error ? {
             name: error.name,
             message: error.message,
