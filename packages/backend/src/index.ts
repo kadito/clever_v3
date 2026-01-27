@@ -25,41 +25,6 @@ app.use(
   })
 );
 
-// Basic health check endpoint
-app.get('/test-ucpa', async c => {
-  console.log("AUQI")
-  const res = await fetch("https://staging.d216bmulyknrj1.amplifyapp.com/", {
-    method: "GET"
-  });
-
-  if (!res.ok) {
-    const bodyPreview = await res.text().catch(() => "");
-    // eslint-disable-next-line no-console
-    console.error(
-      `[ERROR] HTTP ${res.status} ${res.statusText}\n${bodyPreview.slice(0, 500)}`,
-    );
-    throw new Error("EXIT")
-  }
-  console.log("[HEADERS]:", res.headers);
-  const contentType = res.headers.get("content-type") ?? "";
-  const html = await res.text();
-  console.log("contentType: ", contentType)
-  console.log("content-encoding:", res.headers.get("content-encoding"));
-
-  // eslint-disable-next-line no-console
-  // // eslint-disable-next-line no-console
-  // console.log(`[INFO] content-type: ${contentType || "(missing)"}`);
-  // // eslint-disable-next-line no-console
-  // console.log(`[INFO] bytes: ${Buffer.byteLength(html, "utf8")}`);
-
-  // fs.writeFileSync(join(__dirname, "output", "index.html"), html, "utf8");
-  // // eslint-disable-next-line no-console
-  // console.log(`[INFO] saved: ${join(__dirname, "output", "index.html")}`);
-
-  return c.json(html);
-});
-
-
 // API routes
 app.route('/api', api);
 
