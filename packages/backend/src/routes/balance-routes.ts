@@ -53,9 +53,10 @@ balanceRouter.use('*', requireAuth);
  * - 200: Balance index found
  * - 404: Balance index not found (client has no transactions)
  * - 401: Not authenticated
+ * - 403: Not authorized (admin only)
  * - 500: Server error
  */
-balanceRouter.get('/:clientId', async (c: Context) => {
+balanceRouter.get('/:clientId', requireAdminAccess, async (c: Context) => {
   try {
     const user = requireUserContext(c);
     const clientId = c.req.param('clientId');
@@ -154,9 +155,10 @@ balanceRouter.get('/:clientId', async (c: Context) => {
  * - 200: Transaction history retrieved
  * - 400: Invalid query parameters
  * - 401: Not authenticated
+ * - 403: Not authorized (admin only)
  * - 500: Server error
  */
-balanceRouter.get('/:clientId/transactions', async (c: Context) => {
+balanceRouter.get('/:clientId/transactions', requireAdminAccess, async (c: Context) => {
   try {
     const user = requireUserContext(c);
     const clientId = c.req.param('clientId');

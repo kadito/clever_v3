@@ -54,8 +54,8 @@
           </div>
         </div>
 
-        <!-- Balance Section -->
-        <div class="detail-section">
+        <!-- Balance Section (Admin Only) -->
+        <div v-if="permissions.canViewAuditTrail" class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch flex justify-between items-center"
