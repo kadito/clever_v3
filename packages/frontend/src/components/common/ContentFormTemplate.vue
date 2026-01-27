@@ -489,7 +489,7 @@
     </main>
 
     <!-- Mobile action bar -->
-    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 sm:hidden">
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 sm:hidden z-50">
       <div class="flex space-x-3">
         <button
           type="button"

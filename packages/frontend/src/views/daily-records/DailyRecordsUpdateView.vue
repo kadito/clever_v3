@@ -40,7 +40,7 @@
   >
     <!-- Custom form content -->
     <template #customSections="{ formData: templateFormData, errors, updateFieldValue: templateUpdateFieldValue }">
-      <div class="pb-32 sm:pb-6">
+      <div class="pb-48 sm:pb-6">
       <!-- Date Section -->
       <div class="form-section">
         <h2 class="section-title">Informação Geral</h2>
@@ -161,6 +161,7 @@ const isLoadingRecord = ref(true);
 const isSaving = ref(false);
 const error = ref<string | null>(null);
 const dailyRecordUuid = ref<string>('');
+let loadPromise: Promise<void> | null = null; // Promise-based lock to prevent duplicate loads
 
 // Form data
 const formData = reactive<{ dataRegistro: string }>({
@@ -211,7 +212,14 @@ const addActivity = () => {
 };
 
 const handleActivityUpdate = (index: number, updatedActivity: Activity) => {
-  activities.value[index] = updatedActivity;
+  console.log('📝 handleActivityUpdate called for index:', index);
+  console.log('📝 Updated activity received:', JSON.stringify(updatedActivity, null, 2));
+  console.log('📝 Current activities before update:', JSON.stringify(activities.value, null, 2));
+  
+  // Use splice to ensure reactivity
+  activities.value.splice(index, 1, updatedActivity);
+  
+  console.log('📝 Current activities after update:', JSON.stringify(activities.value, null, 2));
 };
 
 const removeActivity = (index: number) => {
@@ -224,6 +232,8 @@ const validateForm = (): boolean => {
   Object.keys(validationErrors).forEach(key => {
     delete validationErrors[key];
   });
+
+  console.log('🔍 validateForm - activities.value at validation time:', JSON.stringify(activities.value, null, 2));
 
   // Transform form data to DailyRecordCreationData format for validation
   const dailyRecordData = {
@@ -266,66 +276,95 @@ const validateForm = (): boolean => {
 
 // Load existing daily record
 const loadDailyRecord = async () => {
-  const uuid = route.params.uuid as string;
-  if (!uuid) {
-    error.value = 'UUID do registo diário não fornecido';
-    isLoadingRecord.value = false;
-    return;
+  console.log('🔄 loadDailyRecord called - stack trace:', new Error().stack);
+  
+  // Promise-based lock: if already loading, return the existing promise
+  if (loadPromise) {
+    console.warn('⚠️ loadDailyRecord already in progress, returning existing promise');
+    return loadPromise;
   }
-
-  // Validate UUID format
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  if (!uuidRegex.test(uuid)) {
-    console.error('Invalid UUID format:', uuid);
-    error.value = 'UUID inválido';
-    isLoadingRecord.value = false;
-    return;
-  }
-
-  dailyRecordUuid.value = uuid;
-
-  try {
-    console.log('Loading daily record for editing:', uuid);
-    await api.fetchById(uuid);
-
-    if (api.error.value) {
-      console.error('Error loading daily record:', JSON.stringify(api.error.value, null, 2));
-      error.value = typeof api.error.value === 'string' 
-        ? api.error.value 
-        : api.error.value.message || 'Erro ao carregar registo diário';
+  
+  // Create the promise immediately and store it BEFORE any async operations
+  // This ensures the lock is set synchronously before any other calls can check it
+  const executeLoad = async () => {
+    const uuid = route.params.uuid as string;
+    if (!uuid) {
+      error.value = 'UUID do registo diário não fornecido';
       isLoadingRecord.value = false;
       return;
     }
 
-    if (api.currentItem.value) {
-      const dailyRecord = api.currentItem.value as ContentWithRelations<DailyRecord['data']>;
-      
-      console.log('Daily record loaded successfully:', JSON.stringify(dailyRecord, null, 2));
-
-      // Pre-populate form data
-      formData.dataRegistro = dailyRecord.data.dataRegistro;
-      
-      // Pre-populate activities (deep copy to avoid reference issues)
-      activities.value = JSON.parse(JSON.stringify(dailyRecord.data.atividades || []));
-
-      console.log('Form pre-populated with:', JSON.stringify({
-        dataRegistro: formData.dataRegistro,
-        activitiesCount: activities.value.length,
-      }, null, 2));
-    } else {
-      error.value = 'Registo diário não encontrado';
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(uuid)) {
+      console.error('Invalid UUID format:', uuid);
+      error.value = 'UUID inválido';
+      isLoadingRecord.value = false;
+      return;
     }
-  } catch (err) {
-    console.error('Error loading daily record:', JSON.stringify(err, null, 2));
-    error.value = err instanceof Error ? err.message : 'Erro ao carregar registo diário';
-  } finally {
-    isLoadingRecord.value = false;
-  }
+
+    dailyRecordUuid.value = uuid;
+
+    try {
+      console.log('Loading daily record for editing:', uuid);
+      await api.fetchById(uuid);
+
+      if (api.error.value) {
+        console.error('Error loading daily record:', JSON.stringify(api.error.value, null, 2));
+        error.value = typeof api.error.value === 'string' 
+          ? api.error.value 
+          : api.error.value.message || 'Erro ao carregar registo diário';
+        isLoadingRecord.value = false;
+        return;
+      }
+
+      if (api.currentItem.value) {
+        const dailyRecord = api.currentItem.value as ContentWithRelations<DailyRecord['data']>;
+        
+        console.log('Daily record loaded successfully:', JSON.stringify(dailyRecord, null, 2));
+
+        // Pre-populate form data
+        formData.dataRegistro = dailyRecord.data.dataRegistro;
+        
+        // Pre-populate activities (deep copy to avoid reference issues)
+        activities.value = JSON.parse(JSON.stringify(dailyRecord.data.atividades || []));
+
+        console.log('Form pre-populated with:', JSON.stringify({
+          dataRegistro: formData.dataRegistro,
+          activitiesCount: activities.value.length,
+        }, null, 2));
+      } else {
+        error.value = 'Registo diário não encontrado';
+      }
+    } catch (err) {
+      console.error('Error loading daily record:', JSON.stringify(err, null, 2));
+      error.value = err instanceof Error ? err.message : 'Erro ao carregar registo diário';
+    } finally {
+      isLoadingRecord.value = false;
+    }
+  };
+  
+  // Store the promise SYNCHRONOUSLY before executing
+  loadPromise = executeLoad();
+  
+  // Wait for the promise to complete and then clear it
+  await loadPromise
+    .then(() => {
+      console.log('✅ loadDailyRecord completed successfully');
+    })
+    .catch((err) => {
+      console.error('❌ loadDailyRecord failed:', err);
+    })
+    .finally(() => {
+      loadPromise = null; // Clear the lock
+      console.log('🔓 Load lock released');
+    });
 };
 
 // Form submission
 const handleSubmit = async () => {
   console.log('🚀 handleSubmit called for update');
+  console.log('🔍 activities.value at start of handleSubmit:', JSON.stringify(activities.value, null, 2));
 
   // Validate form
   if (!validateForm()) {
@@ -337,6 +376,8 @@ const handleSubmit = async () => {
   try {
     isSaving.value = true;
     clearError();
+
+    console.log('🔍 activities.value after validation:', JSON.stringify(activities.value, null, 2));
 
     // Transform form data to DailyRecordUpdateData format
     const dailyRecordData: DailyRecordUpdateData = {

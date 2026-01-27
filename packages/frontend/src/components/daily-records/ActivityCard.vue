@@ -48,7 +48,7 @@
         <select
           v-model="localActivity.tipoAtividade"
           class="form-select"
-          @change="emitUpdate"
+          @change="handleActivityTypeChange"
         >
           <option value="Interno">Interno</option>
           <option value="Externo">Externo</option>
@@ -185,7 +185,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import type { Activity } from '@clever/shared';
 import WorkSheetSearchInput from '@/components/common/WorkSheetSearchInput.vue';
 import RemoteAssistanceSearchInput from '@/components/common/RemoteAssistanceSearchInput.vue';
@@ -211,14 +211,11 @@ const emit = defineEmits<Emits>();
 // Local state - create a copy of the activity to avoid direct prop mutation
 const localActivity = ref<Activity>({ ...props.activity });
 
-// Watch for external changes to activity prop
-watch(
-  () => props.activity,
-  (newActivity) => {
-    localActivity.value = { ...newActivity };
-  },
-  { deep: true }
-);
+// Only sync from prop on initial mount or when switching to view mode
+// In edit mode, local state is the source of truth
+onMounted(() => {
+  localActivity.value = { ...props.activity };
+});
 
 // Computed properties
 const activityTypeClass = computed(() => {
@@ -330,6 +327,11 @@ const handleLinkTypeChange = () => {
   emitUpdate();
 };
 
+const handleActivityTypeChange = () => {
+  console.log('🎯 Activity type changed to:', localActivity.value.tipoAtividade);
+  emitUpdate();
+};
+
 const handleWorkSheetSelected = () => {
   emitUpdate();
 };
@@ -344,6 +346,7 @@ const handleRemove = () => {
 
 const emitUpdate = () => {
   // Emit the updated activity
+  console.log('🔄 ActivityCard emitUpdate called, localActivity:', JSON.stringify(localActivity.value, null, 2));
   emit('activity-updated', { ...localActivity.value });
 };
 </script>

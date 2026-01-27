@@ -14,7 +14,7 @@
   >
     <!-- Custom form content -->
     <template #customSections="{ formData: templateFormData, errors, updateFieldValue: templateUpdateFieldValue }">
-      <div class="pb-32 sm:pb-6">
+      <div class="pb-48 sm:pb-6">
       <!-- Date Section -->
       <div class="form-section">
         <h2 class="section-title">Informação Geral</h2>
@@ -25,11 +25,16 @@
             Data do Registo *
           </label>
           <input
-            v-model="formData.dataRegistro"
+            :value="templateFormData?.dataRegistro || formData.dataRegistro"
             type="date"
             class="form-input"
             :class="{ 'border-red-500': validationErrors.dataRegistro }"
             required
+            @input="e => {
+              const value = (e.target as HTMLInputElement).value;
+              formData.dataRegistro = value;
+              templateUpdateFieldValue('dataRegistro', value);
+            }"
           />
           <p v-if="validationErrors.dataRegistro" class="form-error">
             {{ validationErrors.dataRegistro }}
@@ -50,7 +55,7 @@
         </div>
 
         <!-- Activities List -->
-        <div v-if="activities.length === 0" class="empty-activities">
+        <div v-if="!formData.atividades || formData.atividades.length === 0" class="empty-activities">
           <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
@@ -65,12 +70,12 @@
 
         <div v-else class="activities-list">
           <ActivityCard
-            v-for="(activity, index) in activities"
+            v-for="(activity, index) in formData.atividades"
             :key="index"
             :activity="activity"
             :is-edit-mode="true"
-            @activity-updated="handleActivityUpdate(index, $event)"
-            @activity-removed="removeActivity(index)"
+            @activity-updated="handleActivityUpdate(index, $event, templateUpdateFieldValue)"
+            @activity-removed="removeActivity(index, templateUpdateFieldValue)"
           />
         </div>
 
@@ -78,7 +83,7 @@
         <button
           type="button"
           class="add-activity-button-bottom"
-          @click="addActivity"
+          @click="addActivity(templateUpdateFieldValue)"
           :disabled="isSaving"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,11 +103,11 @@
       </div>
 
       <!-- Summary Section -->
-      <div v-if="activities.length > 0" class="summary-section mb-32">
+      <div v-if="formData.atividades && formData.atividades.length > 0" class="summary-section mb-32">
         <div class="summary-grid">
           <div class="summary-item">
             <span class="summary-label">Atividades</span>
-            <span class="summary-value">{{ activities.length }}</span>
+            <span class="summary-value">{{ formData.atividades.length }}</span>
           </div>
           <div class="summary-item">
             <span class="summary-label">Total Horas</span>
@@ -116,7 +121,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue';
+import { ref, computed, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import type { Activity, DailyRecordCreationData } from '@clever/shared';
 import { validateDailyRecordCreation, minutesToTime } from '@clever/shared';
@@ -133,13 +138,19 @@ const api = useApi('daily-records');
 const isSaving = ref(false);
 const error = ref<string | null>(null);
 
-// Form data
-const formData = reactive<{ dataRegistro: string }>({
+// Form data - include activities in the form data object
+const formData = reactive<{ dataRegistro: string; atividades: Activity[] }>({
   dataRegistro: new Date().toISOString().split('T')[0], // Default to today
+  atividades: [], // Activities stored in form data
 });
 
-// Activities array
-const activities = ref<Activity[]>([]);
+// Computed property for activities (for easier access)
+const activities = computed({
+  get: () => formData.atividades,
+  set: (value: Activity[]) => {
+    formData.atividades = value;
+  }
+});
 
 // Validation errors
 const validationErrors = reactive<Record<string, string>>({});
@@ -151,11 +162,11 @@ const clearError = () => {
 
 // Computed properties
 const totalHours = computed(() => {
-  if (activities.value.length === 0) return '00:00';
+  if (formData.atividades.length === 0) return '00:00';
 
   let totalMinutes = 0;
 
-  activities.value.forEach(activity => {
+  formData.atividades.forEach(activity => {
     if (activity.totalHoras) {
       const [hours, minutes] = activity.totalHoras.split(':').map(Number);
       totalMinutes += hours * 60 + minutes;
@@ -166,7 +177,7 @@ const totalHours = computed(() => {
 });
 
 // Activity management methods
-const addActivity = () => {
+const addActivity = (updateFieldValue: (key: string, value: any) => void) => {
   const newActivity: Activity = {
     tipoAtividade: 'Interno',
     assunto: '',
@@ -178,15 +189,25 @@ const addActivity = () => {
     tipoLigacao: 'Nenhuma',
   };
 
-  activities.value.push(newActivity);
+  formData.atividades.push(newActivity);
+  // Sync with template form data
+  updateFieldValue('atividades', [...formData.atividades]);
+  console.log('Activity added. Total activities:', formData.atividades.length);
+  console.log('Activities array:', JSON.stringify(formData.atividades, null, 2));
 };
 
-const handleActivityUpdate = (index: number, updatedActivity: Activity) => {
-  activities.value[index] = updatedActivity;
+const handleActivityUpdate = (index: number, updatedActivity: Activity, updateFieldValue: (key: string, value: any) => void) => {
+  console.log(`Activity ${index} updated:`, JSON.stringify(updatedActivity, null, 2));
+  formData.atividades[index] = updatedActivity;
+  // Sync with template form data
+  updateFieldValue('atividades', [...formData.atividades]);
+  console.log('All activities after update:', JSON.stringify(formData.atividades, null, 2));
 };
 
-const removeActivity = (index: number) => {
-  activities.value.splice(index, 1);
+const removeActivity = (index: number, updateFieldValue: (key: string, value: any) => void) => {
+  formData.atividades.splice(index, 1);
+  // Sync with template form data
+  updateFieldValue('atividades', [...formData.atividades]);
 };
 
 // Validation
@@ -236,8 +257,21 @@ const validateForm = (): boolean => {
 };
 
 // Form submission
-const handleSubmit = async () => {
+const handleSubmit = async (submittedData?: Record<string, any>) => {
   console.log('🚀 handleSubmit called');
+  console.log('Submitted data from template:', JSON.stringify(submittedData, null, 2));
+  console.log('Local form data:', JSON.stringify(formData, null, 2));
+  
+  // Merge submitted data with local formData to ensure we have all fields
+  const dataToSubmit = {
+    ...formData,
+    ...submittedData,
+  };
+  console.log('Data to submit:', JSON.stringify(dataToSubmit, null, 2));
+  console.log('Activities count:', dataToSubmit.atividades?.length || 0);
+
+  // Update local formData with merged data to ensure validation uses correct data
+  Object.assign(formData, dataToSubmit);
 
   // Validate form
   if (!validateForm()) {
@@ -252,8 +286,8 @@ const handleSubmit = async () => {
 
     // Transform form data to DailyRecordCreationData format
     const dailyRecordData: DailyRecordCreationData = {
-      dataRegistro: formData.dataRegistro,
-      atividades: activities.value,
+      dataRegistro: dataToSubmit.dataRegistro,
+      atividades: dataToSubmit.atividades || [],
     };
 
     console.log('Creating daily record with data:', JSON.stringify(dailyRecordData, null, 2));

@@ -49,8 +49,8 @@ export function extractTechnicianUser(userContext: UserContext): TechnicianUser 
  * Auto-assign technician data to content during create/update operations
  * 
  * Automatically populates technician fields in content data based on the
- * authenticated user context. Handles both work-sheets and remote-assistance
- * content types with their respective technician field names.
+ * authenticated user context. Handles work-sheets, remote-assistance, and
+ * daily-records content types with their respective technician field names.
  * 
  * @param data - The content data object to modify
  * @param userContext - The authenticated user context from Clerk
@@ -86,6 +86,11 @@ export function autoAssignTechnician(
     if (hasRemoteAssistanceTechnicianField(updatedData)) {
       // Remote assistance: assign to tecnicoResponsavel
       updatedData.tecnicoResponsavel = technicianUser;
+    }
+
+    if (hasDailyRecordTechnicianField(updatedData)) {
+      // Daily records: assign to technician at root level
+      updatedData.technician = technicianUser;
     }
 
     return updatedData;
@@ -134,6 +139,24 @@ function hasRemoteAssistanceTechnicianField(data: Record<string, any>): boolean 
       data.tipoAssistencia !== undefined ||
       data.dataAssistencia !== undefined ||
       data.motivoPedido !== undefined)
+  );
+}
+
+/**
+ * Check if data has daily record technician field structure
+ * 
+ * Determines if the content data represents a daily record that should
+ * have technician assignment in the technician field at root level.
+ * 
+ * @param data - The content data to check
+ * @returns True if data has daily record structure with technician field
+ */
+function hasDailyRecordTechnicianField(data: Record<string, any>): boolean {
+  // Daily records have dataRegistro and atividades fields
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    (data.dataRegistro !== undefined || data.atividades !== undefined)
   );
 }
 
@@ -201,6 +224,12 @@ export function validateTechnicianAssignment(data: Record<string, any>): {
     // Check remote assistance technician assignment
     if (hasRemoteAssistanceTechnicianField(data) && data.tecnicoResponsavel) {
       const technicianErrors = validateTechnicianUser(data.tecnicoResponsavel, 'tecnicoResponsavel');
+      errors.push(...technicianErrors);
+    }
+
+    // Check daily record technician assignment
+    if (hasDailyRecordTechnicianField(data) && data.technician) {
+      const technicianErrors = validateTechnicianUser(data.technician, 'technician');
       errors.push(...technicianErrors);
     }
 
