@@ -17,6 +17,7 @@ import licensesRouter from './licenses';
 import contractsRouter from './contracts';
 import workSheetsRouter from './work-sheets';
 import remoteAssistanceRouter from './remote-assistance';
+import dailyRecordsRouter from './daily-records';
 import type { AppContext } from '../types/auth';
 import type {
   BaseContent,
@@ -34,7 +35,9 @@ import {
   validateWorkSheetUpdate,
   validateRemoteAssistanceCreation,
   validateRemoteAssistanceUpdate,
-  // Note: Daily records, reminders, and pending items validation functions
+  validateDailyRecordCreation,
+  validateDailyRecordUpdate,
+  // Note: Reminders and pending items validation functions
   // will be added when those content types are implemented
 } from '@clever/shared';
 
@@ -130,20 +133,11 @@ api.route('/content/work-sheets', workSheetsRouter);
 // Remote Assistance route with date-based sorting and custom validation
 api.route('/content/remote-assistance', remoteAssistanceRouter);
 
+// Daily Records route with date-based sorting and custom validation
+api.route('/content/daily-records', dailyRecordsRouter);
+
 // Generic routes for other content types using standard configuration with relation validation
 
-const dailyRecordsConfig = createStandardContentConfig('daily-records', 'date-desc');
-// TODO: Implement daily records validation when the content type is fully implemented
-// dailyRecordsConfig.validateCreate = (data: any) => {
-//   const errors = validateDailyRecordCreation(data.data || data);
-//   if (errors.length > 0) throw new Error(errors[0]);
-// };
-// dailyRecordsConfig.validateUpdate = (data: any) => {
-//   const errors = validateDailyRecordUpdate(data.data || data);
-//   if (errors.length > 0) throw new Error(errors[0]);
-// };
-const dailyRecordsRouter = createContentRoutes<BaseContent>(dailyRecordsConfig);
-api.route('/content/daily-records', dailyRecordsRouter);
 
 const remindersConfig = createStandardContentConfig('reminders', 'date-desc');
 // TODO: Implement reminders validation when the content type is fully implemented

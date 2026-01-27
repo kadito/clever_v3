@@ -14,6 +14,7 @@ export * from './types/contracts';
 export * from './types/licenses';
 export * from './types/work-sheets';
 export * from './types/remote-assistance';
+export * from './types/daily-records';
 
 // Re-export specific utilities for convenience
 export { resolveContentRelations, type ContentFetcher } from './utils';

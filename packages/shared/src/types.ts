@@ -187,6 +187,7 @@ export * from './types/licenses';
 export * from './types/contracts';
 export * from './types/work-sheets';
 export * from './types/remote-assistance';
+export * from './types/daily-records';
 
 // Validation functions are now exported from their specific modules
 // e.g., from './types/clients/validation', './types/contracts/validation', etc.

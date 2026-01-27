@@ -62,9 +62,9 @@ export const BASIC_FIELD_DEFINITIONS: Record<string, string[]> = {
     'fimContratoSH',
   ],
   licenses: ['versao', 'numeroSerie', 'dataVencimento'],
-  'work-sheets': ['numeroFolha', 'dataInicio', 'dataFim'],
+  'work-sheets': ['clientId', 'request', 'otherData'], // Extract nested data for work sheets
   'daily-records': ['data', 'atividade', 'duracao'],
-  'remote-assistance': ['data', 'tipo', 'duracao'],
+  'remote-assistance': ['clientId', 'tipoAssistencia', 'dataAssistencia', 'horasTotais'], // Extract key fields for remote assistance
   reminders: ['titulo', 'dataLembrete', 'prioridade'],
   pending: ['titulo', 'dataLimite', 'status'],
 } as const;
@@ -95,6 +95,60 @@ export function extractBasicFields(
 ): Record<string, any> {
   if (!contentData || typeof contentData !== 'object') {
     return {};
+  }
+
+  // Special handling for work-sheets with nested data
+  if (contentType === 'work-sheets') {
+    const extracted: Record<string, any> = {};
+    
+    // Extract clientId for relation resolution
+    if (contentData.clientId) {
+      extracted.clientId = contentData.clientId;
+    }
+    
+    // Extract service type from nested otherData
+    if (contentData.otherData?.serviceType) {
+      extracted.tipoServico = contentData.otherData.serviceType;
+    }
+    
+    // Extract assistance date from nested request
+    if (contentData.request?.assistanceDate) {
+      extracted.dataAssistencia = contentData.request.assistanceDate;
+    }
+    
+    // Extract total hours from nested request
+    if (contentData.request?.totalHours) {
+      extracted.totalHoras = contentData.request.totalHours;
+    }
+    
+    return extracted;
+  }
+
+  // Special handling for remote-assistance
+  if (contentType === 'remote-assistance') {
+    const extracted: Record<string, any> = {};
+    
+    // Extract clientId for relation resolution
+    if (contentData.clientId) {
+      extracted.clientId = contentData.clientId;
+    }
+    
+    // Extract assistance type
+    if (contentData.tipoAssistencia) {
+      extracted.tipoAssistencia = contentData.tipoAssistencia;
+    }
+    
+    // Extract assistance date
+    if (contentData.dataAssistencia) {
+      extracted.dataAssistencia = contentData.dataAssistencia;
+    }
+    
+    // Extract total hours
+    if (contentData.horasTotais) {
+      extracted.totalHoras = contentData.horasTotais;
+    }
+    
+    return extracted;
   }
 
   // Get the basic field definitions for this content type

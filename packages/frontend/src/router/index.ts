@@ -63,7 +63,8 @@ const generateContentRoutes = (): RouteRecordRaw[] => {
       contentType === 'licenses' ||
       contentType === 'contracts' ||
       contentType === 'work-sheets' ||
-      contentType === 'remote-assistance'; // Clients, licenses, contracts, work-sheets, and remote-assistance have specific components
+      contentType === 'remote-assistance' ||
+      contentType === 'daily-records'; // Clients, licenses, contracts, work-sheets, remote-assistance, and daily-records have specific components
 
     if (hasSpecificComponents) {
       // Use specific components for implemented content types

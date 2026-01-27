@@ -85,6 +85,18 @@ export const CONTENT_RELATION_CONFIGS: Record<string, RelationFieldConfig[]> = {
       required: false, // Optional - daily records can exist without client reference
       displayName: 'Cliente',
     },
+    {
+      fieldName: 'workSheetId',
+      targetType: 'work-sheets',
+      required: false, // Optional - activities can optionally link to work sheets
+      displayName: 'Folha de Obra',
+    },
+    {
+      fieldName: 'remoteAssistanceId',
+      targetType: 'remote-assistance',
+      required: false, // Optional - activities can optionally link to remote assistance
+      displayName: 'Assistência Remota',
+    },
   ],
   // Clients don't have relations to other content types currently
   clients: [],
