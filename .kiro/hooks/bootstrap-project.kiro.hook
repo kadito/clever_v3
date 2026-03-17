@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Bootstrap Project",
+  "description": "Analyzes the repo and generates project-level steerings and hooks via V-cycle.",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Activate the power \"kiro-spec-methodology\" #project-bootstrap.md The keyword is \"bootproject\"."
+  }
+}

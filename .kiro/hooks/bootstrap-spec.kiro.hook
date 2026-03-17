@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Bootstrap Spec",
+  "description": "Creates the brief, pipeline and starts a new spec in V-cycle mode.",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Activate the power \"kiro-spec-methodology\" #spec-bootstrap.md The keyword is \"bootspec\"."
+  }
+}

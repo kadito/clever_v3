@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Type Check",
+  "description": "Runs pnpm type-check across all packages.",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "pnpm type-check"
+  }
+}

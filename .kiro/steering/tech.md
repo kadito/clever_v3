@@ -1,125 +1,59 @@
-# Technology Stack
+# Tech Stack
 
-## Build System
+## Package manager
 
-- **Monorepo**: pnpm workspaces with TypeScript project references
-- **Node.js**: >=18.0.0 required
-- **pnpm**: >=8.0.0 required
-- **TypeScript**: v5+ with strict mode enabled
+- pnpm >=8.0.0 — always use `pnpm`, never npm/yarn
+- Workspace protocol: `workspace:*` for internal deps
+- Node.js >=18.0.0
 
-## Frontend Stack
+## Packages
 
-- **Vue 3** with Composition API
-- **Vue Router 4** for routing with dashboard-centric navigation
-- **Pinia** for state management
-- **Vite** for build tooling and dev server
-- **Tailwind CSS** for styling with mobile-first responsive design
-- **Vitest** for testing
+| Package            | Role                      |
+|--------------------|---------------------------|
+| `@clever/shared`   | Types, utils, permissions |
+| `@clever/frontend` | Vue 3 SPA                 |
+| `@clever/backend`  | Hono API on CF Workers    |
 
-## Design Philosophy
+## Frontend
 
-- **Mobile-First**: All components designed for mobile screens first, then
-  enhanced for larger screens with 44px minimum touch targets
-- **5-View Pattern**: Home (dashboard) → List (search) → Detail → Create →
-  Update for all content types (separate Create/Update components)
-- **Color Palette**: Based on old_src (#75AE93 primary, #2c3e50 secondary)
-- **Touch-Friendly**: Optimized for mobile interactions with proper tap targets
-- **Form Architecture**: Shared form data composable with component recreation
-  handling
-- **UI Patterns**: Multiselect dropdowns, conditional fields, dynamic
-  configuration management
+- Vue 3 + Composition API (no Options API, no class components)
+- Vue Router 4, Pinia, Vite, Tailwind CSS v3
+- Clerk (`@clerk/clerk-js`) for auth
+- Testing: Vitest + @vue/test-utils + fast-check (PBT)
+- Path alias: `@/` → `packages/frontend/src/`
 
-## Backend Stack
+## Backend
 
-- **Hono** web framework
-- **Cloudflare Workers** runtime
-- **Wrangler** for deployment and local development
+- Hono on Cloudflare Workers
+- `@hono/clerk-auth` for JWT verification
+- Storage: Cloudflare R2 (JSON docs) + KV (static assets)
+- Testing: Vitest + fast-check
 
-## Code Quality Tools
+## Shared
 
-- **ESLint** with TypeScript and Vue plugins
-- **Prettier** for code formatting
-- **TypeScript** strict mode for type checking
+- Pure TypeScript, no runtime deps
+- Exports: types, permissions, utils, relation helpers, balance types
 
-## Development Environment
-
-### Local Development Setup
-
-**IMPORTANT: The development server is ALWAYS RUNNING.**
-
-**Access URLs:**
-
-- **Application**: http://localhost:8787/
-- **API Endpoints**: http://localhost:8787/api/\*
-- **Vue SPA**: All non-API routes served by Vue Router
-
-**Development Server Assumptions:**
-
-- **DO NOT run `pnpm dev`** - the server is already running
-- **DO NOT start any development servers** - they are already active
-- If server doesn't respond, inform the user to restart it manually
-- Single Wrangler dev server serves both frontend and backend
-- Vue static files served from KV binding in development
-- API routes handled by Hono, all other routes serve Vue SPA
-
-### Alternative Development Commands
+## Commands
 
 ```bash
-# Start frontend only (for isolated frontend development)
-pnpm --filter @clever/frontend dev
-
-# Start backend only (for isolated backend development)
-pnpm --filter @clever/backend dev
-```
-
-**Note:** Use `pnpm dev` from root for normal development as it provides the
-complete integrated experience.
-
-### Building
-
-```bash
-# Build all packages
-pnpm build
-
-# Build specific package
-pnpm --filter @clever/shared build
-```
-
-### Code Quality
-
-```bash
-# Run all checks (type-check, lint, format)
-pnpm check-all
-
-# Type checking
-pnpm type-check
-
-# Linting
-pnpm lint
-pnpm lint:fix
-
-# Formatting
-pnpm format
-pnpm format:check
-```
-
-### Testing
-
-```bash
-# Run all tests
-pnpm test
-
-# Test specific package (replace WORKSPACE with package name)
-pnpm --filter @clever/WORKSPACE test
-
-# Examples:
+pnpm dev                           # Full-stack (Wrangler, port 8787) — ALWAYS RUNNING, do not restart
+pnpm build                         # Build all packages
+pnpm test                          # All tests
 pnpm --filter @clever/frontend test
 pnpm --filter @clever/backend test
 pnpm --filter @clever/shared test
+pnpm type-check                    # tsc --build across all
+pnpm check-all                     # type-check + lint + format:check
+pnpm lint:fix
+pnpm format
+pnpm deploy:test                   # build + wrangler deploy (test env)
+pnpm deploy:prod                   # build + wrangler deploy --env production
 ```
 
-## Package Structure
+## Dev server
 
-- `@clever/shared` - Common types and utilities
-- `@clever/frontend` - Vue 3 application
-- `@clever/backend` - Hono API server
+- URL: http://localhost:8787
+- API: http://localhost:8787/api/*
+- SPA fallback: all non-API routes → Vue Router
+- **Do not run `pnpm dev`** — server is already running
