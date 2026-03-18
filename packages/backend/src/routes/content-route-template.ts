@@ -139,7 +139,7 @@ export function createContentRoutes<T extends BaseContent>(config: ContentRouteC
 
       const searchQuery = c.req.query('search');
       const page = parseInt(c.req.query('page') || '1');
-      const limit = parseInt(c.req.query('limit') || '50');
+      const limit = parseInt(c.req.query('limit') || '10');
 
       // Validate pagination parameters
       if (page < 1 || limit < 1 || limit > 100) {

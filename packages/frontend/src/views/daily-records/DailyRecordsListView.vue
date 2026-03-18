@@ -25,8 +25,10 @@
     :current-page="api.pagination.value.page"
     :total-pages="api.pagination.value.totalPages"
     :total-count="api.pagination.value.total"
-    :show-pagination="api.pagination.value.totalPages > 1"
+    :items-per-page="itemsPerPage"
+    :show-pagination="api.pagination.value.total > 0"
     @page-change="handlePageChange"
+    @items-per-page-change="handleItemsPerPageChange"
     @clear-error="clearError"
   >
     <!-- Custom daily record icon -->
@@ -169,6 +171,7 @@ const isLoading = ref(false);
 const searchQuery = ref('');
 const error = ref<string | null>(null);
 const hasFetched = ref(false);
+const itemsPerPage = ref(10);
 
 // Clear error function
 const clearError = () => {
@@ -365,7 +368,7 @@ const handleEdit = (item: BaseContent) => {
 // Page change handler
 const handlePageChange = async (page: number) => {
   isLoading.value = true;
-  await api.fetchList({ page }).then(() => {
+  await api.fetchList({ page, limit: itemsPerPage.value }).then(() => {
     if (api.items.value) {
       dailyRecords.value = (api.items.value as ContentWithRelations<DailyRecord['data']>[]).sort(
         (a, b) => {
@@ -387,6 +390,32 @@ const handlePageChange = async (page: number) => {
   });
 };
 
+// Items per page change handler
+const handleItemsPerPageChange = async (limit: number) => {
+  itemsPerPage.value = limit;
+  isLoading.value = true;
+  await api.fetchList({ page: 1, limit }).then(() => {
+    if (api.items.value) {
+      dailyRecords.value = (api.items.value as ContentWithRelations<DailyRecord['data']>[]).sort(
+        (a, b) => {
+          const dateA = new Date(a.data.dataRegistro);
+          const dateB = new Date(b.data.dataRegistro);
+          const dateDiff = dateB.getTime() - dateA.getTime();
+          if (dateDiff !== 0) return dateDiff;
+          const createdA = new Date(a.createdAt);
+          const createdB = new Date(b.createdAt);
+          return createdB.getTime() - createdA.getTime();
+        }
+      );
+    }
+  }).catch((err) => {
+    console.error('Error changing items per page:', JSON.stringify(err, null, 2));
+    error.value = err instanceof Error ? err.message : 'Erro ao carregar registos diários';
+  }).finally(() => {
+    isLoading.value = false;
+  });
+};
+
 // Data loading
 const loadDailyRecords = async () => {
   try {
@@ -394,7 +423,7 @@ const loadDailyRecords = async () => {
     clearError();
 
     console.log('Loading daily records...');
-    await api.fetchList();
+    await api.fetchList({ limit: itemsPerPage.value });
 
     if (api.items.value) {
       // Sort daily records by date descending (newest first) - as per requirements 12.5

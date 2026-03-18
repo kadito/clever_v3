@@ -166,16 +166,33 @@
         </div>
       </div>
 
-      <!-- Pagination (if needed) -->
+      <!-- Pagination -->
       <div
-        v-if="showPagination && totalPages > 1"
-        class="flex items-center justify-between pt-6 border-t border-gray-200 mt-6"
+        v-if="showPagination && totalCount && totalCount > 0"
+        class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 border-t border-gray-200 mt-6"
       >
-        <div class="text-sm text-gray-700">
-          Mostrando {{ startItem }} a {{ endItem }} de {{ totalCount }} resultados
+        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+          <div class="text-sm text-gray-700">
+            Mostrando {{ startItem }} a {{ endItem }} de {{ totalCount }} resultados
+          </div>
+
+          <!-- Items per page selector -->
+          <div class="flex items-center gap-2">
+            <label for="items-per-page" class="text-sm text-gray-500">Por página:</label>
+            <select
+              id="items-per-page"
+              :value="itemsPerPage"
+              @change="handleItemsPerPageChange(Number(($event.target as HTMLSelectElement).value))"
+              class="text-sm border border-gray-300 rounded-lg px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 touch-target"
+            >
+              <option :value="10">10</option>
+              <option :value="20">20</option>
+              <option :value="50">50</option>
+            </select>
+          </div>
         </div>
 
-        <div class="flex items-center space-x-2">
+        <div v-if="totalPages > 1" class="flex items-center space-x-2">
           <button
             @click="handlePreviousPage"
             :disabled="currentPage === 1"
@@ -256,6 +273,7 @@ interface Props {
   totalPages?: number;
   totalCount?: number | null;
   showPagination?: boolean;
+  itemsPerPage?: number;
 
   // Create button
   showCreateButton?: boolean;
@@ -284,6 +302,7 @@ const props = withDefaults(defineProps<Props>(), {
   totalPages: 1,
   totalCount: null,
   showPagination: false,
+  itemsPerPage: 10,
   showCreateButton: true,
   createButtonText: 'Criar Novo',
   emptyIcon: '📄',
@@ -312,6 +331,7 @@ const emit = defineEmits<{
 
   // Pagination events
   pageChange: [page: number];
+  itemsPerPageChange: [limit: number];
 
   // Error handling
   clearError: [];
@@ -325,12 +345,12 @@ const displayedItems = computed(() => props.items);
 
 const startItem = computed(() => {
   if (!props.totalCount || props.totalCount === 0) return 0;
-  return (props.currentPage - 1) * 10 + 1;
+  return (props.currentPage - 1) * props.itemsPerPage + 1;
 });
 
 const endItem = computed(() => {
   if (!props.totalCount) return 0;
-  const end = props.currentPage * 10;
+  const end = props.currentPage * props.itemsPerPage;
   return Math.min(end, props.totalCount);
 });
 
@@ -362,6 +382,10 @@ const handleCreate = () => {
 
 const handleEdit = (item: BaseContent) => {
   emit('edit', item);
+};
+
+const handleItemsPerPageChange = (limit: number) => {
+  emit('itemsPerPageChange', limit);
 };
 
 const handlePreviousPage = () => {

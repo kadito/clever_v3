@@ -160,12 +160,29 @@
         </div>
 
         <!-- Pagination -->
-        <div v-if="totalPages > 1" class="flex items-center justify-between pt-6">
-          <div class="text-sm text-gray-700">
-            Mostrando {{ startItem }} a {{ endItem }} de {{ totalItems }} resultados
+        <div v-if="totalItems > 0" class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div class="text-sm text-gray-700">
+              Mostrando {{ startItem }} a {{ endItem }} de {{ totalItems }} resultados
+            </div>
+
+            <!-- Items per page selector -->
+            <div class="flex items-center gap-2">
+              <label for="items-per-page-generic" class="text-sm text-gray-500">Por página:</label>
+              <select
+                id="items-per-page-generic"
+                :value="itemsPerPage"
+                @change="handleItemsPerPageChange(Number(($event.target as HTMLSelectElement).value))"
+                class="text-sm border border-gray-300 rounded-lg px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 touch-target"
+              >
+                <option :value="10">10</option>
+                <option :value="20">20</option>
+                <option :value="50">50</option>
+              </select>
+            </div>
           </div>
 
-          <div class="flex items-center space-x-2">
+          <div v-if="totalPages > 1" class="flex items-center space-x-2">
             <button
               @click="previousPage"
               :disabled="currentPage === 1"
@@ -266,11 +283,11 @@ const filters = computed(() => [
 
 const startItem = computed(() => {
   if (totalItems.value === 0) return 0;
-  return (currentPage.value - 1) * 10 + 1;
+  return (currentPage.value - 1) * itemsPerPage.value + 1;
 });
 
 const endItem = computed(() => {
-  const end = currentPage.value * 10;
+  const end = currentPage.value * itemsPerPage.value;
   return Math.min(end, totalItems.value);
 });
 
@@ -281,6 +298,12 @@ const handleSearch = (query: string) => {
 
 const handleFilter = (updatedFilters: any[]) => {
   // Filter logic will be implemented when needed
+};
+
+const handleItemsPerPageChange = (limit: number) => {
+  itemsPerPage.value = limit;
+  currentPage.value = 1;
+  refresh();
 };
 
 const navigateToDetail = (id: string) => {
