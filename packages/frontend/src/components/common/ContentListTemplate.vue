@@ -169,65 +169,69 @@
       <!-- Pagination -->
       <div
         v-if="showPagination && totalCount && totalCount > 0"
-        class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 border-t border-gray-200 mt-6"
+        class="pagination-bar pt-6 border-t border-gray-200 mt-6"
       >
-        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-          <div class="text-sm text-gray-700">
-            Mostrando {{ startItem }} a {{ endItem }} de {{ totalCount }} resultados
+        <!-- Mobile: stacked, centered layout -->
+        <!-- Desktop: single row -->
+        <div class="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
+          <!-- Page navigation (shown first on mobile for quick access) -->
+          <div v-if="totalPages > 1" class="flex items-center gap-1 order-1 sm:order-2">
+            <button
+              @click="handlePreviousPage"
+              :disabled="currentPage === 1"
+              class="pagination-btn"
+              aria-label="Página anterior"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+
+            <span class="px-4 py-2 text-sm font-medium text-gray-700 select-none">
+              {{ currentPage }} / {{ totalPages }}
+            </span>
+
+            <button
+              @click="handleNextPage"
+              :disabled="currentPage === totalPages"
+              class="pagination-btn"
+              aria-label="Próxima página"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
           </div>
 
-          <!-- Items per page selector -->
-          <div class="flex items-center gap-2">
-            <label for="items-per-page" class="text-sm text-gray-500">Por página:</label>
+          <!-- Results count + per page selector -->
+          <div class="flex items-center gap-3 order-2 sm:order-1">
+            <span class="text-sm text-gray-500">
+              {{ startItem }}–{{ endItem }} de {{ totalCount }}
+            </span>
+
+            <span class="text-gray-300">|</span>
+
             <select
-              id="items-per-page"
               :value="itemsPerPage"
               @change="handleItemsPerPageChange(Number(($event.target as HTMLSelectElement).value))"
-              class="text-sm border border-gray-300 rounded-lg px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 touch-target"
+              class="pagination-select"
+              aria-label="Resultados por página"
             >
-              <option :value="10">10</option>
-              <option :value="20">20</option>
-              <option :value="50">50</option>
+              <option :value="10">10 / pág</option>
+              <option :value="20">20 / pág</option>
+              <option :value="50">50 / pág</option>
             </select>
           </div>
-        </div>
-
-        <div v-if="totalPages > 1" class="flex items-center space-x-2">
-          <button
-            @click="handlePreviousPage"
-            :disabled="currentPage === 1"
-            class="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-touch hover:bg-gray-100 transition-colors duration-200 touch-target"
-            aria-label="Página anterior"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
-
-          <span class="px-3 py-1 text-sm font-medium text-gray-700">
-            {{ currentPage }} de {{ totalPages }}
-          </span>
-
-          <button
-            @click="handleNextPage"
-            :disabled="currentPage === totalPages"
-            class="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-touch hover:bg-gray-100 transition-colors duration-200 touch-target"
-            aria-label="Próxima página"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </button>
         </div>
       </div>
     </div>
@@ -478,5 +482,34 @@ const clearError = () => {
 /* Portuguese text optimization */
 .content-list-item {
   @apply text-portuguese;
+}
+
+/* Pagination controls */
+.pagination-btn {
+  @apply flex items-center justify-center w-11 h-11 rounded-full text-gray-500
+    hover:text-gray-700 hover:bg-gray-100
+    disabled:opacity-40 disabled:cursor-not-allowed
+    transition-colors duration-200;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.pagination-select {
+  @apply text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-700
+    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
+    appearance-none cursor-pointer;
+  min-height: 44px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.25em 1.25em;
+  padding-right: 2rem;
+}
+
+/* Touch-friendly pagination on mobile */
+@media (hover: none) {
+  .pagination-btn:active:not(:disabled) {
+    @apply bg-gray-200 scale-95;
+  }
 }
 </style>

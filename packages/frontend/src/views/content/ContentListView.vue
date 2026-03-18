@@ -160,62 +160,67 @@
         </div>
 
         <!-- Pagination -->
-        <div v-if="totalItems > 0" class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6">
-          <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-            <div class="text-sm text-gray-700">
-              Mostrando {{ startItem }} a {{ endItem }} de {{ totalItems }} resultados
+        <div v-if="totalItems > 0" class="pt-6">
+          <div class="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
+            <!-- Page navigation (shown first on mobile for quick access) -->
+            <div v-if="totalPages > 1" class="flex items-center gap-1 order-1 sm:order-2">
+              <button
+                @click="previousPage"
+                :disabled="currentPage === 1"
+                class="flex items-center justify-center w-11 h-11 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-200"
+                aria-label="Página anterior"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </button>
+
+              <span class="px-4 py-2 text-sm font-medium text-gray-700 select-none">
+                {{ currentPage }} / {{ totalPages }}
+              </span>
+
+              <button
+                @click="nextPage"
+                :disabled="currentPage === totalPages"
+                class="flex items-center justify-center w-11 h-11 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-200"
+                aria-label="Próxima página"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
             </div>
 
-            <!-- Items per page selector -->
-            <div class="flex items-center gap-2">
-              <label for="items-per-page-generic" class="text-sm text-gray-500">Por página:</label>
+            <!-- Results count + per page selector -->
+            <div class="flex items-center gap-3 order-2 sm:order-1">
+              <span class="text-sm text-gray-500">
+                {{ startItem }}–{{ endItem }} de {{ totalItems }}
+              </span>
+
+              <span class="text-gray-300">|</span>
+
               <select
-                id="items-per-page-generic"
                 :value="itemsPerPage"
                 @change="handleItemsPerPageChange(Number(($event.target as HTMLSelectElement).value))"
-                class="text-sm border border-gray-300 rounded-lg px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 touch-target"
+                class="text-sm border border-gray-300 rounded-lg px-3 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 cursor-pointer"
+                style="min-height: 44px"
+                aria-label="Resultados por página"
               >
-                <option :value="10">10</option>
-                <option :value="20">20</option>
-                <option :value="50">50</option>
+                <option :value="10">10 / pág</option>
+                <option :value="20">20 / pág</option>
+                <option :value="50">50 / pág</option>
               </select>
             </div>
-          </div>
-
-          <div v-if="totalPages > 1" class="flex items-center space-x-2">
-            <button
-              @click="previousPage"
-              :disabled="currentPage === 1"
-              class="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg hover:bg-gray-100 transition-colors duration-200 touch-target"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </button>
-
-            <span class="px-3 py-1 text-sm font-medium text-gray-700">
-              {{ currentPage }} de {{ totalPages }}
-            </span>
-
-            <button
-              @click="nextPage"
-              :disabled="currentPage === totalPages"
-              class="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg hover:bg-gray-100 transition-colors duration-200 touch-target"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
           </div>
         </div>
       </div>
