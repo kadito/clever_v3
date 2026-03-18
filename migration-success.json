@@ -1,0 +1,787 @@
+[
+  {
+    "uuid": "0c67a3a0-20ab-4b53-b781-40546103fe9a",
+    "nomeEmpresa": "Forno da Serra Lda",
+    "nomeComercial": "Forno da Serra"
+  },
+  {
+    "uuid": "177f6b60-f74c-45c4-9ba5-5fb0e87f0e6e",
+    "nomeEmpresa": "Sociedade Recreativa Relvense",
+    "nomeComercial": "Sociedade Recreativa Relvense"
+  },
+  {
+    "uuid": "274a393c-874b-4c12-b17c-e37dae74c99c",
+    "nomeEmpresa": "Rui Ribeiro Teixeira Unipessoal Lda",
+    "nomeComercial": "Zé Povinho"
+  },
+  {
+    "uuid": "326ba125-c6c7-4fd2-b19c-0153e5bfa6d1",
+    "nomeEmpresa": "Hospital Cuf Cascais, S.a.",
+    "nomeComercial": "Hospital Cuf Cascais, S.a."
+  },
+  {
+    "uuid": "3b4f3fe3-e8a7-49f1-8f53-c9a0997633a4",
+    "nomeEmpresa": "Armando Ilda & Filhos Lda",
+    "nomeComercial": "Adega 25 de Abril"
+  },
+  {
+    "uuid": "3d5f4dae-adf6-41e3-84e1-b1a6019133d8",
+    "nomeEmpresa": "Soma de Talentos, Lda",
+    "nomeComercial": "Nairobi"
+  },
+  {
+    "uuid": "58392b47-adaa-45ac-82e8-52b43238c90f",
+    "nomeEmpresa": "Arquimino Carapau Unipessoal, Lda",
+    "nomeComercial": "Sabores com Alma"
+  },
+  {
+    "uuid": "aaaecb4d-a425-435e-9aad-e3109ec23501",
+    "nomeEmpresa": "José Luis Costa Coutinho, Unipessoal, Lda",
+    "nomeComercial": "Pão Artesanal Caldas/Pão com Chouriço"
+  },
+  {
+    "uuid": "d0caff72-dbbc-422a-b6de-2bb6c0b69b5a",
+    "nomeEmpresa": "Costa Brava - Cafe Restaurante, Lda",
+    "nomeComercial": "Restaurante Costa Brava"
+  },
+  {
+    "uuid": "d25e0e4e-43ee-420e-87c1-407b973b3f42",
+    "nomeEmpresa": "Jose Manuel Serralheiro Costa Lda",
+    "nomeComercial": "Restaurante Toucinho"
+  },
+  {
+    "uuid": "ed5e941b-1295-45c4-8156-de491011f67a",
+    "nomeEmpresa": "Hospital Cuf Infante Santo S A",
+    "nomeComercial": "Hospital Cuf Infante Santo S A"
+  },
+  {
+    "uuid": "f29ca52d-b942-4726-aca2-614186d9d250",
+    "nomeEmpresa": "Resposta Sincera - Unipessoal Lda",
+    "nomeComercial": "Café Louro"
+  },
+  {
+    "uuid": "02c4cf93-e974-4564-8f79-a9c267406006",
+    "nomeEmpresa": "Padaria Madrilena, Lda.",
+    "nomeComercial": "Padaria Madrilena"
+  },
+  {
+    "uuid": "070faef8-e154-4be6-b9e9-ec9940fe98f0",
+    "nomeEmpresa": "Jose Faustino Antunes Unipessoal Lda",
+    "nomeComercial": "Jose Faustino Antunes Unipessoal Lda"
+  },
+  {
+    "uuid": "16a9bf98-b4df-4739-bbdf-314628f2ec92",
+    "nomeEmpresa": "Apcel Lojas Lda",
+    "nomeComercial": "Gema d'Évora"
+  },
+  {
+    "uuid": "1cd0430c-0f94-4d8b-bb60-f496f1f08f04",
+    "nomeEmpresa": "Aguas da Figueira S A",
+    "nomeComercial": "Aguas da Figueira S A"
+  },
+  {
+    "uuid": "237677cd-72dc-4238-b5fe-5a816f27e1ba",
+    "nomeEmpresa": "Bruno Gomes Unipessoal, Lda",
+    "nomeComercial": "Café Tenda"
+  },
+  {
+    "uuid": "25ff2c83-a30a-41c6-aada-9a34808dfdd7",
+    "nomeEmpresa": "Dolphingadget Unipessoal Lda",
+    "nomeComercial": "Dolphingadget Unipessoal Lda"
+  },
+  {
+    "uuid": "26e763db-ab03-4bd8-995c-d8e99c6c1144",
+    "nomeEmpresa": "Armando Nunes Afonso",
+    "nomeComercial": "Cervejaria Armando"
+  },
+  {
+    "uuid": "27af0005-f2d9-4108-a82c-289a83e774bb",
+    "nomeEmpresa": "Pastelaria - Diogo & Cristina Lda",
+    "nomeComercial": "Dolce Peccato"
+  },
+  {
+    "uuid": "29d45b9c-9f5c-4f71-bb5f-ff7c7ece9c5a",
+    "nomeEmpresa": "Café Chamite Paivense, Lda",
+    "nomeComercial": "Pastelaria Chaimite"
+  },
+  {
+    "uuid": "36d47166-21d2-4cec-a80a-e860e4f929ab",
+    "nomeEmpresa": "Portis, SA",
+    "nomeComercial": "Portis, SA"
+  },
+  {
+    "uuid": "382d67c6-f5eb-43d9-be9e-043642377991",
+    "nomeEmpresa": "Cafetaria Gelataria Central Pinhal Rei, Lda",
+    "nomeComercial": "Central Dos Leitões"
+  },
+  {
+    "uuid": "3a1a0d2a-86bf-414e-9b6f-490fc4ea41d7",
+    "nomeEmpresa": "Cunha & Oliveira Lda",
+    "nomeComercial": "Restaurante Oh Carlos"
+  },
+  {
+    "uuid": "42b66534-7f4a-4922-a65a-df838b9ace04",
+    "nomeEmpresa": "Ana Paula Tavares Carvalho",
+    "nomeComercial": "Cabelereiro de Celas"
+  },
+  {
+    "uuid": "52ce74e6-b8b6-4a4c-ab9b-5ae41ee58023",
+    "nomeEmpresa": "Mini Mercado Passagem Unipessoal, Lda",
+    "nomeComercial": "Mini Mercado Passagem"
+  },
+  {
+    "uuid": "553b73e5-0491-42af-85ed-f18c3d5db5f1",
+    "nomeEmpresa": "Stop Snack Bar e Pastelaria, Lda.",
+    "nomeComercial": "Pastelaria Nanni"
+  },
+  {
+    "uuid": "60dbc3cd-2c93-421a-ba31-df1be8eadbef",
+    "nomeEmpresa": "Impactdistance Lda",
+    "nomeComercial": "Impactdistance"
+  },
+  {
+    "uuid": "632170c9-243f-42e3-ad8f-e986c63b10c9",
+    "nomeEmpresa": "Ana Catarina Lima",
+    "nomeComercial": "Café Musgueira"
+  },
+  {
+    "uuid": "67bd604e-fa0e-4b7d-af81-82dccde18dda",
+    "nomeEmpresa": "Kofler Group Portugal Lda",
+    "nomeComercial": "Kofler Group Portugal Lda"
+  },
+  {
+    "uuid": "67c36527-67d3-476b-b507-dfeb412caf61",
+    "nomeEmpresa": "Cafe do Cais Actividades Hoteleiras Lda",
+    "nomeComercial": "Havana"
+  },
+  {
+    "uuid": "7167468e-2a1f-4897-921b-c4ed4e532b2c",
+    "nomeEmpresa": "Baltazar & Carla de Sousa Lda",
+    "nomeComercial": "O Frangote"
+  },
+  {
+    "uuid": "78137089-ca0e-4459-b88a-716981e998c8",
+    "nomeEmpresa": "Js5 Restauração Lda",
+    "nomeComercial": "O Farnel"
+  },
+  {
+    "uuid": "84fc1145-1a2a-479a-be30-633656ba5a44",
+    "nomeEmpresa": "Ementa Certa - Restauração, Lda",
+    "nomeComercial": "Restaurante O Carvoeiro"
+  },
+  {
+    "uuid": "868de371-ee2e-406b-b2a7-423e5a9ea361",
+    "nomeEmpresa": "Carlos Pereira Ferreira",
+    "nomeComercial": "Café Central Cortes"
+  },
+  {
+    "uuid": "8a2e5a44-b9d0-44f9-bac9-80155a3da919",
+    "nomeEmpresa": "HPC - Importação de Roupas e Artigos Desportivos, Lda",
+    "nomeComercial": "HAWAII"
+  },
+  {
+    "uuid": "92ac1097-2313-485e-838e-9c4026e68c07",
+    "nomeEmpresa": "O Reino dos Frangos, Lda",
+    "nomeComercial": "Churrasqueira Reino dos Frangos"
+  },
+  {
+    "uuid": "9523e1ef-48ac-48b1-b40c-2f78c53e54bc",
+    "nomeEmpresa": "Jose Julio Ferreira Coelho",
+    "nomeComercial": "Pastelaria Pedroguense"
+  },
+  {
+    "uuid": "9b8f91f0-3b33-4ed8-8637-d42cc73e79a0",
+    "nomeEmpresa": "Manuela Pombinha Uni. Lda.",
+    "nomeComercial": "Restaurante Rosa dos Ventos"
+  },
+  {
+    "uuid": "9bd3b687-3707-4191-b26a-e0b8ab8f9448",
+    "nomeEmpresa": "Xodo - Pastelaria e Padaria, Lda",
+    "nomeComercial": "Xodo"
+  },
+  {
+    "uuid": "9ed1d1c8-c1c2-410a-aa15-d639317fea61",
+    "nomeEmpresa": "Pastelaria Manos do 8 Lda",
+    "nomeComercial": "Pastelaria Manos do 8"
+  },
+  {
+    "uuid": "a886b0ac-10df-4af5-b4d8-857d895354f0",
+    "nomeEmpresa": "Daiac - Empreendimentos Hoteleiros e Rest. Unip. Lda",
+    "nomeComercial": "Tapas Bar"
+  },
+  {
+    "uuid": "af1232d3-b058-4286-9c82-77183a5b2698",
+    "nomeEmpresa": "Miguel Abrantes - Vinhos Unipessoal, Lda",
+    "nomeComercial": "Miguel Abrantes - Vinhos Unipessoal, Lda"
+  },
+  {
+    "uuid": "b244b5ac-1d23-4832-acf7-df0af554652d",
+    "nomeEmpresa": "Maria Madalena Pedrosa Leandro (Casa Marquinhas)",
+    "nomeComercial": "Casa Marquinhas Enguias"
+  },
+  {
+    "uuid": "bcdf039f-2c7d-4f55-88d3-1b39339e489f",
+    "nomeEmpresa": "Cesar Ricardo Ramusga Lopes",
+    "nomeComercial": "Cesar Ricardo Ramusga Lopes"
+  },
+  {
+    "uuid": "d00a1aa7-3b6b-4e9f-89a9-f212ad56e23b",
+    "nomeEmpresa": "Chuva D'Alfaces Unipessoal, Lda.",
+    "nomeComercial": "Chuva D'Alfaces"
+  },
+  {
+    "uuid": "e0225889-aa67-431d-bec8-51fba034d80c",
+    "nomeEmpresa": "Fernandes e Alexandre - Restaurantes, Lda.",
+    "nomeComercial": "Via Rápida"
+  },
+  {
+    "uuid": "e5241ea3-22c4-4816-b59a-71459410f80b",
+    "nomeEmpresa": "Cristovão Martins Santos",
+    "nomeComercial": "G Club"
+  },
+  {
+    "uuid": "eda780f6-430c-4367-b3a1-773c9c44fc17",
+    "nomeEmpresa": "Restaurante Barraca de Pau, Limitada",
+    "nomeComercial": "Restaurante Barraca de Pau"
+  },
+  {
+    "uuid": "fbd2874e-4093-4a7e-9983-279dd53be630",
+    "nomeEmpresa": "Graça Martins Cabeleireiro, Lda.",
+    "nomeComercial": "Cabelereiro Graça Martins"
+  },
+  {
+    "uuid": "0cd3c78f-6d61-4af7-ad6d-e60fff077e14",
+    "nomeEmpresa": "Ying Shan, Unipessoal Lda",
+    "nomeComercial": "Pão Quente Volta de Mar"
+  },
+  {
+    "uuid": "121082fb-8964-4421-b471-805fb30e8f00",
+    "nomeEmpresa": "Brejo Doce Comercio de Pastelaria e Pão Quente Lda",
+    "nomeComercial": "Brejo Doce Pastelaria"
+  },
+  {
+    "uuid": "172f8b9e-d21f-464a-a600-7fd796965f7a",
+    "nomeEmpresa": "Girafas - Snack Bar e Actividades Similares Lda.",
+    "nomeComercial": "Girafas - Snack Bar e Actividades Similares Lda."
+  },
+  {
+    "uuid": "1dc602ec-4a61-4f19-8e6a-48e99d67490b",
+    "nomeEmpresa": "Vânia Patrícia Cancela Freitas",
+    "nomeComercial": "Café A Ponte"
+  },
+  {
+    "uuid": "1fe3e786-4e5d-4bf8-9826-cc87bfc0c88e",
+    "nomeEmpresa": "Paladares Poéticos Unipessoal, Lda.",
+    "nomeComercial": "Paladares Poéticos"
+  },
+  {
+    "uuid": "21f9afd5-ac93-480c-9a64-dc1d640b616a",
+    "nomeEmpresa": "Maria de Fatima Gomes Oliveira Marrafa",
+    "nomeComercial": "Tasca da Fatinha"
+  },
+  {
+    "uuid": "2422ab46-2112-4660-b9b6-bec8486dd110",
+    "nomeEmpresa": "Rui Miguel Marreiros Delfino",
+    "nomeComercial": "Castanha Dourada"
+  },
+  {
+    "uuid": "24d29c09-00cb-4863-a265-7cbe09a560b4",
+    "nomeEmpresa": "Regaloboemio, Lda",
+    "nomeComercial": "Pastelaria Fontinha"
+  },
+  {
+    "uuid": "253bd61a-d355-4211-b532-1a2759d6d783",
+    "nomeEmpresa": "Baptista & Vinagre, Lda",
+    "nomeComercial": " Unicroissant Nazaré"
+  },
+  {
+    "uuid": "263acaa5-ee74-451b-a5ed-31f3c6a8ffb5",
+    "nomeEmpresa": "Jorge Manuel Tesouro César",
+    "nomeComercial": "Cervejaria Cesar"
+  },
+  {
+    "uuid": "26e2d9d9-0ee5-4490-b872-e2068d7d9ff6",
+    "nomeEmpresa": "Wanessa Marinho Unipessoal, Lda.",
+    "nomeComercial": "MBrasil Rodízio"
+  },
+  {
+    "uuid": "2f76a120-9200-4604-928c-3780882cc750",
+    "nomeEmpresa": "Almargem Praias Lda",
+    "nomeComercial": "Lagoa Ó Mar"
+  },
+  {
+    "uuid": "335009a2-6ae3-4fc4-b0f2-3b7fed876139",
+    "nomeEmpresa": "Carla Almeida Rodrigues unipessoal, Lda",
+    "nomeComercial": "Pastelaria Carla"
+  },
+  {
+    "uuid": "3652c175-347f-4c1d-a258-9c92a1f55bfa",
+    "nomeEmpresa": "Hernani Emanuel Rodrigues Silva Joao",
+    "nomeComercial": "Pastelaria Horizonte"
+  },
+  {
+    "uuid": "37ae40e7-8fb4-42da-873b-0f67fbd68a73",
+    "nomeEmpresa": "Tasis The American School In Portugal S A",
+    "nomeComercial": "Tasis The American School In Portugal S A"
+  },
+  {
+    "uuid": "3816976f-0eb6-4094-be8a-f713c4f8560c",
+    "nomeEmpresa": "Abilvito - Atividades Hoteleiras e Turisticas, Unipoessoal, Lda.",
+    "nomeComercial": "Café Creme"
+  },
+  {
+    "uuid": "3936078f-e212-4fc7-9014-6b1380d19a25",
+    "nomeEmpresa": "Bruna Salsinha Francisco",
+    "nomeComercial": "Versus - CLIENTE FORA DE ATIVIDADE"
+  },
+  {
+    "uuid": "466c3478-aca1-4e61-a44f-d072926c19ca",
+    "nomeEmpresa": "Receita Misterio Unipessoal, Lda.",
+    "nomeComercial": "Café do Centro"
+  },
+  {
+    "uuid": "4a3594f8-08a9-4eca-931a-f886e0ff0c73",
+    "nomeEmpresa": "Ferreira & Araújo - Produtos Alimentares - Sociedade Unipessoal, Lda",
+    "nomeComercial": "Frutaria Tropical"
+  },
+  {
+    "uuid": "4b269c12-ce63-422c-9b9e-0697bb0ec2c4",
+    "nomeEmpresa": "Caravela Sentinela Unipessoal Lda",
+    "nomeComercial": "Amazonia WebCafe"
+  },
+  {
+    "uuid": "4b49ffe0-4667-4f51-b89c-13ee1e38313b",
+    "nomeEmpresa": "Fernando Ricardo Ferreira Cardoso",
+    "nomeComercial": "RICARDO CONCEPT"
+  },
+  {
+    "uuid": "4b85527a-3ab6-4e63-8279-165db5771937",
+    "nomeEmpresa": "Guadiarcos Restaurante Tipico, Lda.",
+    "nomeComercial": "Restaurante Os Arcos"
+  },
+  {
+    "uuid": "4c8210fb-16cb-4f51-8169-2ec4d4b203b0",
+    "nomeEmpresa": "Delicia latina, Lda.",
+    "nomeComercial": "Delicia Latina"
+  },
+  {
+    "uuid": "4dc4c21c-9a85-4f16-83f8-46fc491716cb",
+    "nomeEmpresa": "Godinho & Valerio Lda",
+    "nomeComercial": "Pizzaria La Tavola"
+  },
+  {
+    "uuid": "50ae5b4a-2b9a-433f-b437-a122806c35a7",
+    "nomeEmpresa": "Soma de Talentos, Lda",
+    "nomeComercial": "Eletrico"
+  },
+  {
+    "uuid": "54935357-dc97-450f-90d7-d6945511b3f7",
+    "nomeEmpresa": "Conceitos Objetivos, Lda.",
+    "nomeComercial": "Real Cafetaria"
+  },
+  {
+    "uuid": "5540e569-7abe-4fa6-ab58-82b3535eb297",
+    "nomeEmpresa": "Delicia Latina 2",
+    "nomeComercial": "Delicia Latina 2"
+  },
+  {
+    "uuid": "584fbe6c-cf75-4e41-899d-f30a13caeb00",
+    "nomeEmpresa": "Rainha dos Bytes - Panificação, Lda.",
+    "nomeComercial": "Pastelaria Princesa"
+  },
+  {
+    "uuid": "592cce17-7784-4261-906b-30df89816462",
+    "nomeEmpresa": "Smileflavours - Unipessoal Lda",
+    "nomeComercial": "Gelatomania - Nazaré"
+  },
+  {
+    "uuid": "66a81b23-dfe1-4802-aecc-1fc70121e208",
+    "nomeEmpresa": "Gestinforma, Lda.",
+    "nomeComercial": "Gestinforma, Lda"
+  },
+  {
+    "uuid": "675cecd0-f808-410b-aee8-9070c581e604",
+    "nomeEmpresa": "Fernando Jose da Silva Henriques",
+    "nomeComercial": "Fernando Jose da Silva Henriques"
+  },
+  {
+    "uuid": "6de5ea3f-1a4a-4914-854b-9fd17760f3d1",
+    "nomeEmpresa": "Zona J, Lda. Quiosque da Vila",
+    "nomeComercial": "Quiosque da Vila"
+  },
+  {
+    "uuid": "6ee32f90-d1a4-4fcd-9026-825e021a9dd9",
+    "nomeEmpresa": "Damasio Caixinha Sereno Melo - Pap. Tabacaria, Lda",
+    "nomeComercial": "Papelaria Central"
+  },
+  {
+    "uuid": "7c99e72b-733f-411e-80ea-c515f036434e",
+    "nomeEmpresa": "Fluxo Principal - Unipessoal Lda",
+    "nomeComercial": "Fluxo Principal - Unipessoal Lda"
+  },
+  {
+    "uuid": "864b24c2-8509-4114-a12a-0dd2ccf18f2a",
+    "nomeEmpresa": "Floriano dos Santos & Idalina Sales, Lda.",
+    "nomeComercial": "Restaurante Oceanário"
+  },
+  {
+    "uuid": "8ad327d0-5eca-4025-ab0b-9cb5f349d295",
+    "nomeEmpresa": "Almargem Praias Lda",
+    "nomeComercial": "Taberna D’Vila"
+  },
+  {
+    "uuid": "8cb75093-20da-481b-8ccb-20081908eba1",
+    "nomeEmpresa": "Surpresagradavel Gelataria Lda",
+    "nomeComercial": "Gelatomania São Martinho do Porto"
+  },
+  {
+    "uuid": "8e1a98bd-b9e5-4e3e-b521-71879fcc574a",
+    "nomeEmpresa": "Marcia de Jesus Gonçalves",
+    "nomeComercial": "Marcia de Jesus Gonçalves"
+  },
+  {
+    "uuid": "90279db9-0f5d-4d0d-9508-dc67080a1e91",
+    "nomeEmpresa": "Socieduca - Sociedade de Educação Sa",
+    "nomeComercial": "Socieduca - Sociedade de Educação Sa"
+  },
+  {
+    "uuid": "933d81c9-9c23-444a-8b90-621ef82ace76",
+    "nomeEmpresa": "Js5 Restauração Lda",
+    "nomeComercial": "Hamburgueria Portuguesa"
+  },
+  {
+    "uuid": "96429091-8160-4f1e-ad9b-aab7a03e2b75",
+    "nomeEmpresa": "Alcancimperio - Unipessoal, Lda",
+    "nomeComercial": "Restaurante Praia do Farol"
+  },
+  {
+    "uuid": "9ce7d05b-95e2-4395-8837-d0b2de7a0f7c",
+    "nomeEmpresa": "Doces Suspiros Unipessoal, lda.",
+    "nomeComercial": "Pastelaria Doces Suspiros"
+  },
+  {
+    "uuid": "a0d1169b-169a-4f2e-82d9-19e1b1424ab1",
+    "nomeEmpresa": "Gafaniz & Gafaniz Lda",
+    "nomeComercial": "Gafaniz & Gafaniz Lda"
+  },
+  {
+    "uuid": "a215fbb4-0d49-4a5b-b8f5-1de0ecaf8758",
+    "nomeEmpresa": "Fernando Manuel Teixeira Luis",
+    "nomeComercial": "Sol e Sombra"
+  },
+  {
+    "uuid": "a2307d99-d7db-4eeb-baec-dbf50cb2b518",
+    "nomeEmpresa": "Centro Glass Comercialização e Aplicação de Vidros Em Viaturas Lda",
+    "nomeComercial": "Centro Glass Comercialização e Aplicação de Vidros Em Viaturas Lda"
+  },
+  {
+    "uuid": "af1c12da-bc8f-4218-ab99-53fc23e92380",
+    "nomeEmpresa": "Esquina da Sorte, lda",
+    "nomeComercial": "Esquina da Sorte"
+  },
+  {
+    "uuid": "af4b34dd-ae80-4748-a59f-0f58884e8136",
+    "nomeEmpresa": "Padaria Domingues, Lda.",
+    "nomeComercial": "Padaria Domingues - Puro Gosto"
+  },
+  {
+    "uuid": "bade905d-2de5-4d23-ac4f-782cd30d46a9",
+    "nomeEmpresa": "Patinhas de Algodão - Lda",
+    "nomeComercial": "Cafe do Largo"
+  },
+  {
+    "uuid": "bc0f73fe-b35e-4185-9676-85a4a82f45cf",
+    "nomeEmpresa": "Rui Freire Restauração Unipessoal, Lda.",
+    "nomeComercial": "Adega do Santos"
+  },
+  {
+    "uuid": "bd83f89e-228c-42a1-b923-9fd9085d2e79",
+    "nomeEmpresa": "Armando J Pereira & Filhos Lda",
+    "nomeComercial": "Restaurante Covas"
+  },
+  {
+    "uuid": "bd9bdbfd-7fb0-4cd9-8a72-c3e919e7c5e1",
+    "nomeEmpresa": "Ondagalapos - Sociedade Marítimo Turística, Lda.",
+    "nomeComercial": "Ondagalapos"
+  },
+  {
+    "uuid": "c5576afa-92b0-46c8-98ce-35273ff2715b",
+    "nomeEmpresa": "Geladaria Doce Veneno, Lda",
+    "nomeComercial": "Geladaria Doce Veneno, Lda"
+  },
+  {
+    "uuid": "ca4772e5-a990-4865-a325-19adccca7209",
+    "nomeEmpresa": "Basilios - Atividades Turisticas Hoteleiras, Unipessoal, Lda.",
+    "nomeComercial": "Basilios Restaurante"
+  },
+  {
+    "uuid": "cda1b816-f919-4aac-bf8f-6373f0d94eca",
+    "nomeEmpresa": "Terracepeople - Turismo Lda",
+    "nomeComercial": "Terracepeople - Turismo Lda"
+  },
+  {
+    "uuid": "d73dadbc-de1a-4939-83d7-6cad2a3f93b6",
+    "nomeEmpresa": "Quotidiano Cordato - LDA",
+    "nomeComercial": "Quotidiano Cordato - LDA"
+  },
+  {
+    "uuid": "d744e32b-97f3-441a-9775-e10a20a983e0",
+    "nomeEmpresa": "Bar Cardoso, Lda",
+    "nomeComercial": "Ambassador Bar"
+  },
+  {
+    "uuid": "dd914f38-4a52-4991-bc11-464864d211c0",
+    "nomeEmpresa": "João Manuel Vaz Pinto",
+    "nomeComercial": "Vertigo Rooftop Bar"
+  },
+  {
+    "uuid": "de058f7b-bb61-4c84-8af4-4887e7af4fff",
+    "nomeEmpresa": "Paulo Mendes & Ana Gonçalves Lda",
+    "nomeComercial": "Gelataria Veneto/Amoremio Praia Barra"
+  },
+  {
+    "uuid": "ee617be2-1da5-4a20-9900-351a3de637c3",
+    "nomeEmpresa": "ZONA J CAFE BAR, LDA.",
+    "nomeComercial": "ZONA J"
+  },
+  {
+    "uuid": "eeedd4c2-69db-4e1c-8669-61c2993a1b71",
+    "nomeEmpresa": "Brasio Inverno Unipessoal Lda",
+    "nomeComercial": "Brasio Inverno"
+  },
+  {
+    "uuid": "fd1d8fe9-c833-4a69-ba44-6b6f880f3953",
+    "nomeEmpresa": "Jornada Glaciar Lda",
+    "nomeComercial": "Gelatomania - Sesimbra"
+  },
+  {
+    "uuid": "f5060ba5-a594-4c1d-853e-c60215ad1caa",
+    "nomeEmpresa": "Sabores100Confusão Unipessoal Lda",
+    "nomeComercial": "Restaurante Raposeira"
+  },
+  {
+    "uuid": "4dd3b8c9-af95-4f66-a0db-37438ae18cb2",
+    "nomeEmpresa": "Fortaleza dos Campeões - Unipessoal Lda",
+    "nomeComercial": "Coffe Break (Fortaleza Campeoes)"
+  },
+  {
+    "uuid": "68b8e7f7-9f84-4a62-81f9-9eafa80c87e3",
+    "nomeEmpresa": "Garça Faiscante Lda",
+    "nomeComercial": "Gelataria Veneza Beppo Vieira"
+  },
+  {
+    "uuid": "a5dae2de-fbba-4598-bbc2-ee915d4b84bc",
+    "nomeEmpresa": "Trevos Abençoados Unipessoal Lda",
+    "nomeComercial": "Restaurante O Pipas"
+  },
+  {
+    "uuid": "a0ed33cb-a8ef-4f70-b6c9-a409aa8d88d2",
+    "nomeEmpresa": "Susana & Sara Fernandes, Lda",
+    "nomeComercial": "Dr.Kid Leiria"
+  },
+  {
+    "uuid": "c35fefb3-fcaa-4859-a370-00f2a70dcfba",
+    "nomeEmpresa": "Vitor Alexandre Mendes Costa",
+    "nomeComercial": "Gelataria Veneto Viseu"
+  },
+  {
+    "uuid": "5ec96bc2-6cb1-4ba1-9ba7-7aa586685563",
+    "nomeEmpresa": "Casa de Repouso Jardim dos Amados lda",
+    "nomeComercial": "Casa de Repouso Jardim dos Amados"
+  },
+  {
+    "uuid": "7f4cf77b-c06b-4ff3-ba71-fecf8bb6110b",
+    "nomeEmpresa": "Sabor do Desassosego Lda",
+    "nomeComercial": "Sabor do Desassossego"
+  },
+  {
+    "uuid": "398d69d3-c54d-4cd9-a871-ea3ac3215e4f",
+    "nomeEmpresa": "Patricia Ya Henda Cirilo da Cruz - Uni. Lda.",
+    "nomeComercial": "Cucina e Conversa"
+  },
+  {
+    "uuid": "d520b5b4-4f8e-41a9-933f-3454ab7658ac",
+    "nomeEmpresa": "Steven Manuel Rosario Martins Lda",
+    "nomeComercial": "Chelsea"
+  },
+  {
+    "uuid": "715a55fd-b5b9-4ceb-8a91-40d7df1b23c8",
+    "nomeEmpresa": "Sussurro Sapiente, Lda.",
+    "nomeComercial": "O Sinaleiro"
+  },
+  {
+    "uuid": "9fdd5472-4484-40c9-bb05-85007ecf8192",
+    "nomeEmpresa": "Climarcer S.A",
+    "nomeComercial": "Climacer"
+  },
+  {
+    "uuid": "490411b6-fac4-439f-b94c-0c56e62e49a3",
+    "nomeEmpresa": "Mercan Property Aviz, Lda",
+    "nomeComercial": "Forno da Telha"
+  },
+  {
+    "uuid": "8f4cb6c1-5042-4bfa-a248-188f10c53350",
+    "nomeEmpresa": "Calco da Ma Cara Lda",
+    "nomeComercial": "Solar dos Cantos"
+  },
+  {
+    "uuid": "f69696bd-df8e-4623-a269-eeabd1e762a5",
+    "nomeEmpresa": "E-DU-Dente, Lda",
+    "nomeComercial": "É Du Dente"
+  },
+  {
+    "uuid": "f68ff95c-e4d5-453a-a154-f28bf21b252f",
+    "nomeEmpresa": "Largo do Paço Investimentos Turisticos e Imobiliarios SA",
+    "nomeComercial": "Largo do Paço"
+  },
+  {
+    "uuid": "f6f4a340-6980-421f-a275-13b8d9a68cf9",
+    "nomeEmpresa": "World Waves Lda",
+    "nomeComercial": "Naada"
+  },
+  {
+    "uuid": "61df604a-3558-4b65-9dad-7045398a341d",
+    "nomeEmpresa": "Andreia Patricia Lourenco da Silva Afonso",
+    "nomeComercial": "Colour Beans"
+  },
+  {
+    "uuid": "8fdc6fc0-9ba2-4354-adec-b7257faeb341",
+    "nomeEmpresa": "Paladares do Paraiso Lda",
+    "nomeComercial": "Casa da Guia"
+  },
+  {
+    "uuid": "52c2d665-8745-4a9f-9774-b5a53319e81e",
+    "nomeEmpresa": "Berço do Papel - Comercio de Papel Lda",
+    "nomeComercial": "Berço do Papel"
+  },
+  {
+    "uuid": "ab669617-7ecd-4858-9c86-6c3446eda0a5",
+    "nomeEmpresa": "Receitas e Sumarios S.A",
+    "nomeComercial": "Batardas"
+  },
+  {
+    "uuid": "5105a7d8-055f-4de1-bdc2-6d112ddea4f8",
+    "nomeEmpresa": "Filipa Fontes",
+    "nomeComercial": "A Canadinha"
+  },
+  {
+    "uuid": "ec324a6a-dba2-4023-a81e-3d8929b6813c",
+    "nomeEmpresa": "Creative Habitat Group Turismo e Arte Lda",
+    "nomeComercial": "Herdade da Barrosinha"
+  },
+  {
+    "uuid": "cb08dcb7-9b3f-40ac-a108-db88fef021fa",
+    "nomeEmpresa": "NRD Nucleo de Radio-Diagnostico, SA.",
+    "nomeComercial": "NRD"
+  },
+  {
+    "uuid": "38f0b672-80bb-4ad3-909c-278a41f6544f",
+    "nomeEmpresa": "Sempre Fantastico Lda",
+    "nomeComercial": "Gelatomania Tomar"
+  },
+  {
+    "uuid": "4ded5655-198f-4f26-bc38-9a0ebb90b345",
+    "nomeEmpresa": "O Peleiro Industria Hotelaria Lda",
+    "nomeComercial": "O Peleiro"
+  },
+  {
+    "uuid": "83b5f25e-3956-4195-adcc-f5a495e39b42",
+    "nomeEmpresa": "Vantagem+ Consultores de Formacao Lda",
+    "nomeComercial": "Vantagem+"
+  },
+  {
+    "uuid": "b1589edb-3374-40ce-a199-0d7db59ed0ad",
+    "nomeEmpresa": "Bernardino Gomes - Gestão Hoteleira SA",
+    "nomeComercial": "Holiday Inn Express"
+  },
+  {
+    "uuid": "fa7d9e0c-aea3-43db-aed7-a4716438d7bd",
+    "nomeEmpresa": "Abençoada Canela - Unipessoal Lda",
+    "nomeComercial": "La Nenette"
+  },
+  {
+    "uuid": "ea505bd1-901e-400e-ba9d-e23d8c7b5248",
+    "nomeEmpresa": "Padaria na Medida, Lda.",
+    "nomeComercial": "Padaria ti Odete"
+  },
+  {
+    "uuid": "a4deae34-1521-45fb-90f5-514a9c18bce3",
+    "nomeEmpresa": "Cfx, Lda.",
+    "nomeComercial": "Papelaria Cesário Verde"
+  },
+  {
+    "uuid": "3156fd47-8aca-401d-bedd-12b07c4f75be",
+    "nomeEmpresa": "Autoridade Supervisão Seguros e Fundos Pensoes",
+    "nomeComercial": "ASF"
+  },
+  {
+    "uuid": "cfc80e5d-e540-401e-ac70-0b5cddd27a51",
+    "nomeEmpresa": "Glamoursentinel - Unipessoal Lda.",
+    "nomeComercial": "Graça Martins"
+  },
+  {
+    "uuid": "aedcba7b-ee95-4520-a5e8-09b387f7a391",
+    "nomeEmpresa": "António Pedro Sardinha Vieira Ramos",
+    "nomeComercial": "Exa.pt"
+  },
+  {
+    "uuid": "b2775ba5-9575-4146-a95d-b187d53995e9",
+    "nomeEmpresa": "Leiriouro Galvanoplastia do Lis Lda",
+    "nomeComercial": "Leiriouro"
+  },
+  {
+    "uuid": "3ad009b6-0ae2-407d-836d-603838673c3d",
+    "nomeEmpresa": "Aveiweb - Tecnologias de Informacao Lda",
+    "nomeComercial": "Aveiweb"
+  },
+  {
+    "uuid": "701208ba-c469-4c16-9cd0-9d1cb05760f8",
+    "nomeEmpresa": "Estrelas Intocáveis, Unip. Lda.",
+    "nomeComercial": "Restaurante Morena"
+  },
+  {
+    "uuid": "90163c56-5d6c-4e6e-b133-1e63a40fa16e",
+    "nomeEmpresa": "Resposta Sincera - Unipessoal Lda",
+    "nomeComercial": "Café Louro Sobreda"
+  },
+  {
+    "uuid": "72adf96a-ce14-44a8-a6b5-35591ab984ce",
+    "nomeEmpresa": "Amadeu & Bruno, Lda.",
+    "nomeComercial": "Restaurante Dona Elvira"
+  },
+  {
+    "uuid": "eb0fcbb6-b437-4e18-8bf6-04526b2ed18b",
+    "nomeEmpresa": "Dream Id-Auditor Sistemas de Gestão e Controlo, Unipessoal, Lda",
+    "nomeComercial": "DreamId"
+  },
+  {
+    "uuid": "33845ea7-ed86-4165-b71e-a690c5dc6442",
+    "nomeEmpresa": "Cafetaria Gelataria Central Pinhal Rei, Lda",
+    "nomeComercial": "Central dos Frangos"
+  },
+  {
+    "uuid": "6a72cdf2-0338-466a-a125-235671ad7d63",
+    "nomeEmpresa": "GALP",
+    "nomeComercial": "Galp Energia, SGPS, S.A."
+  },
+  {
+    "uuid": "c46135b3-9e6a-486c-bddd-6be7ba9ec7b7",
+    "nomeEmpresa": "Dias e Pestana, Lda.",
+    "nomeComercial": "Montes Bistro"
+  },
+  {
+    "uuid": "e30ccec4-b4db-413d-a830-420d237a6175",
+    "nomeEmpresa": "Silva & Rocha, Lda",
+    "nomeComercial": "Tabacaria POP"
+  },
+  {
+    "uuid": "b0027132-6d66-480f-80ee-ec2279cd4f9c",
+    "nomeEmpresa": "Joaquim Neto Unipessoal Lda.",
+    "nomeComercial": "Café Quineto"
+  },
+  {
+    "uuid": "579a02df-f60b-442b-bfe4-9178ef572141",
+    "nomeEmpresa": "Zhong Shan, Unipessoal Lda",
+    "nomeComercial": "A Grelha"
+  }
+]

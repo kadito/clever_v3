@@ -107,24 +107,16 @@
     </header>
 
     <!-- Main content area -->
-    <main class="flex-1">
+    <main class="flex-1 md:flex">
       <!-- Desktop sidebar -->
-      <div class="hidden md:flex">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
-          <div class="p-4">
-            <AppNavigation :is-mobile="false" />
-          </div>
-        </aside>
-
-        <!-- Main content -->
-        <div class="flex-1">
-          <slot />
+      <aside class="hidden md:block w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
+        <div class="p-4">
+          <AppNavigation :is-mobile="false" />
         </div>
-      </div>
+      </aside>
 
-      <!-- Mobile content (full width) -->
-      <div class="md:hidden">
+      <!-- Content area (single slot for both mobile and desktop) -->
+      <div class="flex-1">
         <slot />
       </div>
     </main>

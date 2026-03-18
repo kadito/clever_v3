@@ -22,6 +22,11 @@
     @item-click="handleContractClick"
     @create="handleCreate"
     @edit="handleEdit"
+    :current-page="api.pagination.value.page"
+    :total-pages="api.pagination.value.totalPages"
+    :total-count="api.pagination.value.total"
+    :show-pagination="api.pagination.value.totalPages > 1"
+    @page-change="handlePageChange"
     @clear-error="clearError"
   >
     <!-- Custom contract icon -->
@@ -128,6 +133,7 @@ const contracts = ref<ContentWithRelations<Contract['data']>[]>([]);
 const isLoading = ref(false);
 const searchQuery = ref('');
 const error = ref<string | null>(null);
+const hasFetched = ref(false);
 
 // Clear error function
 const clearError = () => {
@@ -396,6 +402,27 @@ const handleCreate = () => {
 const handleEdit = (item: BaseContent) => {
   const contract = item as ContentWithRelations<Contract['data']>;
   router.push(`/contracts/${contract.uuid}/editar`);
+};
+
+// Page change handler
+const handlePageChange = async (page: number) => {
+  isLoading.value = true;
+  await api.fetchList({ page }).then(() => {
+    if (api.items.value) {
+      contracts.value = (api.items.value as ContentWithRelations<Contract['data']>[]).sort(
+        (a, b) => {
+          const dateA = new Date(a.createdAt);
+          const dateB = new Date(b.createdAt);
+          return dateB.getTime() - dateA.getTime();
+        }
+      );
+    }
+  }).catch((err) => {
+    console.error('Error changing page:', JSON.stringify(err, null, 2));
+    error.value = err instanceof Error ? err.message : 'Erro ao carregar contratos';
+  }).finally(() => {
+    isLoading.value = false;
+  });
 };
 
 // Data loading

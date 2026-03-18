@@ -22,6 +22,11 @@
     @item-click="handleWorkSheetClick"
     @create="handleCreate"
     @edit="handleEdit"
+    :current-page="api.pagination.value.page"
+    :total-pages="api.pagination.value.totalPages"
+    :total-count="api.pagination.value.total"
+    :show-pagination="api.pagination.value.totalPages > 1"
+    @page-change="handlePageChange"
     @clear-error="clearError"
   >
     <!-- Custom work sheet icon -->
@@ -148,6 +153,7 @@ const workSheets = ref<ContentWithRelations<WorkSheet['data']>[]>([]);
 const isLoading = ref(false);
 const searchQuery = ref('');
 const error = ref<string | null>(null);
+const hasFetched = ref(false);
 
 // Clear error function
 const clearError = () => {
@@ -365,6 +371,27 @@ const handleCreate = () => {
 const handleEdit = (item: BaseContent) => {
   const workSheet = item as ContentWithRelations<WorkSheet['data']>;
   router.push(`/work-sheets/${workSheet.uuid}/editar`);
+};
+
+// Page change handler
+const handlePageChange = async (page: number) => {
+  isLoading.value = true;
+  await api.fetchList({ page }).then(() => {
+    if (api.items.value) {
+      workSheets.value = (api.items.value as ContentWithRelations<WorkSheet['data']>[]).sort(
+        (a, b) => {
+          const dateA = new Date(a.createdAt);
+          const dateB = new Date(b.createdAt);
+          return dateB.getTime() - dateA.getTime();
+        }
+      );
+    }
+  }).catch((err) => {
+    console.error('Error changing page:', JSON.stringify(err, null, 2));
+    error.value = err instanceof Error ? err.message : 'Erro ao carregar folhas de obra';
+  }).finally(() => {
+    isLoading.value = false;
+  });
 };
 
 // Data loading

@@ -22,6 +22,11 @@
     @item-click="handleClientClick"
     @create="handleCreate"
     @edit="handleEdit"
+    :current-page="api.pagination.value.page"
+    :total-pages="api.pagination.value.totalPages"
+    :total-count="api.pagination.value.total"
+    :show-pagination="api.pagination.value.totalPages > 1"
+    @page-change="handlePageChange"
     @clear-error="clearError"
   >
     <!-- Custom client icon -->
@@ -131,6 +136,7 @@ const clients = ref<Client[]>([]);
 const isLoading = ref(false);
 const searchQuery = ref('');
 const error = ref<string | null>(null);
+const hasFetched = ref(false);
 
 // Clear error function
 const clearError = () => {
@@ -237,6 +243,25 @@ const handleCreate = () => {
 const handleEdit = (item: BaseContent) => {
   const client = item as Client;
   router.push(`/clients/${client.uuid}/editar`);
+};
+
+// Page change handler
+const handlePageChange = async (page: number) => {
+  isLoading.value = true;
+  await api.fetchList({ page }).then(() => {
+    if (api.items.value) {
+      clients.value = api.items.value.sort((a, b) => {
+        const nameA = (a.data.nomeComercial || a.data.nomeEmpresa || '').toLowerCase();
+        const nameB = (b.data.nomeComercial || b.data.nomeEmpresa || '').toLowerCase();
+        return nameA.localeCompare(nameB, 'pt-PT');
+      });
+    }
+  }).catch((err) => {
+    console.error('Error changing page:', err);
+    error.value = err instanceof Error ? err.message : 'Erro ao carregar clientes';
+  }).finally(() => {
+    isLoading.value = false;
+  });
 };
 
 // Data loading

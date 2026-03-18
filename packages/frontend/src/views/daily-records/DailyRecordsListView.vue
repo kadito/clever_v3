@@ -22,6 +22,11 @@
     @item-click="handleDailyRecordClick"
     @create="handleCreate"
     @edit="handleEdit"
+    :current-page="api.pagination.value.page"
+    :total-pages="api.pagination.value.totalPages"
+    :total-count="api.pagination.value.total"
+    :show-pagination="api.pagination.value.totalPages > 1"
+    @page-change="handlePageChange"
     @clear-error="clearError"
   >
     <!-- Custom daily record icon -->
@@ -163,6 +168,7 @@ const dailyRecords = ref<ContentWithRelations<DailyRecord['data']>[]>([]);
 const isLoading = ref(false);
 const searchQuery = ref('');
 const error = ref<string | null>(null);
+const hasFetched = ref(false);
 
 // Clear error function
 const clearError = () => {
@@ -354,6 +360,31 @@ const handleCreate = () => {
 const handleEdit = (item: BaseContent) => {
   const record = item as ContentWithRelations<DailyRecord['data']>;
   router.push(`/daily-records/${record.uuid}/editar`);
+};
+
+// Page change handler
+const handlePageChange = async (page: number) => {
+  isLoading.value = true;
+  await api.fetchList({ page }).then(() => {
+    if (api.items.value) {
+      dailyRecords.value = (api.items.value as ContentWithRelations<DailyRecord['data']>[]).sort(
+        (a, b) => {
+          const dateA = new Date(a.data.dataRegistro);
+          const dateB = new Date(b.data.dataRegistro);
+          const dateDiff = dateB.getTime() - dateA.getTime();
+          if (dateDiff !== 0) return dateDiff;
+          const createdA = new Date(a.createdAt);
+          const createdB = new Date(b.createdAt);
+          return createdB.getTime() - createdA.getTime();
+        }
+      );
+    }
+  }).catch((err) => {
+    console.error('Error changing page:', JSON.stringify(err, null, 2));
+    error.value = err instanceof Error ? err.message : 'Erro ao carregar registos diários';
+  }).finally(() => {
+    isLoading.value = false;
+  });
 };
 
 // Data loading

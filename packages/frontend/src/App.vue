@@ -1,15 +1,8 @@
 <template>
-  <!-- Show layout for most pages, but not for auth pages -->
-  <AppLayout v-if="!hideLayout">
+  <component :is="hideLayout ? 'div' : AppLayout">
     <RouterView />
     <ErrorNotification />
-  </AppLayout>
-
-  <!-- Direct view for auth pages -->
-  <div v-else>
-    <RouterView />
-    <ErrorNotification />
-  </div>
+  </component>
 </template>
 
 <script setup lang="ts">

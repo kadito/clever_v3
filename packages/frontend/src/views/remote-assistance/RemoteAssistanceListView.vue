@@ -22,6 +22,11 @@
     @item-click="handleRemoteAssistanceClick"
     @create="handleCreate"
     @edit="handleEdit"
+    :current-page="api.pagination.value.page"
+    :total-pages="api.pagination.value.totalPages"
+    :total-count="api.pagination.value.total"
+    :show-pagination="api.pagination.value.totalPages > 1"
+    @page-change="handlePageChange"
     @clear-error="clearError"
   >
     <!-- Custom remote assistance icon -->
@@ -189,6 +194,7 @@ const remoteAssistance = ref<ContentWithRelations<RemoteAssistance['data']>[]>([
 const isLoading = ref(false);
 const searchQuery = ref('');
 const error = ref<string | null>(null);
+const hasFetched = ref(false);
 
 // Clear error function
 const clearError = () => {
@@ -512,6 +518,31 @@ const handleCreate = () => {
 const handleEdit = (item: BaseContent) => {
   const assistance = item as ContentWithRelations<RemoteAssistance['data']>;
   router.push(`/remote-assistance/${assistance.uuid}/editar`);
+};
+
+// Page change handler
+const handlePageChange = async (page: number) => {
+  isLoading.value = true;
+  await api.fetchList({ page }).then(() => {
+    if (api.items.value) {
+      remoteAssistance.value = (
+        api.items.value as ContentWithRelations<RemoteAssistance['data']>[]
+      ).sort((a, b) => {
+        const dateA = new Date(a.data.dataAssistencia || a.createdAt);
+        const dateB = new Date(b.data.dataAssistencia || b.createdAt);
+        const dateDiff = dateB.getTime() - dateA.getTime();
+        if (dateDiff !== 0) return dateDiff;
+        const createdA = new Date(a.createdAt);
+        const createdB = new Date(b.createdAt);
+        return createdB.getTime() - createdA.getTime();
+      });
+    }
+  }).catch((err) => {
+    console.error('Error changing page:', JSON.stringify(err, null, 2));
+    error.value = err instanceof Error ? err.message : 'Erro ao carregar assistências remotas';
+  }).finally(() => {
+    isLoading.value = false;
+  });
 };
 
 // Data loading
