@@ -1,3 +1,8 @@
+---
+inclusion: fileMatch
+fileMatchPattern: ["**/permissions*", "**/usePermissions*", "**/middleware/permissions*"]
+---
+
 # User Permissions Patterns
 
 ## Overview

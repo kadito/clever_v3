@@ -1,9 +1,9 @@
 # Roadmap
 
-Phase 1: Foundation
+## Phase 1: Foundation ✅
 
 - Single Worker setup (unified frontend + backend deployment)
-- KV binding for Vue static assets
+- KV binding via [assets] for Vue static assets
 - Route handling (API vs SPA routes)
 - BaseContent interface and implementation
 - Content CRUD operations (clients, contracts, licenses)
@@ -12,40 +12,37 @@ Phase 1: Foundation
 - R2 storage layer
 - Basic UI with Portuguese labels
 
-Phase 2: Core Features
+## Phase 2: Core Features ✅
 
-- All content types implementation:
+- Content types implemented:
   - Folhas de Obra (Work Sheets)
   - Registo Diário (Daily Records)
   - Assistências Remotas (Remote Assistance)
-  - Lembretes (Reminders)
-  - Pendentes (Pending Items)
+  - _(Lembretes and Pendentes use generic views, not yet specialized)_
 - Content Relations System:
   - Automatic relation detection and resolution
-  - License → Client relations
-  - Contract → Client relations
-  - Work Sheet → Client relations
-  - Remote Assistance → Client relations
-- Schema validation
-- Comprehensive testing
+  - License → Client, Contract → Client, WorkSheet → Client, RemoteAssistance → Client
+  - Relation type guards and validation in @clever/shared
 - User Permissions System:
   - Role-based access control (Admin/User)
-  - Delete operation restrictions for User role
-  - Audit trail visibility restrictions for User role
-  - Shared permission utilities in @clever/shared
-  - Frontend usePermissions composable
-  - Backend permission middleware
-  - Consistent enforcement across all content types
+  - Delete restrictions + audit trail visibility for User role
+  - Shared permission utilities, frontend composable, backend middleware
+- Delete functionality across all content types with ConfirmationDialog
+- Automatic technician assignment from Clerk auth context
+- Balance reporting system (report, export, transaction history)
+- Contract form system (CPA/S&H toggles, plan selection, equipment management, pricing)
 
-Phase 3: Advanced Features
+## Phase 3: Advanced Features (current)
 
+- Client-contract balance refactoring
 - Data migration from old system
 - Automation workflows
 - External integrations
 - Advanced search and filtering
-- Reporting capabilities
+- Reporting enhancements
+- Reminders and Pending Items specialized views
 
-Deployment Strategy:
+## Deployment Strategy
 
 - test branch → test environment
 - prod branch → production environment

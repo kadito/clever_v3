@@ -1,3 +1,8 @@
+---
+inclusion: fileMatch
+fileMatchPattern: ["**/contracts/**", "**/contracts.*"]
+---
+
 # Contract Form Patterns
 
 ## Overview

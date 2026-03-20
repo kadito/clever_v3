@@ -1,3 +1,8 @@
+---
+inclusion: fileMatch
+fileMatchPattern: ["**/common/ConfirmationDialog*", "**/*Detail*"]
+---
+
 # Delete Functionality Patterns
 
 ## Overview

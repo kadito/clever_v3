@@ -9,5 +9,7 @@
   "then": {
     "type": "askAgent",
     "prompt": "Activate the power \"kiro-spec-methodology\" #project-bootstrap.md The keyword is \"bootproject\". Focus on Step 1 and Step 2 only: review the existing steering files in .kiro/steering/, compare them against the current codebase, and propose updates for any that are stale or missing. Present each file for validation before saving."
-  }
+  },
+  "workspaceFolderName": "clever_kiro",
+  "shortName": "steering-regenerate"
 }

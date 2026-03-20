@@ -1,3 +1,8 @@
+---
+inclusion: fileMatch
+fileMatchPattern: ["**/forms/**", "**/*Create*", "**/*Update*", "**/useSharedFormData*"]
+---
+
 # Form Architecture Patterns
 
 ## Core Form Components

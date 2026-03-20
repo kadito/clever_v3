@@ -1,3 +1,8 @@
+---
+inclusion: fileMatch
+fileMatchPattern: ["**/*Update*"]
+---
+
 # Read-Only Fields Pattern
 
 ## Overview

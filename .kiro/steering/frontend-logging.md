@@ -1,3 +1,8 @@
+---
+inclusion: fileMatch
+fileMatchPattern: ["packages/frontend/**/*.vue", "packages/frontend/**/*.ts"]
+---
+
 # Frontend Logging Standards
 
 ## Vue Client-Side Logging

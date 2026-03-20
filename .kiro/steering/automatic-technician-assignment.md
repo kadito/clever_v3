@@ -1,3 +1,8 @@
+---
+inclusion: fileMatch
+fileMatchPattern: ["**/work-sheets/**", "**/remote-assistance/**", "**/technician*"]
+---
+
 # Automatic Technician Assignment Patterns
 
 ## Overview
