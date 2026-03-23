@@ -229,19 +229,7 @@
         </div>
       </template>
 
-      <template #field-contractId="{ formData, error, updateFieldValue }">
-        <ContractSearchInput
-          :model-value="formData?.contractId || ''"
-          :client-id="formData?.clientId || ''"
-          :has-error="!!error"
-          @update:model-value="value => updateFieldValue('contractId', value)"
-          @contract-selected="handleContractSelected"
-        />
-        <p v-if="error" class="form-error text-red-600 text-sm mt-1">{{ error }}</p>
-        <p v-if="!formData?.clientId" class="form-help text-xs text-gray-500 mt-1">
-          Selecione um cliente primeiro para escolher um contrato
-        </p>
-      </template>
+
     </ContentCreateTemplate>
 </template>
 
@@ -255,10 +243,8 @@ import {
   calculateRoundedTotalHours,
   calculateAssistanceValueWithBusinessHours,
   REMOTE_ASSISTANCE_CONSTANTS,
-  type Contract,
 } from '@clever/shared';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
-import ContractSearchInput from '@/components/common/ContractSearchInput.vue';
 import ContentCreateTemplate from '@/components/common/ContentCreateTemplate.vue';
 import { remoteAssistanceFormSections } from '@/config/remote-assistance-form-sections';
 import { useSharedFormData } from '@/composables/useSharedFormData';
@@ -288,11 +274,6 @@ const selectedClient = ref<Client | null>(null);
 const handleClientSelected = (client: Client | null) => {
   selectedClient.value = client;
   // Client data will be handled on the backend side when creating the remote assistance
-};
-
-const handleContractSelected = (contract: Contract | null) => {
-  console.log('Contract selected:', JSON.stringify(contract, null, 2));
-  // Contract ID is already updated via v-model
 };
 
 // Time input formatting functions with 15-minute rounding
@@ -405,7 +386,6 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
       relatorio: data.relatorio || '',
       valorAssist: data.valorAssist || 0,
       paymentMethod: data.paymentMethod || '',
-      contractId: data.contractId || '',
       resolvido: data.resolvido,
       anexos: data.anexos || '',
     };
@@ -484,13 +464,6 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
       errors.push('Método de pagamento inválido. Deve ser: Contrato, Faturação ou Garantia');
     }
 
-    // Contract ID validation (conditional - required when payment method is Contrato)
-    if (remoteAssistanceData.paymentMethod === 'Contrato') {
-      if (!remoteAssistanceData.contractId || remoteAssistanceData.contractId.trim() === '') {
-        errors.push('Contrato é obrigatório quando o método de pagamento é "Contrato"');
-      }
-    }
-
     // Validate resolvido field (required)
     if (remoteAssistanceData.resolvido === undefined || remoteAssistanceData.resolvido === null) {
       errors.push('Por favor, indique se o problema foi resolvido');
@@ -537,8 +510,6 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
         fieldErrors.paymentMethod = errorMessage;
       } else if (errorMessage.includes('Método de pagamento inválido')) {
         fieldErrors.paymentMethod = errorMessage;
-      } else if (errorMessage.includes('Contrato é obrigatório')) {
-        fieldErrors.contractId = errorMessage;
       } else if (errorMessage.includes('indique se o problema foi resolvido')) {
         fieldErrors.resolvido = errorMessage;
       } else if (errorMessage.includes('Relatório final é obrigatório')) {
@@ -579,7 +550,6 @@ const handleCreateSuccess = async (formData: Record<string, any>) => {
       relatorio: formData.relatorio || '',
       valorAssist: formData.valorAssist || 0,
       paymentMethod: formData.paymentMethod || '',
-      contractId: formData.contractId || '',
       resolvido: formData.resolvido || false,
       anexos: formData.anexos || '',
     };
@@ -639,15 +609,7 @@ watch(
   }
 );
 
-// Clear contractId when payment method changes from Contrato to other values
-watch(
-  () => formData.value?.paymentMethod,
-  (newValue, oldValue) => {
-    if (oldValue === 'Contrato' && newValue !== 'Contrato') {
-      updateFieldValue('contractId', '');
-    }
-  }
-);
+
 </script>
 
 <style scoped>

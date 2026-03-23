@@ -140,18 +140,19 @@ export class BalanceMiddleware {
   /**
    * Hook called after contract update.
    * 
-   * Detects contract renovations by comparing previous and current contract data.
-   * A renovation is detected when:
-   * - Contract end date is extended, OR
-   * - Contract resources are increased
+   * Detects contract renovations by comparing previous and current resource fields.
+   * An ADD transaction is only created when resource fields change (not when only
+   * dates or plans change).
    * 
-   * Creates an ADD transaction for renovations that adds new resources to balance.
+   * Resource fields compared:
+   * - manutencoesPorAnoCPA, deslocacoesPorAnoCPA, horasAssistenciaAnualCPA
+   * - manutencoesPorAnoSH, deslocacoesPorAnoSH, horasAssistenciaAnualSH
    * 
    * @param contract - Updated contract content
    * @param previousContract - Previous contract content before update
    * @param userId - User ID from authentication context
    * 
-   * Validates: Requirements 12.2, 10.1, 10.2, 10.3, 10.4, 10.5
+   * Validates: Requirements 12.2, REQ-02.1, REQ-02.2, REQ-02.3
    */
   async onContractUpdated(
     contract: Contract,
@@ -174,22 +175,21 @@ export class BalanceMiddleware {
         return;
       }
 
-      // Detect if this is a renovation
-      const isRenovation = this.detectContractRenovation(contract, previousContract);
+      // Compare resource fields — only create ADD transaction when resources changed
+      const resourcesChanged = this.haveResourcesChanged(contract, previousContract);
 
-      if (!isRenovation) {
-        console.log('Balance middleware: Contract update is not a renovation, skipping:', 
+      if (!resourcesChanged) {
+        console.log('Balance middleware: Contract resources unchanged (dates/plan only), skipping ADD transaction:', 
           JSON.stringify({ contractId: contract.uuid }, null, 2));
         return;
       }
 
-      console.log('Balance middleware: Contract renovation detected:', JSON.stringify({
+      console.log('Balance middleware: Contract resource change detected (renovation):', JSON.stringify({
         contractId: contract.uuid,
         clientId,
       }, null, 2));
 
-      // Extract transaction changes from updated contract
-      // For renovations, we add the NEW resources (not the difference)
+      // Extract transaction changes from updated contract using the new resource values
       const changes = extractContractAddTransaction(contract);
 
       // Check if there are any changes to process
@@ -199,7 +199,7 @@ export class BalanceMiddleware {
         return;
       }
 
-      // Create ADD transaction for renovation
+      // Create ADD transaction for renovation with source "contract-renovation"
       const transaction = await this.balanceService.createAddTransaction(
         clientId,
         contract.uuid,
@@ -407,124 +407,54 @@ export class BalanceMiddleware {
   // ============================================================================
 
   /**
-   * Detect if a contract update is a renovation.
+   * Compare resource fields between current and previous contract.
    * 
-   * A renovation is detected when:
-   * - Contract end date is extended (fimContratoCPA or fimContratoSH is later), OR
-   * - Contract resources are increased (any usage value is higher)
+   * Returns true when any of the 6 resource fields differ:
+   * - manutencoesPorAnoCPA, deslocacoesPorAnoCPA, horasAssistenciaAnualCPA
+   * - manutencoesPorAnoSH, deslocacoesPorAnoSH, horasAssistenciaAnualSH
+   * 
+   * Date-only or plan-only changes do NOT trigger a renovation ADD transaction.
    * 
    * @param current - Current contract after update
    * @param previous - Previous contract before update
-   * @returns true if renovation detected, false otherwise
+   * @returns true if any resource field changed, false otherwise
    */
-  private detectContractRenovation(current: Contract, previous: Contract): boolean {
-    // Check if CPA end date is extended
-    if (current.data.hasCPAContract && previous.data.hasCPAContract) {
-      const currentEndDate = current.data.fimContratoCPA;
-      const previousEndDate = previous.data.fimContratoCPA;
+  private haveResourcesChanged(current: Contract, previous: Contract): boolean {
+    const currentResources = {
+      manutencoesPorAnoCPA: current.data.manutencoesPorAnoCPA || 0,
+      deslocacoesPorAnoCPA: current.data.deslocacoesPorAnoCPA || 0,
+      horasAssistenciaAnualCPA: current.data.horasAssistenciaAnualCPA || 0,
+      manutencoesPorAnoSH: current.data.manutencoesPorAnoSH || 0,
+      deslocacoesPorAnoSH: current.data.deslocacoesPorAnoSH || 0,
+      horasAssistenciaAnualSH: current.data.horasAssistenciaAnualSH || 0,
+    };
 
-      if (currentEndDate && previousEndDate) {
-        const currentDate = new Date(currentEndDate);
-        const previousDate = new Date(previousEndDate);
+    const previousResources = {
+      manutencoesPorAnoCPA: previous.data.manutencoesPorAnoCPA || 0,
+      deslocacoesPorAnoCPA: previous.data.deslocacoesPorAnoCPA || 0,
+      horasAssistenciaAnualCPA: previous.data.horasAssistenciaAnualCPA || 0,
+      manutencoesPorAnoSH: previous.data.manutencoesPorAnoSH || 0,
+      deslocacoesPorAnoSH: previous.data.deslocacoesPorAnoSH || 0,
+      horasAssistenciaAnualSH: previous.data.horasAssistenciaAnualSH || 0,
+    };
 
-        if (currentDate > previousDate) {
-          console.log('Balance middleware: Renovation detected - CPA end date extended:', JSON.stringify({
-            previousEndDate,
-            currentEndDate,
-          }, null, 2));
-          return true;
-        }
-      }
-    }
+    const changed = (
+      currentResources.manutencoesPorAnoCPA !== previousResources.manutencoesPorAnoCPA ||
+      currentResources.deslocacoesPorAnoCPA !== previousResources.deslocacoesPorAnoCPA ||
+      currentResources.horasAssistenciaAnualCPA !== previousResources.horasAssistenciaAnualCPA ||
+      currentResources.manutencoesPorAnoSH !== previousResources.manutencoesPorAnoSH ||
+      currentResources.deslocacoesPorAnoSH !== previousResources.deslocacoesPorAnoSH ||
+      currentResources.horasAssistenciaAnualSH !== previousResources.horasAssistenciaAnualSH
+    );
 
-    // Check if S&H end date is extended
-    if (current.data.hasSHContract && previous.data.hasSHContract) {
-      const currentEndDate = current.data.fimContratoSH;
-      const previousEndDate = previous.data.fimContratoSH;
-
-      if (currentEndDate && previousEndDate) {
-        const currentDate = new Date(currentEndDate);
-        const previousDate = new Date(previousEndDate);
-
-        if (currentDate > previousDate) {
-          console.log('Balance middleware: Renovation detected - S&H end date extended:', JSON.stringify({
-            previousEndDate,
-            currentEndDate,
-          }, null, 2));
-          return true;
-        }
-      }
-    }
-
-    // Check if CPA resources are increased
-    if (current.data.hasCPAContract && previous.data.hasCPAContract) {
-      const currentCPA = {
-        manutencoes: current.data.manutencoesPorAnoCPA || 0,
-        deslocacoes: current.data.deslocacoesPorAnoCPA || 0,
-        horas: current.data.horasAssistenciaAnualCPA || 0,
-      };
-
-      const previousCPA = {
-        manutencoes: previous.data.manutencoesPorAnoCPA || 0,
-        deslocacoes: previous.data.deslocacoesPorAnoCPA || 0,
-        horas: previous.data.horasAssistenciaAnualCPA || 0,
-      };
-
-      if (
-        currentCPA.manutencoes > previousCPA.manutencoes ||
-        currentCPA.deslocacoes > previousCPA.deslocacoes ||
-        currentCPA.horas > previousCPA.horas
-      ) {
-        console.log('Balance middleware: Renovation detected - CPA resources increased:', JSON.stringify({
-          previousCPA,
-          currentCPA,
-        }, null, 2));
-        return true;
-      }
-    }
-
-    // Check if S&H resources are increased
-    if (current.data.hasSHContract && previous.data.hasSHContract) {
-      const currentSH = {
-        manutencoes: current.data.manutencoesPorAnoSH || 0,
-        deslocacoes: current.data.deslocacoesPorAnoSH || 0,
-        horas: current.data.horasAssistenciaAnualSH || 0,
-      };
-
-      const previousSH = {
-        manutencoes: previous.data.manutencoesPorAnoSH || 0,
-        deslocacoes: previous.data.deslocacoesPorAnoSH || 0,
-        horas: previous.data.horasAssistenciaAnualSH || 0,
-      };
-
-      if (
-        currentSH.manutencoes > previousSH.manutencoes ||
-        currentSH.deslocacoes > previousSH.deslocacoes ||
-        currentSH.horas > previousSH.horas
-      ) {
-        console.log('Balance middleware: Renovation detected - S&H resources increased:', JSON.stringify({
-          previousSH,
-          currentSH,
-        }, null, 2));
-        return true;
-      }
-    }
-
-    // Check if new contract section was added
-    if (
-      (current.data.hasCPAContract && !previous.data.hasCPAContract) ||
-      (current.data.hasSHContract && !previous.data.hasSHContract)
-    ) {
-      console.log('Balance middleware: Renovation detected - new contract section added:', JSON.stringify({
-        previousHasCPA: previous.data.hasCPAContract,
-        currentHasCPA: current.data.hasCPAContract,
-        previousHasSH: previous.data.hasSHContract,
-        currentHasSH: current.data.hasSHContract,
+    if (changed) {
+      console.log('Balance middleware: Resource fields changed:', JSON.stringify({
+        previous: previousResources,
+        current: currentResources,
       }, null, 2));
-      return true;
     }
 
-    return false;
+    return changed;
   }
 
   /**

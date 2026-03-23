@@ -19,6 +19,7 @@ import type { TransactionChanges } from './balance-types';
 import type { Contract } from './types/contracts/types';
 import type { WorkSheet } from './types/work-sheets/types';
 import type { RemoteAssistance } from './types/remote-assistance/types';
+import { calculateWorkSheetTotals } from './types/work-sheets/validation';
 
 // ============================================================================
 // Contract ADD Transaction Extraction
@@ -135,14 +136,11 @@ export function extractWorkSheetDebtTransaction(workSheet: WorkSheet): Transacti
   }
 
   // Other payment methods - add to debt
-  // Note: totalValue should be calculated from hours and displacement costs
-  // This is typically done in the work sheet creation logic before calling this function
-  // For now, we'll use a placeholder of 0 if no value is provided
-  // In production, the calling code should ensure totalValue is calculated
-  const totalValue = 0; // TODO: Calculate from hours and displacement costs
+  // Calculate total value from hours worked and displacement costs
+  const totals = calculateWorkSheetTotals(workSheet.data);
 
   return {
-    balanceChange: totalValue,
+    balanceChange: totals.totalPrice,
   };
 }
 

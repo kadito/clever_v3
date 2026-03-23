@@ -21,6 +21,7 @@ import type {
   StorageBucket,
   ApiResponse,
   ContentWithRelations,
+  Client,
 } from '@clever/shared';
 import {
   validateWorkSheetCreation,
@@ -29,9 +30,10 @@ import {
   calculateWorkSheetTotals,
 } from '@clever/shared';
 import { autoAssignTechnician, validateTechnicianAssignment } from '../utils/technician-assignment';
-import { createBalanceService } from '../services/balance-service';
+import { createBalanceService, ValidationError } from '../services/balance-service';
 import { createBalanceMiddleware } from '../middleware/balance-middleware';
 import { requireUserContext } from '../middleware/clerk';
+import { extractWorkSheetDebtTransaction, hasTransactionChanges } from '@clever/shared';
 
 /**
  * Work sheet-specific validation for create operations
@@ -315,6 +317,7 @@ workSheetsRouter.route('/', crudRoutes);
  * Override POST handler to integrate balance middleware
  * Calls balance middleware after successful work sheet creation
  * Requirements: 12.3 - Automatic balance processing on work sheet creation
+ * Requirements: REQ-04.1, REQ-04.2 - Automatic contract resolution from client
  */
 workSheetsRouter.post('/', async (c: Context) => {
   try {
@@ -357,15 +360,80 @@ workSheetsRouter.post('/', async (c: Context) => {
       }
     }
 
+    const contentData = requestData.data || requestData;
+
+    // ========================================================================
+    // Automatic contract resolution from client (REQ-04.1, CA-04.1.3)
+    // Always resolve contractId from the client's contratoId — ignore body value
+    // ========================================================================
+    const clientId = contentData.clientId as string | undefined;
+    let resolvedContractId: string | undefined;
+
+    if (clientId) {
+      const clientObject = await r2Bucket.get(`content/clients/${clientId}.json`);
+      if (!clientObject) {
+        const response: ApiResponse = {
+          success: false,
+          error: 'Cliente não encontrado.',
+          timestamp: new Date().toISOString(),
+        };
+        return c.json(response, 404);
+      }
+
+      const client = (await clientObject.json()) as Client;
+      resolvedContractId = client.data.contratoId;
+    }
+
+    // Reject CONTRATO payment when client has no active contract (REQ-04.2, CA-04.1.3)
+    const paymentMethod = contentData.displacement?.paymentMethod as string | undefined;
+    if (paymentMethod === 'CONTRATO' && !resolvedContractId) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'O cliente não possui contrato ativo para consumir recursos.',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 400);
+    }
+
+    // Override contractId — always resolved from client, never from body
+    contentData.contractId = resolvedContractId;
+
+    // ========================================================================
+    // Validate resource availability BEFORE creating content (REQ-04.4)
+    // If resources are insufficient, reject with HTTP 400 — content NOT created
+    // ========================================================================
+    const balanceService = createBalanceService(r2Bucket);
+
+    if (paymentMethod === 'CONTRATO' && clientId) {
+      // Build the same changes that the balance middleware would create
+      const proposedChanges = extractWorkSheetDebtTransaction({
+        data: contentData,
+      } as unknown as WorkSheet);
+
+      if (hasTransactionChanges(proposedChanges)) {
+        try {
+          await balanceService.validateResourceAvailability(clientId, proposedChanges);
+        } catch (validationError) {
+          if (validationError instanceof ValidationError) {
+            const response: ApiResponse = {
+              success: false,
+              error: validationError.message,
+              timestamp: new Date().toISOString(),
+            };
+            return c.json(response, 400);
+          }
+          throw validationError;
+        }
+      }
+    }
+
     // Create work sheet using storage service
     const { ContentStorageService } = await import('@clever/shared');
     const storage = new ContentStorageService<WorkSheet>(r2Bucket, 'work-sheets');
-    const contentData = requestData.data || requestData;
     const newWorkSheet = await storage.create(contentData, { userId: user.userId });
 
     // Process balance update asynchronously (don't await - fire and forget)
     // Requirements: 12.5 - Async processing doesn't block content creation
-    const balanceService = createBalanceService(r2Bucket);
     const balanceMiddleware = createBalanceMiddleware(balanceService);
     
     console.log('WORK SHEET CREATED - About to call balance middleware:', JSON.stringify({

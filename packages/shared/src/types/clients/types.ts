@@ -29,15 +29,6 @@ export interface ClientSoftware {
 }
 
 /**
- * Contract reference for a client
- * References contracts stored separately
- */
-export interface ClientContractReference {
-  id: string;
-  year: number;
-}
-
-/**
  * Client data structure
  * Based on analysis of legacy ClienteDetail.vue and ClienteForm.vue
  */
@@ -88,22 +79,16 @@ export interface ClientData {
   // Additional Information
   observacoes?: string; // Notes/observations
 
-  // Contract references (stored separately)
-  contratos?: ClientContractReference[];
+  // Contract reference (1:1 relationship — populated by backend)
+  contratoId?: string;
 
   // Legacy fields for backward compatibility
-  // These are boolean flags from the old system
   vectron?: boolean;
   dreamSoft?: boolean;
   ptcert?: boolean;
   pix?: boolean;
   zsrest?: boolean;
   contasCertas?: boolean;
-  contrato?: boolean;
-  contratoCPA?: boolean;
-  contratoSoftware?: boolean;
-  dataInicio?: string;
-  dataTermino?: string;
   atClient?: string; // Legacy AT client field
 }
 
@@ -119,9 +104,7 @@ export interface Client extends BaseContent {
  * Client creation input (without BaseContent fields)
  */
 export interface CreateClientInput {
-  data: Omit<ClientData, 'contratos'> & {
-    contratos?: ClientContractReference[];
-  };
+  data: ClientData;
 }
 
 /**

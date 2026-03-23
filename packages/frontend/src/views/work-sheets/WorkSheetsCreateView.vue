@@ -111,20 +111,6 @@
         </div>
       </template>
 
-      <template #field-contractId="{ formData, error, updateFieldValue }">
-        <ContractSearchInput
-          :model-value="formData?.contractId || ''"
-          :client-id="formData?.clientId || ''"
-          :has-error="!!error"
-          @update:model-value="value => updateFieldValue('contractId', value)"
-          @contract-selected="handleContractSelected"
-        />
-        <p v-if="error" class="form-error text-red-600 text-sm mt-1">{{ error }}</p>
-        <p v-if="!formData?.clientId" class="form-help text-xs text-gray-500 mt-1">
-          Selecione um cliente primeiro para escolher um contrato
-        </p>
-      </template>
-
       <!-- Pricing display section (only shown when hasDisplacement is true) -->
       <template #after-section-displacement="{ formData: slotFormData }">
         <div v-if="formData?.hasDisplacement === true" class="pricing-section">
@@ -181,10 +167,9 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import type { WorkSheetCreationData, Client, Contract } from '@clever/shared';
+import type { WorkSheetCreationData, Client } from '@clever/shared';
 import { validateWorkSheetCreation } from '@clever/shared';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
-import ContractSearchInput from '@/components/common/ContractSearchInput.vue';
 import SignaturePad from '@/components/forms/SignaturePad.vue';
 import ContentCreateTemplate from '@/components/common/ContentCreateTemplate.vue';
 import { workSheetsFormSections } from '@/config/work-sheets-form-sections';
@@ -220,20 +205,11 @@ const paymentMethods = [
 // Selected client for additional information
 const selectedClient = ref<Client | null>(null);
 
-// Selected contract for additional information
-const selectedContract = ref<Contract | null>(null);
-
 // Methods
 const handleClientSelected = (client: Client | null) => {
   console.log('Client selected:', JSON.stringify(client, null, 2));
   selectedClient.value = client;
   // Client data will be handled on the backend side when creating the work sheet
-};
-
-const handleContractSelected = (contract: Contract | null) => {
-  console.log('Contract selected:', JSON.stringify(contract, null, 2));
-  selectedContract.value = contract;
-  // Contract ID is already updated via v-model
 };
 
 // Signature handling
@@ -299,7 +275,6 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
     // Transform form data to WorkSheetCreationData format
     const workSheetData: WorkSheetCreationData = {
       clientId: data.clientId || '',
-      contractId: data.contractId || undefined, // Add contractId field
       request: {
         date: data.requestDate || '',
         receivedBy: '', // Field removed from form, set to empty string
@@ -380,9 +355,9 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
       ) {
         fieldErrors.resolutionIssues = errorMessage;
       } else if (errorMessage.includes('contrato é obrigatório')) {
-        fieldErrors.contractId = errorMessage;
+        fieldErrors.general = errorMessage;
       } else if (errorMessage.includes('ID do contrato deve ser um UUID válido')) {
-        fieldErrors.contractId = errorMessage;
+        fieldErrors.general = errorMessage;
       } else {
         // Generic error
         fieldErrors.general = errorMessage;
@@ -410,7 +385,6 @@ const handleCreateSuccess = async (formData: Record<string, any>) => {
     // Transform form data to WorkSheetCreationData format
     const workSheetData: WorkSheetCreationData = {
       clientId: formData.clientId || '',
-      contractId: formData.contractId || undefined, // Add contractId field
       request: {
         date: formData.requestDate || '',
         receivedBy: '', // Field removed from form, set to empty string

@@ -14,6 +14,7 @@ import {
 } from './content-route-template';
 import type {
   Contract,
+  Client,
   ContractData,
   ContractCreationData,
   ContractUpdateData,
@@ -24,10 +25,12 @@ import type {
 import {
   getContractSummary,
   hasActiveContract,
+  ContentStorageService,
   // Note: sanitizeContractData will be added when contract validation is fully implemented
 } from '@clever/shared';
 import { createBalanceService } from '../services/balance-service';
 import { createBalanceMiddleware } from '../middleware/balance-middleware';
+import { requireDeletePermission } from '../middleware/permissions';
 import { requireUserContext } from '../middleware/clerk';
 
 /**
@@ -241,6 +244,52 @@ function createContractSearchText(data: ContractData): string {
   return searchTerms.join(' ');
 }
 
+/**
+ * Synchronize the contratoId field on a client document in R2.
+ * Uses optimistic locking (version field) to avoid concurrent write conflicts.
+ * @param r2Bucket - R2 storage bucket
+ * @param clientId - UUID of the client to update
+ * @param contratoId - Contract UUID to set, or undefined to clear
+ */
+async function syncClientContratoId(
+  r2Bucket: StorageBucket,
+  clientId: string,
+  contratoId: string | undefined
+): Promise<void> {
+  const clientKey = `content/clients/${clientId}.json`;
+
+  const clientObject = await r2Bucket.get(clientKey);
+  if (!clientObject) {
+    console.error('syncClientContratoId: client not found:', clientId);
+    return;
+  }
+
+  const client = (await clientObject.json()) as Client;
+
+  const updatedClient: Client = {
+    ...client,
+    data: {
+      ...client.data,
+      contratoId,
+    },
+    updatedAt: new Date().toISOString(),
+    version: client.version + 1,
+  };
+
+  await r2Bucket.put(clientKey, JSON.stringify(updatedClient, null, 2), {
+    httpMetadata: {
+      contentType: 'application/json',
+      cacheControl: 'public, max-age=3600',
+    },
+    customMetadata: {
+      contentType: 'clients',
+      version: updatedClient.version.toString(),
+      createdAt: updatedClient.createdAt,
+      updatedAt: updatedClient.updatedAt,
+    },
+  });
+}
+
 // Create the contracts router using the generic template
 const contractsRouter = new Hono();
 
@@ -372,11 +421,46 @@ contractsRouter.post('/', async (c: Context) => {
       }
     }
 
-    // Create contract using storage service
-    const { ContentStorageService } = await import('@clever/shared');
-    const storage = new ContentStorageService<Contract>(r2Bucket, 'contracts');
+    // Validate 1:1 uniqueness — client must not have an active contract
     const contentData = requestData.data || requestData;
+    const clientId = contentData.clientId as string | undefined;
+
+    if (clientId) {
+      const indexObject = await r2Bucket.get('indexes/contracts-index.json');
+      if (indexObject) {
+        const index = (await indexObject.json()) as { items: Array<{ uuid: string; clientId?: string; isDeleted?: boolean }> };
+        const hasActive = (index.items || []).some(
+          (item) => item.clientId === clientId && !item.isDeleted
+        );
+        if (hasActive) {
+          const response: ApiResponse = {
+            success: false,
+            error: 'Este cliente já possui um contrato ativo.',
+            timestamp: new Date().toISOString(),
+          };
+          return c.json(response, 400);
+        }
+      }
+    }
+
+    // Create contract using storage service
+    const storage = new ContentStorageService<Contract>(r2Bucket, 'contracts');
     const newContract = await storage.create(contentData, { userId: user.userId });
+
+    // Sync contratoId on the client (REQ-01.2, CA-01.2.1)
+    if (clientId) {
+      await syncClientContratoId(r2Bucket, clientId, newContract.uuid)
+        .then(() => {
+          console.log('Client contratoId synced for contract:', newContract.uuid);
+        })
+        .catch((syncError) => {
+          console.error('Failed to sync client contratoId:', JSON.stringify({
+            contractId: newContract.uuid,
+            clientId,
+            error: syncError instanceof Error ? syncError.message : String(syncError),
+          }, null, 2));
+        });
+    }
 
     // Process balance update asynchronously (don't await - fire and forget)
     // Requirements: 12.5 - Async processing doesn't block content creation
@@ -479,7 +563,6 @@ contractsRouter.put('/:uuid', async (c: Context) => {
     }
 
     // Get existing contract for validation and balance comparison
-    const { ContentStorageService } = await import('@clever/shared');
     const storage = new ContentStorageService<Contract>(r2Bucket, 'contracts');
     
     let existingContract: Contract | undefined;
@@ -550,6 +633,90 @@ contractsRouter.put('/:uuid', async (c: Context) => {
     };
     return c.json(response, 500);
   }
+});
+
+/**
+ * Override DELETE handler to clear contratoId on the client after soft delete
+ * Requirements: REQ-01.2 — contratoId = undefined when contract is deleted
+ */
+contractsRouter.delete('/:uuid', requireDeletePermission, async (c: Context) => {
+  const user = requireUserContext(c);
+  const uuid = c.req.param('uuid');
+  const r2Bucket = c.env?.R2_BUCKET as StorageBucket;
+
+  if (!r2Bucket) {
+    const response: ApiResponse = {
+      success: false,
+      error: 'Storage not available',
+      timestamp: new Date().toISOString(),
+    };
+    return c.json(response, 500);
+  }
+
+  // Validate UUID format
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(uuid)) {
+    const response: ApiResponse = {
+      success: false,
+      error: 'Invalid UUID format',
+      timestamp: new Date().toISOString(),
+    };
+    return c.json(response, 400);
+  }
+
+  const storage = new ContentStorageService<Contract>(r2Bucket, 'contracts');
+
+  // Read the contract before deleting to get the clientId
+  const contractKey = `content/contracts/${uuid}.json`;
+  const contractObject = await r2Bucket.get(contractKey)
+    .then((obj) => obj ? obj.json() as Promise<Contract> : null)
+    .catch(() => null);
+
+  if (!contractObject) {
+    const response: ApiResponse = {
+      success: false,
+      error: 'Contrato não encontrado.',
+      timestamp: new Date().toISOString(),
+    };
+    return c.json(response, 404);
+  }
+
+  // Perform the soft delete
+  await storage.delete(uuid, { userId: user.userId })
+    .catch((error) => {
+      if (error instanceof Error && error.message === 'Content not found') {
+        const response: ApiResponse = {
+          success: false,
+          error: 'Contrato não encontrado.',
+          timestamp: new Date().toISOString(),
+        };
+        return c.json(response, 404);
+      }
+      throw error;
+    });
+
+  // Clear contratoId on the client (REQ-01.2, CA-01.2.2)
+  const clientId = contractObject.data?.clientId;
+  if (clientId) {
+    await syncClientContratoId(r2Bucket, clientId, undefined)
+      .then(() => {
+        console.log('Client contratoId cleared after contract deletion:', uuid);
+      })
+      .catch((syncError) => {
+        console.error('Failed to clear client contratoId:', JSON.stringify({
+          contractId: uuid,
+          clientId,
+          error: syncError instanceof Error ? syncError.message : String(syncError),
+        }, null, 2));
+      });
+  }
+
+  const response: ApiResponse<void> = {
+    success: true,
+    timestamp: new Date().toISOString(),
+  };
+  return c.json(response);
 });
 
 export default contractsRouter;

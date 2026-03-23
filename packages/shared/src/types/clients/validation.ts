@@ -270,9 +270,6 @@ export function sanitizeClientData(data: ClientData): ClientData {
       versaoLicenca: software.versaoLicenca?.trim() || undefined,
       nEquipamento: software.nEquipamento?.trim() || undefined,
     })),
-
-    // Preserve contract references as-is
-    contratos: data.contratos || [],
   } as ClientData;
 }
 

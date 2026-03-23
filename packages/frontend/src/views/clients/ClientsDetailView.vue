@@ -54,32 +54,211 @@
           </div>
         </div>
 
-        <!-- Balance Section (Admin Only) -->
-        <div v-if="permissions.canViewAuditTrail" class="detail-section">
+        <!-- Contract Section -->
+        <div class="detail-section">
+          <div class="bg-white rounded-touch border border-gray-200"
+               :class="{
+                 'border-red-200 bg-red-50': contractIsError
+               }">
+            <div
+              class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+              :class="{
+                'border-red-200 bg-red-100': contractIsError
+              }"
+            >
+              <div class="flex items-center justify-between w-full">
+                <div class="flex items-center flex-1 min-w-0">
+                  <div class="flex-shrink-0 mr-3 text-gray-600"
+                       :class="{ 'text-red-600': contractIsError }">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <h2 class="text-lg font-semibold text-gray-900"
+                      :class="{ 'text-red-900': contractIsError }">
+                    Contrato
+                  </h2>
+                  <div v-if="contractIsError" class="ml-2">
+                    <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                  </div>
+                </div>
+                <!-- Navigate to contract detail -->
+                <router-link
+                  v-if="hasContract && contractRelation"
+                  :to="`/contracts/${contractRelation.uuid}`"
+                  class="flex-shrink-0 p-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-full transition-colors"
+                  style="min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center;"
+                  title="Ver detalhes do contrato"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </router-link>
+              </div>
+            </div>
+            <div class="p-4 sm:p-6">
+              <!-- Error state -->
+              <div v-if="contractIsError" class="text-center py-2">
+                <RelationInfoDisplay
+                  :relation-data="contractRelation"
+                  relation-type="contract"
+                  custom-display-name="Contrato"
+                />
+              </div>
+
+              <!-- Contract exists — show summary -->
+              <div v-else-if="hasContract && contractRelation" class="detail-grid">
+                <div class="detail-item">
+                  <label class="detail-label">Tipo de Contrato</label>
+                  <div class="detail-value">
+                    <div class="flex flex-wrap gap-1">
+                      <span
+                        v-for="cType in getContractTypes(contractRelation)"
+                        :key="cType"
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-100 text-primary-800"
+                      >
+                        {{ cType }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="detail-item col-span-full">
+                  <label class="detail-label">Plano(s)</label>
+                  <div class="detail-value font-medium">{{ getContractPlanDisplay(contractRelation) }}</div>
+                </div>
+                <div class="detail-item">
+                  <label class="detail-label">Data Início</label>
+                  <div class="detail-value">{{ getContractDates(contractRelation).start }}</div>
+                </div>
+                <div class="detail-item">
+                  <label class="detail-label">Data Fim</label>
+                  <div class="detail-value">{{ getContractDates(contractRelation).end }}</div>
+                </div>
+                <div class="detail-item">
+                  <label class="detail-label">Estado</label>
+                  <div class="detail-value">
+                    <span
+                      class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                      :class="getContractStatus(contractRelation).isActive
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'"
+                    >
+                      {{ getContractStatus(contractRelation).label }}
+                    </span>
+                  </div>
+                </div>
+                <!-- Link to contract detail -->
+                <div class="col-span-full mt-2">
+                  <router-link
+                    :to="`/contracts/${contractRelation.uuid}`"
+                    class="inline-flex items-center justify-center w-full px-4 py-2 rounded-touch text-primary-700 font-medium border border-primary-300 bg-primary-50 hover:bg-primary-100 transition-colors"
+                    style="min-height: 44px;"
+                  >
+                    Ver Contrato
+                  </router-link>
+                </div>
+              </div>
+
+              <!-- No contract -->
+              <div v-else class="text-center py-4">
+                <p class="text-gray-500 mb-4">Sem contrato ativo</p>
+                <router-link
+                  :to="`/contracts/create?clientId=${item.uuid}`"
+                  class="inline-flex items-center justify-center px-4 py-2 rounded-touch text-white font-medium transition-colors hover:opacity-90"
+                  style="background-color: #75AE93; min-height: 44px; min-width: 44px;"
+                >
+                  Criar Contrato
+                </router-link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Balance Section (All Users) -->
+        <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch flex justify-between items-center"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Saldo e Contratos</h2>
+              <h2 class="text-lg font-semibold text-gray-900">Saldo</h2>
               <div class="flex gap-2">
                 <button
-                  v-if="permissions.canDelete"
+                  v-if="permissions.canViewAuditTrail"
                   @click="handleRecalculateBalance"
                   class="text-sm px-3 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700 transition-colors"
+                  style="min-height: 44px; min-width: 44px;"
                   :disabled="isRecalculating"
                 >
-                  {{ isRecalculating ? 'A recalcular...' : 'Recalcular' }}
+                  {{ isRecalculating ? 'A recalcular...' : 'Recalcular saldo' }}
                 </button>
                 <router-link
+                  v-if="permissions.canViewAuditTrail"
                   :to="`/balance/${item.uuid}/transactions`"
-                  class="text-sm text-primary-600 hover:text-primary-800 underline"
+                  class="text-sm text-primary-600 hover:text-primary-800 underline flex items-center"
+                  style="min-height: 44px; min-width: 44px;"
                 >
                   Ver Histórico
                 </router-link>
               </div>
             </div>
-            <div class="p-0">
-              <ClientBalanceDisplay :client-id="item.uuid" :key="balanceKey" />
+            <div class="p-4 sm:p-6">
+              <!-- Loading State -->
+              <div v-if="isBalanceLoading" class="flex items-center justify-center py-4">
+                <div class="balance-spinner"></div>
+                <span class="ml-2 text-sm text-gray-500">A carregar saldo...</span>
+              </div>
+
+              <!-- Balance Display -->
+              <div v-else class="detail-grid">
+                <!-- Dívida -->
+                <div class="detail-item">
+                  <label class="detail-label">Dívida</label>
+                  <div class="detail-value text-lg font-semibold" :class="balanceData.balance > 0 ? 'text-red-600' : 'text-gray-900'">
+                    {{ balanceData.balance }}€
+                  </div>
+                </div>
+
+                <!-- Manutenções restantes -->
+                <div class="detail-item">
+                  <label class="detail-label">Manutenções restantes</label>
+                  <div
+                    class="detail-value text-lg font-semibold px-2 py-1 rounded"
+                    :class="isResourceLow('manutencoesPorAno') ? 'bg-yellow-50 text-yellow-800 border border-yellow-400' : ''"
+                  >
+                    <span>{{ formatResourceValue(balanceData.contracts.manutencoesPorAno) }}</span>
+                    <span v-if="isResourceLow('manutencoesPorAno')" class="ml-1">⚠️</span>
+                  </div>
+                </div>
+
+                <!-- Deslocações restantes -->
+                <div class="detail-item">
+                  <label class="detail-label">Deslocações restantes</label>
+                  <div
+                    class="detail-value text-lg font-semibold px-2 py-1 rounded"
+                    :class="isResourceLow('deslocacoesPorAno') ? 'bg-yellow-50 text-yellow-800 border border-yellow-400' : ''"
+                  >
+                    <span>{{ formatResourceValue(balanceData.contracts.deslocacoesPorAno) }}</span>
+                    <span v-if="isResourceLow('deslocacoesPorAno')" class="ml-1">⚠️</span>
+                  </div>
+                </div>
+
+                <!-- Horas restantes -->
+                <div class="detail-item">
+                  <label class="detail-label">Horas restantes</label>
+                  <div
+                    class="detail-value text-lg font-semibold px-2 py-1 rounded"
+                    :class="isResourceLow('horasAssistenciaAnuais') ? 'bg-yellow-50 text-yellow-800 border border-yellow-400' : ''"
+                  >
+                    <span>{{ formatResourceValue(balanceData.contracts.horasAssistenciaAnuais) }}</span>
+                    <span v-if="isResourceLow('horasAssistenciaAnuais')" class="ml-1">⚠️</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -472,15 +651,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import type { Client, BaseContent } from '@clever/shared';
+import type { Client, BaseContent, ContentWithRelations } from '@clever/shared';
+import { isRelationError, isResolvedRelation } from '@clever/shared';
 import ContentDetailTemplate from '@/components/common/ContentDetailTemplate.vue';
 import ConfirmationDialog from '@/components/common/ConfirmationDialog.vue';
-import ClientBalanceDisplay from '@/components/balance/ClientBalanceDisplay.vue';
+import RelationInfoDisplay from '@/components/common/RelationInfoDisplay.vue';
 import { useApi } from '@/composables/useApi';
 import { useErrorHandler } from '@/composables/useErrorHandler';
 import { usePermissions } from '@/composables/usePermissions';
+import contractPlansConfig from '@/config/contract-plans.json';
 
 // Router
 const route = useRoute();
@@ -508,6 +689,22 @@ const confirmDeleteMessage = ref('');
 
 // Recalculation state
 const isRecalculating = ref(false);
+
+// Balance state
+const isBalanceLoading = ref(false);
+const balanceData = ref({
+  balance: 0,
+  contracts: {
+    manutencoesPorAno: 0,
+    deslocacoesPorAno: 0,
+    horasAssistenciaAnuais: 0,
+  },
+});
+const initialResources = ref({
+  manutencoesPorAno: 0,
+  deslocacoesPorAno: 0,
+  horasAssistenciaAnuais: 0,
+});
 
 // Clear error function
 const clearError = () => {
@@ -558,6 +755,98 @@ const hasConditionalFields = (data: any): boolean => {
     (data.atcud && (data.seriesDocumentos || data.atUsername || data.atPassword)) ||
     (data.vectronConnect && data.vectronAddress)
   );
+};
+
+// Contract helper functions
+const getPlanName = (contractType: string, planId: string): string => {
+  const config = contractPlansConfig as any;
+  const typeConfig = config[contractType];
+  if (!typeConfig || !typeConfig.plans) return planId;
+  const plan = typeConfig.plans.find((p: any) => p.id === planId);
+  return plan?.name || planId;
+};
+
+const clientWithRelations = computed(() => {
+  return client.value as (Client & { relations?: Record<string, any> }) | null;
+});
+
+const contractRelation = computed(() => {
+  const relations = (clientWithRelations.value as any)?.relations;
+  if (!relations) return undefined;
+  return relations.contratoId;
+});
+
+const hasContract = computed(() => {
+  return contractRelation.value && isResolvedRelation(contractRelation.value);
+});
+
+const contractIsError = computed(() => {
+  return contractRelation.value && isRelationError(contractRelation.value);
+});
+
+const getContractTypes = (contract: any): string[] => {
+  const types: string[] = [];
+  if (contract.hasCPAContract) types.push('CPA');
+  if (contract.hasSHContract) types.push('S&H');
+  return types;
+};
+
+const getContractPlanDisplay = (contract: any): string => {
+  const parts: string[] = [];
+  if (contract.hasCPAContract && contract.cpaContractType && contract.planIdCPA) {
+    const planName = getPlanName(contract.cpaContractType, contract.planIdCPA);
+    parts.push(`CPA: ${planName}`);
+  }
+  if (contract.hasSHContract && contract.planIdSH) {
+    const planName = getPlanName('S&H', contract.planIdSH);
+    parts.push(`S&H: ${planName}`);
+  }
+  return parts.length > 0 ? parts.join(' · ') : '-';
+};
+
+const getContractDates = (contract: any): { start: string; end: string } => {
+  let start = '';
+  let end = '';
+
+  if (contract.hasCPAContract && contract.inicioContratoCPA) {
+    start = formatDate(contract.inicioContratoCPA);
+    end = contract.fimContratoCPA ? formatDate(contract.fimContratoCPA) : '';
+  }
+  if (contract.hasSHContract && contract.inicioContratoSH) {
+    if (!start) start = formatDate(contract.inicioContratoSH);
+    if (!end && contract.fimContratoSH) end = formatDate(contract.fimContratoSH);
+  }
+
+  return { start: start || '-', end: end || '-' };
+};
+
+const getContractStatus = (contract: any): { label: string; isActive: boolean } => {
+  const now = new Date();
+  let endDate: Date | null = null;
+
+  if (contract.hasCPAContract && contract.fimContratoCPA) {
+    endDate = new Date(contract.fimContratoCPA);
+  }
+  if (contract.hasSHContract && contract.fimContratoSH) {
+    const shEnd = new Date(contract.fimContratoSH);
+    if (!endDate || shEnd > endDate) endDate = shEnd;
+  }
+
+  if (!endDate) return { label: 'Ativo', isActive: true };
+  return endDate >= now
+    ? { label: 'Ativo', isActive: true }
+    : { label: 'Expirado', isActive: false };
+};
+
+const formatDate = (dateStr: string): string => {
+  if (!dateStr) return '-';
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
+  return date.toLocaleDateString('pt-PT', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
 };
 
 // Toggle AT Password visibility
@@ -645,6 +934,70 @@ const cancelDelete = () => {
   showDeleteConfirm.value = false;
 };
 
+// Balance display helpers
+const formatResourceValue = (value: number): string => {
+  if (value === -1) return 'Ilimitado';
+  return value.toString();
+};
+
+const isResourceLow = (field: 'manutencoesPorAno' | 'deslocacoesPorAno' | 'horasAssistenciaAnuais'): boolean => {
+  const current = balanceData.value.contracts[field];
+  const initial = initialResources.value[field];
+
+  // Unlimited (-1) never shows warning
+  if (current === -1 || initial === -1) return false;
+  // Zero initial means no contract resources — no warning
+  if (initial === 0) return false;
+
+  const percentageRemaining = (current / initial) * 100;
+  return percentageRemaining < 20;
+};
+
+// Load balance data
+const loadBalance = (clientId: string) => {
+  isBalanceLoading.value = true;
+
+  fetch(`/api/balance/${clientId}`)
+    .then(async (response) => {
+      if (!response.ok) {
+        if (response.status === 404 || response.status === 403) {
+          // No balance or no permission — show zeros
+          console.log('Balance not available:', response.status);
+          return null;
+        }
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Erro ao carregar saldo');
+      }
+      return response.json();
+    })
+    .then((data) => {
+      if (data && data.data) {
+        console.log('Balance loaded:', JSON.stringify(data.data, null, 2));
+        balanceData.value = {
+          balance: data.data.balance ?? 0,
+          contracts: {
+            manutencoesPorAno: data.data.contracts?.manutencoesPorAno ?? 0,
+            deslocacoesPorAno: data.data.contracts?.deslocacoesPorAno ?? 0,
+            horasAssistenciaAnuais: data.data.contracts?.horasAssistenciaAnuais ?? 0,
+          },
+        };
+        // Store initial resources for low-usage calculation
+        initialResources.value = {
+          manutencoesPorAno: data.data.contracts?.manutencoesPorAno ?? 0,
+          deslocacoesPorAno: data.data.contracts?.deslocacoesPorAno ?? 0,
+          horasAssistenciaAnuais: data.data.contracts?.horasAssistenciaAnuais ?? 0,
+        };
+      }
+    })
+    .catch((err) => {
+      console.error('Error loading balance:', JSON.stringify(err, null, 2));
+      // On error, keep zeros — don't show error to user
+    })
+    .finally(() => {
+      isBalanceLoading.value = false;
+    });
+};
+
 // Balance recalculation
 const handleRecalculateBalance = async () => {
   if (!client.value) return;
@@ -677,7 +1030,10 @@ const handleRecalculateBalance = async () => {
     })
     .then(data => {
       console.log('Balance recalculated:', JSON.stringify(data, null, 2));
-      // Force balance component to refresh
+      // Refresh inline balance display
+      if (client.value) {
+        loadBalance(client.value.uuid);
+      }
       balanceKey.value++;
       alert('Saldo recalculado com sucesso!');
     })
@@ -707,6 +1063,8 @@ const loadClient = async () => {
 
     if (api.currentItem.value) {
       client.value = api.currentItem.value;
+      // Load balance data for the client
+      loadBalance(clientId);
     } else {
       throw new Error('Cliente não encontrado');
     }
@@ -728,6 +1086,20 @@ onMounted(() => {
 /* Client-specific styling */
 .software-card {
   @apply p-4 bg-gray-50 rounded-touch border border-gray-200;
+}
+
+/* Balance loading spinner */
+.balance-spinner {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid #e5e7eb;
+  border-top-color: #75AE93;
+  border-radius: 50%;
+  animation: balance-spin 0.8s linear infinite;
+}
+
+@keyframes balance-spin {
+  to { transform: rotate(360deg); }
 }
 
 .software-badge {

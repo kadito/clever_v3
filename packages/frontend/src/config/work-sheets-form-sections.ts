@@ -163,17 +163,7 @@ export const workSheetsFormSections: FormSection[] = [
         required: true,
         fullWidth: true,
       },
-      {
-        key: 'contractId',
-        label: 'Contrato',
-        type: 'custom',
-        required: true,
-        fullWidth: true,
-        conditional: {
-          dependsOn: 'paymentMethod',
-          showWhen: (value: any) => value === 'CONTRATO',
-        },
-      },
+
     ],
   },
   {

@@ -6,7 +6,7 @@
     cancel-route="/contracts"
     :form-sections="contractsFormSections"
     :is-loading="isLoading"
-    :is-saving="isSaving"
+    :is-saving="isSaving || clientHasActiveContract"
     :error="error"
     :custom-validator="validateContractCreate"
     @create="handleCreate"
@@ -88,6 +88,13 @@
           @client-selected="handleClientSelected"
         />
         <div v-if="error" class="form-error">{{ error }}</div>
+        <!-- Active contract warning banner -->
+        <div
+          v-if="clientHasActiveContract"
+          class="bg-yellow-50 border border-yellow-400 rounded-lg p-3 text-yellow-800 text-sm mt-2"
+        >
+          ⚠️ Este cliente já possui um contrato ativo.
+        </div>
       </div>
     </template>
 
@@ -136,6 +143,7 @@ import SHContractSection from '@/components/contracts/SHContractSection.vue';
 import { contractsFormSections } from '@/config/contracts-form-sections';
 import { getPlanDetails, type ContractType } from '../../services/planSelection';
 import { useApi } from '@/composables/useApi';
+import { apiService } from '@/services/api';
 import { useErrorHandler } from '@/composables/useErrorHandler';
 import { useSharedFormData } from '@/composables/useSharedFormData';
 import { usePerformanceOptimizations } from '@/composables/usePerformanceOptimizations';
@@ -161,6 +169,8 @@ const isLoading = ref(false);
 const isSaving = ref(false);
 const error = ref<string | null>(null);
 const selectedClient = shallowRef<Client | null>(null); // Use shallowRef for better performance
+const clientHasActiveContract = ref(false);
+const isCheckingContract = ref(false);
 
 // Display toggle state - both can be active simultaneously
 const showCPASection = ref(false);
@@ -748,10 +758,33 @@ onBeforeUnmount(() => {
 // Equipment management is now handled by CPAEquipmentManager component
 
 // Client selection handler
-const handleClientSelected = (client: Client | null) => {
+const handleClientSelected = async (client: Client | null) => {
   selectedClient.value = client;
-  // Note: We no longer store clienteName as we're removing client information fields
-  // Client data will be resolved through relations in the detail view
+  clientHasActiveContract.value = false;
+
+  if (!client) {
+    return;
+  }
+
+  // Check if client already has an active contract
+  isCheckingContract.value = true;
+  await apiService
+    .getContentList('contracts', { search: client.uuid })
+    .then((response) => {
+      if (response.success && response.data) {
+        const activeContract = response.data.find(
+          (contract) => !contract.isDeleted
+        );
+        clientHasActiveContract.value = !!activeContract;
+      }
+    })
+    .catch((err) => {
+      console.error('Error checking active contract:', JSON.stringify(err, null, 2));
+      clientHasActiveContract.value = false;
+    })
+    .finally(() => {
+      isCheckingContract.value = false;
+    });
 };
 
 // Pricing functions - removed as they're now handled by DynamicPlanDetails component

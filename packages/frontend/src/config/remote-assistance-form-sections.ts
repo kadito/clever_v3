@@ -156,20 +156,7 @@ export const remoteAssistanceFormSections: FormSection[] = [
           { value: 'Garantia', label: 'Garantia' },
         ],
       },
-      {
-        key: 'contractId',
-        label: 'Contrato',
-        type: 'custom',
-        fullWidth: true,
-        conditional: {
-          dependsOn: 'paymentMethod',
-          showWhen: (value: any) => value === 'Contrato',
-        },
-        conditionalRequired: {
-          dependsOn: 'paymentMethod',
-          requiredWhen: (value: any) => value === 'Contrato',
-        },
-      },
+
     ],
   },
   {

@@ -98,8 +98,14 @@ export const CONTENT_RELATION_CONFIGS: Record<string, RelationFieldConfig[]> = {
       displayName: 'Assistência Remota',
     },
   ],
-  // Clients don't have relations to other content types currently
-  clients: [],
+  clients: [
+    {
+      fieldName: 'contratoId',
+      targetType: 'contracts',
+      required: false, // Optional - clients can exist without an active contract
+      displayName: 'Contrato',
+    },
+  ],
   // Other content types don't have relations currently
   reminders: [],
   pending: [],

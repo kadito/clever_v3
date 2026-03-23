@@ -484,6 +484,72 @@ export class BalanceService {
   }
 
   /**
+   * Validate that the client has sufficient resources for a DEBT transaction
+   * that consumes contract resources.
+   * 
+   * Checks each resource being consumed (negative contractUsageChanges):
+   * - Resources with value -1 (unlimited) always pass
+   * - Resources with value 0 and consumption requested → insufficient
+   * - Hours: current must be >= absolute value of hours requested
+   * 
+   * @param clientId - Client UUID
+   * @param changes - Proposed transaction changes
+   * @throws ValidationError if resources are insufficient
+   * 
+   * Validates: Requirements 6.1, 6.2, 6.3, 6.4
+   */
+  async validateResourceAvailability(
+    clientId: string,
+    changes: TransactionChanges
+  ): Promise<void> {
+    // Only validate contract usage changes (resource consumption)
+    if (!changes.contractUsageChanges) {
+      return;
+    }
+
+    const usageChanges = changes.contractUsageChanges;
+
+    // No negative values means no resource consumption — skip validation
+    const hasConsumption =
+      (usageChanges.manutencoesPorAno !== undefined && usageChanges.manutencoesPorAno < 0) ||
+      (usageChanges.deslocacoesPorAno !== undefined && usageChanges.deslocacoesPorAno < 0) ||
+      (usageChanges.horasAssistenciaAnuais !== undefined && usageChanges.horasAssistenciaAnuais < 0);
+
+    if (!hasConsumption) {
+      return;
+    }
+
+    const currentBalance = await this.getBalance(clientId);
+    const contracts = currentBalance?.contracts || {
+      manutencoesPorAno: 0,
+      deslocacoesPorAno: 0,
+      horasAssistenciaAnuais: 0,
+    };
+
+    // Validate maintenance visits
+    if (usageChanges.manutencoesPorAno !== undefined && usageChanges.manutencoesPorAno < 0) {
+      if (contracts.manutencoesPorAno !== -1 && contracts.manutencoesPorAno === 0) {
+        throw new ValidationError('Recursos insuficientes no contrato do cliente.');
+      }
+    }
+
+    // Validate displacements
+    if (usageChanges.deslocacoesPorAno !== undefined && usageChanges.deslocacoesPorAno < 0) {
+      if (contracts.deslocacoesPorAno !== -1 && contracts.deslocacoesPorAno === 0) {
+        throw new ValidationError('Recursos insuficientes no contrato do cliente.');
+      }
+    }
+
+    // Validate assistance hours
+    if (usageChanges.horasAssistenciaAnuais !== undefined && usageChanges.horasAssistenciaAnuais < 0) {
+      const hoursRequested = Math.abs(usageChanges.horasAssistenciaAnuais);
+      if (contracts.horasAssistenciaAnuais !== -1 && contracts.horasAssistenciaAnuais < hoursRequested) {
+        throw new ValidationError('Recursos insuficientes no contrato do cliente.');
+      }
+    }
+  }
+
+  /**
    * Create a DEBT transaction for work sheet or remote assistance.
    * 
    * DEBT transactions either:

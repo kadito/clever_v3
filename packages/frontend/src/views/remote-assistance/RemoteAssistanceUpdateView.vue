@@ -246,20 +246,7 @@
           </div>
         </template>
 
-        <template #field-contractId="{ formData, error, updateFieldValue }">
-          <ContractSearchInput
-            :model-value="formData?.contractId || ''"
-            :client-id="formData?.clientId || ''"
-            :selected-contract="selectedContract"
-            :has-error="!!error"
-            @update:model-value="value => updateFieldValue('contractId', value)"
-            @contract-selected="handleContractSelected"
-          />
-          <p v-if="error" class="form-error text-red-600 text-sm mt-1">{{ error }}</p>
-          <p v-if="!formData?.clientId" class="form-help text-xs text-gray-500 mt-1">
-            Selecione um cliente primeiro para escolher um contrato
-          </p>
-        </template>
+
       </ContentUpdateTemplate>
     </div>
   </div>
@@ -277,10 +264,8 @@ import {
   calculateRoundedTotalHours,
   calculateAssistanceValueWithBusinessHours,
   REMOTE_ASSISTANCE_CONSTANTS,
-  type Contract,
 } from '@clever/shared';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
-import ContractSearchInput from '@/components/common/ContractSearchInput.vue';
 import ErrorComponent from '@/components/common/ErrorComponent.vue';
 import ContentUpdateTemplate from '@/components/common/ContentUpdateTemplate.vue';
 import { remoteAssistanceFormSections } from '@/config/remote-assistance-form-sections';
@@ -304,7 +289,6 @@ const { formData: currentFormData, updateFieldValue } = useSharedFormData(
 
 // State - use API composable state
 const selectedClient = ref<Client | null>(null);
-const selectedContract = ref<Contract | null>(null);
 
 // Computed - use currentItem from API composable
 const remoteAssistance = computed(() => currentItem.value);
@@ -319,9 +303,6 @@ const initialFormData = computed(() => {
   return {
     // Client information
     clientId: data.clientId || '',
-
-    // Contract information (for payment method Contrato)
-    contractId: data.contractId || '',
 
     // Assistance information
     tipoAssistencia: data.tipoAssistencia || '',
@@ -371,15 +352,6 @@ const loadRemoteAssistance = async () => {
       'nomeEmpresa' in currentItem.value.relations.client
     ) {
       selectedClient.value = currentItem.value.relations.client as unknown as Client;
-    }
-
-    // Set selected contract if relation exists
-    if (
-      currentItem.value.relations?.contract &&
-      typeof currentItem.value.relations.contract === 'object' &&
-      'uuid' in currentItem.value.relations.contract
-    ) {
-      selectedContract.value = currentItem.value.relations.contract as Contract;
     }
   }
 };
@@ -440,18 +412,11 @@ const handleClientSelected = (client: Client | null) => {
   // Client data is now handled through relations, no need to auto-populate
 };
 
-const handleContractSelected = (contract: Contract | null) => {
-  console.log('Contract selected:', JSON.stringify(contract, null, 2));
-  selectedContract.value = contract;
-  // Contract ID is already updated via v-model
-};
-
 const validateUpdateForm = (data: Record<string, any>): Record<string, string> => {
   try {
     // Transform form data to RemoteAssistanceUpdateData format for validation
     const remoteAssistanceData: RemoteAssistanceUpdateData = {
       clientId: data.clientId || '',
-      contractId: data.contractId,
       tipoAssistencia: data.tipoAssistencia || '',
       // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
       // We don't include it in the validation data as it will be populated by backend
@@ -600,7 +565,6 @@ const handleUpdate = async (formData: Record<string, any>) => {
     // Transform form data to RemoteAssistanceUpdateData format
     const updateData: RemoteAssistanceUpdateData = {
       clientId: formData.clientId || '',
-      contractId: formData.contractId, // Include contractId
       tipoAssistencia: formData.tipoAssistencia || '',
       // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
       // We don't include it in the update data as it will be populated by backend
@@ -723,12 +687,6 @@ watch(
   () => currentFormData.value?.paymentMethod,
   (paymentMethod, oldPaymentMethod) => {
     const currentFormDataValue = currentFormData.value;
-    
-    // Clear contractId when payment method changes from "Contrato" to other values
-    if (oldPaymentMethod === 'Contrato' && paymentMethod !== 'Contrato') {
-      updateFieldValue('contractId', '');
-      selectedContract.value = null;
-    }
     
     if (currentFormDataValue?.inicioAssistencia && currentFormDataValue?.fimAssistencia) {
       // Use the new business hours calculation logic

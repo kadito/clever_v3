@@ -475,7 +475,6 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
       atPassword: data.atPassword,
       vectronAddress: data.vectronAddress,
       observacoes: data.observacoes,
-      contratos: [],
     };
 
     // Use shared validation
@@ -548,7 +547,6 @@ const handleCreate = async (formData: Record<string, any>) => {
       atPassword: formData.atPassword,
       vectronAddress: formData.vectronAddress,
       observacoes: formData.observacoes,
-      contratos: [],
     };
 
     const response = await api.create({ data: clientData } as any);

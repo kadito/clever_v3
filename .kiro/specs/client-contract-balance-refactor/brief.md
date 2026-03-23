@@ -1,0 +1,1 @@
+Temos de fazer refactor a relacao entre o Cliente e Contratos. Temos tambem de refazer a parte do saldo / balanço do cliente.Ou seja, daqui a diante um Cliente so vai poder ter 1 contrato. O que adiciona regras ao criar um Contrato.E muda completamente a maneira como fazemos as transações e calculamos o saldo do cliente.
