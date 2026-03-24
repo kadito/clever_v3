@@ -24,6 +24,19 @@
         </p>
       </template>
 
+      <!-- Contract search field (conditional on paymentMethod === 'Contrato') -->
+      <template #field-contractId="{ formData, error, updateFieldValue }">
+        <ContractSearchInput
+          :model-value="formData?.contractId || ''"
+          :client-id="formData?.clientId || ''"
+          :has-error="!!error"
+          @update:model-value="value => updateFieldValue('contractId', value)"
+        />
+        <p v-if="error" class="form-error text-red-600 text-sm mt-1">
+          {{ error }}
+        </p>
+      </template>
+
       <!-- Time input fields with automatic formatting and validation -->
       <template #field-inicioAssistencia="{ formData, error, updateFieldValue }">
         <input
@@ -245,6 +258,7 @@ import {
   REMOTE_ASSISTANCE_CONSTANTS,
 } from '@clever/shared';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
+import ContractSearchInput from '@/components/common/ContractSearchInput.vue';
 import ContentCreateTemplate from '@/components/common/ContentCreateTemplate.vue';
 import { remoteAssistanceFormSections } from '@/config/remote-assistance-form-sections';
 import { useSharedFormData } from '@/composables/useSharedFormData';
@@ -464,6 +478,13 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
       errors.push('Método de pagamento inválido. Deve ser: Contrato, Faturação ou Garantia');
     }
 
+    // Contract validation when payment method is Contrato
+    if (remoteAssistanceData.paymentMethod === 'Contrato') {
+      if (!data.contractId?.trim()) {
+        errors.push('O contrato é obrigatório quando o método de pagamento é Contrato');
+      }
+    }
+
     // Validate resolvido field (required)
     if (remoteAssistanceData.resolvido === undefined || remoteAssistanceData.resolvido === null) {
       errors.push('Por favor, indique se o problema foi resolvido');
@@ -510,6 +531,8 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
         fieldErrors.paymentMethod = errorMessage;
       } else if (errorMessage.includes('Método de pagamento inválido')) {
         fieldErrors.paymentMethod = errorMessage;
+      } else if (errorMessage.includes('contrato é obrigatório')) {
+        fieldErrors.contractId = errorMessage;
       } else if (errorMessage.includes('indique se o problema foi resolvido')) {
         fieldErrors.resolvido = errorMessage;
       } else if (errorMessage.includes('Relatório final é obrigatório')) {
@@ -537,6 +560,7 @@ const handleCreateSuccess = async (formData: Record<string, any>) => {
     // Transform form data to RemoteAssistanceCreationData format
     const remoteAssistanceData: RemoteAssistanceCreationData = {
       clientId: formData.clientId || '',
+      contractId: formData.paymentMethod === 'Contrato' ? formData.contractId || '' : undefined,
       tipoAssistencia: formData.tipoAssistencia || '',
       // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
       tecnicoResponsavel: {} as any, // Will be populated by backend auto-assignment
@@ -605,6 +629,16 @@ watch(
   newValue => {
     if (newValue !== false) {
       updateFieldValue('relatorio', '');
+    }
+  }
+);
+
+// Clear contractId when payment method changes away from Contrato
+watch(
+  () => formData.value?.paymentMethod,
+  (newValue) => {
+    if (newValue !== 'Contrato') {
+      updateFieldValue('contractId', '');
     }
   }
 );

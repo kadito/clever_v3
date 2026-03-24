@@ -39,6 +39,19 @@
           </p>
         </template>
 
+        <!-- Contract search field (conditional on paymentMethod === 'Contrato') -->
+        <template #field-contractId="{ formData, error, updateFieldValue }">
+          <ContractSearchInput
+            :model-value="formData?.contractId || ''"
+            :client-id="formData?.clientId || ''"
+            :has-error="!!error"
+            @update:model-value="value => updateFieldValue('contractId', value)"
+          />
+          <p v-if="error" class="form-error text-red-600 text-sm mt-1">
+            {{ error }}
+          </p>
+        </template>
+
         <!-- Time input fields with automatic formatting and validation -->
         <template #field-inicioAssistencia="{ formData, error, updateFieldValue }">
           <input
@@ -266,6 +279,7 @@ import {
   REMOTE_ASSISTANCE_CONSTANTS,
 } from '@clever/shared';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
+import ContractSearchInput from '@/components/common/ContractSearchInput.vue';
 import ErrorComponent from '@/components/common/ErrorComponent.vue';
 import ContentUpdateTemplate from '@/components/common/ContentUpdateTemplate.vue';
 import { remoteAssistanceFormSections } from '@/config/remote-assistance-form-sections';
@@ -303,6 +317,9 @@ const initialFormData = computed(() => {
   return {
     // Client information
     clientId: data.clientId || '',
+
+    // Contract information
+    contractId: data.contractId || '',
 
     // Assistance information
     tipoAssistencia: data.tipoAssistencia || '',
@@ -519,6 +536,13 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
       }
     }
 
+    // Contract validation when payment method is Contrato
+    if (data.paymentMethod === 'Contrato') {
+      if (!data.contractId?.trim()) {
+        errors.push('O contrato é obrigatório quando o método de pagamento é Contrato');
+      }
+    }
+
     // Convert array of error messages to field-specific errors
     const fieldErrors: Record<string, string> = {};
 
@@ -545,6 +569,8 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
         fieldErrors.relatorio = errorMessage;
       } else if (errorMessage.includes('Valor da assistência deve ser um número positivo')) {
         fieldErrors.valorAssist = errorMessage;
+      } else if (errorMessage.includes('contrato é obrigatório')) {
+        fieldErrors.contractId = errorMessage;
       } else {
         // Generic error
         fieldErrors.general = errorMessage;
@@ -565,6 +591,7 @@ const handleUpdate = async (formData: Record<string, any>) => {
     // Transform form data to RemoteAssistanceUpdateData format
     const updateData: RemoteAssistanceUpdateData = {
       clientId: formData.clientId || '',
+      contractId: formData.paymentMethod === 'Contrato' ? formData.contractId || '' : undefined,
       tipoAssistencia: formData.tipoAssistencia || '',
       // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
       // We don't include it in the update data as it will be populated by backend
@@ -687,6 +714,11 @@ watch(
   () => currentFormData.value?.paymentMethod,
   (paymentMethod, oldPaymentMethod) => {
     const currentFormDataValue = currentFormData.value;
+
+    // Clear contractId when payment method changes away from Contrato
+    if (paymentMethod !== 'Contrato') {
+      updateFieldValue('contractId', '');
+    }
     
     if (currentFormDataValue?.inicioAssistencia && currentFormDataValue?.fimAssistencia) {
       // Use the new business hours calculation logic
