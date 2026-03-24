@@ -128,6 +128,43 @@
           </div>
         </template>
 
+        <!-- Contract auto-fetch display (conditional on paymentMethod === 'CONTRATO') -->
+        <template #field-contractId="{ formData, error, updateFieldValue }">
+          <div v-if="isLoadingContracts" class="text-sm text-gray-500 py-2">
+            A carregar contratos...
+          </div>
+          <div v-else-if="clientContracts.length === 0" class="text-sm text-red-600 py-2">
+            Nenhum contrato encontrado para este cliente.
+          </div>
+          <div v-else>
+            <select
+              v-if="clientContracts.length > 1"
+              :value="formData?.contractId || ''"
+              class="form-input mb-2"
+              :class="{ 'border-red-500': !!error }"
+              @change="(e: Event) => updateFieldValue('contractId', (e.target as HTMLSelectElement).value)"
+            >
+              <option value="">Selecionar contrato...</option>
+              <option
+                v-for="contract in clientContracts"
+                :key="contract.uuid"
+                :value="contract.uuid"
+              >
+                {{ getContractDisplayName(contract) }}
+              </option>
+            </select>
+            <div v-if="selectedContract" class="bg-green-50 border border-green-200 rounded-lg p-3">
+              <div class="text-sm font-medium text-green-800">{{ getContractDisplayName(selectedContract) }}</div>
+              <div v-if="getContractDates(selectedContract)" class="text-xs text-green-600 mt-1">
+                Período: {{ getContractDates(selectedContract) }}
+              </div>
+            </div>
+          </div>
+          <p v-if="error" class="form-error text-red-600 text-sm mt-1">
+            {{ error }}
+          </p>
+        </template>
+
         <!-- Pricing display section (only shown when hasDisplacement is true) -->
         <template #after-section-displacement="{ formData: slotFormData }">
           <div v-if="formData?.hasDisplacement === true" class="pricing-section">
@@ -186,7 +223,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import type { WorkSheet, WorkSheetUpdateData, Client } from '@clever/shared';
+import type { WorkSheet, WorkSheetUpdateData, Client, Contract } from '@clever/shared';
 import { validateWorkSheetUpdate } from '@clever/shared';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
 import SignaturePad from '@/components/forms/SignaturePad.vue';
@@ -195,6 +232,7 @@ import ContentUpdateTemplate from '@/components/common/ContentUpdateTemplate.vue
 import { workSheetsFormSections } from '@/config/work-sheets-form-sections';
 import { useApi } from '@/composables/useApi';
 import { useSharedFormData } from '@/composables/useSharedFormData';
+import contractPlansConfig from '@/config/contract-plans.json';
 
 const route = useRoute();
 const router = useRouter();
@@ -211,6 +249,75 @@ const { formData: currentFormData, updateFieldValue } = useSharedFormData('work-
 
 // State - use API composable state
 const selectedClient = ref<Client | null>(null);
+
+// Contract auto-fetch state
+const contractsApi = useApi<Contract>('contracts');
+const clientContracts = ref<Contract[]>([]);
+const isLoadingContracts = ref(false);
+
+const selectedContract = computed(() => {
+  const currentContractId = currentFormData.value?.contractId;
+  if (!currentContractId) return clientContracts.value.length === 1 ? clientContracts.value[0] : null;
+  return clientContracts.value.find(c => c.uuid === currentContractId) || null;
+});
+
+const getPlanName = (contractType: string, planId: string): string => {
+  const plans = (contractPlansConfig as Record<string, { plans: { id: string; name: string }[] }>)[contractType]?.plans || [];
+  const plan = plans.find(p => p.id === planId);
+  return plan?.name || planId;
+};
+
+const getContractDisplayName = (contract: Contract): string => {
+  const parts: string[] = [];
+  if (contract.data?.hasCPAContract) {
+    const cpaType = contract.data.cpaContractType === 'CPA_1500' ? 'CPA 1500' : 'CPA 2023';
+    const planName = getPlanName(contract.data.cpaContractType, contract.data.planIdCPA);
+    parts.push(`${cpaType} - ${planName}`);
+  }
+  if (contract.data?.hasSHContract) {
+    const planName = getPlanName('S&H', contract.data.planIdSH);
+    parts.push(`S&H - ${planName}`);
+  }
+  return parts.join(' | ') || 'Contrato';
+};
+
+const getContractDates = (contract: Contract): string => {
+  if (contract.data?.hasCPAContract && contract.data.inicioContratoCPA) {
+    const inicio = new Date(contract.data.inicioContratoCPA).toLocaleDateString('pt-PT');
+    const fim = new Date(contract.data.fimContratoCPA).toLocaleDateString('pt-PT');
+    return `${inicio} - ${fim}`;
+  }
+  if (contract.data?.hasSHContract && contract.data.inicioContratoSH) {
+    const inicio = new Date(contract.data.inicioContratoSH).toLocaleDateString('pt-PT');
+    const fim = new Date(contract.data.fimContratoSH).toLocaleDateString('pt-PT');
+    return `${inicio} - ${fim}`;
+  }
+  return '';
+};
+
+const fetchClientContracts = async (clientId: string) => {
+  if (!clientId) {
+    clientContracts.value = [];
+    return;
+  }
+  isLoadingContracts.value = true;
+  await contractsApi.fetchList({})
+    .then(() => {
+      clientContracts.value = (contractsApi.items.value || []).filter(
+        (c: Contract) => c.data.clientId === clientId
+      );
+      if (clientContracts.value.length === 1 && !currentFormData.value?.contractId) {
+        updateFieldValue('contractId', clientContracts.value[0].uuid);
+      }
+    })
+    .catch((err: unknown) => {
+      console.error('Error fetching contracts:', JSON.stringify(err, null, 2));
+      clientContracts.value = [];
+    })
+    .finally(() => {
+      isLoadingContracts.value = false;
+    });
+};
 
 // Computed - use currentItem from API composable
 const workSheet = computed(() => currentItem.value);
@@ -256,6 +363,9 @@ const initialFormData = computed(() => {
     totalKms: data.displacement?.totalKms || 0,
     paymentMethod: data.displacement?.paymentMethod || 'PENDENTE',
 
+    // Contract ID
+    contractId: data.contractId || '',
+
     // Contract information
     warranty: data.otherData?.warranty || false,
     contract: data.otherData?.contract || false,
@@ -292,7 +402,11 @@ const loadWorkSheet = async () => {
   await fetchById(uuid);
 
   if (currentItem.value) {
-    // Work sheet loaded successfully
+    // Fetch contracts if payment method is CONTRATO
+    const data = currentItem.value.data;
+    if (data?.displacement?.paymentMethod === 'CONTRATO' && data?.clientId) {
+      await fetchClientContracts(data.clientId);
+    }
   }
 };
 
@@ -404,6 +518,11 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
       fieldErrors.oneWayKms = 'Quilómetros de ida deve ser um número positivo';
     }
 
+    // Contract validation when payment method is CONTRATO
+    if (data.paymentMethod === 'CONTRATO' && !data.contractId?.trim()) {
+      fieldErrors.contractId = 'O contrato é obrigatório quando o método de pagamento é CONTRATO';
+    }
+
     // CONDITIONAL FIELD VALIDATION - Only validate when conditions are met
 
     // Material details only required when materialUsed is true
@@ -461,6 +580,7 @@ const handleUpdate = async (formData: Record<string, any>) => {
   // Transform form data to API format
   const updateData = {
     clientId: formData.clientId,
+    contractId: formData.paymentMethod === 'CONTRATO' ? formData.contractId || '' : undefined,
     request: {
       date: formData.requestDate || '',
       receivedBy: '', // Field removed from form, set to empty string
@@ -623,6 +743,23 @@ watch(
       updateFieldValue('warranty', false);
       updateFieldValue('contract', false);
       updateFieldValue('contractYear', new Date().getFullYear().toString());
+      updateFieldValue('contractId', '');
+      clientContracts.value = [];
+    } else if (currentFormData.value?.clientId) {
+      fetchClientContracts(currentFormData.value.clientId);
+    }
+  }
+);
+
+// Fetch contracts when client changes and payment method is CONTRATO
+watch(
+  () => currentFormData.value?.clientId,
+  (newClientId) => {
+    if (currentFormData.value?.paymentMethod === 'CONTRATO' && newClientId) {
+      updateFieldValue('contractId', '');
+      fetchClientContracts(newClientId);
+    } else {
+      clientContracts.value = [];
     }
   }
 );

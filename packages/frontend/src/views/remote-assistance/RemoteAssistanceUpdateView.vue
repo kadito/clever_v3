@@ -39,14 +39,40 @@
           </p>
         </template>
 
-        <!-- Contract search field (conditional on paymentMethod === 'Contrato') -->
+        <!-- Contract auto-fetch display (conditional on paymentMethod === 'Contrato') -->
         <template #field-contractId="{ formData, error, updateFieldValue }">
-          <ContractSearchInput
-            :model-value="formData?.contractId || ''"
-            :client-id="formData?.clientId || ''"
-            :has-error="!!error"
-            @update:model-value="value => updateFieldValue('contractId', value)"
-          />
+          <div v-if="isLoadingContracts" class="text-sm text-gray-500 py-2">
+            A carregar contratos...
+          </div>
+          <div v-else-if="clientContracts.length === 0" class="text-sm text-red-600 py-2">
+            Nenhum contrato encontrado para este cliente.
+          </div>
+          <div v-else>
+            <!-- Simple dropdown if multiple contracts -->
+            <select
+              v-if="clientContracts.length > 1"
+              :value="formData?.contractId || ''"
+              class="form-input mb-2"
+              :class="{ 'border-red-500': !!error }"
+              @change="(e: Event) => updateFieldValue('contractId', (e.target as HTMLSelectElement).value)"
+            >
+              <option value="">Selecionar contrato...</option>
+              <option
+                v-for="contract in clientContracts"
+                :key="contract.uuid"
+                :value="contract.uuid"
+              >
+                {{ getContractDisplayName(contract) }}
+              </option>
+            </select>
+            <!-- Contract info display -->
+            <div v-if="selectedContractForDisplay" class="bg-green-50 border border-green-200 rounded-lg p-3">
+              <div class="text-sm font-medium text-green-800">{{ getContractDisplayName(selectedContractForDisplay) }}</div>
+              <div v-if="getContractDates(selectedContractForDisplay)" class="text-xs text-green-600 mt-1">
+                Período: {{ getContractDates(selectedContractForDisplay) }}
+              </div>
+            </div>
+          </div>
           <p v-if="error" class="form-error text-red-600 text-sm mt-1">
             {{ error }}
           </p>
@@ -269,7 +295,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { Client, ContentWithRelations } from '@clever/shared';
-import type { RemoteAssistance, RemoteAssistanceUpdateData } from '@clever/shared';
+import type { RemoteAssistance, RemoteAssistanceUpdateData, Contract } from '@clever/shared';
 import {
   validateAndFormatTime,
   validateTimeSequence,
@@ -279,12 +305,12 @@ import {
   REMOTE_ASSISTANCE_CONSTANTS,
 } from '@clever/shared';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
-import ContractSearchInput from '@/components/common/ContractSearchInput.vue';
 import ErrorComponent from '@/components/common/ErrorComponent.vue';
 import ContentUpdateTemplate from '@/components/common/ContentUpdateTemplate.vue';
 import { remoteAssistanceFormSections } from '@/config/remote-assistance-form-sections';
 import { useApi } from '@/composables/useApi';
 import { useSharedFormData } from '@/composables/useSharedFormData';
+import contractPlansConfig from '@/config/contract-plans.json';
 
 const route = useRoute();
 const router = useRouter();
@@ -303,6 +329,76 @@ const { formData: currentFormData, updateFieldValue } = useSharedFormData(
 
 // State - use API composable state
 const selectedClient = ref<Client | null>(null);
+
+// Contract auto-fetch state
+const contractsApiForFetch = useApi<Contract>('contracts');
+const clientContracts = ref<Contract[]>([]);
+const isLoadingContracts = ref(false);
+
+const selectedContractForDisplay = computed(() => {
+  const currentContractId = currentFormData.value?.contractId;
+  if (!currentContractId) return clientContracts.value.length === 1 ? clientContracts.value[0] : null;
+  return clientContracts.value.find(c => c.uuid === currentContractId) || null;
+});
+
+const getPlanName = (contractType: string, planId: string): string => {
+  const plans = (contractPlansConfig as Record<string, { plans: { id: string; name: string }[] }>)[contractType]?.plans || [];
+  const plan = plans.find(p => p.id === planId);
+  return plan?.name || planId;
+};
+
+const getContractDisplayName = (contract: Contract): string => {
+  const parts: string[] = [];
+  if (contract.data?.hasCPAContract) {
+    const cpaType = contract.data.cpaContractType === 'CPA_1500' ? 'CPA 1500' : 'CPA 2023';
+    const planName = getPlanName(contract.data.cpaContractType, contract.data.planIdCPA);
+    parts.push(`${cpaType} - ${planName}`);
+  }
+  if (contract.data?.hasSHContract) {
+    const planName = getPlanName('S&H', contract.data.planIdSH);
+    parts.push(`S&H - ${planName}`);
+  }
+  return parts.join(' | ') || 'Contrato';
+};
+
+const getContractDates = (contract: Contract): string => {
+  if (contract.data?.hasCPAContract && contract.data.inicioContratoCPA) {
+    const inicio = new Date(contract.data.inicioContratoCPA).toLocaleDateString('pt-PT');
+    const fim = new Date(contract.data.fimContratoCPA).toLocaleDateString('pt-PT');
+    return `${inicio} - ${fim}`;
+  }
+  if (contract.data?.hasSHContract && contract.data.inicioContratoSH) {
+    const inicio = new Date(contract.data.inicioContratoSH).toLocaleDateString('pt-PT');
+    const fim = new Date(contract.data.fimContratoSH).toLocaleDateString('pt-PT');
+    return `${inicio} - ${fim}`;
+  }
+  return '';
+};
+
+const fetchClientContracts = async (clientId: string) => {
+  if (!clientId) {
+    clientContracts.value = [];
+    return;
+  }
+  isLoadingContracts.value = true;
+  await contractsApiForFetch.fetchList({})
+    .then(() => {
+      clientContracts.value = (contractsApiForFetch.items.value || []).filter(
+        (c: Contract) => c.data.clientId === clientId
+      );
+      // Auto-select if only one contract and no contract already selected
+      if (clientContracts.value.length === 1 && !currentFormData.value?.contractId) {
+        updateFieldValue('contractId', clientContracts.value[0].uuid);
+      }
+    })
+    .catch((err: unknown) => {
+      console.error('Error fetching contracts:', JSON.stringify(err, null, 2));
+      clientContracts.value = [];
+    })
+    .finally(() => {
+      isLoadingContracts.value = false;
+    });
+};
 
 // Computed - use currentItem from API composable
 const remoteAssistance = computed(() => currentItem.value);
@@ -369,6 +465,11 @@ const loadRemoteAssistance = async () => {
       'nomeEmpresa' in currentItem.value.relations.client
     ) {
       selectedClient.value = currentItem.value.relations.client as unknown as Client;
+    }
+
+    // Fetch contracts if payment method is Contrato
+    if (currentItem.value.data?.paymentMethod === 'Contrato' && currentItem.value.data?.clientId) {
+      await fetchClientContracts(currentItem.value.data.clientId);
     }
   }
 };
@@ -718,6 +819,9 @@ watch(
     // Clear contractId when payment method changes away from Contrato
     if (paymentMethod !== 'Contrato') {
       updateFieldValue('contractId', '');
+      clientContracts.value = [];
+    } else if (currentFormDataValue?.clientId) {
+      fetchClientContracts(currentFormDataValue.clientId);
     }
     
     if (currentFormDataValue?.inicioAssistencia && currentFormDataValue?.fimAssistencia) {
@@ -729,6 +833,19 @@ watch(
       );
 
       updateFieldValue('valorAssist', valueCalculation.totalValue);
+    }
+  }
+);
+
+// Fetch contracts when client changes and payment method is Contrato
+watch(
+  () => currentFormData.value?.clientId,
+  (newClientId) => {
+    if (currentFormData.value?.paymentMethod === 'Contrato' && newClientId) {
+      updateFieldValue('contractId', '');
+      fetchClientContracts(newClientId);
+    } else {
+      clientContracts.value = [];
     }
   }
 );
