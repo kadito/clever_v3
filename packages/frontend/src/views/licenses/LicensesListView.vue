@@ -31,6 +31,14 @@
     @items-per-page-change="handleItemsPerPageChange"
     @clear-error="clearError"
   >
+    <!-- Expiration date filter -->
+    <template #filters>
+      <ExpirationDateFilter
+        v-model="selectedMonth"
+        :options="filterOptions"
+      />
+    </template>
+
     <!-- Custom license icon -->
     <template #itemIcon="{ item }">
       <div class="license-icon">
@@ -123,8 +131,10 @@ import { useRouter } from 'vue-router';
 import type { License, BaseContent, ContentWithRelations } from '@clever/shared';
 import { calculateLicenseStatus } from '@clever/shared';
 import ContentListTemplate from '@/components/common/ContentListTemplate.vue';
+import ExpirationDateFilter from '@/components/common/ExpirationDateFilter.vue';
 import { useApi } from '@/composables/useApi';
 import { useErrorHandler } from '@/composables/useErrorHandler';
+import { useExpirationFilter } from '@/composables/useExpirationFilter';
 
 // Router
 const router = useRouter();
@@ -132,6 +142,7 @@ const router = useRouter();
 // Composables
 const api = useApi<License>('licenses');
 const errorHandler = useErrorHandler();
+const { filterOptions, selectedMonth, filterItems } = useExpirationFilter('licenses');
 
 // State
 const licenses = ref<ContentWithRelations<License['data']>[]>([]);
@@ -148,31 +159,35 @@ const clearError = () => {
 
 // Computed properties
 const displayedLicenses = computed(() => {
+  let result: ContentWithRelations<License['data']>[];
+
   if (!searchQuery.value) {
-    return licenses.value;
+    result = licenses.value;
+  } else {
+    const query = searchQuery.value.toLowerCase();
+    result = licenses.value.filter(license => {
+      const data = license.data;
+      return (
+        data.clientName?.toLowerCase().includes(query) ||
+        data.versao?.toLowerCase().includes(query) ||
+        data.numeroSerie?.toLowerCase().includes(query) ||
+        data.modalidade?.toLowerCase().includes(query) ||
+        data.duracaoContrato?.toLowerCase().includes(query) ||
+        data.software?.name?.some(name => name.toLowerCase().includes(query)) ||
+        data.software?.model?.toLowerCase().includes(query) ||
+        data.software?.product?.toLowerCase().includes(query) ||
+        data.software?.version?.toLowerCase().includes(query) ||
+        data.software?.licenseType?.toLowerCase().includes(query) ||
+        data.invoices?.some(
+          invoice =>
+            invoice.numeroFatura?.toLowerCase().includes(query) ||
+            invoice.ano?.toLowerCase().includes(query)
+        )
+      );
+    });
   }
 
-  const query = searchQuery.value.toLowerCase();
-  return licenses.value.filter(license => {
-    const data = license.data;
-    return (
-      data.clientName?.toLowerCase().includes(query) ||
-      data.versao?.toLowerCase().includes(query) ||
-      data.numeroSerie?.toLowerCase().includes(query) ||
-      data.modalidade?.toLowerCase().includes(query) ||
-      data.duracaoContrato?.toLowerCase().includes(query) ||
-      data.software?.name?.some(name => name.toLowerCase().includes(query)) ||
-      data.software?.model?.toLowerCase().includes(query) ||
-      data.software?.product?.toLowerCase().includes(query) ||
-      data.software?.version?.toLowerCase().includes(query) ||
-      data.software?.licenseType?.toLowerCase().includes(query) ||
-      data.invoices?.some(
-        invoice =>
-          invoice.numeroFatura?.toLowerCase().includes(query) ||
-          invoice.ano?.toLowerCase().includes(query)
-      )
-    );
-  });
+  return filterItems(result) as ContentWithRelations<License['data']>[];
 });
 
 // Display functions for ContentListTemplate

@@ -31,6 +31,14 @@
     @items-per-page-change="handleItemsPerPageChange"
     @clear-error="clearError"
   >
+    <!-- Expiration date filter -->
+    <template #filters>
+      <ExpirationDateFilter
+        v-model="selectedMonth"
+        :options="filterOptions"
+      />
+    </template>
+
     <!-- Custom contract icon -->
     <template #itemIcon="{ item }">
       <div class="contract-icon">
@@ -120,8 +128,10 @@ import { useRouter } from 'vue-router';
 import type { Contract, BaseContent, ContentWithRelations } from '@clever/shared';
 import { hasActiveContract, getContractSummary } from '@clever/shared';
 import ContentListTemplate from '@/components/common/ContentListTemplate.vue';
+import ExpirationDateFilter from '@/components/common/ExpirationDateFilter.vue';
 import { useApi } from '@/composables/useApi';
 import { useErrorHandler } from '@/composables/useErrorHandler';
+import { useExpirationFilter } from '@/composables/useExpirationFilter';
 
 // Router
 const router = useRouter();
@@ -129,6 +139,7 @@ const router = useRouter();
 // Composables
 const api = useApi<Contract>('contracts');
 const errorHandler = useErrorHandler();
+const { filterOptions, selectedMonth, filterItems } = useExpirationFilter('contracts');
 
 // State
 const contracts = ref<ContentWithRelations<Contract['data']>[]>([]);
@@ -145,33 +156,37 @@ const clearError = () => {
 
 // Computed properties
 const displayedContracts = computed(() => {
+  let result: ContentWithRelations<Contract['data']>[];
+
   if (!searchQuery.value) {
-    return contracts.value;
+    result = contracts.value;
+  } else {
+    const query = searchQuery.value.toLowerCase();
+    result = contracts.value.filter(contract => {
+      const data = contract.data;
+      return (
+        data.clientId?.toLowerCase().includes(query) ||
+        data.cpaContractType?.toLowerCase().includes(query) ||
+        data.planIdCPA?.toLowerCase().includes(query) ||
+        data.planoCPA?.toLowerCase().includes(query) ||
+        data.planIdSH?.toLowerCase().includes(query) ||
+        data.planoSH?.toLowerCase().includes(query) ||
+        data.modalidadePagamentoCPA?.toLowerCase().includes(query) ||
+        data.modalidadePagamentoSH?.toLowerCase().includes(query) ||
+        data.cpaEquipments?.some(
+          eq =>
+            eq.modelo?.toLowerCase().includes(query) || eq.numeroSerie?.toLowerCase().includes(query)
+        ) ||
+        data.modeloCPA?.toLowerCase().includes(query) ||
+        data.numeroSerieCPA?.toLowerCase().includes(query) ||
+        data.modeloPSO?.toLowerCase().includes(query) ||
+        data.numeroSeriePSO?.toLowerCase().includes(query) ||
+        data.softwarePSO?.toLowerCase().includes(query)
+      );
+    });
   }
 
-  const query = searchQuery.value.toLowerCase();
-  return contracts.value.filter(contract => {
-    const data = contract.data;
-    return (
-      data.clientId?.toLowerCase().includes(query) ||
-      data.cpaContractType?.toLowerCase().includes(query) ||
-      data.planIdCPA?.toLowerCase().includes(query) ||
-      data.planoCPA?.toLowerCase().includes(query) ||
-      data.planIdSH?.toLowerCase().includes(query) ||
-      data.planoSH?.toLowerCase().includes(query) ||
-      data.modalidadePagamentoCPA?.toLowerCase().includes(query) ||
-      data.modalidadePagamentoSH?.toLowerCase().includes(query) ||
-      data.cpaEquipments?.some(
-        eq =>
-          eq.modelo?.toLowerCase().includes(query) || eq.numeroSerie?.toLowerCase().includes(query)
-      ) ||
-      data.modeloCPA?.toLowerCase().includes(query) ||
-      data.numeroSerieCPA?.toLowerCase().includes(query) ||
-      data.modeloPSO?.toLowerCase().includes(query) ||
-      data.numeroSeriePSO?.toLowerCase().includes(query) ||
-      data.softwarePSO?.toLowerCase().includes(query)
-    );
-  });
+  return filterItems(result) as ContentWithRelations<Contract['data']>[];
 });
 
 // Display functions for ContentListTemplate

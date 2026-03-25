@@ -39,7 +39,7 @@
       </header>
 
       <!-- Mobile-optimized search -->
-      <div class="mb-6">
+      <div class="mb-6 flex flex-col sm:flex-row gap-3">
         <SearchBar
           :model-value="localSearchQuery"
           @update:model-value="localSearchQuery = $event"
@@ -47,7 +47,9 @@
           :debounce-ms="300"
           @search="handleSearch"
           @clear="handleClearSearch"
+          class="flex-1"
         />
+        <slot name="filters" />
       </div>
 
       <!-- Loading state -->
