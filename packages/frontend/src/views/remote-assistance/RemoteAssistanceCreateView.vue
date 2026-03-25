@@ -189,11 +189,28 @@
             </div>
           </div>
 
-          <!-- Pricing breakdown (only if payment method is Faturação) -->
-          <div
-            v-if="slotFormData?.paymentMethod === 'Faturação' && pricingBreakdown"
-            class="pricing-breakdown"
-          >
+          <!-- Pricing note -->
+          <div class="pricing-note">
+            <svg
+              class="w-4 h-4 text-blue-500 inline mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span class="text-sm text-gray-600">
+              💶 Preço: 30€/hora (09:00-18:00) | 45€/hora (outras horas) - sem IVA
+            </span>
+          </div>
+
+          <!-- Pricing breakdown (always shown) -->
+          <div v-if="pricingBreakdown" class="pricing-breakdown">
             <div class="pricing-table">
               <div v-if="pricingBreakdown.businessHours > 0" class="pricing-row">
                 <span class="pricing-label">Horário Comercial (09:00-18:00):</span>
@@ -220,7 +237,7 @@
 
           <!-- Contract/Warranty notice -->
           <div
-            v-else-if="slotFormData?.paymentMethod === 'Contrato' || slotFormData?.paymentMethod === 'Garantia'"
+            v-if="slotFormData?.paymentMethod === 'Contrato' || slotFormData?.paymentMethod === 'Garantia'"
             class="no-charge-notice"
           >
             <svg
@@ -243,26 +260,6 @@
                   : 'Assistência coberta por garantia'
               }}
               - Sem custo
-            </span>
-          </div>
-
-          <!-- Pricing note -->
-          <div class="pricing-note">
-            <svg
-              class="w-4 h-4 text-blue-500 inline mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span class="text-sm text-gray-600">
-              💶 Preço: 30€/hora (09:00-18:00) | 45€/hora (outras horas) - sem IVA
             </span>
           </div>
         </div>
@@ -450,11 +447,11 @@ const pricingBreakdown = computed(() => {
     return null;
   }
 
-  // Use the new business hours calculation logic with payment method
+  // Always calculate pricing for display purposes (pass 'Faturação' to get actual values)
   return calculateAssistanceValueWithBusinessHours(
     currentFormData.inicioAssistencia,
     currentFormData.fimAssistencia,
-    currentFormData.paymentMethod
+    'Faturação'
   );
 });
 
