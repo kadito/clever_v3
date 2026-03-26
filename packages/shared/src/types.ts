@@ -104,7 +104,8 @@ export type ContentType =
   | 'daily-records'
   | 'remote-assistance'
   | 'reminders'
-  | 'pending';
+  | 'pending'
+  | 'installations-programming';
 
 // Request types
 export type CreateContentRequest<T extends BaseContent> = Omit<
@@ -188,6 +189,7 @@ export * from './types/contracts';
 export * from './types/work-sheets';
 export * from './types/remote-assistance';
 export * from './types/daily-records';
+export * from './types/installations-programming';
 
 // Validation functions are now exported from their specific modules
 // e.g., from './types/clients/validation', './types/contracts/validation', etc.

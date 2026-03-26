@@ -10,6 +10,7 @@ const contentTypes = [
   'daily-records',
   'contracts',
   'licenses',
+  'installations-programming',
   // 'reminders',
   // 'pending',
 ] as const;
@@ -23,6 +24,7 @@ const getContentTypeDisplayName = (contentType: string): string => {
     'work-sheets': 'Folhas de Obra',
     'daily-records': 'Registo Diário',
     'remote-assistance': 'Assistências Remotas',
+    'installations-programming': 'Instalações e Programações',
     reminders: 'Lembretes',
     pending: 'Pendentes',
   };
@@ -39,6 +41,7 @@ const getContentTypeIcon = (contentType: string): string => {
     'work-sheets': '📝',
     'daily-records': '📅',
     'remote-assistance': '🔧',
+    'installations-programming': '🔧',
     reminders: '💭',
     pending: '⏳',
   };
@@ -64,7 +67,8 @@ const generateContentRoutes = (): RouteRecordRaw[] => {
       contentType === 'contracts' ||
       contentType === 'work-sheets' ||
       contentType === 'remote-assistance' ||
-      contentType === 'daily-records'; // Clients, licenses, contracts, work-sheets, remote-assistance, and daily-records have specific components
+      contentType === 'daily-records' ||
+      contentType === 'installations-programming'; // Clients, licenses, contracts, work-sheets, remote-assistance, and daily-records have specific components
 
     if (hasSpecificComponents) {
       // Use specific components for implemented content types

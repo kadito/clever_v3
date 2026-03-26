@@ -18,6 +18,7 @@ import contractsRouter from './contracts';
 import workSheetsRouter from './work-sheets';
 import remoteAssistanceRouter from './remote-assistance';
 import dailyRecordsRouter from './daily-records';
+import installationsProgrammingRouter from './installations-programming';
 import balanceRouter from './balance-routes';
 import type { AppContext } from '../types/auth';
 import type {
@@ -65,6 +66,7 @@ const CONTENT_TYPES: ContentType[] = [
   'remote-assistance',
   'reminders',
   'pending',
+  'installations-programming',
 ];
 
 // Apply authentication to all API routes except health check
@@ -136,6 +138,9 @@ api.route('/content/remote-assistance', remoteAssistanceRouter);
 
 // Daily Records route with date-based sorting and custom validation
 api.route('/content/daily-records', dailyRecordsRouter);
+
+// Installations & Programming route with phase-based validation and progress tracking
+api.route('/content/installations-programming', installationsProgrammingRouter);
 
 // Balance routes for client balance information and reporting
 // Requirements: 8.1, 8.2, 8.3, 8.4, 9.1, 9.2, 9.3, 9.4, 9.5, 15.1, 15.2, 15.3, 15.4
