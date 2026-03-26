@@ -27,12 +27,12 @@
 
 ### Campos no registo (já existentes)
 
-| Campo | Tipo | Localização no registo | Formato | Utilização |
-|-------|------|----------------------|---------|------------|
-| `technician.firstName` | `string` | `item.data.technician.firstName` | Texto livre | Compor nome completo do colaborador |
-| `technician.lastName` | `string` | `item.data.technician.lastName` | Texto livre | Compor nome completo do colaborador |
-| `technician.userId` | `string` | `item.data.technician.userId` | UUID Clerk | Identificador único do colaborador |
-| `dataRegistro` | `string` | `item.data.dataRegistro` | `YYYY-MM-DD` (ISO) | Data do registo |
+| Campo                  | Tipo     | Localização no registo           | Formato            | Utilização                          |
+| ------------------------| ----------| ----------------------------------| --------------------| -------------------------------------|
+| `technician.firstName` | `string` | `item.data.technician.firstName` | Texto livre        | Compor nome completo do colaborador |
+| `technician.lastName`  | `string` | `item.data.technician.lastName`  | Texto livre        | Compor nome completo do colaborador |
+| `technician.userId`    | `string` | `item.data.technician.userId`    | UUID Clerk         | Identificador único do colaborador  |
+| `dataRegistro`         | `string` | `item.data.dataRegistro`         | `YYYY-MM-DD` (ISO) | Data do registo                     |
 
 ### Campos a adicionar ao índice (`extractIndexFields`)
 
