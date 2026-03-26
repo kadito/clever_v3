@@ -11,7 +11,7 @@
     create-button-text="Criar Registo Diário"
     empty-icon="📅"
     empty-title="Nenhum registo diário encontrado"
-    empty-message="Não há registos diários cadastrados no sistema."
+    :empty-message="hasActiveFilters ? 'Não foram encontrados registos para os filtros selecionados' : 'Não há registos diários cadastrados no sistema.'"
     empty-search-message="Não foram encontrados registos diários com o termo pesquisado."
     :get-item-title="getDailyRecordTitle"
     :get-item-subtitle="getDailyRecordSubtitle"
@@ -147,15 +147,28 @@
         </div>
       </div>
     </template>
+    <!-- Filters slot -->
+    <template #filters>
+      <DailyRecordsFilters
+        :collaborators="collaborators"
+        :selected-collaborator="selectedCollaborator"
+        :selected-date="selectedDate"
+        :is-loading-collaborators="isLoadingCollaborators"
+        @update:selected-collaborator="selectedCollaborator = $event"
+        @update:selected-date="selectedDate = $event"
+      />
+    </template>
   </ContentListTemplate>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import type { DailyRecord, BaseContent, ContentWithRelations, Activity } from '@clever/shared';
 import ContentListTemplate from '@/components/common/ContentListTemplate.vue';
+import DailyRecordsFilters from '@/components/daily-records/DailyRecordsFilters.vue';
 import { useApi } from '@/composables/useApi';
+import { useDailyRecordsFilters } from '@/composables/useDailyRecordsFilters';
 import { useErrorHandler } from '@/composables/useErrorHandler';
 
 // Router
@@ -164,6 +177,15 @@ const router = useRouter();
 // Composables
 const api = useApi<DailyRecord>('daily-records');
 const errorHandler = useErrorHandler();
+const {
+  selectedCollaborator,
+  selectedDate,
+  collaborators,
+  isLoadingCollaborators,
+  hasActiveFilters,
+  filterParams,
+  fetchCollaborators,
+} = useDailyRecordsFilters();
 
 // State
 const dailyRecords = ref<ContentWithRelations<DailyRecord['data']>[]>([]);
@@ -368,7 +390,7 @@ const handleEdit = (item: BaseContent) => {
 // Page change handler
 const handlePageChange = async (page: number) => {
   isLoading.value = true;
-  await api.fetchList({ page, limit: itemsPerPage.value }).then(() => {
+  await api.fetchList({ page, limit: itemsPerPage.value, ...filterParams.value }).then(() => {
     if (api.items.value) {
       dailyRecords.value = (api.items.value as ContentWithRelations<DailyRecord['data']>[]).sort(
         (a, b) => {
@@ -394,7 +416,7 @@ const handlePageChange = async (page: number) => {
 const handleItemsPerPageChange = async (limit: number) => {
   itemsPerPage.value = limit;
   isLoading.value = true;
-  await api.fetchList({ page: 1, limit }).then(() => {
+  await api.fetchList({ page: 1, limit, ...filterParams.value }).then(() => {
     if (api.items.value) {
       dailyRecords.value = (api.items.value as ContentWithRelations<DailyRecord['data']>[]).sort(
         (a, b) => {
@@ -423,7 +445,7 @@ const loadDailyRecords = async () => {
     clearError();
 
     console.log('Loading daily records...');
-    await api.fetchList({ limit: itemsPerPage.value });
+    await api.fetchList({ limit: itemsPerPage.value, ...filterParams.value });
 
     if (api.items.value) {
       // Sort daily records by date descending (newest first) - as per requirements 12.5
@@ -454,10 +476,36 @@ const loadDailyRecords = async () => {
   }
 };
 
+// Watch filter changes — reset page to 1 and re-fetch
+watch([selectedCollaborator, selectedDate], async () => {
+  isLoading.value = true;
+  await api.fetchList({ page: 1, limit: itemsPerPage.value, ...filterParams.value }).then(() => {
+    if (api.items.value) {
+      dailyRecords.value = (api.items.value as ContentWithRelations<DailyRecord['data']>[]).sort(
+        (a, b) => {
+          const dateA = new Date(a.data.dataRegistro);
+          const dateB = new Date(b.data.dataRegistro);
+          const dateDiff = dateB.getTime() - dateA.getTime();
+          if (dateDiff !== 0) return dateDiff;
+          const createdA = new Date(a.createdAt);
+          const createdB = new Date(b.createdAt);
+          return createdB.getTime() - createdA.getTime();
+        }
+      );
+    }
+  }).catch((err) => {
+    console.error('Error applying filters:', JSON.stringify(err, null, 2));
+    error.value = err instanceof Error ? err.message : 'Erro ao carregar registos diários';
+  }).finally(() => {
+    isLoading.value = false;
+  });
+});
+
 // Lifecycle
 onMounted(() => {
   console.log('DailyRecordsListView mounted');
   loadDailyRecords();
+  fetchCollaborators();
 });
 </script>
 

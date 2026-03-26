@@ -207,6 +207,10 @@ dailyRecordConfig.extractIndexFields = (content: DailyRecord) => {
   return {
     // Basic information for search and display
     dataRegistro: data.dataRegistro || '',
+
+    // Technician fields for filtering
+    technicianUserId: data.technician?.userId ?? null,
+    technicianName: data.technician ? `${data.technician.firstName} ${data.technician.lastName}` : null,
     activityCount: data.atividades?.length || 0,
     totalHours: calculateDailyTotalHours(data),
 
@@ -231,6 +235,67 @@ dailyRecordConfig.extractIndexFields = (content: DailyRecord) => {
 // Add validation functions
 dailyRecordConfig.validateCreate = validateDailyRecordCreate;
 dailyRecordConfig.validateUpdate = validateDailyRecordUpdateData;
+
+/**
+ * List unique collaborators from daily records index
+ * Returns sorted list of technicians who have at least one non-deleted daily record
+ * Requirements: REQ-01, CA-01.1, CA-01.3
+ */
+interface CollaboratorEntry {
+  userId: string;
+  name: string;
+}
+
+dailyRecordsRouter.get('/collaborators', async (c: Context): Promise<Response> => {
+  const r2Bucket = c.env?.R2_BUCKET as StorageBucket;
+
+  if (!r2Bucket) {
+    return c.json(
+      { success: false, error: 'Storage not available', timestamp: new Date().toISOString() } satisfies ApiResponse,
+      500
+    );
+  }
+
+  let collaborators: CollaboratorEntry[] = [];
+  let errorOccurred = false;
+
+  await r2Bucket
+    .get('indexes/daily-records-index.json')
+    .then(async (indexObject) => {
+      if (!indexObject) return;
+
+      const index = (await indexObject.json()) as { items: Array<{ isDeleted?: boolean; technicianUserId?: string | null; technicianName?: string | null }> };
+      const seen = new Map<string, string>();
+
+      for (const item of index.items) {
+        if (item.isDeleted) continue;
+        if (!item.technicianUserId || !item.technicianName) continue;
+        if (!seen.has(item.technicianUserId)) {
+          seen.set(item.technicianUserId, item.technicianName);
+        }
+      }
+
+      collaborators = Array.from(seen, ([userId, name]) => ({ userId, name }))
+        .sort((a, b) => a.name.localeCompare(b.name, 'pt-PT'));
+    })
+    .catch((error: unknown) => {
+      console.error('Error fetching collaborators:', error);
+      errorOccurred = true;
+    });
+
+  if (errorOccurred) {
+    return c.json(
+      { success: false, error: 'Failed to retrieve collaborators', timestamp: new Date().toISOString() } satisfies ApiResponse,
+      500
+    );
+  }
+
+  return c.json({
+    success: true,
+    data: collaborators,
+    timestamp: new Date().toISOString(),
+  } satisfies ApiResponse<CollaboratorEntry[]>);
+});
 
 // Custom GET route for single daily record with activity relation resolution
 // This overrides the generic GET /:uuid route to handle nested activity relations

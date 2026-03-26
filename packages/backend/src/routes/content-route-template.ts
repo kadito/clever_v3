@@ -8,7 +8,7 @@ import { Hono } from 'hono';
 import type { Context } from 'hono';
 import { requireAuth, requireUserContext } from '../middleware/clerk';
 import { requireDeletePermission } from '../middleware/permissions';
-import { ContentStorageService } from '@clever/shared';
+import { ContentStorageService, resolveContentRelations } from '@clever/shared';
 import type { StorageBucket } from '@clever/shared';
 import type {
   BaseContent,
@@ -45,12 +45,111 @@ export interface ContentRouteConfig<T extends BaseContent> {
  * Extended storage service with content-specific sorting
  */
 class ConfigurableContentStorageService<T extends BaseContent> extends ContentStorageService<T> {
+  private readonly bucket: StorageBucket;
+
   constructor(
-    r2Bucket: StorageBucket, // Use the generic storage interface
+    r2Bucket: StorageBucket,
     contentType: string,
     private config: ContentRouteConfig<T>
   ) {
     super(r2Bucket, contentType);
+    this.bucket = r2Bucket;
+  }
+
+  /**
+   * List content with collaborator/date/search filters applied in AND logic before pagination
+   * Requirements: REQ-01, REQ-02, REQ-03 - Filtered listing with combined filters
+   */
+  async listFiltered(
+    filters: { collaborator?: string | undefined; date?: string | undefined; search?: string | undefined; expirationMonth?: string | undefined },
+    page: number = 1,
+    limit: number = 50
+  ): Promise<{ items: ContentWithRelations<T['data']>[]; total: number }> {
+    const indexKey = `indexes/${this.config.contentType}-index.json`;
+    const indexObject = await this.bucket.get(indexKey);
+
+    if (!indexObject) {
+      return { items: [], total: 0 };
+    }
+
+    const index = (await indexObject.json()) as { items: Array<Record<string, unknown>> };
+    let filtered = index.items.filter(
+      (item: Record<string, unknown>) => !item.isDeleted
+    );
+
+    if (filters.collaborator) {
+      const collaboratorId = filters.collaborator;
+      filtered = filtered.filter(
+        (item: Record<string, unknown>) => item.technicianUserId === collaboratorId
+      );
+    }
+
+    if (filters.date) {
+      const dateValue = filters.date;
+      filtered = filtered.filter(
+        (item: Record<string, unknown>) => item.dataRegistro === dateValue
+      );
+    }
+
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase();
+      filtered = filtered.filter(
+        (item: Record<string, unknown>) =>
+          typeof item.searchableText === 'string' && item.searchableText.includes(searchTerm)
+      );
+    }
+
+    if (filters.expirationMonth) {
+      const expirationMonth = filters.expirationMonth;
+      filtered = filtered.filter((item: Record<string, unknown>) => {
+        let expirationDate: string | undefined;
+
+        if (this.config.contentType === 'contracts') {
+          const cpa = typeof item.fimContratoCPA === 'string' ? item.fimContratoCPA : undefined;
+          const sh = typeof item.fimContratoSH === 'string' ? item.fimContratoSH : undefined;
+          if (cpa && sh) {
+            expirationDate = cpa < sh ? cpa : sh;
+          } else {
+            expirationDate = cpa || sh;
+          }
+        } else if (this.config.contentType === 'licenses') {
+          expirationDate = typeof item.dataVencimento === 'string' ? item.dataVencimento : undefined;
+        }
+
+        if (!expirationDate) return false;
+        return expirationDate.substring(0, 7) === expirationMonth;
+      });
+    }
+
+    const sorted = this.sortIndexItems(filtered);
+    const total = sorted.length;
+    const startIndex = (page - 1) * limit;
+    const paginated = sorted.slice(startIndex, startIndex + limit);
+
+    const items: ContentWithRelations<T['data']>[] = [];
+
+    for (const indexItem of paginated) {
+      const key = `content/${this.config.contentType}/${indexItem.uuid as string}.json`;
+      const object = await this.bucket.get(key);
+      if (object) {
+        const content = (await object.json()) as T;
+        if (!content.isDeleted) {
+          const contentWithRelations = await resolveContentRelations(
+            content,
+            async (contentType: string, uuid: string) => {
+              const relKey = `content/${contentType}/${uuid}.json`;
+              const relObject = await this.bucket.get(relKey);
+              if (!relObject) return null;
+              const relContent = (await relObject.json()) as BaseContent;
+              return relContent.isDeleted ? null : relContent;
+            }
+          );
+          items.push(contentWithRelations);
+        }
+      }
+    }
+
+    return { items, total };
   }
 
   /**
@@ -138,6 +237,10 @@ export function createContentRoutes<T extends BaseContent>(config: ContentRouteC
       );
 
       const searchQuery = c.req.query('search');
+      const collaborator = c.req.query('collaborator');
+      const date = c.req.query('date');
+      const rawExpirationMonth = c.req.query('expirationMonth');
+      const expirationMonth = rawExpirationMonth && /^\d{4}-\d{2}$/.test(rawExpirationMonth) ? rawExpirationMonth : undefined;
       const page = parseInt(c.req.query('page') || '1');
       const limit = parseInt(c.req.query('limit') || '10');
 
@@ -151,14 +254,34 @@ export function createContentRoutes<T extends BaseContent>(config: ContentRouteC
         return c.json(response, 400);
       }
 
-      if (searchQuery) {
-        // Search content
+      const hasFilters = Boolean(collaborator || date || expirationMonth);
+
+      if (searchQuery && !hasFilters) {
+        // Search content (legacy path — no extra filters)
         const results = await storage.search(searchQuery);
         const response: SearchResponse<ContentWithRelations<any>> = {
           success: true,
           data: results,
           query: searchQuery,
           count: results.length,
+          timestamp: new Date().toISOString(),
+        };
+        return c.json(response);
+      } else if (hasFilters) {
+        // Filtered listing — read index, apply collaborator/date/search in AND, then paginate
+        const { items, total } = await storage.listFiltered(
+          { collaborator, date, search: searchQuery, expirationMonth },
+          page,
+          limit
+        );
+        const response: ListResponse<ContentWithRelations<any>> = {
+          success: true,
+          data: items,
+          pagination: {
+            page,
+            limit,
+            total,
+          },
           timestamp: new Date().toISOString(),
         };
         return c.json(response);

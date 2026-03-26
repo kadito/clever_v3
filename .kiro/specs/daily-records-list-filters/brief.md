@@ -1,0 +1,1 @@
+Now we need to improve the Listing page of Registo diario de atividades.We must be able to filter by collaborator and by day. 

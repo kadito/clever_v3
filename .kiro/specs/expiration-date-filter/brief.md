@@ -1,1 +1,1 @@
-So on Contratros and Licenças we need to improve the LISTING Page or the search possiblitiies.We must be able to FILTER by the expiration date of a contract or a licença.The Filter input must be a dropdown and the value must represent YEAR and MONTH. We must display the following 12 months.
+We must refactor expiration-date-filter SPEC. The filter is only on Client side. It never can work like that. the LIST endpoints have pagination.

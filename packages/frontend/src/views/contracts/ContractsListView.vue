@@ -123,7 +123,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import type { Contract, BaseContent, ContentWithRelations } from '@clever/shared';
 import { hasActiveContract, getContractSummary } from '@clever/shared';
@@ -139,7 +139,7 @@ const router = useRouter();
 // Composables
 const api = useApi<Contract>('contracts');
 const errorHandler = useErrorHandler();
-const { filterOptions, selectedMonth, filterItems } = useExpirationFilter('contracts');
+const { filterOptions, selectedMonth, clearFilter, filterParams } = useExpirationFilter();
 
 // State
 const contracts = ref<ContentWithRelations<Contract['data']>[]>([]);
@@ -156,37 +156,7 @@ const clearError = () => {
 
 // Computed properties
 const displayedContracts = computed(() => {
-  let result: ContentWithRelations<Contract['data']>[];
-
-  if (!searchQuery.value) {
-    result = contracts.value;
-  } else {
-    const query = searchQuery.value.toLowerCase();
-    result = contracts.value.filter(contract => {
-      const data = contract.data;
-      return (
-        data.clientId?.toLowerCase().includes(query) ||
-        data.cpaContractType?.toLowerCase().includes(query) ||
-        data.planIdCPA?.toLowerCase().includes(query) ||
-        data.planoCPA?.toLowerCase().includes(query) ||
-        data.planIdSH?.toLowerCase().includes(query) ||
-        data.planoSH?.toLowerCase().includes(query) ||
-        data.modalidadePagamentoCPA?.toLowerCase().includes(query) ||
-        data.modalidadePagamentoSH?.toLowerCase().includes(query) ||
-        data.cpaEquipments?.some(
-          eq =>
-            eq.modelo?.toLowerCase().includes(query) || eq.numeroSerie?.toLowerCase().includes(query)
-        ) ||
-        data.modeloCPA?.toLowerCase().includes(query) ||
-        data.numeroSerieCPA?.toLowerCase().includes(query) ||
-        data.modeloPSO?.toLowerCase().includes(query) ||
-        data.numeroSeriePSO?.toLowerCase().includes(query) ||
-        data.softwarePSO?.toLowerCase().includes(query)
-      );
-    });
-  }
-
-  return filterItems(result) as ContentWithRelations<Contract['data']>[];
+  return contracts.value;
 });
 
 // Display functions for ContentListTemplate
@@ -425,7 +395,7 @@ const handleEdit = (item: BaseContent) => {
 // Page change handler
 const handlePageChange = async (page: number) => {
   isLoading.value = true;
-  await api.fetchList({ page, limit: itemsPerPage.value }).then(() => {
+  await api.fetchList({ page, limit: itemsPerPage.value, ...filterParams.value }).then(() => {
     if (api.items.value) {
       contracts.value = (api.items.value as ContentWithRelations<Contract['data']>[]).sort(
         (a, b) => {
@@ -447,7 +417,7 @@ const handlePageChange = async (page: number) => {
 const handleItemsPerPageChange = async (limit: number) => {
   itemsPerPage.value = limit;
   isLoading.value = true;
-  await api.fetchList({ page: 1, limit }).then(() => {
+  await api.fetchList({ page: 1, limit, ...filterParams.value }).then(() => {
     if (api.items.value) {
       contracts.value = (api.items.value as ContentWithRelations<Contract['data']>[]).sort(
         (a, b) => {
@@ -471,7 +441,7 @@ const loadContracts = async () => {
     isLoading.value = true;
     clearError();
 
-    await api.fetchList({ limit: itemsPerPage.value });
+    await api.fetchList({ limit: itemsPerPage.value, ...filterParams.value });
 
     if (api.items.value) {
       // Sort contracts by creation date (most recent first) - as per requirements 8.6
@@ -492,6 +462,27 @@ const loadContracts = async () => {
     isLoading.value = false;
   }
 };
+
+// Watch filter changes — reset page to 1 and re-fetch
+watch(selectedMonth, async () => {
+  isLoading.value = true;
+  await api.fetchList({ page: 1, limit: itemsPerPage.value, ...filterParams.value }).then(() => {
+    if (api.items.value) {
+      contracts.value = (api.items.value as ContentWithRelations<Contract['data']>[]).sort(
+        (a, b) => {
+          const dateA = new Date(a.createdAt);
+          const dateB = new Date(b.createdAt);
+          return dateB.getTime() - dateA.getTime();
+        }
+      );
+    }
+  }).catch((err) => {
+    console.error('Error applying filters:', JSON.stringify(err, null, 2));
+    error.value = err instanceof Error ? err.message : 'Erro ao carregar contratos';
+  }).finally(() => {
+    isLoading.value = false;
+  });
+});
 
 // Lifecycle
 onMounted(() => {

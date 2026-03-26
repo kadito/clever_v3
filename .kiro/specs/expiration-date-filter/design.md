@@ -1,176 +1,257 @@
-# Expiration Date Filter — Design
+# Expiration Date Filter — Design (Refactored: Server-Side Filtering)
 
-## 1. Data model — expiration date extraction
+## 1. Data model — expiration date extraction from index
 
-Each content type uses a different strategy to determine its expiration date:
+O filtro de expiração opera sobre os campos já presentes nos índices R2 (`indexes/{type}-index.json`). Não é necessário alterar a estrutura dos índices — os campos de data de expiração já são extraídos no `extractIndexFields` de cada content type.
 
-| Content type | Source field(s) | Extraction rule | Return type |
-|-------------|----------------|-----------------|-------------|
-| Licenças | `data.dataVencimento` | Direct read — single ISO date string | `string \| undefined` |
-| Contratos | `data.fimContratoCPA`, `data.fimContratoSH` | Take the soonest (earliest) of the two dates present. If only one exists, use that one. If neither exists, return `undefined`. | `string \| undefined` |
+### Campos de expiração por content type
 
-- The extraction logic is a pure function: `getExpirationDate(item: BaseContent): string | undefined`
-- It inspects `item.contentType` to decide which rule to apply
-- It lives in the composable (section 2), not in a separate utility — scope is too small to justify a file
-- Dates are compared as ISO strings (lexicographic comparison works for `YYYY-MM-DD` format)
-- Items where the function returns `undefined` are treated as "no expiration date" (see REQ-06)
+| Content type | Campo(s) no índice | Regra de extração | Tipo retornado |
+|-------------|-------------------|-------------------|----------------|
+| Licenças (`licenses`) | `dataVencimento` | Leitura direta do campo | `string \| undefined` |
+| Contratos (`contracts`) | `fimContratoCPA`, `fimContratoSH` | Usar a data mais próxima (earliest) das duas presentes. Se só uma existe, usar essa. Se nenhuma existe, `undefined`. | `string \| undefined` |
 
-## 2. Composable — `useExpirationFilter`
+### Regras de extração
 
-File: `packages/frontend/src/composables/useExpirationFilter.ts`
+- A extração acontece no backend, dentro do `listFiltered`, sobre os campos do índice (não sobre o documento completo)
+- Datas são strings ISO (`YYYY-MM-DD`) — comparação lexicográfica funciona
+- Para comparar com o mês selecionado (`YYYY-MM`), extrair os primeiros 7 caracteres da data: `date.substring(0, 7)`
+- Items onde a data de expiração é `undefined` são excluídos quando o filtro está ativo (REQ-08)
+- Items sem data de expiração são incluídos normalmente quando nenhum filtro está ativo (REQ-08)
 
-### Interface
+## 2. Backend — `listFiltered` extension with `expirationMonth`
 
-| Export | Type | Description |
-|--------|------|-------------|
-| `useExpirationFilter(contentType)` | Function | Factory — returns all reactive state and methods below |
-| `contentType` parameter | `'contracts' \| 'licenses'` | Determines which extraction rule to use |
+O método `listFiltered` em `ConfigurableContentStorageService` (ficheiro `content-route-template.ts`) já suporta filtros `collaborator`, `date` e `search` em lógica AND antes da paginação. O filtro `expirationMonth` segue exatamente o mesmo padrão.
 
-### Returned API
+### Interface do filtro (alteração)
 
-| Name | Type | Description | REQ |
-|------|------|-------------|-----|
-| `filterOptions` | `ComputedRef<FilterOption[]>` | 12 month options starting from current month | REQ-02 |
-| `selectedMonth` | `Ref<string \| null>` | Currently selected value (`"YYYY-MM"` format) or `null` | REQ-03, REQ-04 |
-| `clearFilter` | `() => void` | Sets `selectedMonth` to `null` | REQ-04 |
-| `filterItems` | `(items: BaseContent[]) => BaseContent[]` | Filters items by selected month; returns all items if no filter active | REQ-03, REQ-06, REQ-07 |
+| Campo | Tipo | Antes | Depois |
+|-------|------|-------|--------|
+| `filters` param | `object` | `{ collaborator?, date?, search? }` | `{ collaborator?, date?, search?, expirationMonth? }` |
+| `expirationMonth` | `string \| undefined` | — | Formato `YYYY-MM` (ex: `"2026-06"`) |
 
-### `FilterOption` shape
+### Lógica de filtragem por `expirationMonth`
 
-| Field | Type | Example |
+- Aplicada após os filtros existentes (`collaborator`, `date`, `search`) e antes do sort + paginação
+- Para cada item no índice filtrado:
+
+| Content type | Lógica | Detalhe |
+|-------------|--------|---------|
+| `contracts` | Calcular data de expiração = `min(fimContratoCPA, fimContratoSH)` das presentes | Se ambas existem, usar a menor. Se só uma, usar essa. |
+| `licenses` | Data de expiração = `dataVencimento` | Leitura direta |
+| Ambos | Comparar `expirationDate.substring(0, 7) === expirationMonth` | Match por ano-mês |
+| Ambos | Se data de expiração é `undefined` → excluir item | REQ-08 |
+
+### Determinação do content type
+
+- O `ConfigurableContentStorageService` já tem acesso a `this.config.contentType`
+- Usar `this.config.contentType` para decidir qual regra de extração aplicar
+- Não é necessário inspecionar cada item individualmente — todos os items num índice são do mesmo tipo
+
+### Posição na cadeia de filtragem
+
+| Ordem | Filtro | Já existe? |
+|-------|--------|-----------|
+| 1 | `isDeleted === false` | Sim |
+| 2 | `collaborator` | Sim |
+| 3 | `date` | Sim |
+| 4 | `search` | Sim |
+| 5 | `expirationMonth` | **Novo** |
+| 6 | Sort | Sim |
+| 7 | Paginação (slice) | Sim |
+
+### Impacto na paginação
+
+- O `total` retornado reflete o dataset filtrado (após todos os filtros, incluindo `expirationMonth`) — REQ-03 (CA-03.3)
+- A paginação opera sobre o array já filtrado — REQ-09 (CA-09.3)
+
+## 3. Backend — route handler query parameter extraction
+
+O handler GET `/` em `createContentRoutes` precisa de extrair o novo query parameter `expirationMonth` e passá-lo ao `listFiltered`.
+
+### Alteração no handler
+
+| Aspeto | Antes | Depois |
+|--------|-------|--------|
+| Query params extraídos | `search`, `collaborator`, `date`, `page`, `limit` | + `expirationMonth` |
+| Condição `hasFilters` | `Boolean(collaborator \|\| date)` | `Boolean(collaborator \|\| date \|\| expirationMonth)` |
+| Chamada `listFiltered` | `{ collaborator, date, search }` | `{ collaborator, date, search, expirationMonth }` |
+
+### Validação do parâmetro
+
+- Formato esperado: `YYYY-MM` (ex: `"2026-06"`)
+- Se presente mas inválido (não corresponde a `/^\d{4}-\d{2}$/`): ignorar silenciosamente (tratar como se não tivesse sido enviado)
+- Se ausente ou vazio: não aplicar filtro de expiração
+- Não é necessário validar se o mês está dentro do range de 12 meses — o backend filtra por qualquer mês válido
+
+### Exemplo de request
+
+```
+GET /api/content/contracts?page=1&limit=10&expirationMonth=2026-06
+GET /api/content/licenses?page=1&limit=10&search=acme&expirationMonth=2026-06
+```
+
+## 4. Frontend — `useExpirationFilter` composable (refactored)
+
+Ficheiro: `packages/frontend/src/composables/useExpirationFilter.ts`
+
+O composable é simplificado: remove `filterItems()` e `getExpirationDate()` (a filtragem agora é server-side). Mantém apenas a gestão do estado do dropdown e a geração de opções.
+
+### Exports removidos
+
+| Export | Motivo da remoção |
+|--------|-------------------|
+| `getExpirationDate(item)` | Lógica movida para o backend `listFiltered` |
+| `filterItems(items)` | Filtragem agora é server-side |
+
+### API retornada (refactored)
+
+| Nome | Tipo | Descrição | REQ |
+|------|------|-----------|-----|
+| `filterOptions` | `ComputedRef<FilterOption[]>` | 12 opções de mês a partir do mês atual | REQ-02 |
+| `selectedMonth` | `Ref<string \| null>` | Valor selecionado (`"YYYY-MM"`) ou `null` | REQ-03, REQ-06 |
+| `clearFilter` | `() => void` | Define `selectedMonth` como `null` | REQ-06 |
+| `filterParams` | `ComputedRef<Record<string, string>>` | Parâmetros para enviar à API (`{ expirationMonth: "YYYY-MM" }` ou `{}`) | REQ-03, REQ-09 |
+
+### `FilterOption` shape (sem alteração)
+
+| Campo | Tipo | Exemplo |
 |-------|------|---------|
 | `value` | `string` | `"2026-03"` |
 | `label` | `string` | `"Março 2026"` |
 
-### Month generation rules
+### Geração de opções de mês (sem alteração)
 
-- Generate 12 options starting from the current month (inclusive) through 11 months ahead
-- Use `pt-PT` locale for month names via `Intl.DateTimeFormat`
-- Capitalize first letter of month name (Portuguese months are lowercase by default from `Intl`)
-- Format: `"{MonthName} {Year}"` — e.g., `"Março 2026"`, `"Fevereiro 2027"`
-- Computed at composable creation time — no reactivity on current date needed (page reload recomputes)
+- 12 opções a partir do mês atual (inclusive) até 11 meses à frente
+- Locale `pt-PT` via `Intl.DateTimeFormat` para nomes dos meses
+- Primeira letra maiúscula (meses em português são minúsculos por defeito no `Intl`)
+- Formato: `"{NomeMês} {Ano}"` — ex: `"Março 2026"`, `"Fevereiro 2027"`
 
-### Filtering logic
+### `filterParams` — novo export
 
-- If `selectedMonth` is `null` → return all items unchanged (no filtering)
-- For each item, call `getExpirationDate(item)` (section 1)
-- If expiration date is `undefined` → exclude item from filtered results (REQ-06)
-- Extract `YYYY-MM` from the expiration date and compare with `selectedMonth`
-- Return only items where `YYYY-MM` matches
+- Segue o mesmo padrão de `useDailyRecordsFilters.filterParams`
+- Quando `selectedMonth` é `null` → retorna `{}`
+- Quando `selectedMonth` tem valor → retorna `{ expirationMonth: selectedMonth }`
+- Usado no ListView para spread nos parâmetros da API: `api.fetchList({ page, limit, ...filterParams.value })`
 
-### Coexistence with search (REQ-07)
+### Parâmetro `contentType` — removido
 
-- The composable does NOT handle search — it only filters by expiration month
-- The ListView applies search first (existing logic), then passes the result to `filterItems`
-- Both criteria are applied as intersection: item must match search AND expiration month
+- O composable já não precisa de saber o content type (não faz extração de datas)
+- Assinatura simplificada: `useExpirationFilter()` sem parâmetros
 
-## 3. Component — `ExpirationDateFilter` dropdown
+## 5. Frontend — `ExpirationDateFilter` component (unchanged)
 
-File: `packages/frontend/src/components/common/ExpirationDateFilter.vue`
+Ficheiro: `packages/frontend/src/components/common/ExpirationDateFilter.vue`
 
-### Props
+O componente não precisa de alterações — é puramente presentacional e já funciona corretamente.
 
-| Prop | Type | Required | Default | Description |
-|------|------|----------|---------|-------------|
-| `options` | `FilterOption[]` | Yes | — | Month options from composable |
-| `modelValue` | `string \| null` | Yes | — | Selected month value (v-model) |
+### Props e emits (sem alteração)
 
-### Emits
+| Prop | Tipo | Descrição |
+|------|------|-----------|
+| `options` | `FilterOption[]` | Opções de mês do composable |
+| `modelValue` | `string \| null` | Valor selecionado (v-model) |
 
-| Event | Payload | Description |
-|-------|---------|-------------|
-| `update:modelValue` | `string \| null` | Emitted on selection change or clear |
+| Emit | Payload | Descrição |
+|------|---------|-----------|
+| `update:modelValue` | `string \| null` | Emitido na mudança de seleção ou clear |
 
-### Template structure
+### Comportamento existente
 
-- Native `<select>` element with Tailwind styling — simplest viable solution, no custom dropdown library
-- Default option: `"Data de Expiração"` (placeholder, value `""`) — REQ-01 (CA-01.3)
-- One `<option>` per `FilterOption` in `options` prop
-- When selection changes to `""` (placeholder), emit `null` to clear filter — REQ-04
+- `<select>` nativo com placeholder "Data de Expiração" (REQ-01, CA-01.3)
+- Opção "Limpar filtro" visível quando há seleção ativa
+- Mínimo 44px de altura (C-01)
+- Emite `null` ao selecionar placeholder ou "Limpar filtro" (REQ-06)
 
-### Styling rules
+### Nota sobre import
 
-- Minimum height 44px (touch target — C-01)
-- Same border, rounded corners, and focus ring as `SearchBar` input for visual consistency — C-05
-- Tailwind classes: `border border-gray-300 rounded-lg py-3 px-4 text-base focus:ring-2 focus:ring-primary-500 focus:border-primary-500`
-- Full width on mobile, auto width on larger screens
-- Text color: `text-gray-700` when a month is selected, `text-gray-400` for placeholder state
+- O import de `FilterOption` muda de `@/composables/useExpirationFilter` — o tipo continua a ser exportado pelo composable refactored
 
-### Placement
+## 6. Frontend — ListView integration (contracts + licenses)
 
-- Rendered inside `ContentListTemplate` via a new slot or directly in each ListView
-- Positioned between the search bar and the items list — same row as search on desktop, stacked on mobile
+### Estratégia de integração
 
-## 4. Integration — ListView changes
+A integração muda fundamentalmente: em vez de filtrar client-side com `filterItems()`, os ListViews passam `expirationMonth` como query parameter à API. O backend filtra antes da paginação.
 
-### Integration strategy
-
-The `ExpirationDateFilter` component is placed directly inside each ListView, not inside `ContentListTemplate`. This avoids modifying the shared template (which serves all content types) for a feature only needed by two.
-
-Each ListView already computes a `displayedX` array from search. The expiration filter is applied as a second stage on that array before passing it to `ContentListTemplate`.
-
-### Data flow
+### Data flow (refactored)
 
 ```mermaid
 sequenceDiagram
-    participant API as useApi
+    participant User
     participant LV as ListView
     participant EF as useExpirationFilter
+    participant API as useApi → Backend
     participant CLT as ContentListTemplate
 
-    API->>LV: items (all loaded)
-    LV->>LV: searchFiltered = apply search query
-    LV->>EF: filterItems(searchFiltered)
-    EF-->>LV: expirationFiltered
-    LV->>CLT: :items="expirationFiltered"
+    User->>LV: Seleciona mês no dropdown
+    LV->>EF: selectedMonth = "2026-06"
+    EF-->>LV: filterParams = { expirationMonth: "2026-06" }
+    LV->>API: fetchList({ page: 1, limit, search, ...filterParams })
+    API-->>LV: items filtrados + pagination (total filtrado)
+    LV->>CLT: :items="items" :total-count="total"
+    CLT-->>User: Lista filtrada com paginação correta
 ```
 
-| Step | Actor | Action | REQ |
-|------|-------|--------|-----|
-| 1 | `useApi` | Loads all items from R2 | — |
-| 2 | ListView | Applies existing search filter → `searchFiltered` | — |
-| 3 | `useExpirationFilter` | `filterItems(searchFiltered)` → applies month filter | REQ-03, REQ-06 |
-| 4 | ListView | Passes result to `ContentListTemplate` as `:items` | REQ-07 |
+### Data flow (tabela equivalente)
 
-### Changes per file
+| Passo | Ator | Ação | REQ |
+|-------|------|------|-----|
+| 1 | User | Seleciona mês no dropdown | REQ-03 |
+| 2 | `useExpirationFilter` | `filterParams` atualiza para `{ expirationMonth: "YYYY-MM" }` | REQ-03 |
+| 3 | ListView | Chama `fetchList({ page: 1, limit, ...filterParams })` | REQ-03, REQ-09 (CA-09.4) |
+| 4 | Backend | Filtra índice por `expirationMonth` + search + paginação | REQ-03 (CA-03.2, CA-03.3) |
+| 5 | ListView | Recebe items filtrados + total filtrado | REQ-07 |
+| 6 | `ContentListTemplate` | Renderiza lista com paginação correta | REQ-09 (CA-09.3) |
 
-| File | Change | Details |
-|------|--------|---------|
-| `ContractsListView.vue` | Import composable + component | Add `useExpirationFilter('contracts')`, render `ExpirationDateFilter` above `ContentListTemplate`, chain filter in `displayedContracts` computed |
-| `LicensesListView.vue` | Import composable + component | Add `useExpirationFilter('licenses')`, render `ExpirationDateFilter` above `ContentListTemplate`, chain filter in `displayedLicenses` computed |
+### Alterações por ficheiro
 
-### Computed property pattern (both views)
+| Ficheiro | Alteração | Detalhe |
+|----------|-----------|---------|
+| `ContractsListView.vue` | Refactor composable usage | Substituir `useExpirationFilter('contracts')` por `useExpirationFilter()`. Remover `filterItems` do computed `displayedContracts`. Adicionar `filterParams` ao `fetchList` e `handleSearch`. |
+| `LicensesListView.vue` | Refactor composable usage | Substituir `useExpirationFilter('licenses')` por `useExpirationFilter()`. Remover `filterItems` do computed `displayedLicenses`. Adicionar `filterParams` ao `fetchList` e `handleSearch`. |
 
-- Current: `displayedX = searchFilter(items)`
-- New: `displayedX = filterItems(searchFilter(items))`
-- When no filter is active (`selectedMonth === null`), `filterItems` returns the input unchanged — zero overhead
+### Padrão de chamada API (ambos os views)
 
-### Template placement
+- Antes: `api.fetchList({ page, limit, search })` → client-side `filterItems(items)`
+- Depois: `api.fetchList({ page, limit, search, ...filterParams.value })`
+- Quando `selectedMonth` é `null`, `filterParams` é `{}` — nenhum parâmetro extra enviado
+- Quando o filtro muda: reset para page 1 e re-fetch (REQ-09, CA-09.4)
 
-- The `ExpirationDateFilter` dropdown is rendered in the ListView template, between the `ContentListTemplate` opening tag and its content
-- Positioned in a flex row with the search bar area on desktop (`flex flex-col sm:flex-row gap-3`), stacked on mobile
-- The dropdown sits next to or below the search bar, before the items list
+### Watch no `selectedMonth`
 
-### Empty state handling
+- Adicionar `watch` no `selectedMonth` para re-fetch automático quando o filtro muda
+- O watch chama `fetchList` com page 1 (reset de paginação) e os `filterParams` atualizados
+- Segue o mesmo padrão usado no `DailyRecordsListView` para os filtros de collaborator/date
 
-- When the combined search + filter yields zero results, `ContentListTemplate` shows its existing empty state
-- The empty state message already handles search context; the filter adds no new empty state — the existing `emptySearchMessage` covers it (REQ-05)
+### Computed `displayedX` — simplificação
 
-## 5. Error handling and edge cases
+- Antes: `displayedContracts = filterItems(searchFilter(items))`
+- Depois: `displayedContracts = items` (a filtragem e search são server-side)
+- O computed pode ser removido ou simplificado para apenas retornar `api.items.value`
 
-| Scenario | Behavior | REQ |
-|----------|----------|-----|
-| Item has no expiration date + filter active | `getExpirationDate` returns `undefined` → item excluded from results | REQ-06 |
-| Item has no expiration date + no filter | Item displayed normally (no filtering applied) | REQ-06 |
-| Contract has only `fimContratoCPA` | Use `fimContratoCPA` as expiration date | REQ-03 (CA-03.5) |
-| Contract has only `fimContratoSH` | Use `fimContratoSH` as expiration date | REQ-03 (CA-03.5) |
-| Contract has both dates | Use the soonest (earliest / min) of the two | REQ-03 (CA-03.5) |
-| Contract has neither date | Treated as no expiration date | REQ-06 |
-| Expiration date is malformed (not ISO) | `getExpirationDate` returns `undefined` — item excluded when filter active | REQ-06 |
-| Zero items match filter + search | `ContentListTemplate` shows existing empty state message | REQ-05 |
-| User navigates away and returns | `selectedMonth` is a local ref — resets to `null` on component remount (no persistence) | C-06 |
-| Month boundary — item expires on last day of month | ISO date `YYYY-MM-DD` → extract `YYYY-MM` → matches selected month correctly | REQ-03 |
+### Template (sem alteração estrutural)
 
-- No try/catch needed — all operations are pure string comparisons on already-loaded data
-- No network errors possible — this is entirely client-side
-- No loading states needed — filtering is synchronous on in-memory arrays
+- O `ExpirationDateFilter` já está no slot `#filters` do `ContentListTemplate`
+- O `v-model` continua ligado a `selectedMonth`
+- As `options` continuam a vir de `filterOptions`
+
+## 7. Error handling and edge cases
+
+| Cenário | Comportamento | REQ |
+|---------|--------------|-----|
+| Item sem data de expiração + filtro ativo | Backend exclui item dos resultados (data de expiração = `undefined`) | REQ-08 (CA-08.1) |
+| Item sem data de expiração + sem filtro | Item incluído normalmente (filtro não aplicado) | REQ-08 (CA-08.2) |
+| Contrato com apenas `fimContratoCPA` | Backend usa `fimContratoCPA` como data de expiração | REQ-04 (CA-04.2) |
+| Contrato com apenas `fimContratoSH` | Backend usa `fimContratoSH` como data de expiração | REQ-04 (CA-04.2) |
+| Contrato com ambas as datas | Backend usa a mais próxima (min) das duas | REQ-04 (CA-04.1) |
+| Contrato sem nenhuma data | Tratado como sem data de expiração — excluído quando filtro ativo | REQ-08 |
+| Data de expiração malformada (não ISO) no índice | `substring(0, 7)` não corresponde a nenhum `YYYY-MM` válido → item excluído | REQ-08 |
+| Zero items correspondem ao filtro + search | Backend retorna `{ items: [], total: 0 }` → `ContentListTemplate` mostra empty state existente | REQ-07 (CA-07.1, CA-07.2) |
+| User navega para fora e volta | `selectedMonth` é ref local — reset para `null` no remount do componente (sem persistência) | C-06 |
+| Fronteira de mês — item expira no último dia do mês | ISO date `YYYY-MM-DD` → `substring(0, 7)` → corresponde ao mês selecionado corretamente | REQ-03 |
+| `expirationMonth` com formato inválido no query param | Backend ignora silenciosamente (não aplica filtro) | — |
+| Erro de rede durante fetch com filtro | `useApi` error handling existente trata o erro — mostra mensagem de erro | — |
+
+- Não é necessário try/catch adicional no backend — a filtragem é comparação de strings sobre dados já carregados do índice
+- Não são necessários loading states adicionais — o `useApi` já gere o loading state
+- O empty state existente do `ContentListTemplate` cobre todos os cenários de zero resultados

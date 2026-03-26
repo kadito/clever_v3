@@ -126,7 +126,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import type { License, BaseContent, ContentWithRelations } from '@clever/shared';
 import { calculateLicenseStatus } from '@clever/shared';
@@ -142,7 +142,7 @@ const router = useRouter();
 // Composables
 const api = useApi<License>('licenses');
 const errorHandler = useErrorHandler();
-const { filterOptions, selectedMonth, filterItems } = useExpirationFilter('licenses');
+const { filterOptions, selectedMonth, clearFilter, filterParams } = useExpirationFilter();
 
 // State
 const licenses = ref<ContentWithRelations<License['data']>[]>([]);
@@ -159,35 +159,7 @@ const clearError = () => {
 
 // Computed properties
 const displayedLicenses = computed(() => {
-  let result: ContentWithRelations<License['data']>[];
-
-  if (!searchQuery.value) {
-    result = licenses.value;
-  } else {
-    const query = searchQuery.value.toLowerCase();
-    result = licenses.value.filter(license => {
-      const data = license.data;
-      return (
-        data.clientName?.toLowerCase().includes(query) ||
-        data.versao?.toLowerCase().includes(query) ||
-        data.numeroSerie?.toLowerCase().includes(query) ||
-        data.modalidade?.toLowerCase().includes(query) ||
-        data.duracaoContrato?.toLowerCase().includes(query) ||
-        data.software?.name?.some(name => name.toLowerCase().includes(query)) ||
-        data.software?.model?.toLowerCase().includes(query) ||
-        data.software?.product?.toLowerCase().includes(query) ||
-        data.software?.version?.toLowerCase().includes(query) ||
-        data.software?.licenseType?.toLowerCase().includes(query) ||
-        data.invoices?.some(
-          invoice =>
-            invoice.numeroFatura?.toLowerCase().includes(query) ||
-            invoice.ano?.toLowerCase().includes(query)
-        )
-      );
-    });
-  }
-
-  return filterItems(result) as ContentWithRelations<License['data']>[];
+  return licenses.value;
 });
 
 // Display functions for ContentListTemplate
@@ -392,7 +364,7 @@ const handleEdit = (item: BaseContent) => {
 // Page change handler
 const handlePageChange = async (page: number) => {
   isLoading.value = true;
-  await api.fetchList({ page, limit: itemsPerPage.value }).then(() => {
+  await api.fetchList({ page, limit: itemsPerPage.value, ...filterParams.value }).then(() => {
     if (api.items.value) {
       licenses.value = (api.items.value as ContentWithRelations<License['data']>[]).sort((a, b) => {
         const dateA = new Date(a.createdAt);
@@ -401,7 +373,7 @@ const handlePageChange = async (page: number) => {
       });
     }
   }).catch((err) => {
-    console.error('Error changing page:', err);
+    console.error('Error changing page:', JSON.stringify(err, null, 2));
     error.value = err instanceof Error ? err.message : 'Erro ao carregar licenças';
   }).finally(() => {
     isLoading.value = false;
@@ -412,7 +384,7 @@ const handlePageChange = async (page: number) => {
 const handleItemsPerPageChange = async (limit: number) => {
   itemsPerPage.value = limit;
   isLoading.value = true;
-  await api.fetchList({ page: 1, limit }).then(() => {
+  await api.fetchList({ page: 1, limit, ...filterParams.value }).then(() => {
     if (api.items.value) {
       licenses.value = (api.items.value as ContentWithRelations<License['data']>[]).sort((a, b) => {
         const dateA = new Date(a.createdAt);
@@ -421,7 +393,7 @@ const handleItemsPerPageChange = async (limit: number) => {
       });
     }
   }).catch((err) => {
-    console.error('Error changing items per page:', err);
+    console.error('Error changing items per page:', JSON.stringify(err, null, 2));
     error.value = err instanceof Error ? err.message : 'Erro ao carregar licenças';
   }).finally(() => {
     isLoading.value = false;
@@ -434,7 +406,7 @@ const loadLicenses = async () => {
     isLoading.value = true;
     clearError();
 
-    await api.fetchList({ limit: itemsPerPage.value });
+    await api.fetchList({ limit: itemsPerPage.value, ...filterParams.value });
 
     if (api.items.value) {
       // Sort licenses by creation date (most recent first)
@@ -447,12 +419,31 @@ const loadLicenses = async () => {
       throw new Error('Erro ao carregar licenças');
     }
   } catch (err) {
-    console.error('Error loading licenses:', err);
+    console.error('Error loading licenses:', JSON.stringify(err, null, 2));
     error.value = err instanceof Error ? err.message : 'Erro ao carregar licenças';
   } finally {
     isLoading.value = false;
   }
 };
+
+// Watch filter changes — reset page to 1 and re-fetch
+watch(selectedMonth, async () => {
+  isLoading.value = true;
+  await api.fetchList({ page: 1, limit: itemsPerPage.value, ...filterParams.value }).then(() => {
+    if (api.items.value) {
+      licenses.value = (api.items.value as ContentWithRelations<License['data']>[]).sort((a, b) => {
+        const dateA = new Date(a.createdAt);
+        const dateB = new Date(b.createdAt);
+        return dateB.getTime() - dateA.getTime();
+      });
+    }
+  }).catch((err) => {
+    console.error('Error applying filters:', JSON.stringify(err, null, 2));
+    error.value = err instanceof Error ? err.message : 'Erro ao carregar licenças';
+  }).finally(() => {
+    isLoading.value = false;
+  });
+});
 
 // Lifecycle
 onMounted(() => {

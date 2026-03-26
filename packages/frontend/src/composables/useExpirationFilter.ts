@@ -1,41 +1,8 @@
 import { ref, computed, type Ref, type ComputedRef } from 'vue';
-import type { BaseContent } from '@clever/shared';
 
 export interface FilterOption {
   value: string;
   label: string;
-}
-
-/**
- * Extracts the expiration date from a content item based on its contentType.
- *
- * - Licenses: reads `data.dataVencimento`
- * - Contracts: takes the soonest of `data.fimContratoCPA` and `data.fimContratoSH`
- * - Returns undefined if no valid dates are present
- */
-export function getExpirationDate(item: BaseContent): string | undefined {
-  const data = item.data;
-
-  if (item.contentType === 'licenses') {
-    const date = data.dataVencimento;
-    return typeof date === 'string' && date.length >= 7 ? date : undefined;
-  }
-
-  if (item.contentType === 'contracts') {
-    const cpa = typeof data.fimContratoCPA === 'string' && data.fimContratoCPA.length >= 7
-      ? data.fimContratoCPA
-      : undefined;
-    const sh = typeof data.fimContratoSH === 'string' && data.fimContratoSH.length >= 7
-      ? data.fimContratoSH
-      : undefined;
-
-    if (cpa && sh) {
-      return cpa <= sh ? cpa : sh;
-    }
-    return cpa ?? sh;
-  }
-
-  return undefined;
 }
 
 /**
@@ -63,15 +30,17 @@ function buildFilterOptions(now: Date): FilterOption[] {
 }
 
 /**
- * Composable for filtering content items by expiration month.
+ * Composable for expiration month filter state management.
+ * Filtering is now server-side — this composable provides filter UI state
+ * and query parameters to send to the API.
  *
- * Validates: REQ-02, REQ-03, REQ-04, REQ-05, REQ-06, REQ-07
+ * Validates: REQ-02, REQ-03, REQ-06
  */
-export function useExpirationFilter(contentType: 'contracts' | 'licenses'): {
+export function useExpirationFilter(): {
   filterOptions: ComputedRef<FilterOption[]>;
   selectedMonth: Ref<string | null>;
   clearFilter: () => void;
-  filterItems: (items: BaseContent[]) => BaseContent[];
+  filterParams: ComputedRef<Record<string, string>>;
 } {
   const filterOptions = computed(() => buildFilterOptions(new Date()));
 
@@ -81,26 +50,17 @@ export function useExpirationFilter(contentType: 'contracts' | 'licenses'): {
     selectedMonth.value = null;
   };
 
-  const filterItems = (items: BaseContent[]): BaseContent[] => {
+  const filterParams = computed<Record<string, string>>(() => {
     if (selectedMonth.value === null) {
-      return items;
+      return {};
     }
-
-    const target = selectedMonth.value;
-
-    return items.filter((item) => {
-      const expDate = getExpirationDate(item);
-      if (expDate === undefined) {
-        return false;
-      }
-      return expDate.substring(0, 7) === target;
-    });
-  };
+    return { expirationMonth: selectedMonth.value };
+  });
 
   return {
     filterOptions,
     selectedMonth,
     clearFilter,
-    filterItems,
+    filterParams,
   };
 }
