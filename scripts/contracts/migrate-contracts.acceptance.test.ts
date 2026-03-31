@@ -117,7 +117,7 @@ describe('CA-01: Key retrieval', () => {
       }
       if (opts?.method === 'PUT') return mockResponse({ success: true });
       if (url.includes('content/clients/')) {
-        return mockResponse({ uuid: 'cli-0', data: { contratoId: '' }, updatedAt: '2024-01-01T00:00:00Z' });
+        return mockResponse({ uuid: 'cli-0', data: { contractId: '' }, updatedAt: '2024-01-01T00:00:00Z' });
       }
       if (url.includes('indexes/')) return mockResponse({}, 404);
       return mockResponse({}, 404);
@@ -185,7 +185,7 @@ describe('CA-02: Record reading', () => {
       if (url.includes('/values/contratos-good')) return mockResponse(validRecord);
       if (opts?.method === 'PUT') return mockResponse({ success: true });
       if (url.includes('content/clients/')) {
-        return mockResponse({ uuid: 'cli-valid', data: { contratoId: '' }, updatedAt: '2024-01-01T00:00:00Z' });
+        return mockResponse({ uuid: 'cli-valid', data: { contractId: '' }, updatedAt: '2024-01-01T00:00:00Z' });
       }
       if (url.includes('indexes/')) return mockResponse({}, 404);
       return mockResponse({}, 404);
@@ -381,7 +381,7 @@ describe('CA-04: R2 write', () => {
         return mockResponse({ success: true });
       }
       if (url.includes('content/clients/')) {
-        return mockResponse({ uuid: 'cli-abc', data: { contratoId: '' }, updatedAt: '2024-01-01T00:00:00Z' });
+        return mockResponse({ uuid: 'cli-abc', data: { contractId: '' }, updatedAt: '2024-01-01T00:00:00Z' });
       }
       if (url.includes('indexes/')) return mockResponse({}, 404);
       return mockResponse({}, 404);
@@ -415,7 +415,7 @@ describe('CA-04: R2 write', () => {
         return mockResponse({ success: true });
       }
       if (url.includes('content/clients/')) {
-        return mockResponse({ uuid: 'cli-ok', data: { contratoId: '' }, updatedAt: '2024-01-01T00:00:00Z' });
+        return mockResponse({ uuid: 'cli-ok', data: { contractId: '' }, updatedAt: '2024-01-01T00:00:00Z' });
       }
       if (url.includes('indexes/')) return mockResponse({}, 404);
       return mockResponse({}, 404);
@@ -471,7 +471,7 @@ describe('CA-05: Index update', () => {
         return mockResponse({ success: true });
       }
       if (url.includes('content/clients/')) {
-        return mockResponse({ uuid: 'c1', data: { contratoId: '' }, updatedAt: '2024-01-01T00:00:00Z' });
+        return mockResponse({ uuid: 'c1', data: { contractId: '' }, updatedAt: '2024-01-01T00:00:00Z' });
       }
       if (url.includes('indexes/')) return mockResponse({}, 404);
       return mockResponse({}, 404);
@@ -505,7 +505,7 @@ describe('CA-05: Index update', () => {
         return mockResponse({ success: true });
       }
       if (url.includes('content/clients/')) {
-        return mockResponse({ uuid: 'c1', data: { contratoId: '' }, updatedAt: '2024-01-01T00:00:00Z' });
+        return mockResponse({ uuid: 'c1', data: { contractId: '' }, updatedAt: '2024-01-01T00:00:00Z' });
       }
       if (url.includes('indexes/')) return mockResponse({}, 404);
       return mockResponse({}, 404);
@@ -533,11 +533,11 @@ describe('CA-05: Index update', () => {
 // ============================================================
 
 describe('CA-06: Client update', () => {
-  it('MA-AT-22: CA-06.1 — Client updated with contratoId and refreshed updatedAt', async () => {
+  it('MA-AT-22: CA-06.1 — Client updated with contractId and refreshed updatedAt', async () => {
     setEnvVars();
 
     const record = makeLegacyRecord({ id: 'c1', clienteId: 'cli-1' });
-    const clientRecord = { uuid: 'cli-1', data: { contratoId: '' }, updatedAt: '2024-01-01T00:00:00Z' };
+    const clientRecord = { uuid: 'cli-1', data: { contractId: '' }, updatedAt: '2024-01-01T00:00:00Z' };
 
     let writtenClient: any = null;
     vi.stubGlobal('fetch', vi.fn().mockImplementation(async (url: string, opts?: RequestInit) => {
@@ -560,7 +560,7 @@ describe('CA-06: Client update', () => {
     await migrateContracts();
 
     expect(writtenClient).not.toBeNull();
-    expect(writtenClient.data.contratoId).toBe('c1');
+    expect(writtenClient.data.contractId).toBe('c1');
     expect(writtenClient.updatedAt).not.toBe('2024-01-01T00:00:00Z');
   });
 
@@ -604,7 +604,7 @@ describe('CA-06: Client update', () => {
     setEnvVars();
 
     const record = makeLegacyRecord({ id: 'uuid-ok', clienteId: 'cli-1' });
-    const clientRecord = { uuid: 'cli-1', data: { contratoId: '' }, updatedAt: '2024-01-01T00:00:00Z' };
+    const clientRecord = { uuid: 'cli-1', data: { contractId: '' }, updatedAt: '2024-01-01T00:00:00Z' };
 
     vi.stubGlobal('fetch', vi.fn().mockImplementation(async (url: string, opts?: RequestInit) => {
       if (url.includes('/keys?')) {
@@ -666,7 +666,7 @@ describe('CA-07: Success output file', () => {
       if (url.includes('/values/contratos-3')) return mockResponse(records[2]);
       if (opts?.method === 'PUT') return mockResponse({ success: true });
       if (url.includes('content/clients/')) {
-        return mockResponse({ uuid: 'c1', data: { contratoId: '' }, updatedAt: '2024-01-01T00:00:00Z' });
+        return mockResponse({ uuid: 'c1', data: { contractId: '' }, updatedAt: '2024-01-01T00:00:00Z' });
       }
       if (url.includes('indexes/')) return mockResponse({}, 404);
       return mockResponse({}, 404);
@@ -801,7 +801,7 @@ describe('CA-09: Summary', () => {
       if (url.includes('/values/contratos-bad2')) return mockResponse(invalidRecord2);
       if (opts?.method === 'PUT') return mockResponse({ success: true });
       if (url.includes('content/clients/')) {
-        return mockResponse({ uuid: 'c1', data: { contratoId: '' }, updatedAt: '2024-01-01T00:00:00Z' });
+        return mockResponse({ uuid: 'c1', data: { contractId: '' }, updatedAt: '2024-01-01T00:00:00Z' });
       }
       if (url.includes('indexes/')) return mockResponse({}, 404);
       return mockResponse({}, 404);

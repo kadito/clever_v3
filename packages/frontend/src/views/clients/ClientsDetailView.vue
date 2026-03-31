@@ -773,7 +773,7 @@ const clientWithRelations = computed(() => {
 const contractRelation = computed(() => {
   const relations = (clientWithRelations.value as any)?.relations;
   if (!relations) return undefined;
-  return relations.contratoId;
+  return relations.contract;
 });
 
 const hasContract = computed(() => {

@@ -100,7 +100,7 @@ export const CONTENT_RELATION_CONFIGS: Record<string, RelationFieldConfig[]> = {
   ],
   clients: [
     {
-      fieldName: 'contratoId',
+      fieldName: 'contractId',
       targetType: 'contracts',
       required: false, // Optional - clients can exist without an active contract
       displayName: 'Contrato',

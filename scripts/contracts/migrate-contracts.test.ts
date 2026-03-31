@@ -9,7 +9,7 @@ import {
   buildContractSearchText,
   buildIndexItem,
   updateContractIndex,
-  updateClientContratoId,
+  updateClientContractId,
   writeOutputFiles,
   printSummary,
   migrateContracts,
@@ -593,14 +593,14 @@ describe('updateContractIndex()', () => {
 
 
 // ============================================================
-// MI-IT-23 through MI-IT-25: updateClientContratoId()
+// MI-IT-23 through MI-IT-25: updateClientContractId()
 // ============================================================
 
-describe('updateClientContratoId()', () => {
+describe('updateClientContractId()', () => {
   it('MI-IT-23: successful client update', async () => {
     const clientRecord = {
       uuid: 'client-1',
-      data: { contratoId: '' },
+      data: { contractId: '' },
       updatedAt: '2024-01-01T00:00:00Z',
     };
 
@@ -613,10 +613,10 @@ describe('updateClientContratoId()', () => {
       return mockResponse(clientRecord);
     }));
 
-    const result = await updateClientContratoId(ACCOUNT, BUCKET, 'client-1', 'contract-uuid-1', TOKEN);
+    const result = await updateClientContractId(ACCOUNT, BUCKET, 'client-1', 'contract-uuid-1', TOKEN);
     expect(result).toBeNull(); // null = success
     expect(writtenClient).not.toBeNull();
-    expect((writtenClient as Record<string, unknown>).data).toHaveProperty('contratoId', 'contract-uuid-1');
+    expect((writtenClient as Record<string, unknown>).data).toHaveProperty('contractId', 'contract-uuid-1');
     // updatedAt should be refreshed
     expect((writtenClient as Record<string, unknown>).updatedAt).not.toBe('2024-01-01T00:00:00Z');
   });
@@ -624,7 +624,7 @@ describe('updateClientContratoId()', () => {
   it('MI-IT-24: client not found (R2 404)', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockResponse({}, 404)));
 
-    const result = await updateClientContratoId(ACCOUNT, BUCKET, 'missing-client', 'contract-uuid-1', TOKEN);
+    const result = await updateClientContractId(ACCOUNT, BUCKET, 'missing-client', 'contract-uuid-1', TOKEN);
     expect(result).toMatch(/client update failed/);
     expect(result).toMatch(/not found/);
   });
@@ -632,7 +632,7 @@ describe('updateClientContratoId()', () => {
   it('MI-IT-25: client update write fails', async () => {
     const clientRecord = {
       uuid: 'client-1',
-      data: { contratoId: '' },
+      data: { contractId: '' },
       updatedAt: '2024-01-01T00:00:00Z',
     };
 
@@ -643,7 +643,7 @@ describe('updateClientContratoId()', () => {
       return mockResponse(clientRecord);
     }));
 
-    const result = await updateClientContratoId(ACCOUNT, BUCKET, 'client-1', 'contract-uuid-1', TOKEN);
+    const result = await updateClientContractId(ACCOUNT, BUCKET, 'client-1', 'contract-uuid-1', TOKEN);
     expect(result).toMatch(/client update failed/);
     expect(result).toMatch(/write failed: HTTP 500/);
   });
@@ -809,7 +809,7 @@ describe('migrateContracts()', () => {
 
     const clientRecord = {
       uuid: 'cli-1',
-      data: { contratoId: '' },
+      data: { contractId: '' },
       updatedAt: '2024-01-01T00:00:00Z',
     };
 

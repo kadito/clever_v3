@@ -80,7 +80,7 @@ export interface ClientData {
   observacoes?: string; // Notes/observations
 
   // Contract reference (1:1 relationship — populated by backend)
-  contratoId?: string;
+  contractId?: string;
 
   // Legacy fields for backward compatibility
   vectron?: boolean;

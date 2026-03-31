@@ -245,22 +245,22 @@ function createContractSearchText(data: ContractData): string {
 }
 
 /**
- * Synchronize the contratoId field on a client document in R2.
+ * Synchronize the contractId field on a client document in R2.
  * Uses optimistic locking (version field) to avoid concurrent write conflicts.
  * @param r2Bucket - R2 storage bucket
  * @param clientId - UUID of the client to update
- * @param contratoId - Contract UUID to set, or undefined to clear
+ * @param contractId - Contract UUID to set, or undefined to clear
  */
-async function syncClientContratoId(
+async function syncClientContractId(
   r2Bucket: StorageBucket,
   clientId: string,
-  contratoId: string | undefined
+  contractId: string | undefined
 ): Promise<void> {
   const clientKey = `content/clients/${clientId}.json`;
 
   const clientObject = await r2Bucket.get(clientKey);
   if (!clientObject) {
-    console.error('syncClientContratoId: client not found:', clientId);
+    console.error('syncClientContractId: client not found:', clientId);
     return;
   }
 
@@ -270,7 +270,7 @@ async function syncClientContratoId(
     ...client,
     data: {
       ...client.data,
-      contratoId,
+      contractId,
     },
     updatedAt: new Date().toISOString(),
     version: client.version + 1,
@@ -447,14 +447,14 @@ contractsRouter.post('/', async (c: Context) => {
     const storage = new ContentStorageService<Contract>(r2Bucket, 'contracts');
     const newContract = await storage.create(contentData, { userId: user.userId });
 
-    // Sync contratoId on the client (REQ-01.2, CA-01.2.1)
+    // Sync contractId on the client (REQ-01.2, CA-01.2.1)
     if (clientId) {
-      await syncClientContratoId(r2Bucket, clientId, newContract.uuid)
+      await syncClientContractId(r2Bucket, clientId, newContract.uuid)
         .then(() => {
-          console.log('Client contratoId synced for contract:', newContract.uuid);
+          console.log('Client contractId synced for contract:', newContract.uuid);
         })
         .catch((syncError) => {
-          console.error('Failed to sync client contratoId:', JSON.stringify({
+          console.error('Failed to sync client contractId:', JSON.stringify({
             contractId: newContract.uuid,
             clientId,
             error: syncError instanceof Error ? syncError.message : String(syncError),
@@ -636,8 +636,8 @@ contractsRouter.put('/:uuid', async (c: Context) => {
 });
 
 /**
- * Override DELETE handler to clear contratoId on the client after soft delete
- * Requirements: REQ-01.2 — contratoId = undefined when contract is deleted
+ * Override DELETE handler to clear contractId on the client after soft delete
+ * Requirements: REQ-01.2 — contractId = undefined when contract is deleted
  */
 contractsRouter.delete('/:uuid', requireDeletePermission, async (c: Context) => {
   const user = requireUserContext(c);
@@ -696,15 +696,15 @@ contractsRouter.delete('/:uuid', requireDeletePermission, async (c: Context) => 
       throw error;
     });
 
-  // Clear contratoId on the client (REQ-01.2, CA-01.2.2)
+  // Clear contractId on the client (REQ-01.2, CA-01.2.2)
   const clientId = contractObject.data?.clientId;
   if (clientId) {
-    await syncClientContratoId(r2Bucket, clientId, undefined)
+    await syncClientContractId(r2Bucket, clientId, undefined)
       .then(() => {
-        console.log('Client contratoId cleared after contract deletion:', uuid);
+        console.log('Client contractId cleared after contract deletion:', uuid);
       })
       .catch((syncError) => {
-        console.error('Failed to clear client contratoId:', JSON.stringify({
+        console.error('Failed to clear client contractId:', JSON.stringify({
           contractId: uuid,
           clientId,
           error: syncError instanceof Error ? syncError.message : String(syncError),

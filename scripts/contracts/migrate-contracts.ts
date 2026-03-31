@@ -305,9 +305,9 @@ export async function updateContractIndex(
     });
 }
 
-// --- Client sync — contratoId update ---
+// --- Client sync — contractId update ---
 
-export async function updateClientContratoId(
+export async function updateClientContractId(
   accountId: string,
   bucketName: string,
   clientId: string,
@@ -324,7 +324,7 @@ export async function updateClientContratoId(
     return `client update failed: ${client.reason}`;
   }
 
-  client.data.contratoId = contractUuid;
+  client.data.contractId = contractUuid;
   client.updatedAt = new Date().toISOString();
 
   return await writeR2Object(accountId, bucketName, clientKey, client, token)
@@ -457,8 +457,8 @@ export async function migrateContracts(): Promise<void> {
     });
     migratedRecords.push(transformed);
 
-    // Update client contratoId
-    const clientWarning = await updateClientContratoId(accountId, bucketName, transformed.data.clientId, transformed.uuid, token);
+    // Update client contractId
+    const clientWarning = await updateClientContractId(accountId, bucketName, transformed.data.clientId, transformed.uuid, token);
     if (clientWarning) {
       console.log(`  ⚠ ${clientWarning}`);
       errorList.push({ id: transformed.uuid, reason: clientWarning, type: 'warning' });

@@ -8,7 +8,6 @@ import type { BaseContent } from './types.js';
 export const RELATION_TYPE_MAPPING: Record<string, string> = {
   clientId: 'clients',
   contractId: 'contracts',
-  contratoId: 'contracts',
   licenseId: 'licenses',
   workSheetId: 'work-sheets',
   dailyRecordId: 'daily-records',

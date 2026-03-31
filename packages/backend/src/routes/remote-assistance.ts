@@ -388,7 +388,7 @@ remoteAssistanceRouter.post('/', async (c: Context) => {
 
     // ========================================================================
     // Automatic contract resolution from client (REQ-04.1, CA-04.1.3)
-    // Always resolve contractId from the client's contratoId — ignore body value
+    // Always resolve contractId from the client's contractId — ignore body value
     // ========================================================================
     const clientId = contentData.clientId as string | undefined;
     let resolvedContractId: string | undefined;
@@ -405,7 +405,7 @@ remoteAssistanceRouter.post('/', async (c: Context) => {
       }
 
       const client = (await clientObject.json()) as Client;
-      resolvedContractId = client.data.contratoId;
+      resolvedContractId = client.data.contractId;
     }
 
     // Reject "Contrato" payment when client has no active contract (REQ-04.3, CA-04.1.3)
