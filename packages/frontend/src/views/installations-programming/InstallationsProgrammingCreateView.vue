@@ -563,28 +563,45 @@ const handleSubmit = async () => {
 }
 
 .switch {
-  @apply relative inline-flex flex-shrink-0 rounded-full cursor-pointer transition-colors duration-200;
-  width: 44px;
-  height: 24px;
-  background-color: #d1d5db;
+  @apply relative inline-flex flex-shrink-0 rounded-full cursor-pointer transition-colors duration-200 ease-in-out;
+  width: 50px;
+  height: 26px;
+  background-color: #e5e7eb;
   -webkit-tap-highlight-color: transparent;
 }
 
 .switch--on {
-  background-color: #75AE93;
+  background-color: rgb(117, 174, 147);
 }
 
 .switch-thumb {
-  @apply inline-block rounded-full bg-white shadow transition-transform duration-200;
+  @apply absolute rounded-full bg-white transition-transform duration-200 ease-in-out;
+  top: 50%;
+  left: 3px;
   width: 20px;
   height: 20px;
-  margin-top: 2px;
-  margin-left: 2px;
-  transform: translateX(0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.1);
+  transform: translateY(-50%) translateX(0);
 }
 
 .switch--on .switch-thumb {
-  transform: translateX(20px);
+  transform: translateY(-50%) translateX(24px);
+}
+
+@media (max-width: 640px) {
+  .switch {
+    width: 48px;
+    height: 28px;
+  }
+
+  .switch-thumb {
+    width: 22px;
+    height: 22px;
+  }
+
+  .switch--on .switch-thumb {
+    transform: translateY(-50%) translateX(20px);
+  }
 }
 
 .switch:focus-visible {

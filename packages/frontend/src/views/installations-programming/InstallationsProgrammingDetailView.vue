@@ -37,13 +37,13 @@
               </div>
               <div class="p-4 sm:p-6">
                 <div class="detail-grid">
-                  <DetailField label="PLUS" :value="item.data.phase1?.plus" />
-                  <DetailField label="Departamento" :value="item.data.phase1?.departamento" />
-                  <DetailField label="Cabeçalho" :value="item.data.phase1?.cabecalho" />
-                  <DetailField label="Rede" :value="item.data.phase1?.rede" />
-                  <DetailField label="Vectron Connect" :value="item.data.phase1?.vectronConnect" />
-                  <DetailField label="Anydesk" :value="item.data.phase1?.anydesk" />
-                  <DetailField label="Séries / Nº Equipamentos" :value="item.data.phase1?.seriesEquipamentos" />
+                  <div class="detail-item"><span class="detail-label">PLUS</span><span class="detail-value">{{ item.data.phase1?.plus || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Departamento</span><span class="detail-value">{{ item.data.phase1?.departamento || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Cabeçalho</span><span class="detail-value">{{ item.data.phase1?.cabecalho || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Rede</span><span class="detail-value">{{ item.data.phase1?.rede || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Vectron Connect</span><span class="detail-value">{{ item.data.phase1?.vectronConnect || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Anydesk</span><span class="detail-value">{{ item.data.phase1?.anydesk || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Séries / Nº Equipamentos</span><span class="detail-value">{{ item.data.phase1?.seriesEquipamentos || '—' }}</span></div>
                 </div>
               </div>
             </div>
@@ -57,14 +57,14 @@
               </div>
               <div class="p-4 sm:p-6">
                 <div class="detail-grid">
-                  <BooleanField label="Ligação a CPA" :value="item.data.phase1?.ligacaoCPA" />
-                  <BooleanField label="Ligação a Gaveta" :value="item.data.phase1?.ligacaoGaveta" />
-                  <BooleanField label="Ligação a Impressora ou Monitor de Pedidos" :value="item.data.phase1?.ligacaoImpressoraMonitor" />
-                  <BooleanField label="Ligação a Faturadora" :value="item.data.phase1?.ligacaoFaturadora" />
-                  <BooleanField label="Ligação a Display Clientes" :value="item.data.phase1?.ligacaoDisplayClientes" />
-                  <BooleanField label="Ligação a Scanner" :value="item.data.phase1?.ligacaoScanner" />
-                  <BooleanField label="Ligação a Leitor de Cartões" :value="item.data.phase1?.ligacaoLeitorCartoes" />
-                  <BooleanField label="Ligação a Fechadura de Chaves de Operador" :value="item.data.phase1?.ligacaoFechaduraChaves" />
+                  <div class="detail-item"><span class="detail-label">Ligação a CPA</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase1?.ligacaoCPA ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase1?.ligacaoCPA ? 'Sim' : 'Não' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Ligação a Gaveta</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase1?.ligacaoGaveta ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase1?.ligacaoGaveta ? 'Sim' : 'Não' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Ligação a Impressora ou Monitor de Pedidos</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase1?.ligacaoImpressoraMonitor ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase1?.ligacaoImpressoraMonitor ? 'Sim' : 'Não' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Ligação a Faturadora</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase1?.ligacaoFaturadora ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase1?.ligacaoFaturadora ? 'Sim' : 'Não' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Ligação a Display Clientes</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase1?.ligacaoDisplayClientes ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase1?.ligacaoDisplayClientes ? 'Sim' : 'Não' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Ligação a Scanner</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase1?.ligacaoScanner ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase1?.ligacaoScanner ? 'Sim' : 'Não' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Ligação a Leitor de Cartões</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase1?.ligacaoLeitorCartoes ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase1?.ligacaoLeitorCartoes ? 'Sim' : 'Não' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Ligação a Fechadura de Chaves de Operador</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase1?.ligacaoFechaduraChaves ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase1?.ligacaoFechaduraChaves ? 'Sim' : 'Não' }}</span></div>
                 </div>
               </div>
             </div>
@@ -89,18 +89,18 @@
                 <h2 class="text-lg font-semibold text-gray-900">Equipamento Vectron</h2>
               </div>
               <div class="p-4 sm:p-6">
-                <BooleanField label="Equipamento Vectron" :value="item.data.phase1?.isVectron" />
+                <div class="detail-item"><span class="detail-label">Equipamento Vectron</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase1?.isVectron ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase1?.isVectron ? 'Sim' : 'Não' }}</span></div>
 
                 <div v-if="item.data.phase1?.isVectron" class="mt-6 space-y-6">
                   <!-- Leitura X -->
                   <div>
                     <h3 class="text-sm font-semibold text-gray-700 mb-3">Programação Leitura X</h3>
                     <div class="detail-grid">
-                      <DetailField label="Plus 1" :value="item.data.phase1?.vectronLeituraX?.plus1" />
-                      <DetailField label="Plus 2" :value="item.data.phase1?.vectronLeituraX?.plus2" />
-                      <DetailField label="Departamentos" :value="item.data.phase1?.vectronLeituraX?.departamentos" />
-                      <DetailField label="Operadores" :value="item.data.phase1?.vectronLeituraX?.operadores" />
-                      <DetailField label="Transações C/IVA" :value="item.data.phase1?.vectronLeituraX?.transacoesComIVA" />
+                      <div class="detail-item"><span class="detail-label">Plus 1</span><span class="detail-value">{{ item.data.phase1?.vectronLeituraX?.plus1 || '—' }}</span></div>
+                      <div class="detail-item"><span class="detail-label">Plus 2</span><span class="detail-value">{{ item.data.phase1?.vectronLeituraX?.plus2 || '—' }}</span></div>
+                      <div class="detail-item"><span class="detail-label">Departamentos</span><span class="detail-value">{{ item.data.phase1?.vectronLeituraX?.departamentos || '—' }}</span></div>
+                      <div class="detail-item"><span class="detail-label">Operadores</span><span class="detail-value">{{ item.data.phase1?.vectronLeituraX?.operadores || '—' }}</span></div>
+                      <div class="detail-item"><span class="detail-label">Transações C/IVA</span><span class="detail-value">{{ item.data.phase1?.vectronLeituraX?.transacoesComIVA || '—' }}</span></div>
                     </div>
                   </div>
 
@@ -108,8 +108,8 @@
                   <div>
                     <h3 class="text-sm font-semibold text-gray-700 mb-3">Tecla Só Consulta Diária</h3>
                     <div class="detail-grid">
-                      <DetailField label="Leitura Gerente Normal" :value="item.data.phase1?.vectronConsultaDiaria?.leituraGerenteNormal" />
-                      <DetailField label="Leitura Supervisor" :value="item.data.phase1?.vectronConsultaDiaria?.leituraSupervisor" />
+                      <div class="detail-item"><span class="detail-label">Leitura Gerente Normal</span><span class="detail-value">{{ item.data.phase1?.vectronConsultaDiaria?.leituraGerenteNormal || '—' }}</span></div>
+                      <div class="detail-item"><span class="detail-label">Leitura Supervisor</span><span class="detail-value">{{ item.data.phase1?.vectronConsultaDiaria?.leituraSupervisor || '—' }}</span></div>
                     </div>
                   </div>
                 </div>
@@ -148,8 +148,8 @@
               </div>
               <div class="p-4 sm:p-6">
                 <div class="detail-grid">
-                  <DetailField label="Nº Fatura" :value="item.data.phase3?.nrFatura" />
-                  <DetailField label="Nº Guia de Transportes" :value="item.data.phase3?.nrGuiaTransportes" />
+                  <div class="detail-item"><span class="detail-label">Nº Fatura</span><span class="detail-value">{{ item.data.phase3?.nrFatura || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Nº Guia de Transportes</span><span class="detail-value">{{ item.data.phase3?.nrGuiaTransportes || '—' }}</span></div>
                 </div>
               </div>
             </div>
@@ -163,13 +163,13 @@
               </div>
               <div class="p-4 sm:p-6">
                 <div class="detail-grid">
-                  <DetailField label="Data de Instalação" :value="formatDate(item.data.phase3?.dataInstalacao)" />
-                  <DetailField label="Hora Inicial" :value="item.data.phase3?.horaInicialInstalacao" />
-                  <DetailField label="Hora Final" :value="item.data.phase3?.horaFinalInstalacao" />
-                  <DetailField label="Data de Formação" :value="formatDate(item.data.phase3?.dataFormacao)" />
-                  <DetailField label="Hora Inicial" :value="item.data.phase3?.horaInicialFormacao" />
-                  <DetailField label="Hora Final" :value="item.data.phase3?.horaFinalFormacao" />
-                  <DetailField label="Quem Recebeu Formação" :value="item.data.phase3?.quemRecebeuFormacao" />
+                  <div class="detail-item"><span class="detail-label">Data de Instalação</span><span class="detail-value">{{ formatDate(item.data.phase3?.dataInstalacao) || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Hora Inicial</span><span class="detail-value">{{ item.data.phase3?.horaInicialInstalacao || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Hora Final</span><span class="detail-value">{{ item.data.phase3?.horaFinalInstalacao || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Data de Formação</span><span class="detail-value">{{ formatDate(item.data.phase3?.dataFormacao) || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Hora Inicial</span><span class="detail-value">{{ item.data.phase3?.horaInicialFormacao || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Hora Final</span><span class="detail-value">{{ item.data.phase3?.horaFinalFormacao || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Quem Recebeu Formação</span><span class="detail-value">{{ item.data.phase3?.quemRecebeuFormacao || '—' }}</span></div>
                 </div>
               </div>
             </div>
@@ -183,21 +183,17 @@
               </div>
               <div class="p-4 sm:p-6">
                 <div class="detail-grid">
-                  <BooleanField label="POS" :value="item.data.phase3?.materialInstalado?.pos" />
-                  <BooleanField label="CPA" :value="item.data.phase3?.materialInstalado?.cpa" />
-                  <BooleanField label="Balança" :value="item.data.phase3?.materialInstalado?.balanca" />
-                  <BooleanField label="CCTV" :value="item.data.phase3?.materialInstalado?.cctv" />
-                  <BooleanField label="Alarme" :value="item.data.phase3?.materialInstalado?.alarme" />
-                  <BooleanField label="Impressora" :value="item.data.phase3?.materialInstalado?.impressora" />
-                  <BooleanField label="UPS" :value="item.data.phase3?.materialInstalado?.ups" />
-                  <BooleanField label="Router" :value="item.data.phase3?.materialInstalado?.router" />
-                  <BooleanField label="Switch" :value="item.data.phase3?.materialInstalado?.switchEquip" />
-                  <BooleanField label="Rolos" :value="item.data.phase3?.materialInstalado?.rolos" />
-                  <DetailField
-                    v-if="item.data.phase3?.materialInstalado?.rolos"
-                    label="Quantidade de Rolos"
-                    :value="String(item.data.phase3?.materialInstalado?.rolosQuantidade ?? 0)"
-                  />
+                  <div class="detail-item"><span class="detail-label">POS</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase3?.materialInstalado?.pos ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase3?.materialInstalado?.pos ? 'Sim' : 'Não' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">CPA</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase3?.materialInstalado?.cpa ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase3?.materialInstalado?.cpa ? 'Sim' : 'Não' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Balança</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase3?.materialInstalado?.balanca ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase3?.materialInstalado?.balanca ? 'Sim' : 'Não' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">CCTV</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase3?.materialInstalado?.cctv ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase3?.materialInstalado?.cctv ? 'Sim' : 'Não' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Alarme</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase3?.materialInstalado?.alarme ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase3?.materialInstalado?.alarme ? 'Sim' : 'Não' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Impressora</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase3?.materialInstalado?.impressora ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase3?.materialInstalado?.impressora ? 'Sim' : 'Não' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">UPS</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase3?.materialInstalado?.ups ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase3?.materialInstalado?.ups ? 'Sim' : 'Não' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Router</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase3?.materialInstalado?.router ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase3?.materialInstalado?.router ? 'Sim' : 'Não' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Switch</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase3?.materialInstalado?.switchEquip ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase3?.materialInstalado?.switchEquip ? 'Sim' : 'Não' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Rolos</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase3?.materialInstalado?.rolos ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase3?.materialInstalado?.rolos ? 'Sim' : 'Não' }}</span></div>
+                  <div v-if="item.data.phase3?.materialInstalado?.rolos" class="detail-item"><span class="detail-label">Quantidade de Rolos</span><span class="detail-value">{{ item.data.phase3?.materialInstalado?.rolosQuantidade ?? 0 }}</span></div>
                 </div>
               </div>
             </div>
@@ -213,18 +209,10 @@
                 <h2 class="text-lg font-semibold text-gray-900">Teste Anydesk</h2>
               </div>
               <div class="p-4 sm:p-6">
-                <BooleanField label="Anydesk Testado" :value="item.data.phase4?.anydeskTestado" />
+                <div class="detail-item"><span class="detail-label">Anydesk Testado</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase4?.anydeskTestado ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase4?.anydeskTestado ? 'Sim' : 'Não' }}</span></div>
                 <div class="mt-4">
-                  <DetailField
-                    v-if="item.data.phase4?.anydeskTestado"
-                    label="Código Anydesk"
-                    :value="item.data.phase4?.anydeskCodigo"
-                  />
-                  <DetailField
-                    v-if="item.data.phase4?.anydeskTestado === false"
-                    label="Motivo da Falha"
-                    :value="item.data.phase4?.anydeskMotivo"
-                  />
+                  <div v-if="item.data.phase4?.anydeskTestado" class="detail-item"><span class="detail-label">Código Anydesk</span><span class="detail-value">{{ item.data.phase4?.anydeskCodigo || '—' }}</span></div>
+                  <div v-if="item.data.phase4?.anydeskTestado === false" class="detail-item"><span class="detail-label">Motivo da Falha</span><span class="detail-value">{{ item.data.phase4?.anydeskMotivo || '—' }}</span></div>
                 </div>
               </div>
             </div>
@@ -237,18 +225,10 @@
                 <h2 class="text-lg font-semibold text-gray-900">Teste Vectron Connect</h2>
               </div>
               <div class="p-4 sm:p-6">
-                <BooleanField label="Vectron Connect Testado" :value="item.data.phase4?.vectronConnectTestado" />
+                <div class="detail-item"><span class="detail-label">Vectron Connect Testado</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase4?.vectronConnectTestado ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase4?.vectronConnectTestado ? 'Sim' : 'Não' }}</span></div>
                 <div class="mt-4">
-                  <DetailField
-                    v-if="item.data.phase4?.vectronConnectTestado"
-                    label="Código Vectron Connect"
-                    :value="item.data.phase4?.vectronConnectCodigo"
-                  />
-                  <DetailField
-                    v-if="item.data.phase4?.vectronConnectTestado === false"
-                    label="Motivo da Falha"
-                    :value="item.data.phase4?.vectronConnectMotivo"
-                  />
+                  <div v-if="item.data.phase4?.vectronConnectTestado" class="detail-item"><span class="detail-label">Código Vectron Connect</span><span class="detail-value">{{ item.data.phase4?.vectronConnectCodigo || '—' }}</span></div>
+                  <div v-if="item.data.phase4?.vectronConnectTestado === false" class="detail-item"><span class="detail-label">Motivo da Falha</span><span class="detail-value">{{ item.data.phase4?.vectronConnectMotivo || '—' }}</span></div>
                 </div>
               </div>
             </div>
@@ -263,14 +243,10 @@
                 <h2 class="text-lg font-semibold text-gray-900">Finalização</h2>
               </div>
               <div class="p-4 sm:p-6 space-y-4">
-                <BooleanField label="DUMP Lido" :value="item.data.phase5?.dumpLido" />
-                <BooleanField label="Cópia de Segurança" :value="item.data.phase5?.copiaSeguranca" />
-                <BooleanField label="Foto da Instalação" :value="item.data.phase5?.fotoInstalacao" />
-                <DetailField
-                  v-if="item.data.phase5?.fotoInstalacao"
-                  label="URL da Drive"
-                  :value="item.data.phase5?.fotoURL"
-                />
+                <div class="detail-item"><span class="detail-label">DUMP Lido</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase5?.dumpLido ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase5?.dumpLido ? 'Sim' : 'Não' }}</span></div>
+                <div class="detail-item"><span class="detail-label">Cópia de Segurança</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase5?.copiaSeguranca ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase5?.copiaSeguranca ? 'Sim' : 'Não' }}</span></div>
+                <div class="detail-item"><span class="detail-label">Foto da Instalação</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase5?.fotoInstalacao ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase5?.fotoInstalacao ? 'Sim' : 'Não' }}</span></div>
+                <div v-if="item.data.phase5?.fotoInstalacao" class="detail-item"><span class="detail-label">URL da Drive</span><span class="detail-value">{{ item.data.phase5?.fotoURL || '—' }}</span></div>
               </div>
             </div>
           </div>
@@ -305,32 +281,8 @@ import ClientInfoSection from '@/components/common/ClientInfoSection.vue';
 import ConfirmationDialog from '@/components/common/ConfirmationDialog.vue';
 import { useApi } from '@/composables/useApi';
 
-// Inline sub-components for detail display
-const DetailField = {
-  props: { label: String, value: String },
-  template: `
-    <div class="detail-item">
-      <label class="detail-label">{{ label }}</label>
-      <div class="detail-value">{{ value || '—' }}</div>
-    </div>
-  `,
-};
-
-const BooleanField = {
-  props: { label: String, value: Boolean },
-  template: `
-    <div class="detail-item">
-      <label class="detail-label">{{ label }}</label>
-      <div class="detail-value flex items-center">
-        <span
-          class="inline-block w-3 h-3 rounded-full mr-2"
-          :class="value ? 'bg-[#75AE93]' : 'bg-gray-300'"
-        ></span>
-        {{ value ? 'Sim' : 'Não' }}
-      </div>
-    </div>
-  `,
-};
+// No inline sub-components — using direct template markup instead
+// (scoped styles don't apply to inline Options API components)
 
 // Router
 const route = useRoute();
@@ -553,7 +505,20 @@ onMounted(() => {
 }
 
 .detail-value {
-  @apply text-sm text-gray-900 break-words;
+  @apply text-sm text-gray-900 break-words flex items-center;
+}
+
+/* Boolean indicator dot */
+.bool-dot {
+  @apply inline-block w-3 h-3 rounded-full mr-2 flex-shrink-0;
+}
+
+.bool-dot--on {
+  background-color: #75AE93;
+}
+
+.bool-dot--off {
+  @apply bg-gray-300;
 }
 
 /* Mobile-first responsive adjustments */
