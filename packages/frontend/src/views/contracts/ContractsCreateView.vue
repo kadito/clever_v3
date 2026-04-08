@@ -791,6 +791,21 @@ const handleClientSelected = async (client: Client | null) => {
 
 // Payment method selection - removed as they're now handled by DynamicPlanDetails component
 
+// Benefit field validation helper
+const validateBenefitField = (value: unknown): string | null => {
+  if (value === '' || value === undefined || value === null) {
+    return 'Este campo é obrigatório';
+  }
+  const num = Number(value);
+  if (isNaN(num) || !Number.isInteger(num)) {
+    return 'Introduza um valor numérico válido';
+  }
+  if (num < 0 && num !== -1) {
+    return 'O valor deve ser 0 ou superior, ou -1 para ilimitado';
+  }
+  return null;
+};
+
 // Contract validation function - updated for display toggle system
 const validateContractCreate = (data: Record<string, any>): Record<string, string> => {
   const errors: Record<string, string> = {};
@@ -881,6 +896,15 @@ const validateContractCreate = (data: Record<string, any>): Record<string, strin
           errors.fimContratoCPA = 'A data de fim deve ser posterior à data de início';
         }
       }
+
+      // Validate CPA benefit fields
+      const cpaBenefitFields = ['horasAssistenciaAnualCPA', 'deslocacoesPorAnoCPA', 'manutencoesPorAnoCPA'] as const;
+      for (const field of cpaBenefitFields) {
+        const err = validateBenefitField(data[field]);
+        if (err) {
+          errors[field] = err;
+        }
+      }
     }
 
     // S&H-specific validation (if S&H is configured)
@@ -926,6 +950,15 @@ const validateContractCreate = (data: Record<string, any>): Record<string, strin
         const endDate = new Date(data.fimContratoSH);
         if (startDate >= endDate) {
           errors.fimContratoSH = 'A data de fim deve ser posterior à data de início';
+        }
+      }
+
+      // Validate S&H benefit fields
+      const shBenefitFields = ['horasAssistenciaAnualSH', 'deslocacoesPorAnoSH', 'manutencoesPorAnoSH'] as const;
+      for (const field of shBenefitFields) {
+        const err = validateBenefitField(data[field]);
+        if (err) {
+          errors[field] = err;
         }
       }
     }

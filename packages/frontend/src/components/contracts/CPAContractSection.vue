@@ -89,6 +89,17 @@
       @update:end-date="$emit('update-field', 'fimContratoCPA', $event)"
     />
 
+    <!-- Benefit Fields (editable overrides) -->
+    <BenefitFieldsGroup
+      :horas-assistencia="formData?.horasAssistenciaAnualCPA ?? 0"
+      :deslocacoes-por-ano="formData?.deslocacoesPorAnoCPA ?? 0"
+      :manutencoes-por-ano="formData?.manutencoesPorAnoCPA ?? 0"
+      :disabled="!formData?.planIdCPA"
+      @update:horas-assistencia="$emit('update-field', 'horasAssistenciaAnualCPA', $event)"
+      @update:deslocacoes-por-ano="$emit('update-field', 'deslocacoesPorAnoCPA', $event)"
+      @update:manutencoes-por-ano="$emit('update-field', 'manutencoesPorAnoCPA', $event)"
+    />
+
     <!-- Dynamic Plan Details Display -->
     <DynamicPlanDetails
       v-if="shouldShowPlanDetails || props.isLoadingPlan"
@@ -107,6 +118,7 @@
 
 <script setup lang="ts">
 import type { ContractEquipment } from '@clever/shared';
+import BenefitFieldsGroup from './BenefitFieldsGroup.vue';
 import CPAEquipmentManager from './CPAEquipmentManager.vue';
 import ContractDatesSection from './ContractDatesSection.vue';
 import DynamicPlanDetails from './DynamicPlanDetails.vue';

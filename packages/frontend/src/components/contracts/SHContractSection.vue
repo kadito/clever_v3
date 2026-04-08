@@ -74,6 +74,17 @@
       @update:end-date="$emit('update-field', 'fimContratoSH', $event)"
     />
 
+    <!-- Benefit Fields (editable overrides) -->
+    <BenefitFieldsGroup
+      :horas-assistencia="formData?.horasAssistenciaAnualSH ?? 0"
+      :deslocacoes-por-ano="formData?.deslocacoesPorAnoSH ?? 0"
+      :manutencoes-por-ano="formData?.manutencoesPorAnoSH ?? 0"
+      :disabled="!formData?.planIdSH"
+      @update:horas-assistencia="$emit('update-field', 'horasAssistenciaAnualSH', $event)"
+      @update:deslocacoes-por-ano="$emit('update-field', 'deslocacoesPorAnoSH', $event)"
+      @update:manutencoes-por-ano="$emit('update-field', 'manutencoesPorAnoSH', $event)"
+    />
+
     <!-- Dynamic Plan Details Display -->
     <div v-if="props.isLoadingPlan" class="plan-loading-state">
       <div class="loading-spinner">
@@ -97,6 +108,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import BenefitFieldsGroup from './BenefitFieldsGroup.vue';
 import ContractDatesSection from './ContractDatesSection.vue';
 import DynamicPlanDetails from './DynamicPlanDetails.vue';
 import SHEquipmentCard from './SHEquipmentCard.vue';

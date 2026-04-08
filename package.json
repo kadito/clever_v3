@@ -6,6 +6,7 @@
   "scripts": {
     "build": "pnpm -r build",
     "dev": "wrangler dev",
+    "dev:full": "pnpm dev & pnpm dev:frontend",
     "dev:frontend": "pnpm --filter @clever/frontend dev",
     "dev:backend": "pnpm --filter @clever/backend dev",
     "dev:shared": "pnpm --filter @clever/shared dev",

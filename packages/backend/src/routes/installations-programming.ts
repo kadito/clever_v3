@@ -22,34 +22,11 @@ import { Hono } from 'hono';
 
 function defaultPhase1() {
   return {
-    plus: '',
-    departamento: '',
-    cabecalho: '',
-    rede: '',
-    vectronConnect: '',
-    anydesk: '',
-    seriesEquipamentos: '',
-    ligacaoCPA: false,
-    ligacaoGaveta: false,
-    ligacaoImpressoraMonitor: false,
-    ligacaoFaturadora: false,
-    ligacaoDisplayClientes: false,
-    ligacaoScanner: false,
-    ligacaoLeitorCartoes: false,
-    ligacaoFechaduraChaves: false,
-    turnos: '',
-    isVectron: false,
-    vectronLeituraX: {
-      plus1: '',
-      plus2: '',
-      departamentos: '',
-      operadores: '',
-      transacoesComIVA: '',
-    },
-    vectronConsultaDiaria: {
-      leituraGerenteNormal: '',
-      leituraSupervisor: '',
-    },
+    tipoProgramacao: '',
+    numeroSerie: '',
+    numeroEquipamento: '',
+    leiturasGuardadas: '',
+    testeFinal: false,
   };
 }
 
@@ -68,6 +45,7 @@ function defaultPhase3() {
     horaInicialFormacao: '',
     horaFinalFormacao: '',
     quemRecebeuFormacao: '',
+    tecnicoFormacao: '',
     materialInstalado: {
       pos: false,
       cpa: false,

@@ -814,6 +814,21 @@ onBeforeUnmount(() => {
   cleanupFunctions.length = 0;
 });
 
+// Benefit field validation helper
+const validateBenefitField = (value: unknown): string | null => {
+  if (value === '' || value === undefined || value === null) {
+    return 'Este campo é obrigatório';
+  }
+  const num = Number(value);
+  if (isNaN(num) || !Number.isInteger(num)) {
+    return 'Introduza um valor numérico válido';
+  }
+  if (num < 0 && num !== -1) {
+    return 'O valor deve ser 0 ou superior, ou -1 para ilimitado';
+  }
+  return null;
+};
+
 // Contract validation function for updates - updated for display toggle system
 const validateContractUpdate = (data: Record<string, any>): Record<string, string> => {
   const errors: Record<string, string> = {};
@@ -899,6 +914,15 @@ const validateContractUpdate = (data: Record<string, any>): Record<string, strin
           errors.fimContratoCPA = 'A data de fim deve ser posterior à data de início';
         }
       }
+
+      // Validate CPA benefit fields
+      const cpaBenefitFields = ['horasAssistenciaAnualCPA', 'deslocacoesPorAnoCPA', 'manutencoesPorAnoCPA'] as const;
+      for (const field of cpaBenefitFields) {
+        const err = validateBenefitField(data[field]);
+        if (err) {
+          errors[field] = err;
+        }
+      }
     }
 
     // S&H-specific validation (if S&H is configured)
@@ -944,6 +968,15 @@ const validateContractUpdate = (data: Record<string, any>): Record<string, strin
         const endDate = new Date(data.fimContratoSH);
         if (startDate >= endDate) {
           errors.fimContratoSH = 'A data de fim deve ser posterior à data de início';
+        }
+      }
+
+      // Validate S&H benefit fields
+      const shBenefitFields = ['horasAssistenciaAnualSH', 'deslocacoesPorAnoSH', 'manutencoesPorAnoSH'] as const;
+      for (const field of shBenefitFields) {
+        const err = validateBenefitField(data[field]);
+        if (err) {
+          errors[field] = err;
         }
       }
     }
@@ -1059,11 +1092,23 @@ const loadContract = async () => {
 
       // Set up initial data for the form
       const data = contract.value.data;
+
+      // Infer cpaContractType from planIdCPA if missing (handles migration data)
+      let inferredCpaContractType = data.cpaContractType || '';
+      if (!inferredCpaContractType && data.planIdCPA) {
+        if (data.planIdCPA.startsWith('cpa_1500_')) {
+          inferredCpaContractType = 'CPA_1500';
+        } else if (data.planIdCPA.startsWith('cpa_')) {
+          inferredCpaContractType = 'CPA';
+        }
+        console.log('Inferred cpaContractType from planIdCPA:', JSON.stringify({ planIdCPA: data.planIdCPA, inferred: inferredCpaContractType }, null, 2));
+      }
+
       const contractData = {
         clientId: data.clientId || '',
         hasCPAContract: data.hasCPAContract || false,
         hasSHContract: data.hasSHContract || false,
-        cpaContractType: data.cpaContractType || '',
+        cpaContractType: inferredCpaContractType,
         planIdCPA: data.planIdCPA || '',
         distanceCPA: data.distanceCPA || '',
         modalidadePagamentoCPA: data.modalidadePagamentoCPA || '',
