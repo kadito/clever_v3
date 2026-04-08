@@ -34,6 +34,7 @@ Content Types:
 - Clientes (Clients)
 - Contratos (Contracts)
 - Licenças (Licenses)
+- Programação de Instalações (Installations Programming)
 - Folhas de Obra (Work Sheets)
 - Registo Diário de Atividade (Daily Records)
 - Assistências Remotas (Remote Assistance)

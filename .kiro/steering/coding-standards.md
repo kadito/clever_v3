@@ -48,7 +48,8 @@ fileMatchPattern: ["packages/**/*.ts", "packages/**/*.vue"]
 - Fail closed: missing userType → deny all
 - Backend logs all denials with user + path context
 
-## Testing (dedicated phase only)
+## Testing
 
-- Do not write or run tests during feature development
+- Write and run tests only when defined in a spec's tasks.md (V-cycle methodology)
+- Outside of spec tasks, focus on rapid implementation
 - When writing tests: Vitest + fast-check (PBT), min 100 iterations per property

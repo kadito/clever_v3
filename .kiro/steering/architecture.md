@@ -38,7 +38,7 @@ interface BaseContent {
 - All responses include `relations: Record<string, ResolvedRelation | RelationError>`
 - Errors: `{ type: 'error', code: 404 | 500, message: string }`
 - Use `isRelationError()` / `isResolvedRelation()` from `@clever/shared`
-- Supported: License→Client, Contract→Client, WorkSheet→Client, RemoteAssistance→Client
+- Supported: License→Client, Contract→Client, WorkSheet→Client, RemoteAssistance→Client, InstallationsProgramming→Client
 
 ## API endpoints
 
@@ -48,6 +48,8 @@ GET/PUT/DELETE  /api/content/{type}/{uuid}
 GET             /api/balance/report
 GET             /api/balance/report/export
 ```
+
+Content types: clients, contracts, licenses, daily-records, work-sheets, remote-assistance, installations-programming
 
 ## Permissions
 

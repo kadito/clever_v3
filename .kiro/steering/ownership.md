@@ -20,8 +20,8 @@ Kiro is responsible for:
 
 Kiro must:
 
-- **NOT write or run automated tests during development** - focus on rapid
-  implementation
+- Write and run tests only when defined in a spec's tasks.md (V-cycle methodology)
+- Outside of spec tasks, focus on rapid implementation without writing tests
 - Explain breaking changes before applying them
 - Prefer refactors over patches
 - Flag technical debt early

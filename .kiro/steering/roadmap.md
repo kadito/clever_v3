@@ -18,10 +18,11 @@
   - Folhas de Obra (Work Sheets)
   - Registo Diário (Daily Records)
   - Assistências Remotas (Remote Assistance)
+  - Programação de Instalações (Installations Programming)
   - _(Lembretes and Pendentes use generic views, not yet specialized)_
 - Content Relations System:
   - Automatic relation detection and resolution
-  - License → Client, Contract → Client, WorkSheet → Client, RemoteAssistance → Client
+  - License → Client, Contract → Client, WorkSheet → Client, RemoteAssistance → Client, InstallationsProgramming → Client
   - Relation type guards and validation in @clever/shared
 - User Permissions System:
   - Role-based access control (Admin/User)
@@ -31,6 +32,8 @@
 - Automatic technician assignment from Clerk auth context
 - Balance reporting system (report, export, transaction history)
 - Contract form system (CPA/S&H toggles, plan selection, equipment management, pricing)
+- Manual benefit override for contract plans (BenefitFieldsGroup)
+- Expiration date filtering
 
 ## Phase 3: Advanced Features (current)
 

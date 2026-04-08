@@ -321,6 +321,34 @@ and additional equipment costs.
 - Price breakdown section shows composition when additional costs exist
 - Savings calculation compares total annual cost vs total monthly cost × 12
 
+## Manual Benefit Override (BenefitFieldsGroup)
+
+### Overview
+
+Contract plans auto-populate 3 benefit fields per section (CPA/S&H), but users can override them manually. The `BenefitFieldsGroup.vue` component encapsulates this pattern.
+
+### Fields
+
+| Label (PT) | CPA field | S&H field |
+|-------------|-----------|-----------|
+| HORAS DE ASSISTÊNCIA ANUAL | `horasAssistenciaAnualCPA` | `horasAssistenciaAnualSH` |
+| DESLOCAÇÕES POR ANO | `deslocacoesPorAnoCPA` | `deslocacoesPorAnoSH` |
+| MANUTENÇÕES POR ANO | `manutencoesPorAnoCPA` | `manutencoesPorAnoSH` |
+
+### Validation rules
+
+- Accepted: integers ≥ 0 or -1 (unlimited)
+- Rejected: negative ≠ -1, non-numeric, empty
+- Inline validation on `@input` / `@blur` with PT error messages
+- Submission blocked if any benefit field is invalid
+
+### Integration pattern
+
+- Placed in CPA/SH sections after `ContractDatesSection`, before `DynamicPlanDetails`
+- Props bound to `formData.{field}`, emits propagate via `update-field`
+- `disabled` when no plan selected (`!formData.planIdCPA` / `!formData.planIdSH`)
+- Plan selection auto-populates values; changing plan overwrites manual edits
+
 ## Equipment Management
 
 ### CPA Equipment Pattern
