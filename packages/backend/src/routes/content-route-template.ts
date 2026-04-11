@@ -159,11 +159,11 @@ class ConfigurableContentStorageService<T extends BaseContent> extends ContentSt
   protected sortIndexItems(items: any[]): any[] {
     switch (this.config.sortStrategy) {
       case 'alphabetical':
-        // Sort alphabetically by searchable text or name field
+        // Sort alphabetically by nomeComercial/nomeEmpresa (matching UI display order)
         return items.sort((a, b) => {
-          const aText = a.searchableText || a.name || '';
-          const bText = b.searchableText || b.name || '';
-          return aText.localeCompare(bText, 'pt-PT');
+          const aText = a.nomeComercial || a.nomeEmpresa || a.searchableText || a.name || '';
+          const bText = b.nomeComercial || b.nomeEmpresa || b.searchableText || b.name || '';
+          return aText.localeCompare(bText, 'pt-PT', { sensitivity: 'base' });
         });
 
       case 'date-asc':

@@ -2,9 +2,6 @@
   <div class="equipment-section">
     <div class="equipment-header">
       <h4>EQUIPAMENTOS CPA</h4>
-      <button type="button" class="add-equipment-btn" @click="addEquipment">
-        + ADICIONAR EQUIPAMENTO
-      </button>
     </div>
 
     <div class="equipment-info-callout">
@@ -26,6 +23,10 @@
         @remove="removeEquipment(index)"
       />
     </div>
+
+    <button type="button" class="add-equipment-btn" @click="addEquipment">
+      + ADICIONAR EQUIPAMENTO
+    </button>
   </div>
 </template>
 
@@ -83,7 +84,7 @@ const removeEquipment = (index: number) => {
 }
 
 .add-equipment-btn {
-  @apply bg-green-500 text-white border-none px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-colors duration-200 touch-target;
+  @apply mt-4 bg-green-500 text-white border-none px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-colors duration-200 touch-target w-full;
 }
 
 .add-equipment-btn:hover {
@@ -115,14 +116,6 @@ const removeEquipment = (index: number) => {
 
 /* Mobile responsiveness improvements */
 @media (max-width: 640px) {
-  .equipment-header {
-    @apply flex-col gap-3 items-start;
-  }
-
-  .add-equipment-btn {
-    @apply w-full justify-center;
-  }
-
   .equipment-info-callout {
     @apply p-2;
   }
