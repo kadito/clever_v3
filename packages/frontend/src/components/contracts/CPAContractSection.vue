@@ -10,8 +10,8 @@
           class="config-select"
         >
           <option value="">Selecione o tipo...</option>
-          <option value="CPA">CPA - Cashlogy (2023)</option>
-          <option value="CPA_1500">CPA - Cashlogy (1500)</option>
+          <option value="CPA">CPA - Cashlogy 2023</option>
+          <option value="CPA_1500">CPA - Cashlogy 1500 ou Outros</option>
         </select>
       </div>
 

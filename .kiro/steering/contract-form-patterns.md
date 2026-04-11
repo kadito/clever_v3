@@ -22,7 +22,7 @@ different contract sections (CPA and S&H) independently.
 <template>
   <!-- Display Toggle for Contract Section -->
   <DisplayToggleSwitch
-    title="CPA - CASHLOGY"
+    title="CPA"
     :is-active="showCPASection"
     @toggle="handleCPADisplayToggle"
   />

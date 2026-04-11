@@ -82,8 +82,8 @@ describe('CPAContractSection', () => {
     const options = contractTypeSelect.findAll('option');
 
     expect(options).toHaveLength(3); // Empty option + 2 contract types
-    expect(options[1].text()).toBe('CPA - Cashlogy (2023)');
-    expect(options[2].text()).toBe('CPA - Cashlogy (1500)');
+    expect(options[1].text()).toBe('CPA - Cashlogy 2023');
+    expect(options[2].text()).toBe('CPA - Cashlogy 1500 ou Outros');
   });
 
   it('renders plan options correctly', () => {

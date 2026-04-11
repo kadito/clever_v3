@@ -29,7 +29,7 @@
           <div class="contract-type-section">
             <!-- CPA Display Toggle -->
             <DisplayToggleSwitch
-              title="CPA - CASHLOGY"
+              title="CPA"
               :is-active="showCPASection"
               @toggle="handleCPADisplayToggle"
             />

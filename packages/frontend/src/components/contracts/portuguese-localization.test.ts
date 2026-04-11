@@ -13,12 +13,12 @@ describe('Portuguese Localization Verification', () => {
     it('displays Portuguese titles correctly', () => {
       const wrapper = mount(DisplayToggleSwitch, {
         props: {
-          title: 'CPA - CASHLOGY',
+          title: 'CPA',
           isActive: true,
         },
       });
 
-      expect(wrapper.text()).toContain('CPA - CASHLOGY');
+      expect(wrapper.text()).toContain('CPA');
     });
   });
 
@@ -46,8 +46,8 @@ describe('Portuguese Localization Verification', () => {
       expect(wrapper.text()).toContain('Selecione o tipo...');
       expect(wrapper.text()).toContain('Selecione o plano...');
       expect(wrapper.text()).toContain('Selecione a distância...');
-      expect(wrapper.text()).toContain('CPA - Cashlogy (2023)');
-      expect(wrapper.text()).toContain('CPA - Cashlogy (1500)');
+      expect(wrapper.text()).toContain('CPA - Cashlogy 2023');
+      expect(wrapper.text()).toContain('CPA - Cashlogy 1500 ou Outros');
       expect(wrapper.text()).toContain('Menos de 180 km');
       expect(wrapper.text()).toContain('Mais de 180 km');
     });

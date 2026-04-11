@@ -6,18 +6,18 @@ describe('DisplayToggleSwitch', () => {
   it('renders with correct title', () => {
     const wrapper = mount(DisplayToggleSwitch, {
       props: {
-        title: 'CPA - CASHLOGY',
+        title: 'CPA',
         isActive: false,
       },
     });
 
-    expect(wrapper.find('.toggle-title').text()).toBe('CPA - CASHLOGY');
+    expect(wrapper.find('.toggle-title').text()).toBe('CPA');
   });
 
   it('applies inactive class when isActive is false', () => {
     const wrapper = mount(DisplayToggleSwitch, {
       props: {
-        title: 'CPA - CASHLOGY',
+        title: 'CPA',
         isActive: false,
       },
     });
@@ -29,7 +29,7 @@ describe('DisplayToggleSwitch', () => {
   it('applies active class when isActive is true', () => {
     const wrapper = mount(DisplayToggleSwitch, {
       props: {
-        title: 'CPA - CASHLOGY',
+        title: 'CPA',
         isActive: true,
       },
     });
@@ -41,7 +41,7 @@ describe('DisplayToggleSwitch', () => {
   it('emits toggle event when clicked', async () => {
     const wrapper = mount(DisplayToggleSwitch, {
       props: {
-        title: 'CPA - CASHLOGY',
+        title: 'CPA',
         isActive: false,
       },
     });
@@ -55,7 +55,7 @@ describe('DisplayToggleSwitch', () => {
   it('emits correct toggle value when active', async () => {
     const wrapper = mount(DisplayToggleSwitch, {
       props: {
-        title: 'CPA - CASHLOGY',
+        title: 'CPA',
         isActive: true,
       },
     });
@@ -105,7 +105,7 @@ describe('DisplayToggleSwitch', () => {
   it('handles disabled state correctly', () => {
     const wrapper = mount(DisplayToggleSwitch, {
       props: {
-        title: 'CPA - CASHLOGY',
+        title: 'CPA',
         isActive: false,
         disabled: true,
       },
@@ -121,7 +121,7 @@ describe('DisplayToggleSwitch', () => {
   it('does not emit toggle event when disabled', async () => {
     const wrapper = mount(DisplayToggleSwitch, {
       props: {
-        title: 'CPA - CASHLOGY',
+        title: 'CPA',
         isActive: false,
         disabled: true,
       },
@@ -135,7 +135,7 @@ describe('DisplayToggleSwitch', () => {
   it('has proper ARIA attributes', () => {
     const wrapper = mount(DisplayToggleSwitch, {
       props: {
-        title: 'CPA - CASHLOGY',
+        title: 'CPA',
         isActive: true,
       },
     });
@@ -143,6 +143,6 @@ describe('DisplayToggleSwitch', () => {
     const toggleSwitch = wrapper.find('.toggle-switch');
 
     expect(toggleSwitch.attributes('aria-pressed')).toBe('true');
-    expect(toggleSwitch.attributes('aria-label')).toBe('Desativar CPA - CASHLOGY');
+    expect(toggleSwitch.attributes('aria-label')).toBe('Desativar CPA');
   });
 });

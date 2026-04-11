@@ -155,7 +155,7 @@ describe('Plan Details Display', () => {
   it('should display CPA plan details when CPA contract type and plan are selected', async () => {
     const toggleSwitches = wrapper.findAllComponents({ name: 'DisplayToggleSwitch' });
     const cpaToggle = toggleSwitches.find(
-      (toggle: any) => toggle.props('title') === 'CPA - CASHLOGY'
+      (toggle: any) => toggle.props('title') === 'CPA'
     );
 
     // Activate CPA toggle
@@ -202,7 +202,7 @@ describe('Plan Details Display', () => {
   it('should not display plan details when plan is not selected', async () => {
     const toggleSwitches = wrapper.findAllComponents({ name: 'DisplayToggleSwitch' });
     const cpaToggle = toggleSwitches.find(
-      (toggle: any) => toggle.props('title') === 'CPA - CASHLOGY'
+      (toggle: any) => toggle.props('title') === 'CPA'
     );
 
     // Activate CPA toggle but don't select plan
@@ -218,7 +218,7 @@ describe('Plan Details Display', () => {
   it('should display both plan details when both contract types are configured', async () => {
     const toggleSwitches = wrapper.findAllComponents({ name: 'DisplayToggleSwitch' });
     const cpaToggle = toggleSwitches.find(
-      (toggle: any) => toggle.props('title') === 'CPA - CASHLOGY'
+      (toggle: any) => toggle.props('title') === 'CPA'
     );
     const shToggle = toggleSwitches.find(
       (toggle: any) => toggle.props('title') === 'S&H - SOFTWARE E HARDWARE'

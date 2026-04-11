@@ -132,7 +132,7 @@ describe('Display Toggle System', () => {
     expect(toggleSwitches).toHaveLength(2);
 
     const cpaToggle = toggleSwitches.find(
-      (toggle: any) => toggle.props('title') === 'CPA - CASHLOGY'
+      (toggle: any) => toggle.props('title') === 'CPA'
     );
     const shToggle = toggleSwitches.find(
       (toggle: any) => toggle.props('title') === 'S&H - SOFTWARE E HARDWARE'
@@ -165,7 +165,7 @@ describe('Display Toggle System', () => {
   it('should preserve data when switching between display views', async () => {
     const toggleSwitches = wrapper.findAllComponents({ name: 'DisplayToggleSwitch' });
     const cpaToggle = toggleSwitches.find(
-      (toggle: any) => toggle.props('title') === 'CPA - CASHLOGY'
+      (toggle: any) => toggle.props('title') === 'CPA'
     );
     const shToggle = toggleSwitches.find(
       (toggle: any) => toggle.props('title') === 'S&H - SOFTWARE E HARDWARE'
@@ -203,7 +203,7 @@ describe('Display Toggle System', () => {
   it('should allow independent toggle control for each contract type', async () => {
     const toggleSwitches = wrapper.findAllComponents({ name: 'DisplayToggleSwitch' });
     const cpaToggle = toggleSwitches.find(
-      (toggle: any) => toggle.props('title') === 'CPA - CASHLOGY'
+      (toggle: any) => toggle.props('title') === 'CPA'
     );
     const shToggle = toggleSwitches.find(
       (toggle: any) => toggle.props('title') === 'S&H - SOFTWARE E HARDWARE'
@@ -239,7 +239,7 @@ describe('Display Toggle System', () => {
   it('should display both sections when both toggles are active', async () => {
     const toggleSwitches = wrapper.findAllComponents({ name: 'DisplayToggleSwitch' });
     const cpaToggle = toggleSwitches.find(
-      (toggle: any) => toggle.props('title') === 'CPA - CASHLOGY'
+      (toggle: any) => toggle.props('title') === 'CPA'
     );
     const shToggle = toggleSwitches.find(
       (toggle: any) => toggle.props('title') === 'S&H - SOFTWARE E HARDWARE'
@@ -275,7 +275,7 @@ describe('Display Toggle System', () => {
   it('should group each contract type with its toggle for clear visual separation', async () => {
     const toggleSwitches = wrapper.findAllComponents({ name: 'DisplayToggleSwitch' });
     const cpaToggle = toggleSwitches.find(
-      (toggle: any) => toggle.props('title') === 'CPA - CASHLOGY'
+      (toggle: any) => toggle.props('title') === 'CPA'
     );
     const shToggle = toggleSwitches.find(
       (toggle: any) => toggle.props('title') === 'S&H - SOFTWARE E HARDWARE'
@@ -292,7 +292,7 @@ describe('Display Toggle System', () => {
     // First contract-type-section should contain CPA toggle and section
     const cpaContainer = contractTypeSections[0];
     expect(cpaContainer.findComponent({ name: 'DisplayToggleSwitch' }).props('title')).toBe(
-      'CPA - CASHLOGY'
+      'CPA'
     );
     expect(cpaContainer.findComponent({ name: 'CPAContractSection' }).exists()).toBe(true);
 

@@ -1,0 +1,446 @@
+[
+  {
+    "uuid": "5fd03328-d8cc-4325-818b-a74cc01a7c19",
+    "clientId": "584fbe6c-cf75-4e41-899d-f30a13caeb00",
+    "clientName": "Pastelaria Princesa",
+    "software": [
+      "Zon Soft"
+    ],
+    "modalidade": "MENSAL",
+    "dataVencimento": "2026-10-29"
+  },
+  {
+    "uuid": "3dc92354-8ec8-4349-8415-75fee1ab7e18",
+    "clientId": "60dbc3cd-2c93-421a-ba31-df1be8eadbef",
+    "clientName": "Impactdistance",
+    "software": [
+      "Zon Soft"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-01-25"
+  },
+  {
+    "uuid": "995449bb-39c6-4618-8743-a4c9a6e48c00",
+    "clientId": "4b49ffe0-4667-4f51-b89c-13ee1e38313b",
+    "clientName": "RICARDO CONCEPT",
+    "software": [
+      "Zon Soft"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-08-08"
+  },
+  {
+    "uuid": "b105d693-6dee-46b6-a953-45dd7a9e7843",
+    "clientId": "253bd61a-d355-4211-b532-1a2759d6d783",
+    "clientName": " Unicroissant Nazaré",
+    "software": [
+      "Zon Soft"
+    ],
+    "modalidade": "MENSAL",
+    "dataVencimento": "2026-06-12"
+  },
+  {
+    "uuid": "016b01de-a356-4a3b-afd8-1de60571b2ca",
+    "clientId": "335009a2-6ae3-4fc4-b0f2-3b7fed876139",
+    "clientName": "Pastelaria Carla",
+    "software": [
+      "Zon Soft"
+    ],
+    "modalidade": "MENSAL",
+    "dataVencimento": "2026-07-07"
+  },
+  {
+    "uuid": "2d78f92a-1230-4394-8f75-6460a0ea1abc",
+    "clientId": "6ee32f90-d1a4-4fcd-9026-825e021a9dd9",
+    "clientName": "Papelaria Central",
+    "software": [
+      "Cashlogy"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-12-01"
+  },
+  {
+    "uuid": "78e939b0-10fd-4b8d-8efa-ff050d1985fc",
+    "clientId": "4b269c12-ce63-422c-9b9e-0697bb0ec2c4",
+    "clientName": "Amazonia WebCafe",
+    "software": [
+      "Zon Soft"
+    ],
+    "modalidade": "MENSAL",
+    "dataVencimento": "2027-04-21"
+  },
+  {
+    "uuid": "c470920c-7d26-48a6-aeed-891304ed1dc1",
+    "clientId": "a5dae2de-fbba-4598-bbc2-ee915d4b84bc",
+    "clientName": "Restaurante O Pipas",
+    "software": [
+      "Zon Soft"
+    ],
+    "modalidade": "MENSAL",
+    "dataVencimento": "2026-08-13"
+  },
+  {
+    "uuid": "e1d67a2c-ada8-4bd0-ae41-1d6843f5b2b4",
+    "clientId": "a0ed33cb-a8ef-4f70-b6c9-a409aa8d88d2",
+    "clientName": "Dr.Kid Leiria",
+    "software": [
+      "Pix"
+    ],
+    "modalidade": "MENSAL",
+    "dataVencimento": "2026-10-31"
+  },
+  {
+    "uuid": "8004978e-1f6f-4d6a-840b-f4af9c0e2536",
+    "clientId": "29d45b9c-9f5c-4f71-bb5f-ff7c7ece9c5a",
+    "clientName": "Pastelaria Chaimite",
+    "software": [
+      "Contas Certas"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-10-01"
+  },
+  {
+    "uuid": "4ab675a6-7111-466e-ae07-23c0eca89bea",
+    "clientId": "3816976f-0eb6-4094-be8a-f713c4f8560c",
+    "clientName": "Café Creme",
+    "software": [
+      "Contas Certas"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-01-28"
+  },
+  {
+    "uuid": "d1b4bc45-e0a4-4a28-9414-952e83daacad",
+    "clientId": "6ee32f90-d1a4-4fcd-9026-825e021a9dd9",
+    "clientName": "Papelaria Central",
+    "software": [
+      "Contas Certas"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-11-01"
+  },
+  {
+    "uuid": "2d742e1b-56c1-47c1-a179-50afed44b79c",
+    "clientId": "6ee32f90-d1a4-4fcd-9026-825e021a9dd9",
+    "clientName": "Papelaria Central",
+    "software": [
+      "Pix",
+      "Contas Certas"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-12-31"
+  },
+  {
+    "uuid": "91e8782d-8305-4a25-8eb0-e2fe72f7cec7",
+    "clientId": "24d29c09-00cb-4863-a265-7cbe09a560b4",
+    "clientName": "Pastelaria Fontinha",
+    "software": [
+      "Pix",
+      "Contas Certas"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-11-30"
+  },
+  {
+    "uuid": "b96ee83d-55cf-4248-b794-4b100647ecbc",
+    "clientId": "24d29c09-00cb-4863-a265-7cbe09a560b4",
+    "clientName": "Pastelaria Fontinha",
+    "software": [
+      "Contas Certas"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-10-01"
+  },
+  {
+    "uuid": "ce91df64-014c-46e3-9514-2837807d4bd8",
+    "clientId": "675cecd0-f808-410b-aee8-9070c581e604",
+    "clientName": "Fernando Jose da Silva Henriques",
+    "software": [
+      "Pix"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-11-01"
+  },
+  {
+    "uuid": "6543b263-be67-4495-9505-690937ffc8c5",
+    "clientId": "af1c12da-bc8f-4218-ab99-53fc23e92380",
+    "clientName": "Esquina da Sorte",
+    "software": [
+      "Contas Certas"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-06-01"
+  },
+  {
+    "uuid": "39691e95-ecd4-45a2-a284-c084cd67e4a5",
+    "clientId": "d73dadbc-de1a-4939-83d7-6cad2a3f93b6",
+    "clientName": "Quotidiano Cordato - LDA",
+    "software": [
+      "Pix",
+      "Contas Certas"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-09-30"
+  },
+  {
+    "uuid": "0ae5acab-9b8b-48c5-8e12-76951766d0f4",
+    "clientId": "8e1a98bd-b9e5-4e3e-b521-71879fcc574a",
+    "clientName": "Marcia de Jesus Gonçalves",
+    "software": [
+      "Pix"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2027-02-01"
+  },
+  {
+    "uuid": "9a55b70f-108a-4d26-8575-a4cb4061a9ef",
+    "clientId": "2f76a120-9200-4604-928c-3780882cc750",
+    "clientName": "Lagoa Ó Mar",
+    "software": [
+      "AIR Menu"
+    ],
+    "modalidade": "MENSAL",
+    "dataVencimento": "2026-08-08"
+  },
+  {
+    "uuid": "9d9ab3c9-b22d-4235-8c55-088a25293380",
+    "clientId": "8a2e5a44-b9d0-44f9-bac9-80155a3da919",
+    "clientName": "HAWAII",
+    "software": [
+      "AIR Menu"
+    ],
+    "modalidade": "MENSAL",
+    "dataVencimento": "2026-04-05"
+  },
+  {
+    "uuid": "391eb88c-90e1-4c08-802a-dab10a89f10c",
+    "clientId": "a0d1169b-169a-4f2e-82d9-19e1b1424ab1",
+    "clientName": "Gafaniz & Gafaniz Lda",
+    "software": [
+      "Software XD"
+    ],
+    "modalidade": "MENSAL",
+    "dataVencimento": ""
+  },
+  {
+    "uuid": "31bd4ac6-87f6-4e3b-9359-e99bc6172d19",
+    "clientId": "4b49ffe0-4667-4f51-b89c-13ee1e38313b",
+    "clientName": "RICARDO CONCEPT",
+    "software": [
+      "Publicidade"
+    ],
+    "modalidade": "MENSAL",
+    "dataVencimento": ""
+  },
+  {
+    "uuid": "1c23fe11-3dd9-4123-bd55-86b7c133418c",
+    "clientId": "553b73e5-0491-42af-85ed-f18c3d5db5f1",
+    "clientName": "Pastelaria Nanni",
+    "software": [
+      "AIR Menu"
+    ],
+    "modalidade": "MENSAL",
+    "dataVencimento": "2027-03-07"
+  },
+  {
+    "uuid": "9a3b9f79-cedf-4e17-be89-6ab1c989cfa8",
+    "clientId": "24d29c09-00cb-4863-a265-7cbe09a560b4",
+    "clientName": "Pastelaria Fontinha",
+    "software": [
+      "Cashlogy"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-07-01"
+  },
+  {
+    "uuid": "264c3fe3-b95c-4dc8-a098-2b96653bdf33",
+    "clientId": "af1c12da-bc8f-4218-ab99-53fc23e92380",
+    "clientName": "Esquina da Sorte",
+    "software": [
+      "Cashlogy"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-06-01"
+  },
+  {
+    "uuid": "87389eef-8875-43d2-b21c-e9a0bef5b1c4",
+    "clientId": "d73dadbc-de1a-4939-83d7-6cad2a3f93b6",
+    "clientName": "Quotidiano Cordato - LDA",
+    "software": [
+      "Cashlogy"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2028-10-01"
+  },
+  {
+    "uuid": "92ccf150-2826-4c6e-a87e-13af844d7777",
+    "clientId": "a4deae34-1521-45fb-90f5-514a9c18bce3",
+    "clientName": "Papelaria Cesário Verde",
+    "software": [
+      "Pix",
+      "Contas Certas"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2027-01-01"
+  },
+  {
+    "uuid": "ce7a59cb-b827-4918-83ac-d51a59ac2931",
+    "clientId": "9ce7d05b-95e2-4395-8837-d0b2de7a0f7c",
+    "clientName": "Pastelaria Doces Suspiros",
+    "software": [
+      "Contas Certas"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2027-05-01"
+  },
+  {
+    "uuid": "07f54333-2138-4c06-a531-30ff6d8c7746",
+    "clientId": "382d67c6-f5eb-43d9-be9e-043642377991",
+    "clientName": "Central Dos Leitões",
+    "software": [
+      "Cashlogy"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-06-01"
+  },
+  {
+    "uuid": "81eb8bb9-1451-494a-bbac-9b5ea485c4b6",
+    "clientId": "c5576afa-92b0-46c8-98ce-35273ff2715b",
+    "clientName": "Geladaria Doce Veneno, Lda",
+    "software": [
+      "Cashlogy"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2027-02-01"
+  },
+  {
+    "uuid": "146e3173-ecde-40e1-954e-662b97d8ec76",
+    "clientId": "172f8b9e-d21f-464a-a600-7fd796965f7a",
+    "clientName": "Girafas - Snack Bar e Actividades Similares Lda.",
+    "software": [
+      "Cashlogy"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2027-02-01"
+  },
+  {
+    "uuid": "bb51ef9d-7377-406f-b661-15c08d02303b",
+    "clientId": "3652c175-347f-4c1d-a258-9c92a1f55bfa",
+    "clientName": "Pastelaria Horizonte",
+    "software": [
+      "Cashlogy"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-12-01"
+  },
+  {
+    "uuid": "88a98595-467a-49af-98fe-59a0e4486dde",
+    "clientId": "4dd3b8c9-af95-4f66-a0db-37438ae18cb2",
+    "clientName": "Coffe Break (Fortaleza Campeoes)",
+    "software": [
+      "Cashlogy"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-06-01"
+  },
+  {
+    "uuid": "e6bbeb5a-121a-4169-a84d-ebe50949f975",
+    "clientId": "bade905d-2de5-4d23-ac4f-782cd30d46a9",
+    "clientName": "Cafe do Largo",
+    "software": [
+      "Cashlogy"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2027-04-01"
+  },
+  {
+    "uuid": "877084f4-1819-4d71-8def-f5bfa00eeeee",
+    "clientId": "ee617be2-1da5-4a20-9900-351a3de637c3",
+    "clientName": "ZONA J",
+    "software": [
+      "Cashlogy"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-12-01"
+  },
+  {
+    "uuid": "a1581275-2606-4f34-91f1-71c629f4d981",
+    "clientId": "2f76a120-9200-4604-928c-3780882cc750",
+    "clientName": "Lagoa Ó Mar",
+    "software": [
+      "Cashlogy"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2027-04-01"
+  },
+  {
+    "uuid": "c3945390-f4ea-4ea5-819e-0e41ed096fa3",
+    "clientId": "8ad327d0-5eca-4025-ab0b-9cb5f349d295",
+    "clientName": "Taberna D’Vila",
+    "software": [
+      "Cashlogy"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2027-04-01"
+  },
+  {
+    "uuid": "67d3c752-f32b-496b-81f2-f54ba8dd2eb2",
+    "clientId": "de058f7b-bb61-4c84-8af4-4887e7af4fff",
+    "clientName": "Gelataria Veneto/Amoremio Praia Barra",
+    "software": [
+      "Cashlogy"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-06-01"
+  },
+  {
+    "uuid": "9ade9ed6-c56e-4d20-90b6-e30bb3a5dfd8",
+    "clientId": "f5060ba5-a594-4c1d-853e-c60215ad1caa",
+    "clientName": "Restaurante Raposeira",
+    "software": [
+      "Cashlogy"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-10-01"
+  },
+  {
+    "uuid": "4cf9b5b9-4254-4e8b-8bca-721c310dfd50",
+    "clientId": "4b85527a-3ab6-4e63-8279-165db5771937",
+    "clientName": "Restaurante Os Arcos",
+    "software": [
+      "Cashlogy"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-11-01"
+  },
+  {
+    "uuid": "7b7b004c-dc88-490f-a4c4-1ae5d1336c9d",
+    "clientId": "1dc602ec-4a61-4f19-8e6a-48e99d67490b",
+    "clientName": "Café A Ponte",
+    "software": [
+      "Cashlogy"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-03-01"
+  },
+  {
+    "uuid": "c29d661e-fb2a-40a3-8de4-d8f441f4665b",
+    "clientId": "592cce17-7784-4261-906b-30df89816462",
+    "clientName": "Gelatomania - Nazaré",
+    "software": [
+      "Cashlogy"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2027-05-01"
+  },
+  {
+    "uuid": "e3caff3d-3755-425a-bf92-2ba73918d614",
+    "clientId": "21f9afd5-ac93-480c-9a64-dc1d640b616a",
+    "clientName": "Tasca da Fatinha",
+    "software": [
+      "Cashlogy"
+    ],
+    "modalidade": "ANUAL",
+    "dataVencimento": "2026-11-30"
+  }
+]

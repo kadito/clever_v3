@@ -533,8 +533,8 @@ const formatCPAContractType = (contractType: string | undefined): string => {
   if (!contractType) return 'CPA';
 
   const typeMap: Record<string, string> = {
-    CPA: 'CPA - Cashlogy (2023)',
-    CPA_1500: 'CPA - Cashlogy (1500)',
+    CPA: 'CPA - Cashlogy 2023',
+    CPA_1500: 'CPA - Cashlogy 1500 ou Outros',
   };
 
   return typeMap[contractType] || contractType;
