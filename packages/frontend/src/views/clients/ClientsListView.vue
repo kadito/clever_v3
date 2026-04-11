@@ -253,14 +253,10 @@ const handlePageChange = async (page: number) => {
   isLoading.value = true;
   await api.fetchList({ page, limit: itemsPerPage.value }).then(() => {
     if (api.items.value) {
-      clients.value = api.items.value.sort((a, b) => {
-        const nameA = (a.data.nomeComercial || a.data.nomeEmpresa || '').toLowerCase();
-        const nameB = (b.data.nomeComercial || b.data.nomeEmpresa || '').toLowerCase();
-        return nameA.localeCompare(nameB, 'pt-PT');
-      });
+      clients.value = api.items.value;
     }
   }).catch((err) => {
-    console.error('Error changing page:', err);
+    console.error('Error changing page:', JSON.stringify(err, null, 2));
     error.value = err instanceof Error ? err.message : 'Erro ao carregar clientes';
   }).finally(() => {
     isLoading.value = false;
@@ -273,14 +269,10 @@ const handleItemsPerPageChange = async (limit: number) => {
   isLoading.value = true;
   await api.fetchList({ page: 1, limit }).then(() => {
     if (api.items.value) {
-      clients.value = api.items.value.sort((a, b) => {
-        const nameA = (a.data.nomeComercial || a.data.nomeEmpresa || '').toLowerCase();
-        const nameB = (b.data.nomeComercial || b.data.nomeEmpresa || '').toLowerCase();
-        return nameA.localeCompare(nameB, 'pt-PT');
-      });
+      clients.value = api.items.value;
     }
   }).catch((err) => {
-    console.error('Error changing items per page:', err);
+    console.error('Error changing items per page:', JSON.stringify(err, null, 2));
     error.value = err instanceof Error ? err.message : 'Erro ao carregar clientes';
   }).finally(() => {
     isLoading.value = false;
@@ -289,28 +281,21 @@ const handleItemsPerPageChange = async (limit: number) => {
 
 // Data loading
 const loadClients = async () => {
-  try {
-    isLoading.value = true;
-    clearError();
+  isLoading.value = true;
+  clearError();
 
-    await api.fetchList({ limit: itemsPerPage.value });
-
+  await api.fetchList({ limit: itemsPerPage.value }).then(() => {
     if (api.items.value) {
-      // Sort clients alphabetically by commercial name or company name
-      clients.value = api.items.value.sort((a, b) => {
-        const nameA = (a.data.nomeComercial || a.data.nomeEmpresa || '').toLowerCase();
-        const nameB = (b.data.nomeComercial || b.data.nomeEmpresa || '').toLowerCase();
-        return nameA.localeCompare(nameB, 'pt-PT');
-      });
+      clients.value = api.items.value;
     } else {
       throw new Error('Erro ao carregar clientes');
     }
-  } catch (err) {
-    console.error('Error loading clients:', err);
+  }).catch((err) => {
+    console.error('Error loading clients:', JSON.stringify(err, null, 2));
     error.value = err instanceof Error ? err.message : 'Erro ao carregar clientes';
-  } finally {
+  }).finally(() => {
     isLoading.value = false;
-  }
+  });
 };
 
 // Lifecycle
