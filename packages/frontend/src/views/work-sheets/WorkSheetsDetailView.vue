@@ -285,13 +285,17 @@
                   >
                 </div>
                 <div class="pricing-row">
-                  <span class="pricing-label">Preço KMs:</span>
+                  <span class="pricing-label">Preço KMs:
+                    <span class="pricing-detail">{{ workSheet?.data?.displacement?.totalKms || 0 }} km × 0,45€</span>
+                  </span>
                   <span class="pricing-value"
                     >{{ getKmsPrice() }}€ <span class="text-xs text-red-600">sem IVA</span></span
                   >
                 </div>
                 <div class="pricing-row">
-                  <span class="pricing-label">Valor Hora:</span>
+                  <span class="pricing-label">Valor Hora:
+                    <span class="pricing-detail">{{ workSheet?.data?.displacement?.weekendHoliday ? 'Fim de semana / Feriado' : 'Semana' }}</span>
+                  </span>
                   <span class="pricing-value"
                     >{{ getHourlyRate() }}€ <span class="text-xs text-red-600">sem IVA</span></span
                   >
@@ -709,7 +713,7 @@ const getTechnicianDisplayName = (technician: TechnicianUser | string | undefine
 const getDisplacementRate = (): number => {
   if (!workSheet.value?.data?.displacement?.hasDisplacement) return 0;
   const totalKms = workSheet.value.data.displacement.totalKms || 0;
-  return totalKms > 180 ? 50 : 35;
+  return totalKms > 180 ? 55 : 40;
 };
 
 const getHourlyRate = (): number => {
@@ -720,7 +724,7 @@ const getHourlyRate = (): number => {
 
 const getKmsPrice = (): number => {
   if (!workSheet.value?.data?.displacement?.hasDisplacement) return 0;
-  const pricePerKm = 0.4;
+  const pricePerKm = 0.45;
   const totalKms = workSheet.value.data.displacement.totalKms || 0;
   return Math.round(pricePerKm * totalKms * 100) / 100;
 };
@@ -860,6 +864,14 @@ onMounted(() => {
   font-size: 0.875rem;
   color: #6b7280;
   font-weight: 500;
+}
+
+.pricing-detail {
+  display: block;
+  font-size: 0.7rem;
+  color: #9ca3af;
+  font-weight: 400;
+  margin-top: 2px;
 }
 
 .pricing-value {

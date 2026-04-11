@@ -107,6 +107,25 @@ export function validateWorkSheetCreation(data: WorkSheetCreationData): string[]
     );
   }
 
+  // Technical operations validation - all must be completed before saving
+  if (!data.otherData?.dumpReading) {
+    errors.push('Leitura de Dump é obrigatória');
+  }
+  if (!data.otherData?.backup) {
+    errors.push('Cópia de Segurança é obrigatória');
+  }
+  if (!data.otherData?.remoteAccessCheck) {
+    errors.push('Verificação do Acesso Remoto é obrigatória');
+  }
+  if (!data.otherData?.anydesk) {
+    errors.push('AnyDesk é obrigatório');
+  }
+
+  // Service report validation
+  if (!data.otherData?.serviceReport?.trim()) {
+    errors.push('Descrição detalhada do serviço é obrigatória');
+  }
+
   return errors;
 }
 
@@ -241,10 +260,10 @@ export function calculateWorkSheetTotals(data: WorkSheetData): {
     const totalKms = data.displacement.totalKms || 0;
 
     // Displacement rate based on total km
-    result.displacementRate = totalKms > 180 ? 50 : 35;
+    result.displacementRate = totalKms > 180 ? 55 : 40;
 
-    // KMs price = 0.4€ per km × total km
-    result.kmsPrice = Math.round(0.4 * totalKms * 100) / 100;
+    // KMs price = 0.45€ per km × total km
+    result.kmsPrice = Math.round(0.45 * totalKms * 100) / 100;
 
     // Hourly rate based on weekend/holiday
     result.hourlyRate = data.displacement.weekendHoliday ? 60 : 45;

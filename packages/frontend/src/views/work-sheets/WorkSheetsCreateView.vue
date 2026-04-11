@@ -160,13 +160,17 @@
               >
             </div>
             <div class="pricing-row">
-              <span class="pricing-label">Preço KMs:</span>
+              <span class="pricing-label">Preço KMs:
+                <span class="pricing-detail">{{ formData?.totalKms || 0 }} km × 0,45€</span>
+              </span>
               <span class="pricing-value"
                 >{{ getKmsPrice() }}€ <span class="vat-indicator">sem IVA</span></span
               >
             </div>
             <div class="pricing-row">
-              <span class="pricing-label">Valor Hora:</span>
+              <span class="pricing-label">Valor Hora:
+                <span class="pricing-detail">{{ formData?.weekendHoliday ? 'Fim de semana / Feriado' : 'Semana' }}</span>
+              </span>
               <span class="pricing-value"
                 >{{ getHourlyRate() }}€ <span class="vat-indicator">sem IVA</span></span
               >
@@ -410,7 +414,7 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
         materialDetails: data.materialDetails || '',
         equipment: data.equipment || false,
         equipmentDetails: data.equipmentDetails || '',
-        totallyResolved: data.totallyResolved !== undefined ? data.totallyResolved : true,
+        totallyResolved: data.totallyResolved !== undefined ? data.totallyResolved : false,
         resolutionIssues: data.resolutionIssues || '',
         dumpReading: data.dumpReading || false,
         backup: data.backup || false,
@@ -466,6 +470,16 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
         fieldErrors.contractId = errorMessage;
       } else if (errorMessage.includes('ID do contrato deve ser um UUID válido')) {
         fieldErrors.contractId = errorMessage;
+      } else if (errorMessage.includes('Leitura de Dump é obrigatória')) {
+        fieldErrors.dumpReading = errorMessage;
+      } else if (errorMessage.includes('Cópia de Segurança é obrigatória')) {
+        fieldErrors.backup = errorMessage;
+      } else if (errorMessage.includes('Verificação do Acesso Remoto é obrigatória')) {
+        fieldErrors.remoteAccessCheck = errorMessage;
+      } else if (errorMessage.includes('AnyDesk é obrigatório')) {
+        fieldErrors.anydesk = errorMessage;
+      } else if (errorMessage.includes('Descrição detalhada do serviço é obrigatória')) {
+        fieldErrors.serviceReport = errorMessage;
       } else {
         // Generic error
         fieldErrors.general = errorMessage;
@@ -521,7 +535,7 @@ const handleCreateSuccess = async (formData: Record<string, any>) => {
         materialDetails: formData.materialDetails || '',
         equipment: formData.equipment || false,
         equipmentDetails: formData.equipmentDetails || '',
-        totallyResolved: formData.totallyResolved !== undefined ? formData.totallyResolved : true,
+        totallyResolved: formData.totallyResolved !== undefined ? formData.totallyResolved : false,
         resolutionIssues: formData.resolutionIssues || '',
         dumpReading: formData.dumpReading || false,
         backup: formData.backup || false,
@@ -556,7 +570,7 @@ const getDisplacementRate = (): number => {
   const currentFormData = formData.value;
   if (!currentFormData?.hasDisplacement) return 0;
   const totalKms = currentFormData?.totalKms || 0;
-  return totalKms > 180 ? 50 : 35;
+  return totalKms > 180 ? 55 : 40;
 };
 
 const getHourlyRate = (): number => {
@@ -568,7 +582,7 @@ const getHourlyRate = (): number => {
 const getKmsPrice = (): number => {
   const currentFormData = formData.value;
   if (!currentFormData?.hasDisplacement) return 0;
-  const pricePerKm = 0.4;
+  const pricePerKm = 0.45;
   const totalKms = currentFormData?.totalKms || 0;
   return Math.round(pricePerKm * totalKms * 100) / 100;
 };
@@ -900,6 +914,14 @@ watch(
   font-size: 0.9rem;
   color: #666;
   font-weight: 500;
+}
+
+.pricing-detail {
+  display: block;
+  font-size: 0.75rem;
+  color: #999;
+  font-weight: 400;
+  margin-top: 2px;
 }
 
 .pricing-row.total .pricing-label {

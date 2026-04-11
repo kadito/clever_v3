@@ -177,13 +177,17 @@
                 >
               </div>
               <div class="pricing-row">
-                <span class="pricing-label">Preço KMs:</span>
+                <span class="pricing-label">Preço KMs:
+                  <span class="pricing-detail">{{ formData?.totalKms || 0 }} km × 0,45€</span>
+                </span>
                 <span class="pricing-value"
                   >{{ getKmsPrice() }}€ <span class="vat-indicator">sem IVA</span></span
                 >
               </div>
               <div class="pricing-row">
-                <span class="pricing-label">Valor Hora:</span>
+                <span class="pricing-label">Valor Hora:
+                  <span class="pricing-detail">{{ formData?.weekendHoliday ? 'Fim de semana / Feriado' : 'Semana' }}</span>
+                </span>
                 <span class="pricing-value"
                   >{{ getHourlyRate() }}€ <span class="vat-indicator">sem IVA</span></span
                 >
@@ -379,7 +383,7 @@ const initialFormData = computed(() => {
 
     // Service status
     totallyResolved:
-      data.otherData?.totallyResolved !== undefined ? data.otherData.totallyResolved : true,
+      data.otherData?.totallyResolved !== undefined ? data.otherData.totallyResolved : false,
     resolutionIssues: data.otherData?.resolutionIssues || '',
     dumpReading: data.otherData?.dumpReading || false,
     backup: data.otherData?.backup || false,
@@ -561,6 +565,25 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
       delete fieldErrors.resolutionIssues;
     }
 
+    // Technical operations validation - all must be completed before saving
+    if (!data.dumpReading) {
+      fieldErrors.dumpReading = 'Leitura de Dump é obrigatória';
+    }
+    if (!data.backup) {
+      fieldErrors.backup = 'Cópia de Segurança é obrigatória';
+    }
+    if (!data.remoteAccessCheck) {
+      fieldErrors.remoteAccessCheck = 'Verificação do Acesso Remoto é obrigatória';
+    }
+    if (!data.anydesk) {
+      fieldErrors.anydesk = 'AnyDesk é obrigatório';
+    }
+
+    // Service report validation
+    if (!data.serviceReport?.trim()) {
+      fieldErrors.serviceReport = 'Descrição detalhada do serviço é obrigatória';
+    }
+
     return fieldErrors;
   } catch (err) {
     console.error('Error in work sheet update validation:', JSON.stringify(err, null, 2));
@@ -607,7 +630,7 @@ const handleUpdate = async (formData: Record<string, any>) => {
       materialDetails: formData.materialDetails || '',
       equipment: formData.equipment || false,
       equipmentDetails: formData.equipmentDetails || '',
-      totallyResolved: formData.totallyResolved !== undefined ? formData.totallyResolved : true,
+      totallyResolved: formData.totallyResolved !== undefined ? formData.totallyResolved : false,
       resolutionIssues: formData.resolutionIssues || '',
       dumpReading: formData.dumpReading || false,
       backup: formData.backup || false,
@@ -632,7 +655,7 @@ const getDisplacementRate = (): number => {
   const formDataValue = currentFormData.value;
   if (!formDataValue?.hasDisplacement) return 0;
   const totalKms = formDataValue?.totalKms || 0;
-  return totalKms > 180 ? 50 : 35;
+  return totalKms > 180 ? 55 : 40;
 };
 
 const getHourlyRate = (): number => {
@@ -644,7 +667,7 @@ const getHourlyRate = (): number => {
 const getKmsPrice = (): number => {
   const formDataValue = currentFormData.value;
   if (!formDataValue?.hasDisplacement) return 0;
-  const pricePerKm = 0.4;
+  const pricePerKm = 0.45;
   const totalKms = formDataValue?.totalKms || 0;
   return Math.round(pricePerKm * totalKms * 100) / 100;
 };
@@ -1003,6 +1026,14 @@ onMounted(() => {
   font-size: 0.9rem;
   color: #666;
   font-weight: 500;
+}
+
+.pricing-detail {
+  display: block;
+  font-size: 0.75rem;
+  color: #999;
+  font-weight: 400;
+  margin-top: 2px;
 }
 
 .pricing-row.total .pricing-label {

@@ -241,7 +241,7 @@ export const workSheetsFormSections: FormSection[] = [
         type: 'switch',
         fullWidth: false,
         switchLabel: 'O problema foi totalmente resolvido',
-        defaultValue: true,
+        defaultValue: false,
       },
       {
         key: 'dumpReading',
@@ -301,6 +301,7 @@ export const workSheetsFormSections: FormSection[] = [
         type: 'textarea',
         fullWidth: true,
         rows: 5,
+        required: true,
         placeholder: 'Descrição detalhada do serviço realizado...',
       },
     ],
