@@ -154,7 +154,7 @@ export const REMOTE_ASSISTANCE_CONSTANTS = {
   IVA_RATE: 0.23, // 23%
 
   // Assistance types
-  ASSISTANCE_TYPES: ['REMOTA', 'TELEFÓNICA', 'TELEMÓVEL'] as const,
+  ASSISTANCE_TYPES: ['REMOTA', 'TELEFÓNICA'] as const,
 } as const;
 
 /**

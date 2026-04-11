@@ -63,6 +63,7 @@ export function validateWorkSheetCreation(data: WorkSheetCreationData): string[]
     'DINHEIRO',
     'TRANSFERÊNCIA BANCÁRIA',
     'CONTRATO',
+    'GARANTIA',
   ];
   if (
     data.displacement?.paymentMethod &&

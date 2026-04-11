@@ -115,9 +115,9 @@ function validateSoftwareConfiguration(software: Partial<LicenseSoftware>): stri
     }
   }
 
-  // Zon Soft-specific validation
-  if (software.name.includes('Zon Soft')) {
-    // Zon Soft validation is optional - product and version are not required
+  // Zone Soft-specific validation
+  if (software.name.includes('Zone Soft')) {
+    // Zone Soft validation is optional - product and version are not required
     if (software.product === 'ZSFACT' && software.version) {
       errors.push('ZSFACT não tem versões específicas');
     }

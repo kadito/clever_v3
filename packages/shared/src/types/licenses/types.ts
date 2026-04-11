@@ -13,7 +13,7 @@ export interface LicenseSoftware {
   product?: string; // Pix rest, Pix Gest, Pix POS, etc.
   modules?: string[]; // Modulo 1, Modulo 2, Modulo 3, Posto adicional
 
-  // Zon Soft-specific fields
+  // Zone Soft-specific fields
   version?: string; // Pro, Lite, Basic (for non-ZSFACT products)
 
   // Pt CERT-specific fields
@@ -97,7 +97,7 @@ export interface LicenseIndexItem {
 export const SOFTWARE_OPTIONS = [
   { value: 'Vectron', label: 'Vectron' },
   { value: 'Pix', label: 'Pix' },
-  { value: 'Zon Soft', label: 'Zon Soft' },
+  { value: 'Zone Soft', label: 'Zone Soft' },
   { value: 'Pt CERT', label: 'Pt CERT' },
   { value: 'Dream Soft', label: 'Dream Soft' },
   { value: 'Contas Certas', label: 'Contas Certas' },
@@ -134,7 +134,7 @@ export const PIX_PRODUCTS = [
 // Pix modules
 export const PIX_MODULES = ['Modulo 1', 'Modulo 2', 'Modulo 3', 'Posto adicional'] as const;
 
-// Zon Soft products
+// Zone Soft products
 export const ZONSOFT_PRODUCTS = [
   'ZSFACT',
   'ZSGO',
@@ -143,7 +143,7 @@ export const ZONSOFT_PRODUCTS = [
   'ZSREST',
 ] as const;
 
-// Zon Soft versions
+// Zone Soft versions
 export const ZONSOFT_VERSIONS = ['Pro', 'Lite', 'Basic'] as const;
 
 // Pt CERT license types

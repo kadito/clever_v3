@@ -581,8 +581,8 @@
                       </div>
                     </template>
 
-                    <!-- Zon Soft-specific fields -->
-                    <template v-else-if="software.name === 'Zon Soft'">
+                    <!-- Zone Soft-specific fields -->
+                    <template v-else-if="software.name === 'Zone Soft'">
                       <div v-if="software.version" class="detail-item">
                         <label class="detail-label">Versão</label>
                         <div class="detail-value">{{ software.version }}</div>

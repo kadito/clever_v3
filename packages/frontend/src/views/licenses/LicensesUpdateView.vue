@@ -157,9 +157,9 @@
               </div>
             </div>
 
-            <!-- Zon Soft Group -->
-            <div v-if="formData.software.name?.includes('Zon Soft')" class="software-group">
-              <h3 class="software-group-title">Zon Soft</h3>
+            <!-- Zone Soft Group -->
+            <div v-if="formData.software.name?.includes('Zone Soft')" class="software-group">
+              <h3 class="software-group-title">Zone Soft</h3>
               <div class="form-grid">
                 <div class="form-group">
                   <label for="zonsoft-product" class="form-label">Produto</label>
@@ -567,7 +567,7 @@ const onSoftwareSelectionChange = (formData: any) => {
     formData.software.modules = [];
   }
 
-  if (!formData.software.name.includes('Zon Soft')) {
+  if (!formData.software.name.includes('Zone Soft')) {
     formData.software.product = '';
     formData.software.version = '';
   }

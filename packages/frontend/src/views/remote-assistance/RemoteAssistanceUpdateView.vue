@@ -39,6 +39,35 @@
           </p>
         </template>
 
+        <!-- Custom payment method radio buttons -->
+        <template #field-paymentMethod="{ formData, error, updateFieldValue }">
+          <div class="payment-method-selector">
+            <label class="payment-label">Método de Pagamento</label>
+            <div class="payment-options">
+              <label
+                v-for="method in paymentMethods"
+                :key="method.value"
+                :class="[
+                  'payment-option',
+                  formData?.paymentMethod === method.value ? 'selected' : '',
+                ]"
+              >
+                <input
+                  type="radio"
+                  :value="method.value"
+                  :checked="formData?.paymentMethod === method.value"
+                  name="paymentMethod"
+                  @change="updateFieldValue('paymentMethod', method.value)"
+                />
+                <span>{{ method.label }}</span>
+              </label>
+            </div>
+            <p v-if="error" class="form-error text-red-600 text-sm mt-1">
+              {{ error }}
+            </p>
+          </div>
+        </template>
+
         <!-- Contract auto-fetch display (conditional on paymentMethod === 'Contrato') -->
         <template #field-contractId="{ formData, error, updateFieldValue }">
           <div v-if="isLoadingContracts" class="text-sm text-gray-500 py-2">
@@ -326,6 +355,13 @@ const { formData: currentFormData, updateFieldValue } = useSharedFormData(
 
 // State - use API composable state
 const selectedClient = ref<Client | null>(null);
+
+// Payment methods configuration
+const paymentMethods = [
+  { value: 'Contrato', label: 'Contrato' },
+  { value: 'Faturação', label: 'Faturação' },
+  { value: 'Garantia', label: 'Garantia' },
+];
 
 // Contract auto-fetch state
 const contractsApiForFetch = useApi<Contract>('contracts');
@@ -882,6 +918,64 @@ onMounted(() => {
   margin-top: 0.25rem;
 }
 
+/* Payment method styling */
+.payment-method-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.payment-label {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.payment-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.payment-option {
+  flex: 1;
+  min-width: 150px;
+  padding: 0.75rem 1rem;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  background: white;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.payment-option input[type='radio'] {
+  position: absolute;
+  opacity: 0;
+}
+
+.payment-option:hover {
+  border-color: #75ae93;
+  background-color: rgba(117, 174, 147, 0.05);
+}
+
+.payment-option.selected {
+  border-color: #75ae93;
+  background-color: #75ae93;
+  color: white;
+  font-weight: 600;
+}
+
+.payment-option span {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
 .form-help {
   color: #6b7280;
   font-size: 0.75rem;
@@ -1017,6 +1111,14 @@ onMounted(() => {
 @media (max-width: 768px) {
   .remote-assistance-update-container {
     padding: 0.5rem;
+  }
+
+  .payment-options {
+    flex-direction: column;
+  }
+
+  .payment-option {
+    min-width: auto;
   }
 
   .calculation-section {

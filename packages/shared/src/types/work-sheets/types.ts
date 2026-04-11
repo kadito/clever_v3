@@ -26,7 +26,7 @@ export interface WorkSheetDisplacementData {
   weekendHoliday: boolean; // FINAL SEMANA - FERIADO
   oneWayKms: number; // KMS (IDA)
   totalKms: number; // TOTAL KMS (IDA E VOLTA) - calculated automatically
-  paymentMethod: 'PENDENTE' | 'CARTÃO MB' | 'DINHEIRO' | 'TRANSFERÊNCIA BANCÁRIA' | 'CONTRATO'; // MÉTODO DE PAGAMENTO
+  paymentMethod: 'PENDENTE' | 'CARTÃO MB' | 'DINHEIRO' | 'TRANSFERÊNCIA BANCÁRIA' | 'CONTRATO' | 'GARANTIA'; // MÉTODO DE PAGAMENTO
 }
 
 /**
@@ -133,7 +133,7 @@ export interface WorkSheetSearchFilters {
   clientName?: string;
   technician?: string;
   serviceType?: 'ASSISTÊNCIA PRESENCIAL' | 'MANUTENÇÃO' | 'INSTALAÇÃO';
-  paymentMethod?: 'PENDENTE' | 'CARTÃO MB' | 'DINHEIRO' | 'TRANSFERÊNCIA BANCÁRIA' | 'CONTRATO';
+  paymentMethod?: 'PENDENTE' | 'CARTÃO MB' | 'DINHEIRO' | 'TRANSFERÊNCIA BANCÁRIA' | 'CONTRATO' | 'GARANTIA';
   contractId?: string;
   assistanceDateFrom?: string;
   assistanceDateTo?: string;

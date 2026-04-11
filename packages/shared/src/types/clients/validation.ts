@@ -150,9 +150,9 @@ export function validateSoftware(software: ClientSoftware, index: number): strin
       }
       break;
 
-    case 'Zon Soft':
+    case 'Zone Soft':
       if (!software.product) {
-        errors.push(`${prefix}Produto Zon Soft é obrigatório`);
+        errors.push(`${prefix}Produto Zone Soft é obrigatório`);
       }
 
       // Version is required for all products except ZSFACT

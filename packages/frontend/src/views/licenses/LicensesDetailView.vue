@@ -154,7 +154,7 @@
                       </div>
                     </template>
 
-                    <template v-else-if="softwareName === 'Zon Soft'">
+                    <template v-else-if="softwareName === 'Zone Soft'">
                       <div v-if="item.data.software.version" class="detail-item">
                         <label class="detail-label">Versão</label>
                         <div class="detail-value">{{ item.data.software.version }}</div>

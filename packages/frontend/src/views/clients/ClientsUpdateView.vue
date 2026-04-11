@@ -113,7 +113,7 @@
                     <option value="">Selecione...</option>
                     <option value="Vectron">Vectron</option>
                     <option value="Pix">Pix</option>
-                    <option value="Zon Soft">Zon Soft</option>
+                    <option value="Zone Soft">Zone Soft</option>
                     <option value="Pt CERT">Pt CERT</option>
                     <option value="Dream Soft">Dream Soft</option>
                     <option value="Contas Certas">Contas Certas</option>
@@ -163,8 +163,8 @@
                   </select>
                 </div>
 
-                <!-- Zon Soft Product -->
-                <div v-if="software.name === 'Zon Soft'" class="form-group">
+                <!-- Zone Soft Product -->
+                <div v-if="software.name === 'Zone Soft'" class="form-group">
                   <label :for="`zonsoft-product-${software.id}`" class="form-label">Produto</label>
                   <select
                     :id="`zonsoft-product-${software.id}`"
@@ -181,10 +181,10 @@
                   </select>
                 </div>
 
-                <!-- Zon Soft Version -->
+                <!-- Zone Soft Version -->
                 <div
                   v-if="
-                    software.name === 'Zon Soft' &&
+                    software.name === 'Zone Soft' &&
                     software.product &&
                     software.product !== 'ZSFACT'
                   "

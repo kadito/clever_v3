@@ -6,7 +6,7 @@ import type { BaseContent } from '../base';
  */
 export interface ClientSoftware {
   id: number;
-  name: 'Vectron' | 'Pix' | 'Zon Soft' | 'Pt CERT' | 'Dream Soft' | 'Contas Certas';
+  name: 'Vectron' | 'Pix' | 'Zone Soft' | 'Pt CERT' | 'Dream Soft' | 'Contas Certas';
 
   // Vectron-specific fields
   model?: string; // Vectron models: Wide 14, Pos 7, Pos PC, etc.
@@ -16,7 +16,7 @@ export interface ClientSoftware {
   product?: string; // Pix rest, Pix Gest, Pix POS, etc.
   modules?: string[]; // Module 1, Module 2, Module 3, Posto adicional
 
-  // Zon Soft-specific fields
+  // Zone Soft-specific fields
   version?: string; // Pro, Lite, Basic (not for ZSFACT)
 
   // Pt CERT-specific fields

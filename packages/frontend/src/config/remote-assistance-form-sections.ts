@@ -30,7 +30,6 @@ export const remoteAssistanceFormSections: FormSection[] = [
           { value: '', label: 'Selecionar tipo...' },
           { value: 'REMOTA', label: 'REMOTA' },
           { value: 'TELEFÓNICA', label: 'TELEFÓNICA' },
-          { value: 'TELEMÓVEL', label: 'TELEMÓVEL' },
         ],
       },
     ],
@@ -146,15 +145,9 @@ export const remoteAssistanceFormSections: FormSection[] = [
       {
         key: 'paymentMethod',
         label: 'Método de Pagamento',
-        type: 'select',
+        type: 'custom',
         required: true,
-        fullWidth: false,
-        options: [
-          { value: '', label: 'Selecionar método...' },
-          { value: 'Contrato', label: 'Contrato' },
-          { value: 'Faturação', label: 'Faturação' },
-          { value: 'Garantia', label: 'Garantia' },
-        ],
+        fullWidth: true,
       },
       {
         key: 'contractId',

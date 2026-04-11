@@ -335,6 +335,7 @@ const paymentMethods = [
   { value: 'DINHEIRO', label: 'DINHEIRO' },
   { value: 'TRANSFERÊNCIA BANCÁRIA', label: 'TRANSFERÊNCIA BANCÁRIA' },
   { value: 'CONTRATO', label: 'CONTRATO' },
+  { value: 'GARANTIA', label: 'GARANTIA' },
 ];
 
 // Computed
