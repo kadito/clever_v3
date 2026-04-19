@@ -131,14 +131,6 @@
     font-size: 16px;
   }
 
-  /* Prevent date inputs from overflowing on iOS */
-  input[type='date'],
-  input[type='datetime-local'],
-  input[type='time'] {
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-
   @media (min-width: 768px) {
     input,
     textarea,
@@ -642,4 +634,20 @@
     box-shadow: none;
     border: 1px solid #ddd;
   }
+}
+
+/*
+ * iOS Safari date/time input overflow fix.
+ * Placed outside @layer so it wins over scoped component styles.
+ * !important is required because many Vue components define their own
+ * scoped .form-input that would otherwise take precedence.
+ */
+input[type='date'],
+input[type='datetime-local'],
+input[type='time'] {
+  max-width: 100% !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  overflow: hidden;
 }
