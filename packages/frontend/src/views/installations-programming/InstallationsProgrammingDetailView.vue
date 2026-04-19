@@ -28,90 +28,20 @@
           :completed-phases="item.data.completedPhases || []"
         />
 
-        <!-- Phase 1: Programação -->
+        <!-- Phase 1: Programação / Preparação -->
         <div v-if="currentPhase === 1" class="space-y-6">
           <div class="detail-section">
             <div class="bg-white rounded-touch border border-gray-200">
               <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-                <h2 class="text-lg font-semibold text-gray-900">Programação</h2>
+                <h2 class="text-lg font-semibold text-gray-900">Programação / Preparação</h2>
               </div>
               <div class="p-4 sm:p-6">
                 <div class="detail-grid">
-                  <div class="detail-item"><span class="detail-label">PLUS</span><span class="detail-value">{{ item.data.phase1?.plus || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Departamento</span><span class="detail-value">{{ item.data.phase1?.departamento || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Cabeçalho</span><span class="detail-value">{{ item.data.phase1?.cabecalho || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Rede</span><span class="detail-value">{{ item.data.phase1?.rede || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Vectron Connect</span><span class="detail-value">{{ item.data.phase1?.vectronConnect || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Anydesk</span><span class="detail-value">{{ item.data.phase1?.anydesk || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Séries / Nº Equipamentos</span><span class="detail-value">{{ item.data.phase1?.seriesEquipamentos || '—' }}</span></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Switches de ligação -->
-          <div class="detail-section">
-            <div class="bg-white rounded-touch border border-gray-200">
-              <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-                <h2 class="text-lg font-semibold text-gray-900">Ligações</h2>
-              </div>
-              <div class="p-4 sm:p-6">
-                <div class="detail-grid">
-                  <div class="detail-item"><span class="detail-label">Ligação a CPA</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase1?.ligacaoCPA ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase1?.ligacaoCPA ? 'Sim' : 'Não' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Ligação a Gaveta</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase1?.ligacaoGaveta ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase1?.ligacaoGaveta ? 'Sim' : 'Não' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Ligação a Impressora ou Monitor de Pedidos</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase1?.ligacaoImpressoraMonitor ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase1?.ligacaoImpressoraMonitor ? 'Sim' : 'Não' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Ligação a Faturadora</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase1?.ligacaoFaturadora ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase1?.ligacaoFaturadora ? 'Sim' : 'Não' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Ligação a Display Clientes</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase1?.ligacaoDisplayClientes ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase1?.ligacaoDisplayClientes ? 'Sim' : 'Não' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Ligação a Scanner</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase1?.ligacaoScanner ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase1?.ligacaoScanner ? 'Sim' : 'Não' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Ligação a Leitor de Cartões</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase1?.ligacaoLeitorCartoes ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase1?.ligacaoLeitorCartoes ? 'Sim' : 'Não' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Ligação a Fechadura de Chaves de Operador</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase1?.ligacaoFechaduraChaves ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase1?.ligacaoFechaduraChaves ? 'Sim' : 'Não' }}</span></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Turnos -->
-          <div v-if="item.data.phase1?.turnos" class="detail-section">
-            <div class="bg-white rounded-touch border border-gray-200">
-              <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-                <h2 class="text-lg font-semibold text-gray-900">Configuração dos Turnos</h2>
-              </div>
-              <div class="p-4 sm:p-6">
-                <p class="text-sm text-gray-900 whitespace-pre-line">{{ item.data.phase1.turnos }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Vectron (conditional) -->
-          <div class="detail-section">
-            <div class="bg-white rounded-touch border border-gray-200">
-              <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-                <h2 class="text-lg font-semibold text-gray-900">Equipamento Vectron</h2>
-              </div>
-              <div class="p-4 sm:p-6">
-                <div class="detail-item"><span class="detail-label">Equipamento Vectron</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase1?.isVectron ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase1?.isVectron ? 'Sim' : 'Não' }}</span></div>
-
-                <div v-if="item.data.phase1?.isVectron" class="mt-6 space-y-6">
-                  <!-- Leitura X -->
-                  <div>
-                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Programação Leitura X</h3>
-                    <div class="detail-grid">
-                      <div class="detail-item"><span class="detail-label">Plus 1</span><span class="detail-value">{{ item.data.phase1?.vectronLeituraX?.plus1 || '—' }}</span></div>
-                      <div class="detail-item"><span class="detail-label">Plus 2</span><span class="detail-value">{{ item.data.phase1?.vectronLeituraX?.plus2 || '—' }}</span></div>
-                      <div class="detail-item"><span class="detail-label">Departamentos</span><span class="detail-value">{{ item.data.phase1?.vectronLeituraX?.departamentos || '—' }}</span></div>
-                      <div class="detail-item"><span class="detail-label">Operadores</span><span class="detail-value">{{ item.data.phase1?.vectronLeituraX?.operadores || '—' }}</span></div>
-                      <div class="detail-item"><span class="detail-label">Transações C/IVA</span><span class="detail-value">{{ item.data.phase1?.vectronLeituraX?.transacoesComIVA || '—' }}</span></div>
-                    </div>
-                  </div>
-
-                  <!-- Consulta Diária -->
-                  <div>
-                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Tecla Só Consulta Diária</h3>
-                    <div class="detail-grid">
-                      <div class="detail-item"><span class="detail-label">Leitura Gerente Normal</span><span class="detail-value">{{ item.data.phase1?.vectronConsultaDiaria?.leituraGerenteNormal || '—' }}</span></div>
-                      <div class="detail-item"><span class="detail-label">Leitura Supervisor</span><span class="detail-value">{{ item.data.phase1?.vectronConsultaDiaria?.leituraSupervisor || '—' }}</span></div>
-                    </div>
-                  </div>
+                  <div class="detail-item"><span class="detail-label">Tipo de Programação</span><span class="detail-value">{{ item.data.phase1?.tipoProgramacao || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Número de Série</span><span class="detail-value">{{ item.data.phase1?.numeroSerie || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Nº Equipamento</span><span class="detail-value">{{ item.data.phase1?.numeroEquipamento || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Leituras Guardadas</span><span class="detail-value">{{ item.data.phase1?.leiturasGuardadas || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Teste Final</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase1?.testeFinal ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase1?.testeFinal ? 'Sim' : 'Não' }}</span></div>
                 </div>
               </div>
             </div>
@@ -137,39 +67,53 @@
 
         <!-- Phase 3: Instalação no Cliente -->
         <div v-if="currentPhase === 3" class="space-y-6">
-          <!-- Client Info -->
+          <!-- Dados Gerais -->
           <ClientInfoSection :client-relation="installation?.relations?.client" />
 
-          <!-- Documentos -->
           <div class="detail-section">
             <div class="bg-white rounded-touch border border-gray-200">
               <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-                <h2 class="text-lg font-semibold text-gray-900">Documentos</h2>
+                <h2 class="text-lg font-semibold text-gray-900">Dados Gerais</h2>
               </div>
               <div class="p-4 sm:p-6">
                 <div class="detail-grid">
                   <div class="detail-item"><span class="detail-label">Nº Fatura</span><span class="detail-value">{{ item.data.phase3?.nrFatura || '—' }}</span></div>
                   <div class="detail-item"><span class="detail-label">Nº Guia de Transportes</span><span class="detail-value">{{ item.data.phase3?.nrGuiaTransportes || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Técnico</span><span class="detail-value">{{ getTechnicianDisplayName(item.data.technician) }}</span></div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Datas e Horários -->
+          <!-- Detalhes da Instalação -->
           <div class="detail-section">
             <div class="bg-white rounded-touch border border-gray-200">
               <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-                <h2 class="text-lg font-semibold text-gray-900">Datas e Horários</h2>
+                <h2 class="text-lg font-semibold text-gray-900">Detalhes da Instalação</h2>
               </div>
               <div class="p-4 sm:p-6">
                 <div class="detail-grid">
                   <div class="detail-item"><span class="detail-label">Data de Instalação</span><span class="detail-value">{{ formatDate(item.data.phase3?.dataInstalacao) || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Hora Inicial</span><span class="detail-value">{{ item.data.phase3?.horaInicialInstalacao || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Hora Final</span><span class="detail-value">{{ item.data.phase3?.horaFinalInstalacao || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Hora Inicial Instalação</span><span class="detail-value">{{ item.data.phase3?.horaInicialInstalacao || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Hora Final Instalação</span><span class="detail-value">{{ item.data.phase3?.horaFinalInstalacao || '—' }}</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Formação -->
+          <div class="detail-section">
+            <div class="bg-white rounded-touch border border-gray-200">
+              <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+                <h2 class="text-lg font-semibold text-gray-900">Formação</h2>
+              </div>
+              <div class="p-4 sm:p-6">
+                <div class="detail-grid">
                   <div class="detail-item"><span class="detail-label">Data de Formação</span><span class="detail-value">{{ formatDate(item.data.phase3?.dataFormacao) || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Hora Inicial</span><span class="detail-value">{{ item.data.phase3?.horaInicialFormacao || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Hora Final</span><span class="detail-value">{{ item.data.phase3?.horaFinalFormacao || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Hora Inicial Formação</span><span class="detail-value">{{ item.data.phase3?.horaInicialFormacao || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Hora Final Formação</span><span class="detail-value">{{ item.data.phase3?.horaFinalFormacao || '—' }}</span></div>
                   <div class="detail-item"><span class="detail-label">Quem Recebeu Formação</span><span class="detail-value">{{ item.data.phase3?.quemRecebeuFormacao || '—' }}</span></div>
+                  <div class="detail-item"><span class="detail-label">Técnico Responsável pela Formação</span><span class="detail-value">{{ item.data.phase3?.tecnicoFormacao || '—' }}</span></div>
                 </div>
               </div>
             </div>
@@ -312,7 +256,7 @@ const api = useApi<ContentWithRelations<any>>('installations-programming');
 const installation = ref<ContentWithRelations<any> | null>(null);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
-const currentPhase = ref(1);
+const currentPhase = ref(Number(route.query.phase) || 1);
 
 // Delete state
 const isDeleting = ref(false);
@@ -389,7 +333,7 @@ const getStatus = (item: BaseContent | null): string => {
 // Event handlers
 const handleEdit = (item: BaseContent | null) => {
   if (!item) return;
-  router.push(`/installations-programming/${item.uuid}/editar`);
+  router.push(`/installations-programming/${item.uuid}/editar?phase=${currentPhase.value}`);
 };
 
 const handleBack = () => {

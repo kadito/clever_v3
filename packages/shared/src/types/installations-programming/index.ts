@@ -1,7 +1,5 @@
 // Export all types
 export type {
-  VectronLeituraXData,
-  VectronConsultaDiariaData,
   MaterialInstaladoData,
   Phase1Data,
   Phase2Data,

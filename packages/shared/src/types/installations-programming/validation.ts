@@ -7,15 +7,12 @@ function isNonEmpty(value: string): boolean {
 function isPhase1Complete(data: InstallationsProgrammingData): boolean {
   const { phase1 } = data;
   const textFields = [
-    phase1.plus,
-    phase1.departamento,
-    phase1.cabecalho,
-    phase1.rede,
-    phase1.vectronConnect,
-    phase1.anydesk,
-    phase1.seriesEquipamentos,
+    phase1.tipoProgramacao,
+    phase1.numeroSerie,
+    phase1.numeroEquipamento,
+    phase1.leiturasGuardadas,
   ];
-  return textFields.some(isNonEmpty);
+  return textFields.some(isNonEmpty) || phase1.testeFinal === true;
 }
 
 function isPhase2Complete(data: InstallationsProgrammingData): boolean {

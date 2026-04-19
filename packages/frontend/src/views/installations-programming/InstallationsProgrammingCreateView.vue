@@ -26,123 +26,29 @@
     <!-- Phase Content -->
     <form class="phase-content" @submit.prevent="handleSubmit">
 
-      <!-- ═══════════ Phase 1 — Programação ═══════════ -->
+      <!-- ═══════════ Phase 1 — Programação / Preparação ═══════════ -->
       <div v-if="currentPhase === 1" class="phase-section">
-        <h2 class="section-title">Programação</h2>
+        <h2 class="section-title">Programação / Preparação</h2>
 
         <div class="form-group">
-          <label class="form-label" for="p1-plus">PLUS</label>
-          <input id="p1-plus" type="text" class="form-input" v-model="formData.phase1.plus" />
+          <label class="form-label" for="p1-tipoProgramacao">Tipo de Programação</label>
+          <input id="p1-tipoProgramacao" type="text" class="form-input" v-model="formData.phase1.tipoProgramacao" />
         </div>
         <div class="form-group">
-          <label class="form-label" for="p1-departamento">Departamento</label>
-          <input id="p1-departamento" type="text" class="form-input" v-model="formData.phase1.departamento" />
+          <label class="form-label" for="p1-numeroSerie">Número de Série</label>
+          <input id="p1-numeroSerie" type="text" class="form-input" v-model="formData.phase1.numeroSerie" />
         </div>
         <div class="form-group">
-          <label class="form-label" for="p1-cabecalho">Cabeçalho</label>
-          <input id="p1-cabecalho" type="text" class="form-input" v-model="formData.phase1.cabecalho" />
+          <label class="form-label" for="p1-numeroEquipamento">Nº Equipamento</label>
+          <input id="p1-numeroEquipamento" type="text" class="form-input" v-model="formData.phase1.numeroEquipamento" />
         </div>
         <div class="form-group">
-          <label class="form-label" for="p1-rede">Rede</label>
-          <input id="p1-rede" type="text" class="form-input" v-model="formData.phase1.rede" />
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="p1-vectronConnect">Vectron Connect</label>
-          <input id="p1-vectronConnect" type="text" class="form-input" v-model="formData.phase1.vectronConnect" />
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="p1-anydesk">Anydesk</label>
-          <input id="p1-anydesk" type="text" class="form-input" v-model="formData.phase1.anydesk" />
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="p1-seriesEquipamentos">Séries / Nº Equipamentos</label>
-          <input id="p1-seriesEquipamentos" type="text" class="form-input" v-model="formData.phase1.seriesEquipamentos" />
-        </div>
-
-        <!-- Switches de ligações -->
-        <h3 class="subsection-title">Ligações</h3>
-
-        <div class="switch-row">
-          <span class="switch-label">Ligação a CPA</span>
-          <button type="button" role="switch" :aria-checked="formData.phase1.ligacaoCPA" class="switch" :class="{ 'switch--on': formData.phase1.ligacaoCPA }" @click="formData.phase1.ligacaoCPA = !formData.phase1.ligacaoCPA"><span class="switch-thumb" /></button>
+          <label class="form-label" for="p1-leiturasGuardadas">Leituras Guardadas</label>
+          <textarea id="p1-leiturasGuardadas" class="form-input form-textarea" v-model="formData.phase1.leiturasGuardadas" rows="3" />
         </div>
         <div class="switch-row">
-          <span class="switch-label">Ligação a Gaveta</span>
-          <button type="button" role="switch" :aria-checked="formData.phase1.ligacaoGaveta" class="switch" :class="{ 'switch--on': formData.phase1.ligacaoGaveta }" @click="formData.phase1.ligacaoGaveta = !formData.phase1.ligacaoGaveta"><span class="switch-thumb" /></button>
-        </div>
-        <div class="switch-row">
-          <span class="switch-label">Ligação a Impressora ou Monitor de Pedidos</span>
-          <button type="button" role="switch" :aria-checked="formData.phase1.ligacaoImpressoraMonitor" class="switch" :class="{ 'switch--on': formData.phase1.ligacaoImpressoraMonitor }" @click="formData.phase1.ligacaoImpressoraMonitor = !formData.phase1.ligacaoImpressoraMonitor"><span class="switch-thumb" /></button>
-        </div>
-        <div class="switch-row">
-          <span class="switch-label">Ligação a Faturadora</span>
-          <button type="button" role="switch" :aria-checked="formData.phase1.ligacaoFaturadora" class="switch" :class="{ 'switch--on': formData.phase1.ligacaoFaturadora }" @click="formData.phase1.ligacaoFaturadora = !formData.phase1.ligacaoFaturadora"><span class="switch-thumb" /></button>
-        </div>
-        <div class="switch-row">
-          <span class="switch-label">Ligação a Display Clientes</span>
-          <button type="button" role="switch" :aria-checked="formData.phase1.ligacaoDisplayClientes" class="switch" :class="{ 'switch--on': formData.phase1.ligacaoDisplayClientes }" @click="formData.phase1.ligacaoDisplayClientes = !formData.phase1.ligacaoDisplayClientes"><span class="switch-thumb" /></button>
-        </div>
-        <div class="switch-row">
-          <span class="switch-label">Ligação a Scanner</span>
-          <button type="button" role="switch" :aria-checked="formData.phase1.ligacaoScanner" class="switch" :class="{ 'switch--on': formData.phase1.ligacaoScanner }" @click="formData.phase1.ligacaoScanner = !formData.phase1.ligacaoScanner"><span class="switch-thumb" /></button>
-        </div>
-        <div class="switch-row">
-          <span class="switch-label">Ligação a Leitor de Cartões</span>
-          <button type="button" role="switch" :aria-checked="formData.phase1.ligacaoLeitorCartoes" class="switch" :class="{ 'switch--on': formData.phase1.ligacaoLeitorCartoes }" @click="formData.phase1.ligacaoLeitorCartoes = !formData.phase1.ligacaoLeitorCartoes"><span class="switch-thumb" /></button>
-        </div>
-        <div class="switch-row">
-          <span class="switch-label">Ligação a Fechadura de Chaves de Operador</span>
-          <button type="button" role="switch" :aria-checked="formData.phase1.ligacaoFechaduraChaves" class="switch" :class="{ 'switch--on': formData.phase1.ligacaoFechaduraChaves }" @click="formData.phase1.ligacaoFechaduraChaves = !formData.phase1.ligacaoFechaduraChaves"><span class="switch-thumb" /></button>
-        </div>
-
-        <!-- Turnos -->
-        <div class="form-group">
-          <label class="form-label" for="p1-turnos">Configuração dos Turnos</label>
-          <textarea id="p1-turnos" class="form-input form-textarea" v-model="formData.phase1.turnos" rows="3" />
-        </div>
-
-        <!-- Vectron switch -->
-        <div class="switch-row">
-          <span class="switch-label">Equipamento Vectron</span>
-          <button type="button" role="switch" :aria-checked="formData.phase1.isVectron" class="switch" :class="{ 'switch--on': formData.phase1.isVectron }" @click="formData.phase1.isVectron = !formData.phase1.isVectron"><span class="switch-thumb" /></button>
-        </div>
-
-        <!-- Conditional: Vectron Leitura X -->
-        <div v-if="formData.phase1.isVectron" class="conditional-group">
-          <h3 class="subsection-title">Programação Leitura X</h3>
-          <div class="form-group">
-            <label class="form-label" for="p1-vlx-plus1">Plus 1</label>
-            <input id="p1-vlx-plus1" type="text" class="form-input" v-model="formData.phase1.vectronLeituraX.plus1" />
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="p1-vlx-plus2">Plus 2</label>
-            <input id="p1-vlx-plus2" type="text" class="form-input" v-model="formData.phase1.vectronLeituraX.plus2" />
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="p1-vlx-departamentos">Departamentos</label>
-            <input id="p1-vlx-departamentos" type="text" class="form-input" v-model="formData.phase1.vectronLeituraX.departamentos" />
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="p1-vlx-operadores">Operadores</label>
-            <input id="p1-vlx-operadores" type="text" class="form-input" v-model="formData.phase1.vectronLeituraX.operadores" />
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="p1-vlx-transacoes">Transações C/IVA</label>
-            <input id="p1-vlx-transacoes" type="text" class="form-input" v-model="formData.phase1.vectronLeituraX.transacoesComIVA" />
-          </div>
-        </div>
-
-        <!-- Conditional: Vectron Consulta Diária -->
-        <div v-if="formData.phase1.isVectron" class="conditional-group">
-          <h3 class="subsection-title">Tecla Só Consulta Diária</h3>
-          <div class="form-group">
-            <label class="form-label" for="p1-vcd-gerente">Leitura Gerente Normal</label>
-            <input id="p1-vcd-gerente" type="text" class="form-input" v-model="formData.phase1.vectronConsultaDiaria.leituraGerenteNormal" />
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="p1-vcd-supervisor">Leitura Supervisor</label>
-            <input id="p1-vcd-supervisor" type="text" class="form-input" v-model="formData.phase1.vectronConsultaDiaria.leituraSupervisor" />
-          </div>
+          <span class="switch-label">Teste Final a todos os equipamentos e acessórios</span>
+          <button type="button" role="switch" :aria-checked="formData.phase1.testeFinal" class="switch" :class="{ 'switch--on': formData.phase1.testeFinal }" @click="formData.phase1.testeFinal = !formData.phase1.testeFinal"><span class="switch-thumb" /></button>
         </div>
       </div>
 
@@ -156,6 +62,8 @@
       <div v-if="currentPhase === 3" class="phase-section">
         <h2 class="section-title">Instalação no Cliente</h2>
 
+        <!-- Dados Gerais -->
+        <h3 class="subsection-title">Dados Gerais</h3>
         <div class="form-group">
           <label class="form-label">Cliente</label>
           <ClientSearchInput
@@ -173,8 +81,8 @@
           <input id="p3-nrGuia" type="text" class="form-input" v-model="formData.phase3.nrGuiaTransportes" />
         </div>
 
-        <!-- Instalação dates/times -->
-        <h3 class="subsection-title">Instalação</h3>
+        <!-- Detalhes da Instalação -->
+        <h3 class="subsection-title">Detalhes da Instalação</h3>
         <div class="form-group">
           <label class="form-label" for="p3-dataInstalacao">Data de Instalação</label>
           <input id="p3-dataInstalacao" type="date" class="form-input" v-model="formData.phase3.dataInstalacao" />
@@ -190,7 +98,7 @@
           </div>
         </div>
 
-        <!-- Formação dates/times -->
+        <!-- Formação -->
         <h3 class="subsection-title">Formação</h3>
         <div class="form-group">
           <label class="form-label" for="p3-dataFormacao">Data de Formação</label>
@@ -209,6 +117,10 @@
         <div class="form-group">
           <label class="form-label" for="p3-quemRecebeuFormacao">Quem Recebeu Formação</label>
           <input id="p3-quemRecebeuFormacao" type="text" class="form-input" v-model="formData.phase3.quemRecebeuFormacao" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="p3-tecnicoFormacao">Técnico Responsável pela Formação</label>
+          <input id="p3-tecnicoFormacao" type="text" class="form-input" v-model="formData.phase3.tecnicoFormacao" />
         </div>
 
         <!-- Material Instalado -->
@@ -356,34 +268,11 @@ const error = ref<string | null>(null);
 const formData = reactive({
   clientId: '',
   phase1: {
-    plus: '',
-    departamento: '',
-    cabecalho: '',
-    rede: '',
-    vectronConnect: '',
-    anydesk: '',
-    seriesEquipamentos: '',
-    ligacaoCPA: false,
-    ligacaoGaveta: false,
-    ligacaoImpressoraMonitor: false,
-    ligacaoFaturadora: false,
-    ligacaoDisplayClientes: false,
-    ligacaoScanner: false,
-    ligacaoLeitorCartoes: false,
-    ligacaoFechaduraChaves: false,
-    turnos: '',
-    isVectron: false,
-    vectronLeituraX: {
-      plus1: '',
-      plus2: '',
-      departamentos: '',
-      operadores: '',
-      transacoesComIVA: '',
-    },
-    vectronConsultaDiaria: {
-      leituraGerenteNormal: '',
-      leituraSupervisor: '',
-    },
+    tipoProgramacao: '',
+    numeroSerie: '',
+    numeroEquipamento: '',
+    leiturasGuardadas: '',
+    testeFinal: false,
   },
   phase2: {
     checklist: {} as Record<string, Record<string, boolean>>,
@@ -398,6 +287,7 @@ const formData = reactive({
     horaInicialFormacao: '',
     horaFinalFormacao: '',
     quemRecebeuFormacao: '',
+    tecnicoFormacao: '',
     materialInstalado: {
       pos: false,
       cpa: false,

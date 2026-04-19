@@ -4,19 +4,6 @@ import type { FileReference } from '../../file-validation';
 
 // ── Sub-interfaces ──────────────────────────────────────────────────
 
-export interface VectronLeituraXData {
-  plus1: string;
-  plus2: string;
-  departamentos: string;
-  operadores: string;
-  transacoesComIVA: string;
-}
-
-export interface VectronConsultaDiariaData {
-  leituraGerenteNormal: string;
-  leituraSupervisor: string;
-}
-
 export interface MaterialInstaladoData {
   pos: boolean;
   cpa: boolean;
@@ -34,25 +21,11 @@ export interface MaterialInstaladoData {
 // ── Phase interfaces ────────────────────────────────────────────────
 
 export interface Phase1Data {
-  plus: string;
-  departamento: string;
-  cabecalho: string;
-  rede: string;
-  vectronConnect: string;
-  anydesk: string;
-  seriesEquipamentos: string;
-  ligacaoCPA: boolean;
-  ligacaoGaveta: boolean;
-  ligacaoImpressoraMonitor: boolean;
-  ligacaoFaturadora: boolean;
-  ligacaoDisplayClientes: boolean;
-  ligacaoScanner: boolean;
-  ligacaoLeitorCartoes: boolean;
-  ligacaoFechaduraChaves: boolean;
-  turnos: string;
-  isVectron: boolean;
-  vectronLeituraX: VectronLeituraXData;
-  vectronConsultaDiaria: VectronConsultaDiariaData;
+  tipoProgramacao: string;
+  numeroSerie: string;
+  numeroEquipamento: string;
+  leiturasGuardadas: string;
+  testeFinal: boolean;
 }
 
 export interface Phase2Data {
@@ -69,6 +42,7 @@ export interface Phase3Data {
   horaInicialFormacao: string;
   horaFinalFormacao: string;
   quemRecebeuFormacao: string;
+  tecnicoFormacao: string;
   materialInstalado: MaterialInstaladoData;
 }
 
