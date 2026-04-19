@@ -1,4 +1,5 @@
 <template>
+  OLA
   <component :is="hideLayout ? 'div' : AppLayout">
     <RouterView />
     <ErrorNotification />
