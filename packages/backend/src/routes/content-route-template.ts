@@ -612,6 +612,21 @@ export function createContentRoutes<T extends BaseContent>(config: ContentRouteC
       try {
         await storage.delete(uuid, { userId: user.userId });
 
+        // Best-effort cleanup of associated files in R2 (RB-07)
+        const bucket = c.env?.R2_BUCKET as StorageBucket & {
+          list(opts: { prefix: string }): Promise<{ objects: { key: string }[] }>;
+        };
+        if (bucket?.list) {
+          await bucket
+            .list({ prefix: `files/${config.contentType}/${uuid}/` })
+            .then((result) =>
+              Promise.all(result.objects.map((obj) => bucket.delete(obj.key).catch(() => {})))
+            )
+            .catch((err: unknown) => {
+              console.error(`Best-effort file cleanup failed for ${config.contentType}/${uuid}:`, err);
+            });
+        }
+
         const response: ApiResponse<void> = {
           success: true,
           timestamp: new Date().toISOString(),

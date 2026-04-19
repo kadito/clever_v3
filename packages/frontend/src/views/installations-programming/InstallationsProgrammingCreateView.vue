@@ -309,10 +309,16 @@
           <span class="switch-label">Foto da Instalação</span>
           <button type="button" role="switch" :aria-checked="formData.phase5.fotoInstalacao" class="switch" :class="{ 'switch--on': formData.phase5.fotoInstalacao }" @click="formData.phase5.fotoInstalacao = !formData.phase5.fotoInstalacao"><span class="switch-thumb" /></button>
         </div>
-        <!-- Conditional: fotoURL -->
-        <div v-if="formData.phase5.fotoInstalacao" class="form-group conditional-indent">
-          <label class="form-label" for="p5-fotoURL">URL da Drive</label>
-          <input id="p5-fotoURL" type="text" class="form-input" v-model="formData.phase5.fotoURL" />
+        <!-- Conditional: fotoURL file upload -->
+        <div v-if="formData.phase5.fotoInstalacao" class="conditional-indent">
+          <FileUploadZone
+            field-name="fotoURL"
+            label="Foto da Instalação"
+            :multiple="false"
+            :accept-documents="false"
+            :disabled="isSaving"
+            @files-changed="handleFotoFilesChanged"
+          />
         </div>
       </div>
 
@@ -335,7 +341,9 @@ import type { InstallationsProgrammingData } from '@clever/shared';
 import PhaseNavigation from '@/components/installations-programming/PhaseNavigation.vue';
 import PhaseChecklist from '@/components/installations-programming/PhaseChecklist.vue';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
+import FileUploadZone from '@/components/common/FileUploadZone.vue';
 import { useApi } from '@/composables/useApi';
+import { useFileUpload } from '@/composables/useFileUpload';
 
 const router = useRouter();
 const api = useApi('installations-programming');
@@ -416,9 +424,17 @@ const formData = reactive({
     dumpLido: false,
     copiaSeguranca: false,
     fotoInstalacao: false,
-    fotoURL: '',
+    fotoURL: null as null,
   },
 });
+
+// ── File upload state ───────────────────────────────────────────────
+const { uploadFiles } = useFileUpload();
+const pendingFotoFiles = ref<File[]>([]);
+
+const handleFotoFilesChanged = (payload: { fieldName: string; newFiles: File[]; removedKeys: string[] }): void => {
+  pendingFotoFiles.value = payload.newFiles;
+};
 
 // ── Computed completed phases ───────────────────────────────────────
 const completedPhases = computed(() => {
@@ -453,12 +469,24 @@ const handleSubmit = async () => {
   };
 
   await api.create(payload as any)
-    .then((response) => {
-      if (response) {
-        router.push(`/installations-programming/${response.uuid}`);
-      } else {
+    .then(async (response) => {
+      if (!response) {
         throw new Error('Erro ao criar registo de instalação');
       }
+
+      // Upload photo file if selected
+      if (pendingFotoFiles.value.length > 0) {
+        console.log('Uploading photo for new installation:', JSON.stringify({ uuid: response.uuid }, null, 2));
+        await uploadFiles('installations-programming', response.uuid, 'phase5.fotoURL', pendingFotoFiles.value)
+          .then((refs) => {
+            console.log('Photo upload result:', JSON.stringify(refs, null, 2));
+          })
+          .catch((uploadErr: unknown) => {
+            console.error('Photo upload error (non-blocking):', JSON.stringify({ message: (uploadErr as Error).message }, null, 2));
+          });
+      }
+
+      router.push(`/installations-programming/${response.uuid}`);
     })
     .catch((err: unknown) => {
       console.error('Error creating installation:', JSON.stringify(err, null, 2));

@@ -58,7 +58,7 @@ function isPhase5Complete(data: InstallationsProgrammingData): boolean {
   if (!phase5.dumpLido || !phase5.copiaSeguranca) return false;
 
   if (phase5.fotoInstalacao) {
-    return isNonEmpty(phase5.fotoURL);
+    return phase5.fotoURL !== null;
   }
 
   return true;

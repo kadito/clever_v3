@@ -10,6 +10,7 @@ export * from './permissions';
 export * from './balance-types';
 export * from './balance-utils';
 export * from './balance-extraction';
+export * from './file-validation';
 
 // Content type exports
 export * from './types/clients';

@@ -78,7 +78,7 @@ function defaultPhase5() {
     dumpLido: false,
     copiaSeguranca: false,
     fotoInstalacao: false,
-    fotoURL: '',
+    fotoURL: null,
   };
 }
 

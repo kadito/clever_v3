@@ -1,5 +1,6 @@
 import type { BaseContent } from '../base';
 import type { TechnicianUser } from '../../types';
+import type { FileReference } from '../../file-validation';
 
 // ── Sub-interfaces ──────────────────────────────────────────────────
 
@@ -84,7 +85,7 @@ export interface Phase5Data {
   dumpLido: boolean;
   copiaSeguranca: boolean;
   fotoInstalacao: boolean;
-  fotoURL: string;
+  fotoURL: FileReference | null;
 }
 
 // ── Main data interface ─────────────────────────────────────────────

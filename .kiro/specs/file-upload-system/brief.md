@@ -1,0 +1,1 @@
+We need to create a file updoad system to multiple forms. Sometimes the User wants to upload images and files. The idea is to store the files in the R2. In the same R2 but with a different prefix. Then we just need to store the ID of the file to solve it.

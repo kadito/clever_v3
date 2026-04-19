@@ -322,10 +322,17 @@
             <span class="switch-label">Foto da Instalação</span>
             <button type="button" role="switch" :aria-checked="formData.phase5.fotoInstalacao" class="switch" :class="{ 'switch--on': formData.phase5.fotoInstalacao }" @click="formData.phase5.fotoInstalacao = !formData.phase5.fotoInstalacao"><span class="switch-thumb" /></button>
           </div>
-          <!-- Conditional: fotoURL -->
-          <div v-if="formData.phase5.fotoInstalacao" class="form-group conditional-indent">
-            <label class="form-label" for="p5-fotoURL">URL da Drive</label>
-            <input id="p5-fotoURL" type="text" class="form-input" v-model="formData.phase5.fotoURL" />
+          <!-- Conditional: fotoURL file upload -->
+          <div v-if="formData.phase5.fotoInstalacao" class="conditional-indent">
+            <FileUploadZone
+              field-name="fotoURL"
+              label="Foto da Instalação"
+              :multiple="false"
+              :accept-documents="false"
+              :existing-files="existingFotoFiles"
+              :disabled="isSaving"
+              @files-changed="handleFotoFilesChanged"
+            />
           </div>
         </div>
 
@@ -346,11 +353,13 @@
 import { ref, reactive, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { calculateCompletedPhases } from '@clever/shared';
-import type { InstallationsProgrammingData } from '@clever/shared';
+import type { InstallationsProgrammingData, FileReference } from '@clever/shared';
 import PhaseNavigation from '@/components/installations-programming/PhaseNavigation.vue';
 import PhaseChecklist from '@/components/installations-programming/PhaseChecklist.vue';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
+import FileUploadZone from '@/components/common/FileUploadZone.vue';
 import { useApi } from '@/composables/useApi';
+import { useFileUpload } from '@/composables/useFileUpload';
 
 const route = useRoute();
 const router = useRouter();
@@ -435,9 +444,20 @@ const formData = reactive({
     dumpLido: false,
     copiaSeguranca: false,
     fotoInstalacao: false,
-    fotoURL: '',
+    fotoURL: null as FileReference | null,
   },
 });
+
+// ── File upload state ───────────────────────────────────────────────
+const { uploadFiles, deleteFile } = useFileUpload();
+const existingFotoFiles = ref<FileReference[]>([]);
+const pendingFotoFiles = ref<File[]>([]);
+const pendingRemovedKeys = ref<string[]>([]);
+
+const handleFotoFilesChanged = (payload: { fieldName: string; newFiles: File[]; removedKeys: string[] }): void => {
+  pendingFotoFiles.value = payload.newFiles;
+  pendingRemovedKeys.value = payload.removedKeys;
+};
 
 // ── Pre-fill form data from loaded record ───────────────────────────
 const populateFormData = (data: InstallationsProgrammingData): void => {
@@ -516,7 +536,15 @@ const populateFormData = (data: InstallationsProgrammingData): void => {
   formData.phase5.dumpLido = p5.dumpLido ?? false;
   formData.phase5.copiaSeguranca = p5.copiaSeguranca ?? false;
   formData.phase5.fotoInstalacao = p5.fotoInstalacao ?? false;
-  formData.phase5.fotoURL = p5.fotoURL || '';
+  // Only accept valid FileReference objects, ignore old string values
+  formData.phase5.fotoURL = (p5.fotoURL && typeof p5.fotoURL === 'object' && p5.fotoURL.key) ? p5.fotoURL : null;
+
+  // Populate existing files for FileUploadZone — only if valid FileReference
+  if (p5.fotoURL && typeof p5.fotoURL === 'object' && p5.fotoURL.key && p5.fotoURL.name) {
+    existingFotoFiles.value = [p5.fotoURL];
+  } else {
+    existingFotoFiles.value = [];
+  }
 };
 
 // ── Load existing record on mount ───────────────────────────────────
@@ -577,12 +605,37 @@ const handleSubmit = async () => {
   };
 
   await api.update(uuid.value, payload as any)
-    .then((response) => {
-      if (response) {
-        router.push(`/installations-programming/${uuid.value}`);
-      } else {
+    .then(async (response) => {
+      if (!response) {
         throw new Error('Erro ao atualizar registo de instalação');
       }
+
+      // Delete removed files
+      for (const fileKey of pendingRemovedKeys.value) {
+        if (!fileKey) continue;
+        // Extract the fileId.ext from the full R2 key
+        const parts = fileKey.split('/');
+        const shortKey = parts[parts.length - 1];
+        console.log('Deleting file:', JSON.stringify({ fileKey, shortKey }, null, 2));
+        await deleteFile('installations-programming', uuid.value, shortKey)
+          .catch((delErr: unknown) => {
+            console.error('File delete error (non-blocking):', JSON.stringify({ message: (delErr as Error).message }, null, 2));
+          });
+      }
+
+      // Upload new files
+      if (pendingFotoFiles.value.length > 0) {
+        console.log('Uploading new photo for installation:', JSON.stringify({ uuid: uuid.value }, null, 2));
+        await uploadFiles('installations-programming', uuid.value, 'phase5.fotoURL', pendingFotoFiles.value)
+          .then((refs) => {
+            console.log('Photo upload result:', JSON.stringify(refs, null, 2));
+          })
+          .catch((uploadErr: unknown) => {
+            console.error('Photo upload error (non-blocking):', JSON.stringify({ message: (uploadErr as Error).message }, null, 2));
+          });
+      }
+
+      router.push(`/installations-programming/${uuid.value}`);
     })
     .catch((err: unknown) => {
       console.error('Error updating installation:', JSON.stringify(err, null, 2));

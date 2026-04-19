@@ -246,7 +246,23 @@
                 <div class="detail-item"><span class="detail-label">DUMP Lido</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase5?.dumpLido ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase5?.dumpLido ? 'Sim' : 'Não' }}</span></div>
                 <div class="detail-item"><span class="detail-label">Cópia de Segurança</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase5?.copiaSeguranca ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase5?.copiaSeguranca ? 'Sim' : 'Não' }}</span></div>
                 <div class="detail-item"><span class="detail-label">Foto da Instalação</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase5?.fotoInstalacao ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase5?.fotoInstalacao ? 'Sim' : 'Não' }}</span></div>
-                <div v-if="item.data.phase5?.fotoInstalacao" class="detail-item"><span class="detail-label">URL da Drive</span><span class="detail-value">{{ item.data.phase5?.fotoURL || '—' }}</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Photo display -->
+          <div v-if="item.data.phase5?.fotoInstalacao && item.data.phase5?.fotoURL && typeof item.data.phase5.fotoURL === 'object' && item.data.phase5.fotoURL.key" class="detail-section">
+            <div class="bg-white rounded-touch border border-gray-200">
+              <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
+                <h2 class="text-lg font-semibold text-gray-900">Foto</h2>
+              </div>
+              <div class="p-4 sm:p-6">
+                <FileDisplay
+                  :files="[item.data.phase5.fotoURL]"
+                  label="Foto da Instalação"
+                  content-type="installations-programming"
+                  :content-uuid="item.uuid"
+                />
               </div>
             </div>
           </div>
@@ -279,6 +295,7 @@ import PhaseNavigation from '@/components/installations-programming/PhaseNavigat
 import PhaseChecklist from '@/components/installations-programming/PhaseChecklist.vue';
 import ClientInfoSection from '@/components/common/ClientInfoSection.vue';
 import ConfirmationDialog from '@/components/common/ConfirmationDialog.vue';
+import FileDisplay from '@/components/common/FileDisplay.vue';
 import { useApi } from '@/composables/useApi';
 
 // No inline sub-components — using direct template markup instead
