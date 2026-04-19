@@ -116,7 +116,7 @@
       </aside>
 
       <!-- Content area (single slot for both mobile and desktop) -->
-      <div class="flex-1">
+      <div class="flex-1 min-w-0 overflow-x-hidden">
         <slot />
       </div>
     </main>

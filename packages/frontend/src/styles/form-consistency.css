@@ -11,6 +11,9 @@
     @apply text-sm text-gray-900 placeholder-gray-500;
     @apply min-h-touch touch-target;
     @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+    @apply w-full;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   /* Input field styles */
