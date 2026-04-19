@@ -131,6 +131,14 @@
     font-size: 16px;
   }
 
+  /* Prevent date inputs from overflowing on iOS */
+  input[type='date'],
+  input[type='datetime-local'],
+  input[type='time'] {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
   @media (min-width: 768px) {
     input,
     textarea,
@@ -195,6 +203,8 @@
 
   .form-input {
     @apply block w-full px-3 py-2 border border-gray-300 rounded-touch shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .form-textarea {

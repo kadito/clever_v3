@@ -412,6 +412,8 @@ onMounted(() => {
   border-radius: 0.375rem;
   font-size: 0.875rem;
   min-height: 44px;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .filter-checkbox {
