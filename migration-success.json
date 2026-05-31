@@ -783,5 +783,20 @@
     "uuid": "579a02df-f60b-442b-bfe4-9178ef572141",
     "nomeEmpresa": "Zhong Shan, Unipessoal Lda",
     "nomeComercial": "A Grelha"
+  },
+  {
+    "uuid": "8e454ffe-640e-4ed3-ac59-647428e491f8",
+    "nomeEmpresa": "Angelina Goncalves Unipessoal Lda",
+    "nomeComercial": "Papelaria Afia o Conhecimento"
+  },
+  {
+    "uuid": "5d5d7360-2e1a-47e1-af11-3671fd836df0",
+    "nomeEmpresa": "Maria Vitor Franco Alexandre",
+    "nomeComercial": "Maria Vitor Franco Alexandre"
+  },
+  {
+    "uuid": "c6361a35-e366-4f45-88c9-ae2e2a73d753",
+    "nomeEmpresa": "Garcia & Martins, Lda",
+    "nomeComercial": "Restaurante Entrecopos"
   }
 ]

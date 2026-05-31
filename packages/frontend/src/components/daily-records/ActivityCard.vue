@@ -186,9 +186,14 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import type { Activity } from '@clever/shared';
+import type { Activity, WorkSheet, RemoteAssistance } from '@clever/shared';
 import WorkSheetSearchInput from '@/components/common/WorkSheetSearchInput.vue';
 import RemoteAssistanceSearchInput from '@/components/common/RemoteAssistanceSearchInput.vue';
+import { useApi } from '@/composables/useApi';
+
+// API instances for time pre-fill
+const workSheetApi = useApi<WorkSheet>('work-sheets');
+const remoteAssistanceApi = useApi<RemoteAssistance>('remote-assistance');
 
 // Props
 interface Props {
@@ -313,11 +318,39 @@ const validateTimeFormat = (field: 'horaInicio' | 'horaFim') => {
   }
 };
 
+// Time extraction helpers
+
+function extractHHMM(isoString: string | undefined | null): string {
+  if (!isoString) return '';
+  const date = new Date(isoString);
+  if (isNaN(date.getTime())) return '';
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
+
+function extractTimeFromWorkSheet(ws: WorkSheet): { horaInicio: string; horaFim: string } {
+  const arrivalTime = ws.data.request.arrivalTime ?? '';
+  const departureTime = ws.data.request.departureTime ?? '';
+  return {
+    horaInicio: arrivalTime,
+    horaFim: departureTime,
+  };
+}
+
+function extractTimeFromRemoteAssistance(ra: RemoteAssistance): { horaInicio: string; horaFim: string } {
+  const horaInicio = ra.data.inicioAssistencia ?? '';
+  const horaFim = ra.data.fimAssistencia ?? '';
+  return { horaInicio, horaFim };
+}
+
 const handleLinkTypeChange = () => {
   // Clear previous selections when link type changes
   if (localActivity.value.tipoLigacao === 'Nenhuma') {
     localActivity.value.workSheetId = undefined;
     localActivity.value.remoteAssistanceId = undefined;
+    localActivity.value.horaInicio = '';
+    localActivity.value.horaFim = '';
   } else if (localActivity.value.tipoLigacao === 'Folha de Obra') {
     localActivity.value.remoteAssistanceId = undefined;
   } else if (localActivity.value.tipoLigacao === 'Assistência Remota') {
@@ -332,12 +365,42 @@ const handleActivityTypeChange = () => {
   emitUpdate();
 };
 
-const handleWorkSheetSelected = () => {
-  emitUpdate();
+const handleWorkSheetSelected = (workSheet: WorkSheet) => {
+  workSheetApi.fetchById(workSheet.uuid)
+    .then(() => {
+      const ws = workSheetApi.currentItem.value;
+      if (ws) {
+        const { horaInicio, horaFim } = extractTimeFromWorkSheet(ws);
+        localActivity.value.horaInicio = horaInicio;
+        localActivity.value.horaFim = horaFim;
+      }
+    })
+    .catch((err: unknown) => {
+      console.error('Time prefill fetch failed (work-sheet):', JSON.stringify({ error: String(err) }, null, 2));
+      // Fields unchanged on error — user fills manually
+    })
+    .finally(() => {
+      emitUpdate();
+    });
 };
 
-const handleRemoteAssistanceSelected = () => {
-  emitUpdate();
+const handleRemoteAssistanceSelected = (remoteAssistance: RemoteAssistance) => {
+  remoteAssistanceApi.fetchById(remoteAssistance.uuid)
+    .then(() => {
+      const ra = remoteAssistanceApi.currentItem.value;
+      if (ra) {
+        const { horaInicio, horaFim } = extractTimeFromRemoteAssistance(ra);
+        localActivity.value.horaInicio = horaInicio;
+        localActivity.value.horaFim = horaFim;
+      }
+    })
+    .catch((err: unknown) => {
+      console.error('Time prefill fetch failed (remote-assistance):', JSON.stringify({ error: String(err) }, null, 2));
+      // Fields unchanged on error — user fills manually
+    })
+    .finally(() => {
+      emitUpdate();
+    });
 };
 
 const handleRemove = () => {

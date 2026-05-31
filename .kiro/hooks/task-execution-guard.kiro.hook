@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Task Execution Guard",
+  "description": "Loads the V-cycle execution protocol before each spec task — targeted design loading, gap signals, done criterion verification.",
+  "version": "1",
+  "when": {
+    "type": "preTaskExecution"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Activate the power \"kiro-spec-methodology\" #task-execution.md Apply the execution protocol for the current task."
+  }
+}
