@@ -130,6 +130,9 @@ onMounted(() => {
   }
 
   // Mount Clerk SignIn component
+  let mountAttempts = 0;
+  const MAX_MOUNT_ATTEMPTS = 30; // 3 seconds max
+
   const mountSignIn = () => {
     if (window.Clerk && signInRef.value) {
       try {
@@ -178,6 +181,11 @@ onMounted(() => {
         handleAuthError('Failed to load sign-in form');
       }
     } else {
+      mountAttempts++;
+      if (mountAttempts >= MAX_MOUNT_ATTEMPTS) {
+        handleAuthError('Não foi possível carregar o formulário de autenticação. Recarregue a página.');
+        return;
+      }
       // Wait for Clerk to be available
       setTimeout(mountSignIn, 100);
     }
