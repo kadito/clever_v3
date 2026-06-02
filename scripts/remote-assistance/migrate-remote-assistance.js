@@ -41,8 +41,8 @@ async function buildClientLookupMap(accountId, bucketName, token) {
       const map = new Map();
 
       for (const item of items) {
-        const comercial = item.data?.nomeComercial;
-        const empresa = item.data?.nomeEmpresa;
+        const comercial = item.nomeComercial;
+        const empresa = item.nomeEmpresa;
 
         const registerName = (name) => {
           if (!name || typeof name !== 'string') return;

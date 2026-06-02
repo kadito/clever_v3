@@ -265,11 +265,15 @@ async function writeR2Index(accountId, bucketName, accumulator, token) {
 
 async function writeOutputFiles(successList, errorList) {
   const fs = await import('fs/promises');
+  const { fileURLToPath } = await import('url');
+  const path = await import('path');
 
-  await fs.writeFile('./migration-success.json', JSON.stringify(successList, null, 2))
+  const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+
+  await fs.writeFile(path.resolve(scriptDir, 'migration-success.json'), JSON.stringify(successList, null, 2))
     .catch((err) => console.error(`Failed to write migration-success.json: ${err.message}`));
 
-  await fs.writeFile('./migration-errors.json', JSON.stringify(errorList, null, 2))
+  await fs.writeFile(path.resolve(scriptDir, 'migration-errors.json'), JSON.stringify(errorList, null, 2))
     .catch((err) => console.error(`Failed to write migration-errors.json: ${err.message}`));
 }
 

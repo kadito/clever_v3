@@ -43,7 +43,7 @@ async function buildClientLookupMap(accountId, bucketName, token) {
       const map = new Map();
 
       for (const item of items) {
-        const name = item.data?.nomeComercial;
+        const name = item.nomeComercial;
         if (!name) continue;
 
         const key = name.toLowerCase();

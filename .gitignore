@@ -143,3 +143,9 @@ temp/
 wrangler.toml.bak
 .dev.vars
 .mf/
+
+# Migration output files
+scripts/**/migration-success.json
+scripts/**/migration-errors.json
+migration-success.json
+migration-errors.json
