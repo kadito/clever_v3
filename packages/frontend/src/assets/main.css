@@ -645,17 +645,18 @@
 
 /*
  * iOS Safari date/time input overflow fix.
- * Safari renders temporal inputs with display: inline-flex which ignores
- * width: 100% on some iOS versions. Using display: block fixes the width
- * but can cause extra padding — we reset the webkit shadow DOM parts below.
+ * Safari renders temporal inputs with display: inline-flex which can cause
+ * width issues on some iOS versions. We constrain them without forcing
+ * display: block which breaks container padding awareness.
  * Placed outside @layer so it wins over scoped component styles.
  */
 input[type='date'],
 input[type='datetime-local'],
 input[type='time'] {
-  display: block !important;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   max-width: 100% !important;
-  width: 100% !important;
   min-width: 0 !important;
   box-sizing: border-box !important;
 }
