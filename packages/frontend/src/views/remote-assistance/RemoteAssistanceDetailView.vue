@@ -400,13 +400,22 @@
           </div>
         </div>
 
-        <!-- Attachments Section -->
+        <!-- File attachments — only shown when files exist (AC-011) -->
+        <FileDisplay
+          v-if="anexosFiles.length > 0"
+          :files="anexosFiles"
+          label="Anexos"
+          content-type="remote-assistance"
+          :content-uuid="remoteAssistance.uuid"
+        />
+
+        <!-- Text notes — only shown when text exists (AC-016) -->
         <div v-if="item.data.anexos" class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Anexos</h2>
+              <h2 class="text-lg font-semibold text-gray-900">Notas Anexas</h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-value whitespace-pre-line">{{ item.data.anexos }}</div>
@@ -434,11 +443,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import type { RemoteAssistance, BaseContent, TechnicianUser, ContentWithRelations } from '@clever/shared';
+import type { RemoteAssistance, BaseContent, TechnicianUser, ContentWithRelations, FileReference } from '@clever/shared';
 import { isRelationError } from '@clever/shared';
 import ContentDetailTemplate from '@/components/common/ContentDetailTemplate.vue';
 import ClientInfoSection from '@/components/common/ClientInfoSection.vue';
 import ConfirmationDialog from '@/components/common/ConfirmationDialog.vue';
+import FileDisplay from '@/components/common/FileDisplay.vue';
 import { useApi } from '@/composables/useApi';
 import { useErrorHandler } from '@/composables/useErrorHandler';
 import {
@@ -556,6 +566,11 @@ const pricingBreakdown = computed(() => {
     remoteAssistance.value.data.contrato,
     remoteAssistance.value.data.garantia
   );
+});
+
+const anexosFiles = computed((): FileReference[] => {
+  const raw = remoteAssistance.value?.data?.anexosFiles;
+  return Array.isArray(raw) ? raw : [];
 });
 
 // Helper functions

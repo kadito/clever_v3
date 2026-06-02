@@ -311,6 +311,23 @@
           </div>
         </template>
 
+        <!-- FileUploadZone for file attachments -->
+        <template #updateSections>
+          <div class="form-section">
+            <h3 class="form-section-title text-base font-semibold text-gray-900 mb-3">Ficheiros Anexos</h3>
+            <FileUploadZone
+              field-name="anexosFiles"
+              label="Ficheiros"
+              :multiple="true"
+              :accept-images="true"
+              :accept-documents="true"
+              :existing-files="existingAnexosFiles"
+              :disabled="apiLoading.updating.value || uploading || deleting"
+              @files-changed="handleAnexosFilesChanged"
+            />
+            <p v-if="fileError" class="text-sm text-red-600 mt-2">{{ fileError }}</p>
+          </div>
+        </template>
 
       </ContentUpdateTemplate>
     </div>
@@ -333,9 +350,12 @@ import {
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
 import ErrorComponent from '@/components/common/ErrorComponent.vue';
 import ContentUpdateTemplate from '@/components/common/ContentUpdateTemplate.vue';
+import FileUploadZone from '@/components/common/FileUploadZone.vue';
 import { remoteAssistanceFormSections } from '@/config/remote-assistance-form-sections';
 import { useApi } from '@/composables/useApi';
 import { useSharedFormData } from '@/composables/useSharedFormData';
+import { useFileUpload } from '@/composables/useFileUpload';
+import type { FileReference } from '@clever/shared';
 import contractPlansConfig from '@/config/contract-plans.json';
 
 const route = useRoute();
@@ -352,6 +372,18 @@ const {
 const { formData: currentFormData, updateFieldValue } = useSharedFormData(
   'remote-assistance-update'
 );
+
+// File upload state
+const { uploadFiles, deleteFile, uploading, deleting, error: fileError } = useFileUpload();
+const existingAnexosFiles = ref<FileReference[]>([]);
+const pendingNewFiles = ref<File[]>([]);
+const pendingRemovedKeys = ref<string[]>([]);
+
+// File upload handler
+const handleAnexosFilesChanged = (payload: { fieldName: string; newFiles: File[]; removedKeys: string[] }): void => {
+  pendingNewFiles.value = payload.newFiles;
+  pendingRemovedKeys.value = payload.removedKeys;
+};
 
 // State - use API composable state
 const selectedClient = ref<Client | null>(null);
@@ -499,6 +531,11 @@ const loadRemoteAssistance = async () => {
     ) {
       selectedClient.value = currentItem.value.relations.client as unknown as Client;
     }
+
+    // Populate existing file attachments
+    existingAnexosFiles.value = Array.isArray(currentItem.value.data?.anexosFiles)
+      ? currentItem.value.data.anexosFiles
+      : [];
 
     // Fetch contracts if payment method is Contrato
     if (currentItem.value.data?.paymentMethod === 'Contrato' && currentItem.value.data?.clientId) {
@@ -721,41 +758,85 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
 const handleUpdate = async (formData: Record<string, any>) => {
   if (!remoteAssistance.value) return;
 
-  try {
-    // Transform form data to RemoteAssistanceUpdateData format
-    const updateData: RemoteAssistanceUpdateData = {
-      clientId: formData.clientId || '',
-      contractId: formData.paymentMethod === 'Contrato' ? formData.contractId || '' : undefined,
-      tipoAssistencia: formData.tipoAssistencia || '',
-      // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
-      // We don't include it in the update data as it will be populated by backend
-      dataPedido: formData.dataPedido || '',
-      dataAssistencia: formData.dataAssistancia || '',
-      inicioAssistencia: formData.inicioAssistencia || '',
-      fimAssistencia: formData.fimAssistencia || '',
-      horasTotais: calculatedDuration.value || '',
-      motivoPedido: formData.motivoPedido || '',
-      relatorioAssistencia: formData.relatorioAssistencia || '',
-      relatorio: formData.relatorio || '',
-      valorAssist: formData.valorAssist || 0,
-      paymentMethod: formData.paymentMethod || '',
-      resolvido: formData.resolvido || false,
-      anexos: formData.anexos || '',
-    };
+  // Reset file error before operations
+  fileError.value = null;
 
-    const updatedRemoteAssistance = await update(remoteAssistance.value.uuid, {
-      data: updateData,
-    } as Partial<ContentWithRelations<RemoteAssistance['data']>>);
+  // Transform form data to RemoteAssistanceUpdateData format
+  const updateData: RemoteAssistanceUpdateData = {
+    clientId: formData.clientId || '',
+    contractId: formData.paymentMethod === 'Contrato' ? formData.contractId || '' : undefined,
+    tipoAssistencia: formData.tipoAssistencia || '',
+    // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
+    dataPedido: formData.dataPedido || '',
+    dataAssistencia: formData.dataAssistencia || '',
+    inicioAssistencia: formData.inicioAssistencia || '',
+    fimAssistencia: formData.fimAssistencia || '',
+    horasTotais: calculatedDuration.value || '',
+    motivoPedido: formData.motivoPedido || '',
+    relatorioAssistencia: formData.relatorioAssistencia || '',
+    relatorio: formData.relatorio || '',
+    valorAssist: formData.valorAssist || 0,
+    paymentMethod: formData.paymentMethod || '',
+    resolvido: formData.resolvido || false,
+    anexos: formData.anexos || '',
+    anexosFiles: existingAnexosFiles.value,
+  };
 
-    if (updatedRemoteAssistance) {
-      router.push(`/remote-assistance/${remoteAssistance.value.uuid}`);
-    } else {
-      throw new Error('Erro ao atualizar assistência remota');
-    }
-  } catch (err) {
-    console.error('Error updating remote assistance:', JSON.stringify(err, null, 2));
-    // Error is handled by the API composable
-  }
+  const uuid = remoteAssistance.value.uuid;
+
+  await update(uuid, {
+    data: updateData,
+  } as Partial<ContentWithRelations<RemoteAssistance['data']>>)
+    .then(async (updatedRemoteAssistance) => {
+      if (!updatedRemoteAssistance) {
+        throw new Error('Erro ao atualizar assistência remota');
+      }
+
+      const fileErrors: string[] = [];
+
+      // 1. Delete removed files from R2
+      for (const fileKey of pendingRemovedKeys.value) {
+        const shortKey = fileKey.split('/').pop() || fileKey;
+        await deleteFile('remote-assistance', uuid, shortKey)
+          .then((deleted) => {
+            if (!deleted) {
+              fileErrors.push(`Não foi possível remover: ${shortKey}`);
+            }
+          })
+          .catch(() => {
+            fileErrors.push(`Não foi possível remover: ${shortKey}`);
+          });
+      }
+
+      // 2. Upload new files
+      if (pendingNewFiles.value.length > 0) {
+        await uploadFiles('remote-assistance', uuid, 'anexosFiles', pendingNewFiles.value)
+          .then((refs) => {
+            console.log('Anexos upload result:', JSON.stringify(refs, null, 2));
+          })
+          .catch(() => {
+            if (fileError.value) {
+              fileErrors.push(fileError.value);
+            }
+          });
+        if (fileError.value && !fileErrors.includes(fileError.value)) {
+          fileErrors.push(fileError.value);
+        }
+      }
+
+      // 3. Show errors inline if any (AC-009, UX-005)
+      if (fileErrors.length > 0) {
+        fileError.value = fileErrors.join('. ');
+        setTimeout(() => router.push(`/remote-assistance/${uuid}`), 2000);
+        return;
+      }
+
+      router.push(`/remote-assistance/${uuid}`);
+    })
+    .catch((err: unknown) => {
+      console.error('Error updating remote assistance:', JSON.stringify({ message: (err as Error).message }, null, 2));
+      // Error is handled by the API composable
+    });
 };
 
 // Computed properties for calculations

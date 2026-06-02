@@ -185,6 +185,23 @@
         </p>
       </template>
 
+      <!-- FileUploadZone for file attachments -->
+      <template #createSections>
+        <div class="form-section">
+          <h3 class="form-section-title text-base font-semibold text-gray-900 mb-3">Ficheiros Anexos</h3>
+          <FileUploadZone
+            field-name="anexosFiles"
+            label="Ficheiros"
+            :multiple="true"
+            :accept-images="true"
+            :accept-documents="true"
+            :disabled="isSaving || uploading"
+            @files-changed="handleAnexosFilesChanged"
+          />
+          <p v-if="uploadError" class="text-sm text-red-600 mt-2">{{ uploadError }}</p>
+        </div>
+      </template>
+
       <!-- Value calculation display section -->
       <template #after-section-dateTime="{ formData: slotFormData }">
         <div
@@ -311,9 +328,11 @@ import {
 } from '@clever/shared';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
 import ContentCreateTemplate from '@/components/common/ContentCreateTemplate.vue';
+import FileUploadZone from '@/components/common/FileUploadZone.vue';
 import { remoteAssistanceFormSections } from '@/config/remote-assistance-form-sections';
 import { useSharedFormData } from '@/composables/useSharedFormData';
 import { useApi } from '@/composables/useApi';
+import { useFileUpload } from '@/composables/useFileUpload';
 import contractPlansConfig from '@/config/contract-plans.json';
 
 const router = useRouter();
@@ -325,9 +344,18 @@ const api = useApi('remote-assistance');
 const isSaving = ref(false);
 const error = ref<string | null>(null);
 
+// File upload state
+const { uploadFiles, uploading, error: uploadError } = useFileUpload();
+const pendingAnexosFiles = ref<File[]>([]);
+
 // Clear error function
 const clearError = () => {
   error.value = null;
+};
+
+// File upload handler
+const handleAnexosFilesChanged = (payload: { fieldName: string; newFiles: File[]; removedKeys: string[] }): void => {
+  pendingAnexosFiles.value = payload.newFiles;
 };
 
 // Form data management
@@ -682,45 +710,60 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
 };
 
 const handleCreateSuccess = async (formData: Record<string, any>) => {
-  try {
-    isSaving.value = true;
-    clearError();
+  isSaving.value = true;
+  clearError();
 
-    // Transform form data to RemoteAssistanceCreationData format
-    const remoteAssistanceData: RemoteAssistanceCreationData = {
-      clientId: formData.clientId || '',
-      contractId: formData.paymentMethod === 'Contrato' ? formData.contractId || '' : undefined,
-      tipoAssistencia: formData.tipoAssistencia || '',
-      // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
-      tecnicoResponsavel: {} as any, // Will be populated by backend auto-assignment
-      dataPedido: formData.dataPedido || '',
-      dataAssistencia: formData.dataAssistencia || '',
-      inicioAssistencia: formData.inicioAssistencia || '',
-      fimAssistencia: formData.fimAssistencia || '',
-      horasTotais: calculatedDuration.value || '',
-      motivoPedido: formData.motivoPedido || '',
-      relatorioAssistencia: formData.relatorioAssistencia || '',
-      relatorio: formData.relatorio || '',
-      valorAssist: formData.valorAssist || 0,
-      paymentMethod: formData.paymentMethod || '',
-      resolvido: formData.resolvido || false,
-      anexos: formData.anexos || '',
-    };
+  // Transform form data to RemoteAssistanceCreationData format
+  const remoteAssistanceData: RemoteAssistanceCreationData = {
+    clientId: formData.clientId || '',
+    contractId: formData.paymentMethod === 'Contrato' ? formData.contractId || '' : undefined,
+    tipoAssistencia: formData.tipoAssistencia || '',
+    // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
+    tecnicoResponsavel: {} as any, // Will be populated by backend auto-assignment
+    dataPedido: formData.dataPedido || '',
+    dataAssistencia: formData.dataAssistencia || '',
+    inicioAssistencia: formData.inicioAssistencia || '',
+    fimAssistencia: formData.fimAssistencia || '',
+    horasTotais: calculatedDuration.value || '',
+    motivoPedido: formData.motivoPedido || '',
+    relatorioAssistencia: formData.relatorioAssistencia || '',
+    relatorio: formData.relatorio || '',
+    valorAssist: formData.valorAssist || 0,
+    paymentMethod: formData.paymentMethod || '',
+    resolvido: formData.resolvido || false,
+    anexos: formData.anexos || '',
+    anexosFiles: [],
+  };
 
-    const response = await api.create({ data: remoteAssistanceData } as any);
+  await api.create({ data: remoteAssistanceData } as any)
+    .then(async (response) => {
+      if (!response) {
+        throw new Error('Erro ao criar assistência remota');
+      }
 
-    if (response) {
-      // Navigate to the created remote assistance's detail page
+      // Upload pending files after record is saved
+      if (pendingAnexosFiles.value.length > 0) {
+        console.log('Uploading anexos files for new remote assistance:', JSON.stringify({ uuid: response.uuid, count: pendingAnexosFiles.value.length }, null, 2));
+        await uploadFiles('remote-assistance', response.uuid, 'anexosFiles', pendingAnexosFiles.value)
+          .then((refs) => {
+            console.log('Anexos upload result:', JSON.stringify(refs, null, 2));
+          })
+          .catch((uploadErr: unknown) => {
+            console.error('Anexos upload error (non-blocking):', JSON.stringify({ message: (uploadErr as Error).message }, null, 2));
+            // uploadError ref is set by useFileUpload — shown inline in template
+          });
+      }
+
+      // Navigate regardless of upload result — record is saved (BR-009, AC-005)
       router.push(`/remote-assistance/${response.uuid}`);
-    } else {
-      throw new Error('Erro ao criar assistência remota');
-    }
-  } catch (err) {
-    console.error('Error creating remote assistance:', JSON.stringify(err, null, 2));
-    error.value = err instanceof Error ? err.message : 'Erro ao criar assistência remota';
-  } finally {
-    isSaving.value = false;
-  }
+    })
+    .catch((err: unknown) => {
+      console.error('Error creating remote assistance:', JSON.stringify(err, null, 2));
+      error.value = err instanceof Error ? err.message : 'Erro ao criar assistência remota';
+    })
+    .finally(() => {
+      isSaving.value = false;
+    });
 };
 
 // Watchers for automatic calculations

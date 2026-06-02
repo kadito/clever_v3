@@ -1,5 +1,6 @@
 import type { BaseContent } from '../base';
 import type { TechnicianUser } from '../../types';
+import type { FileReference } from '../../file-validation';
 
 /**
  * Remote Assistance Data Interface
@@ -40,6 +41,9 @@ export interface RemoteAssistanceData {
   resolvido: boolean; // Required field
   relatorio?: string; // Conditional field - required when resolvido is false
   anexos: string;
+
+  // File attachments — structured references to files stored in R2
+  anexosFiles: FileReference[];
 }
 
 /**

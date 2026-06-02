@@ -38,7 +38,9 @@ import { autoAssignTechnician, validateTechnicianAssignment } from '../utils/tec
 import { createBalanceService, ValidationError } from '../services/balance-service';
 import { createBalanceMiddleware } from '../middleware/balance-middleware';
 import { requireUserContext } from '../middleware/clerk';
+import { requireDeletePermission } from '../middleware/permissions';
 import { extractRemoteAssistanceDebtTransaction, hasTransactionChanges } from '@clever/shared';
+import type { FileReference } from '@clever/shared';
 
 /**
  * Remote assistance-specific validation for create operations
@@ -82,6 +84,7 @@ function validateRemoteAssistanceCreate(requestData: any, userContext?: UserCont
     paymentMethod: remoteAssistanceData.paymentMethod, // Include paymentMethod field
     resolvido: remoteAssistanceData.resolvido || false,
     anexos: remoteAssistanceData.anexos || '',
+    anexosFiles: Array.isArray(remoteAssistanceData.anexosFiles) ? remoteAssistanceData.anexosFiles : [],
   };
 
   // Use the comprehensive validation from shared package
@@ -136,6 +139,11 @@ function validateRemoteAssistanceUpdateData(
 
   // Remote assistance allows client changes during updates (unlike contracts/licenses)
   // This is because assistance records may need client corrections or reassignments
+
+  // Normalize anexosFiles — default to [] if absent or not an array (RA-ANEXOS-BR-001, RA-ANEXOS-BR-006)
+  remoteAssistanceData.anexosFiles = Array.isArray(remoteAssistanceData.anexosFiles)
+    ? remoteAssistanceData.anexosFiles
+    : [];
 
   // Use the update validation from shared package
   const errors = validateRemoteAssistanceUpdate(
@@ -500,6 +508,77 @@ remoteAssistanceRouter.post('/', async (c: Context) => {
     };
     return c.json(response, 500);
   }
+});
+
+// ============================================================================
+// Custom DELETE handler — best-effort file cleanup
+// ============================================================================
+
+/**
+ * Override DELETE handler to clean up R2 files on record deletion
+ * Reads anexosFiles before soft-delete, then attempts best-effort R2 cleanup
+ * Cleanup errors are swallowed — they never block the response
+ * Requirements: RA-ANEXOS-BR-005, RA-ANEXOS-AC-014, RA-ANEXOS-AC-015
+ */
+remoteAssistanceRouter.delete('/:uuid', requireDeletePermission, async (c: Context) => {
+  const uuid = c.req.param('uuid');
+  const user = requireUserContext(c);
+  const r2Bucket = c.env?.R2_BUCKET as StorageBucket;
+
+  if (!r2Bucket) {
+    const response: ApiResponse = {
+      success: false,
+      error: 'Storage not available',
+      timestamp: new Date().toISOString(),
+    };
+    return c.json(response, 500);
+  }
+
+  // Read the raw record directly from R2 to get anexosFiles before deletion
+  // (ContentStorageService.get() filters out isDeleted records, so we read raw)
+  const rawObject = await r2Bucket.get(`content/remote-assistance/${uuid}.json`);
+
+  if (!rawObject) {
+    const response: ApiResponse = {
+      success: false,
+      error: 'Remote assistance not found',
+      timestamp: new Date().toISOString(),
+    };
+    return c.json(response, 404);
+  }
+
+  const record = (await rawObject.json()) as RemoteAssistance;
+
+  if (record.isDeleted) {
+    const response: ApiResponse = {
+      success: false,
+      error: 'Remote assistance not found',
+      timestamp: new Date().toISOString(),
+    };
+    return c.json(response, 404);
+  }
+
+  const anexosFiles: FileReference[] = Array.isArray(record.data?.anexosFiles)
+    ? record.data.anexosFiles
+    : [];
+
+  // Soft-delete the record using the storage service
+  const { ContentStorageService } = await import('@clever/shared');
+  const storage = new ContentStorageService<RemoteAssistance>(r2Bucket, 'remote-assistance');
+  await storage.delete(uuid, { userId: user.userId });
+
+  // Best-effort file cleanup — errors are swallowed, never block the response
+  for (const fileRef of anexosFiles) {
+    await r2Bucket.delete(fileRef.key).catch((err: unknown) => {
+      console.error('File cleanup failed during record delete:', JSON.stringify({
+        uuid,
+        key: fileRef.key,
+        error: err instanceof Error ? err.message : String(err),
+      }, null, 2));
+    });
+  }
+
+  return c.json({ data: { success: true } });
 });
 
 /**
