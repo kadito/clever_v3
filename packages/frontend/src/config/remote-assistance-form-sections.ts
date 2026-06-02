@@ -169,15 +169,21 @@ export const remoteAssistanceFormSections: FormSection[] = [
   {
     key: 'observations',
     title: 'Anexos',
-    description: 'Informações adicionais e anexos',
+    description: 'Ficheiros e notas adicionais',
     fields: [
       {
-        key: 'anexos',
+        key: 'anexosFiles',
         label: 'Anexos',
+        type: 'custom',
+        fullWidth: true,
+      },
+      {
+        key: 'anexos',
+        label: 'Notas Anexos',
         type: 'textarea',
         fullWidth: true,
         rows: 2,
-        placeholder: 'Informações sobre anexos ou documentos relacionados...',
+        placeholder: 'Notas adicionais sobre anexos ou documentos relacionados...',
       },
     ],
   },

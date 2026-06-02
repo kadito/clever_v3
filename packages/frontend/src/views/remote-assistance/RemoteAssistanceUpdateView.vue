@@ -311,22 +311,19 @@
           </div>
         </template>
 
-        <!-- FileUploadZone for file attachments -->
-        <template #updateSections>
-          <div class="form-section">
-            <h3 class="form-section-title text-base font-semibold text-gray-900 mb-3">Ficheiros Anexos</h3>
-            <FileUploadZone
-              field-name="anexosFiles"
-              label="Ficheiros"
-              :multiple="true"
-              :accept-images="true"
-              :accept-documents="true"
-              :existing-files="existingAnexosFiles"
-              :disabled="apiLoading.updating.value || uploading || deleting"
-              @files-changed="handleAnexosFilesChanged"
-            />
-            <p v-if="fileError" class="text-sm text-red-600 mt-2">{{ fileError }}</p>
-          </div>
+        <!-- FileUploadZone for file attachments (inside Anexos section) -->
+        <template #field-anexosFiles>
+          <FileUploadZone
+            field-name="anexosFiles"
+            label="Ficheiros"
+            :multiple="true"
+            :accept-images="true"
+            :accept-documents="true"
+            :existing-files="existingAnexosFiles"
+            :disabled="apiLoading.updating.value || uploading || deleting"
+            @files-changed="handleAnexosFilesChanged"
+          />
+          <p v-if="fileError" class="text-sm text-red-600 mt-2">{{ fileError }}</p>
         </template>
 
       </ContentUpdateTemplate>

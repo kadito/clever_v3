@@ -400,25 +400,29 @@
           </div>
         </div>
 
-        <!-- File attachments — only shown when files exist (AC-011) -->
-        <FileDisplay
-          v-if="anexosFiles.length > 0"
-          :files="anexosFiles"
-          label="Anexos"
-          content-type="remote-assistance"
-          :content-uuid="remoteAssistance.uuid"
-        />
-
-        <!-- Text notes — only shown when text exists (AC-016) -->
-        <div v-if="item.data.anexos" class="detail-section">
+        <!-- Anexos section — file attachments + text notes together -->
+        <div v-if="anexosFiles.length > 0 || item.data.anexos" class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Notas Anexas</h2>
+              <h2 class="text-lg font-semibold text-gray-900">Anexos</h2>
             </div>
-            <div class="p-4 sm:p-6">
-              <div class="detail-value whitespace-pre-line">{{ item.data.anexos }}</div>
+            <div class="p-4 sm:p-6 space-y-4">
+              <!-- File attachments -->
+              <FileDisplay
+                v-if="anexosFiles.length > 0"
+                :files="anexosFiles"
+                label="Anexos"
+                content-type="remote-assistance"
+                :content-uuid="remoteAssistance.uuid"
+              />
+
+              <!-- Text notes -->
+              <div v-if="item.data.anexos">
+                <h3 class="text-sm font-medium text-gray-700 mb-1">Notas Anexos</h3>
+                <div class="detail-value whitespace-pre-line">{{ item.data.anexos }}</div>
+              </div>
             </div>
           </div>
         </div>
