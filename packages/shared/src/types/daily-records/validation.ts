@@ -74,11 +74,33 @@ export function calculateActivityTotalHours(
  * 
  * @param activity - Activity to validate
  * @param index - Activity index for error messages
+ * @param options - Validation context options
  * @returns Array of validation error messages
  */
-export function validateActivity(activity: Activity, index: number): string[] {
+export function validateActivity(
+  activity: Activity,
+  index: number,
+  options?: { isNewRecord?: boolean }
+): string[] {
   const errors: string[] = [];
   const prefix = `Atividade ${index + 1}:`;
+  const isNew = options?.isNewRecord ?? true; // Default: treat as new (strict)
+
+  // Client validation (DR-BR-001, DR-DEC-004)
+  if (isNew && !activity.clientId) {
+    errors.push(`${prefix} Cliente é obrigatório`);
+  }
+
+  // DR-AC-012: If editing legacy data and user wants to change linked document,
+  // client must be set
+  if (
+    !isNew &&
+    activity.tipoLigacao !== 'Nenhuma' &&
+    (activity.workSheetId || activity.remoteAssistanceId) &&
+    !activity.clientId
+  ) {
+    errors.push(`${prefix} Cliente é obrigatório quando existe ligação a documento`);
+  }
 
   // Activity type validation
   if (!activity.tipoAtividade) {
@@ -217,7 +239,7 @@ export function validateDailyRecordCreation(data: DailyRecordCreationData): stri
     errors.push('Pelo menos uma atividade é obrigatória');
   } else {
     data.atividades.forEach((activity, index) => {
-      const activityErrors = validateActivity(activity, index);
+      const activityErrors = validateActivity(activity, index, { isNewRecord: true });
       errors.push(...activityErrors);
     });
   }
@@ -227,12 +249,30 @@ export function validateDailyRecordCreation(data: DailyRecordCreationData): stri
 
 /**
  * Validate daily record update data
- * Same validation rules as creation
+ * Uses isNewRecord: false to allow legacy activities without clientId
  * 
  * @param data - Daily record update data to validate
  * @returns Array of validation error messages (empty if valid)
  */
 export function validateDailyRecordUpdate(data: DailyRecordCreationData): string[] {
-  // Update validation uses the same rules as creation
-  return validateDailyRecordCreation(data);
+  const errors: string[] = [];
+
+  // Date validation
+  if (!data.dataRegistro) {
+    errors.push('Data do registo é obrigatória');
+  } else if (!isValidDate(data.dataRegistro)) {
+    errors.push('Data do registo deve ser uma data válida');
+  }
+
+  // Activities validation
+  if (!data.atividades || data.atividades.length === 0) {
+    errors.push('Pelo menos uma atividade é obrigatória');
+  } else {
+    data.atividades.forEach((activity, index) => {
+      const activityErrors = validateActivity(activity, index, { isNewRecord: false });
+      errors.push(...activityErrors);
+    });
+  }
+
+  return errors;
 }

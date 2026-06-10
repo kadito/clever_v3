@@ -61,7 +61,7 @@ class ConfigurableContentStorageService<T extends BaseContent> extends ContentSt
    * Requirements: REQ-01, REQ-02, REQ-03 - Filtered listing with combined filters
    */
   async listFiltered(
-    filters: { collaborator?: string | undefined; date?: string | undefined; search?: string | undefined; expirationMonth?: string | undefined },
+    filters: { collaborator?: string | undefined; date?: string | undefined; search?: string | undefined; expirationMonth?: string | undefined; clientId?: string | undefined },
     page: number = 1,
     limit: number = 50
   ): Promise<{ items: ContentWithRelations<T['data']>[]; total: number }> {
@@ -119,6 +119,13 @@ class ConfigurableContentStorageService<T extends BaseContent> extends ContentSt
         if (!expirationDate) return false;
         return expirationDate.substring(0, 7) === expirationMonth;
       });
+    }
+
+    if (filters.clientId) {
+      const clientIdValue = filters.clientId;
+      filtered = filtered.filter(
+        (item: Record<string, unknown>) => item.clientId === clientIdValue
+      );
     }
 
     const sorted = this.sortIndexItems(filtered);
@@ -241,6 +248,7 @@ export function createContentRoutes<T extends BaseContent>(config: ContentRouteC
       const date = c.req.query('date');
       const rawExpirationMonth = c.req.query('expirationMonth');
       const expirationMonth = rawExpirationMonth && /^\d{4}-\d{2}$/.test(rawExpirationMonth) ? rawExpirationMonth : undefined;
+      const clientId = c.req.query('clientId');
       const page = parseInt(c.req.query('page') || '1');
       const limit = parseInt(c.req.query('limit') || '10');
 
@@ -254,7 +262,7 @@ export function createContentRoutes<T extends BaseContent>(config: ContentRouteC
         return c.json(response, 400);
       }
 
-      const hasFilters = Boolean(collaborator || date || expirationMonth);
+      const hasFilters = Boolean(collaborator || date || expirationMonth || clientId);
 
       if (searchQuery && !hasFilters) {
         // Search content (legacy path — no extra filters)
@@ -270,7 +278,7 @@ export function createContentRoutes<T extends BaseContent>(config: ContentRouteC
       } else if (hasFilters) {
         // Filtered listing — read index, apply collaborator/date/search in AND, then paginate
         const { items, total } = await storage.listFiltered(
-          { collaborator, date, search: searchQuery, expirationMonth },
+          { collaborator, date, search: searchQuery, expirationMonth, clientId },
           page,
           limit
         );

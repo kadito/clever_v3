@@ -55,6 +55,17 @@
         </select>
       </div>
 
+      <!-- Client Selection -->
+      <div class="form-field relative z-10">
+        <label class="form-label">Cliente *</label>
+        <ClientSearchInput
+          v-model="localActivity.clientId"
+          :readonly="!isEditMode"
+          :disabled="!isEditMode"
+          @client-selected="handleClientSelected"
+        />
+      </div>
+
       <!-- Link Type Selection -->
       <div class="form-field">
         <label class="form-label">Ligação *</label>
@@ -62,6 +73,7 @@
           v-if="isEditMode"
           v-model="localActivity.tipoLigacao"
           class="form-select"
+          :disabled="!localActivity.clientId && !isLegacyActivity"
           @change="handleLinkTypeChange"
         >
           <option value="Nenhuma">Nenhuma</option>
@@ -73,12 +85,13 @@
 
       <!-- Conditional Fields: Work Sheet Search -->
       <Transition name="field-slide">
-        <div v-if="localActivity.tipoLigacao === 'Folha de Obra'" class="form-field">
+        <div v-if="(localActivity.clientId || isLegacyActivity) && localActivity.tipoLigacao === 'Folha de Obra'" class="form-field">
           <label class="form-label">Folha de Obra *</label>
           <WorkSheetSearchInput
             v-model="localActivity.workSheetId"
             :readonly="!isEditMode"
             :disabled="!isEditMode"
+            :client-id="localActivity.clientId"
             @work-sheet-selected="handleWorkSheetSelected"
           />
         </div>
@@ -86,12 +99,13 @@
 
       <!-- Conditional Fields: Remote Assistance Search -->
       <Transition name="field-slide">
-        <div v-if="localActivity.tipoLigacao === 'Assistência Remota'" class="form-field">
+        <div v-if="(localActivity.clientId || isLegacyActivity) && localActivity.tipoLigacao === 'Assistência Remota'" class="form-field">
           <label class="form-label">Assistência Remota *</label>
           <RemoteAssistanceSearchInput
             v-model="localActivity.remoteAssistanceId"
             :readonly="!isEditMode"
             :disabled="!isEditMode"
+            :client-id="localActivity.clientId"
             @remote-assistance-selected="handleRemoteAssistanceSelected"
           />
         </div>
@@ -186,9 +200,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import type { Activity, WorkSheet, RemoteAssistance } from '@clever/shared';
+import type { Activity, WorkSheet, RemoteAssistance, Client } from '@clever/shared';
 import WorkSheetSearchInput from '@/components/common/WorkSheetSearchInput.vue';
 import RemoteAssistanceSearchInput from '@/components/common/RemoteAssistanceSearchInput.vue';
+import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
 import { useApi } from '@/composables/useApi';
 
 // API instances for time pre-fill
@@ -216,6 +231,9 @@ const emit = defineEmits<Emits>();
 // Local state - create a copy of the activity to avoid direct prop mutation
 const localActivity = ref<Activity>({ ...props.activity });
 
+// Track whether time fields were auto-populated (to know what to clear on client change)
+const timeAutoPopulated = ref(false);
+
 // Only sync from prop on initial mount or when switching to view mode
 // In edit mode, local state is the source of truth
 onMounted(() => {
@@ -227,6 +245,12 @@ const activityTypeClass = computed(() => {
   return localActivity.value.tipoAtividade === 'Interno'
     ? 'activity-type-interno'
     : 'activity-type-externo';
+});
+
+// Detect legacy activities: has a linked document but no clientId assigned (DR-AC-011, DR-DEC-003)
+const isLegacyActivity = computed(() => {
+  return !localActivity.value.clientId &&
+    (!!localActivity.value.workSheetId || !!localActivity.value.remoteAssistanceId);
 });
 
 const calculatedTotalHours = computed(() => {
@@ -351,6 +375,7 @@ const handleLinkTypeChange = () => {
     localActivity.value.remoteAssistanceId = undefined;
     localActivity.value.horaInicio = '';
     localActivity.value.horaFim = '';
+    timeAutoPopulated.value = false;
   } else if (localActivity.value.tipoLigacao === 'Folha de Obra') {
     localActivity.value.remoteAssistanceId = undefined;
   } else if (localActivity.value.tipoLigacao === 'Assistência Remota') {
@@ -365,42 +390,104 @@ const handleActivityTypeChange = () => {
   emitUpdate();
 };
 
-const handleWorkSheetSelected = (workSheet: WorkSheet) => {
-  workSheetApi.fetchById(workSheet.uuid)
-    .then(() => {
-      const ws = workSheetApi.currentItem.value;
-      if (ws) {
-        const { horaInicio, horaFim } = extractTimeFromWorkSheet(ws);
-        localActivity.value.horaInicio = horaInicio;
-        localActivity.value.horaFim = horaFim;
-      }
-    })
-    .catch((err: unknown) => {
-      console.error('Time prefill fetch failed (work-sheet):', JSON.stringify({ error: String(err) }, null, 2));
-      // Fields unchanged on error — user fills manually
-    })
-    .finally(() => {
-      emitUpdate();
-    });
+const handleClientSelected = (client: Client | null) => {
+  const previousClientId = localActivity.value.clientId;
+  const newClientId = client?.uuid || '';
+
+  // Update clientId
+  localActivity.value.clientId = newClientId;
+
+  // If client changed (not initial selection from empty)
+  if (previousClientId && previousClientId !== newClientId) {
+    // Clear linked document (DR-AC-007, DR-BR-003)
+    localActivity.value.workSheetId = undefined;
+    localActivity.value.remoteAssistanceId = undefined;
+
+    // Reset time fields if they were auto-populated (DR-AC-008)
+    if (timeAutoPopulated.value) {
+      localActivity.value.horaInicio = '';
+      localActivity.value.horaFim = '';
+      timeAutoPopulated.value = false;
+    }
+  }
+
+  // If client removed entirely
+  if (!newClientId) {
+    // Same clearing logic as change
+    localActivity.value.workSheetId = undefined;
+    localActivity.value.remoteAssistanceId = undefined;
+    if (timeAutoPopulated.value) {
+      localActivity.value.horaInicio = '';
+      localActivity.value.horaFim = '';
+      timeAutoPopulated.value = false;
+    }
+  }
+
+  emitUpdate();
 };
 
-const handleRemoteAssistanceSelected = (remoteAssistance: RemoteAssistance) => {
-  remoteAssistanceApi.fetchById(remoteAssistance.uuid)
-    .then(() => {
-      const ra = remoteAssistanceApi.currentItem.value;
-      if (ra) {
-        const { horaInicio, horaFim } = extractTimeFromRemoteAssistance(ra);
-        localActivity.value.horaInicio = horaInicio;
-        localActivity.value.horaFim = horaFim;
-      }
-    })
-    .catch((err: unknown) => {
-      console.error('Time prefill fetch failed (remote-assistance):', JSON.stringify({ error: String(err) }, null, 2));
-      // Fields unchanged on error — user fills manually
-    })
-    .finally(() => {
-      emitUpdate();
-    });
+const handleWorkSheetSelected = (workSheet: WorkSheet | null) => {
+  if (workSheet) {
+    localActivity.value.workSheetId = workSheet.uuid;
+    workSheetApi.fetchById(workSheet.uuid)
+      .then(() => {
+        const ws = workSheetApi.currentItem.value;
+        if (ws) {
+          const { horaInicio, horaFim } = extractTimeFromWorkSheet(ws);
+          localActivity.value.horaInicio = horaInicio;
+          localActivity.value.horaFim = horaFim;
+          timeAutoPopulated.value = true;
+        }
+      })
+      .catch((err: unknown) => {
+        console.error('Time prefill fetch failed (work-sheet):', JSON.stringify({ error: String(err) }, null, 2));
+        // Fields unchanged on error — user fills manually
+      })
+      .finally(() => {
+        emitUpdate();
+      });
+  } else {
+    localActivity.value.workSheetId = undefined;
+    // Clear auto-populated time when document is deselected
+    if (timeAutoPopulated.value) {
+      localActivity.value.horaInicio = '';
+      localActivity.value.horaFim = '';
+      timeAutoPopulated.value = false;
+    }
+    emitUpdate();
+  }
+};
+
+const handleRemoteAssistanceSelected = (remoteAssistance: RemoteAssistance | null) => {
+  if (remoteAssistance) {
+    localActivity.value.remoteAssistanceId = remoteAssistance.uuid;
+    remoteAssistanceApi.fetchById(remoteAssistance.uuid)
+      .then(() => {
+        const ra = remoteAssistanceApi.currentItem.value;
+        if (ra) {
+          const { horaInicio, horaFim } = extractTimeFromRemoteAssistance(ra);
+          localActivity.value.horaInicio = horaInicio;
+          localActivity.value.horaFim = horaFim;
+          timeAutoPopulated.value = true;
+        }
+      })
+      .catch((err: unknown) => {
+        console.error('Time prefill fetch failed (remote-assistance):', JSON.stringify({ error: String(err) }, null, 2));
+        // Fields unchanged on error — user fills manually
+      })
+      .finally(() => {
+        emitUpdate();
+      });
+  } else {
+    localActivity.value.remoteAssistanceId = undefined;
+    // Clear auto-populated time when document is deselected
+    if (timeAutoPopulated.value) {
+      localActivity.value.horaInicio = '';
+      localActivity.value.horaFim = '';
+      timeAutoPopulated.value = false;
+    }
+    emitUpdate();
+  }
 };
 
 const handleRemove = () => {
@@ -480,6 +567,11 @@ const emitUpdate = () => {
   @apply block w-full rounded-touch border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500;
   min-height: 44px;
   font-size: 16px; /* Prevent zoom on iOS */
+}
+
+.form-select:disabled,
+.form-input:disabled {
+  @apply bg-gray-100 text-gray-400 cursor-not-allowed opacity-60;
 }
 
 .form-textarea {

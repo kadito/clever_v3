@@ -7,6 +7,8 @@ import type { BaseContent, ContentWithRelations, TechnicianUser } from '../base'
 export interface Activity {
   /** Activity type classification */
   tipoAtividade: 'Interno' | 'Externo';
+  /** Client UUID — mandatory for new activities, optional for legacy data */
+  clientId?: string;
   /** Activity subject (required) */
   assunto: string;
   /** Start time in HH:MM format (24-hour) */

@@ -250,6 +250,7 @@ interface Props {
   disabled?: boolean;
   readonly?: boolean;
   hasError?: boolean;
+  clientId?: string; // filter results by client
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -322,7 +323,11 @@ const getTechnicianName = (workSheet: WorkSheet): string => {
 };
 
 const searchWorkSheets = async (query: string) => {
-  const searchParams = query && query.length >= 1 ? { search: query, limit: 10 } : { limit: 10 };
+  const searchParams = {
+    ...(query && query.length >= 1 ? { search: query } : {}),
+    limit: 10,
+    ...(props.clientId ? { clientId: props.clientId } : {}),
+  };
 
   await workSheetsApi
     .fetchList(searchParams)

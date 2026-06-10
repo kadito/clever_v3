@@ -185,7 +185,7 @@ function transformRecord(legacy, clientId) {
       modalidade: legacy.modalidade || '',
       duracaoContrato: legacy.duracaoContrato || '',
       software: {
-        name: legacy.software?.name || [],
+        name: Array.isArray(legacy.software?.name) ? legacy.software.name : (legacy.software?.name ? [legacy.software.name] : []),
         model: legacy.software?.model || '',
         product: legacy.software?.product || '',
         version: legacy.software?.version || '',
@@ -253,7 +253,12 @@ function buildSearchableText(record, clientName) {
 
   if (data.clientId) terms.push(data.clientId);
   if (clientName) terms.push(clientName);
-  if (data.software.name && data.software.name.length > 0) terms.push(data.software.name.join(' '));
+  const softwareName = data.software.name;
+  if (Array.isArray(softwareName) && softwareName.length > 0) {
+    terms.push(softwareName.join(' '));
+  } else if (typeof softwareName === 'string' && softwareName) {
+    terms.push(softwareName);
+  }
   if (data.versao) terms.push(data.versao);
   if (data.numeroSerie) terms.push(data.numeroSerie);
   if (data.modalidade) terms.push(data.modalidade);
@@ -273,7 +278,7 @@ function buildIndexItem(record, clientName) {
     searchableText: buildSearchableText(record, clientName),
     clientId: data.clientId || '',
     clientName: clientName || '',
-    software: data.software.name || [],
+    software: Array.isArray(data.software.name) ? data.software.name : (data.software.name ? [data.software.name] : []),
     versao: data.versao || '',
     numeroSerie: data.numeroSerie || '',
     modalidade: data.modalidade || '',
