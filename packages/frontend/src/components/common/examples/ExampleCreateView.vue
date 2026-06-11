@@ -16,7 +16,9 @@
     <!-- Custom sections for creation -->
     <template #createSections="{ formData, errors }">
       <div class="bg-blue-50 rounded-touch p-4 border border-blue-200">
-        <h3 class="text-sm font-medium text-blue-800 mb-2">Informação de Criação</h3>
+        <h3 class="text-sm font-medium text-blue-800 mb-2">
+          Informação de Criação
+        </h3>
         <p class="text-xs text-blue-600">
           Este exemplo será criado com todos os campos obrigatórios.
         </p>

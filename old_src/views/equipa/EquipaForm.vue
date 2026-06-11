@@ -1,23 +1,41 @@
 <template>
   <div class="equipa-form-container">
     <div class="form-header">
-      <BackButton :to="cancelRoute" variant="inline" />
+      <BackButton
+        :to="cancelRoute"
+        variant="inline"
+      />
       <h1>{{ isEditing ? 'Editar' : 'Novo' }} Colaborador</h1>
     </div>
 
     <!-- Loading state -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A processar...</p>
     </div>
 
     <!-- Error state -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Form -->
-    <form @submit.prevent="handleSubmit" class="equipa-form" v-if="!loading">
+    <form
+      v-if="!loading"
+      class="equipa-form"
+      @submit.prevent="handleSubmit"
+    >
       <!-- Basic Information Section -->
       <section class="form-section">
         <h2>INFORMAÇÃO BÁSICA</h2>
@@ -25,24 +43,36 @@
           <div class="form-group">
             <label for="name">NOME *</label>
             <input
-              type="text"
               id="name"
               v-model="formData.name"
+              type="text"
               class="form-control"
               required
               placeholder="Nome do colaborador"
-            />
+            >
           </div>
         </div>
       </section>
 
       <!-- Action buttons -->
       <div class="form-actions">
-        <button type="button" @click="handleCancel" class="btn btn-cancel" :disabled="loading">
+        <button
+          type="button"
+          class="btn btn-cancel"
+          :disabled="loading"
+          @click="handleCancel"
+        >
           Cancelar
         </button>
-        <button type="submit" class="btn btn-primary" :disabled="loading || !isFormValid">
-          <span v-if="loading" class="btn-spinner"></span>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          :disabled="loading || !isFormValid"
+        >
+          <span
+            v-if="loading"
+            class="btn-spinner"
+          />
           {{ isEditing ? 'Atualizar' : 'Criar' }} Colaborador
         </button>
       </div>

@@ -4,7 +4,10 @@
     :class="sizeClasses"
   >
     <!-- User initials -->
-    <span class="font-medium text-primary-700" :class="textSizeClasses">
+    <span
+      class="font-medium text-primary-700"
+      :class="textSizeClasses"
+    >
       {{ initials }}
     </span>
   </div>

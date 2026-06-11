@@ -22,32 +22,45 @@
   >
     <!-- Custom content sections -->
     <template #content="{ item }">
-      <div v-if="item && item.data" class="space-y-6">
+      <div
+        v-if="item && item.data"
+        class="space-y-6"
+      >
         <!-- Date Section -->
         <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Data do Registo</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Data do Registo
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
                 <div class="detail-item">
                   <label class="detail-label">Data</label>
-                  <div class="detail-value">{{ formatDate(item.data.dataRegistro) }}</div>
+                  <div class="detail-value">
+                    {{ formatDate(item.data.dataRegistro) }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Total de Atividades</label>
-                  <div class="detail-value">{{ item.data.atividades?.length || 0 }}</div>
+                  <div class="detail-value">
+                    {{ item.data.atividades?.length || 0 }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Total de Horas</label>
-                  <div class="detail-value">{{ calculateTotalHours(item.data.atividades) }}</div>
+                  <div class="detail-value">
+                    {{ calculateTotalHours(item.data.atividades) }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Técnico Responsável</label>
-                  <div class="detail-value">{{ getTechnicianDisplayName(item.data.technician) }}</div>
+                  <div class="detail-value">
+                    {{ getTechnicianDisplayName(item.data.technician) }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -91,15 +104,21 @@
               <div class="detail-grid mb-6">
                 <div class="detail-item">
                   <label class="detail-label">Hora Início</label>
-                  <div class="detail-value">{{ activity.horaInicio }}</div>
+                  <div class="detail-value">
+                    {{ activity.horaInicio }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Hora Fim</label>
-                  <div class="detail-value">{{ activity.horaFim }}</div>
+                  <div class="detail-value">
+                    {{ activity.horaFim }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Tempo de Pausa</label>
-                  <div class="detail-value">{{ activity.tempoPausa }} minutos</div>
+                  <div class="detail-value">
+                    {{ activity.tempoPausa }} minutos
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Total de Horas</label>
@@ -110,9 +129,14 @@
               </div>
 
               <!-- Description -->
-              <div v-if="activity.descricao" class="mb-6">
+              <div
+                v-if="activity.descricao"
+                class="mb-6"
+              >
                 <label class="detail-label">Descrição</label>
-                <div class="detail-value whitespace-pre-line">{{ activity.descricao }}</div>
+                <div class="detail-value whitespace-pre-line">
+                  {{ activity.descricao }}
+                </div>
               </div>
 
               <!-- Link Information -->

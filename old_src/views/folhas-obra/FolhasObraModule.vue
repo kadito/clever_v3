@@ -1,24 +1,37 @@
 <template>
   <div class="folhas-obra-module">
     <div class="module-header">
-      <BackButton to="/" variant="inline" />
+      <BackButton
+        to="/"
+        variant="inline"
+      />
       <div class="module-info">
-        <div class="module-icon">📝</div>
+        <div class="module-icon">
+          📝
+        </div>
         <div class="module-content">
           <h1>Folhas de Obra</h1>
-          <p class="module-description">Gestão de folhas de obra</p>
+          <p class="module-description">
+            Gestão de folhas de obra
+          </p>
         </div>
       </div>
     </div>
 
     <div class="module-actions">
-      <button @click="navigateToList" class="action-btn primary">
+      <button
+        class="action-btn primary"
+        @click="navigateToList"
+      >
         <span class="action-icon">📋</span>
         <span class="action-label">CONSULTAR</span>
         <span class="action-description">Ver lista de folhas de obra</span>
       </button>
 
-      <button @click="navigateToCreate" class="action-btn secondary">
+      <button
+        class="action-btn secondary"
+        @click="navigateToCreate"
+      >
         <span class="action-icon">➕</span>
         <span class="action-label">NOVA FOLHA DE OBRA</span>
         <span class="action-description">Criar uma nova folha de obra</span>

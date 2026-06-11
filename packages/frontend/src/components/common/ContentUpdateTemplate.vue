@@ -26,8 +26,15 @@
     </template>
 
     <!-- Custom field overrides -->
-    <template v-for="(_, name) in $slots" :key="name" #[name]="slotData">
-      <slot :name="name" v-bind="slotData" />
+    <template
+      v-for="(_, name) in $slots"
+      :key="name"
+      #[name]="slotData"
+    >
+      <slot
+        :name="name"
+        v-bind="slotData"
+      />
     </template>
   </ContentFormTemplate>
 </template>

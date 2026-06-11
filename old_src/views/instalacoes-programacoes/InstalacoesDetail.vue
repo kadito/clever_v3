@@ -4,36 +4,68 @@
     <div class="detail-header">
       <BackButton variant="inline" />
       <div class="header-content">
-        <h1 v-if="instalacao">{{ instalacao.nomeCliente }}</h1>
-        <div v-if="instalacao" class="header-meta">
-          <span class="status-badge" :class="getStatusClass(instalacao)">
+        <h1 v-if="instalacao">
+          {{ instalacao.nomeCliente }}
+        </h1>
+        <div
+          v-if="instalacao"
+          class="header-meta"
+        >
+          <span
+            class="status-badge"
+            :class="getStatusClass(instalacao)"
+          >
             {{ getStatusText(instalacao) }}
           </span>
           <span class="year-badge">{{ year }}</span>
         </div>
       </div>
-      <div v-if="instalacao" class="header-actions">
+      <div
+        v-if="instalacao"
+        class="header-actions"
+      >
         <router-link
           :to="{ name: 'instalacao-form', params: { year, id } }"
           class="btn btn-primary"
         >
           ✏️ Editar
         </router-link>
-        <button @click="confirmDelete" class="btn btn-danger">🗑️ Eliminar</button>
+        <button
+          class="btn btn-danger"
+          @click="confirmDelete"
+        >
+          🗑️ Eliminar
+        </button>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div v-if="instalacoesStore.loading" class="loading">Carregando instalação...</div>
+    <div
+      v-if="instalacoesStore.loading"
+      class="loading"
+    >
+      Carregando instalação...
+    </div>
 
     <!-- Error State -->
-    <div v-else-if="instalacoesStore.error" class="error">
+    <div
+      v-else-if="instalacoesStore.error"
+      class="error"
+    >
       Erro: {{ instalacoesStore.error }}
-      <button @click="retry" class="btn btn-primary btn-sm">Tentar novamente</button>
+      <button
+        class="btn btn-primary btn-sm"
+        @click="retry"
+      >
+        Tentar novamente
+      </button>
     </div>
 
     <!-- Installation Details -->
-    <div v-else-if="instalacao" class="detail-content">
+    <div
+      v-else-if="instalacao"
+      class="detail-content"
+    >
       <!-- Basic Information -->
       <div class="detail-section">
         <h2>INFORMAÇÕES BÁSICAS</h2>
@@ -102,23 +134,38 @@
             <label>PROGRAMADO:</label>
             <span>{{ instalacao.programado ? 'SIM' : 'NÃO' }}</span>
           </div>
-          <div class="info-item" v-if="instalacao.programado">
+          <div
+            v-if="instalacao.programado"
+            class="info-item"
+          >
             <label>DATA DA PROGRAMAÇÃO:</label>
             <span>{{ formatDateTime(instalacao.dataProgramacao) || 'N/A' }}</span>
           </div>
-          <div class="info-item" v-if="instalacao.programado">
+          <div
+            v-if="instalacao.programado"
+            class="info-item"
+          >
             <label>FINAL DA PROGRAMAÇÃO:</label>
             <span>{{ formatDateTime(instalacao.finalProgramacao) || 'N/A' }}</span>
           </div>
-          <div class="info-item" v-if="instalacao.programado">
+          <div
+            v-if="instalacao.programado"
+            class="info-item"
+          >
             <label>PROGRAMADO POR:</label>
             <span>{{ instalacao.programadoPor || 'N/A' }}</span>
           </div>
-          <div class="info-item" v-if="instalacao.programado">
+          <div
+            v-if="instalacao.programado"
+            class="info-item"
+          >
             <label>PROGRAMADO EMPRESA:</label>
             <span>{{ instalacao.programadoEmpresa || 'N/A' }}</span>
           </div>
-          <div class="info-item" v-if="instalacao.programado">
+          <div
+            v-if="instalacao.programado"
+            class="info-item"
+          >
             <label>QUAL SISTEMA:</label>
             <span>{{ instalacao.qualSistema || 'N/A' }}</span>
           </div>
@@ -126,7 +173,10 @@
       </div>
 
       <!-- Equipment Section -->
-      <div class="detail-section" v-if="instalacao.programado">
+      <div
+        v-if="instalacao.programado"
+        class="detail-section"
+      >
         <h2>EQUIPAMENTO</h2>
         <div class="info-grid">
           <div class="info-item">
@@ -157,7 +207,10 @@
       </div>
 
       <!-- Tests and Configuration Section -->
-      <div class="detail-section" v-if="instalacao.programado">
+      <div
+        v-if="instalacao.programado"
+        class="detail-section"
+      >
         <h2>TESTES E CONFIGURAÇÃO</h2>
         <div class="info-grid">
           <div class="info-item">
@@ -192,18 +245,27 @@
       </div>
 
       <!-- Training Section -->
-      <div class="detail-section" v-if="instalacao.programado">
+      <div
+        v-if="instalacao.programado"
+        class="detail-section"
+      >
         <h2>FORMAÇÃO</h2>
         <div class="info-grid">
           <div class="info-item">
             <label>FORMAÇÃO:</label>
             <span>{{ instalacao.formacao ? 'SIM' : 'NÃO' }}</span>
           </div>
-          <div class="info-item" v-if="instalacao.formacao">
+          <div
+            v-if="instalacao.formacao"
+            class="info-item"
+          >
             <label>QUEM RECEBEU FORMAÇÃO:</label>
             <span>{{ instalacao.quemRecebeuFormacao || 'N/A' }}</span>
           </div>
-          <div class="info-item" v-if="instalacao.formacao">
+          <div
+            v-if="instalacao.formacao"
+            class="info-item"
+          >
             <label>TESTE PÓS FORMAÇÃO:</label>
             <span>{{ instalacao.testePosFomacao ? 'SIM' : 'NÃO' }}</span>
           </div>
@@ -218,14 +280,21 @@
             <label>ASSINA:</label>
             <span>{{ instalacao.assina ? 'SIM' : 'NÃO' }}</span>
           </div>
-          <div class="info-item" v-if="instalacao.assina">
+          <div
+            v-if="instalacao.assina"
+            class="info-item"
+          >
             <label>QUEM ASSINOU:</label>
             <span>{{ instalacao.quemAssinou || 'N/A' }}</span>
           </div>
           <div class="info-item">
             <label>ASSINATURA (URL):</label>
             <span v-if="instalacao.assinatura">
-              <a :href="instalacao.assinatura" target="_blank" class="signature-link">
+              <a
+                :href="instalacao.assinatura"
+                target="_blank"
+                class="signature-link"
+              >
                 Ver Assinatura
               </a>
             </span>
@@ -234,7 +303,11 @@
           <div class="info-item">
             <label>ANEXAR IMAGEM (URL):</label>
             <span v-if="instalacao.anexarImagem">
-              <a :href="instalacao.anexarImagem" target="_blank" class="signature-link">
+              <a
+                :href="instalacao.anexarImagem"
+                target="_blank"
+                class="signature-link"
+              >
                 Ver Imagem
               </a>
             </span>
@@ -260,28 +333,50 @@
     </div>
 
     <!-- Not Found -->
-    <div v-else class="no-data">
+    <div
+      v-else
+      class="no-data"
+    >
       <div class="no-data-content">
-        <div class="no-data-icon">❌</div>
+        <div class="no-data-icon">
+          ❌
+        </div>
         <h3>Instalação não encontrada</h3>
         <p>A instalação pode ainda não estar disponível no sistema. Tentar novamente?</p>
         <div class="retry-actions">
-          <button @click="retryLoad" class="btn btn-primary" :disabled="instalacoesStore.loading">
+          <button
+            class="btn btn-primary"
+            :disabled="instalacoesStore.loading"
+            @click="retryLoad"
+          >
             {{ instalacoesStore.loading ? 'A carregar...' : 'Tentar novamente' }}
           </button>
-          <router-link to="/instalacoes-programacoes" class="btn btn-secondary">
+          <router-link
+            to="/instalacoes-programacoes"
+            class="btn btn-secondary"
+          >
             Voltar à Lista
           </router-link>
         </div>
-        <p v-if="autoRetryCountdown > 0" class="auto-retry-info">
+        <p
+          v-if="autoRetryCountdown > 0"
+          class="auto-retry-info"
+        >
           Tentativa automática em {{ autoRetryCountdown }}s...
         </p>
       </div>
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div v-if="showDeleteModal" class="modal-overlay" @click="cancelDelete">
-      <div class="modal" @click.stop>
+    <div
+      v-if="showDeleteModal"
+      class="modal-overlay"
+      @click="cancelDelete"
+    >
+      <div
+        class="modal"
+        @click.stop
+      >
         <div class="modal-header">
           <h3>Confirmar Eliminação</h3>
         </div>
@@ -290,11 +385,22 @@
           <p>
             <strong>{{ instalacao?.nomeCliente }}</strong>
           </p>
-          <p class="warning">Esta ação não pode ser desfeita.</p>
+          <p class="warning">
+            Esta ação não pode ser desfeita.
+          </p>
         </div>
         <div class="modal-footer">
-          <button @click="cancelDelete" class="btn btn-secondary">Cancelar</button>
-          <button @click="deleteInstalacao" class="btn btn-danger" :disabled="deleting">
+          <button
+            class="btn btn-secondary"
+            @click="cancelDelete"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn btn-danger"
+            :disabled="deleting"
+            @click="deleteInstalacao"
+          >
             {{ deleting ? 'Eliminando...' : 'Eliminar' }}
           </button>
         </div>

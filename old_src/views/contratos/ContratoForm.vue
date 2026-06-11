@@ -1,23 +1,41 @@
 <template>
   <div class="contrato-form-container">
     <div class="form-header">
-      <BackButton :to="cancelRoute" variant="inline" />
+      <BackButton
+        :to="cancelRoute"
+        variant="inline"
+      />
       <h1>{{ isEditing ? 'Editar' : 'Novo' }} Contrato</h1>
     </div>
 
     <!-- Loading state -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A processar...</p>
     </div>
 
     <!-- Error state -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Form -->
-    <form @submit.prevent="handleSubmit" class="contrato-form" v-if="!loading">
+    <form
+      v-if="!loading"
+      class="contrato-form"
+      @submit.prevent="handleSubmit"
+    >
       <!-- Basic Information Section -->
       <section class="form-section">
         <h2>INFORMAÇÃO BÁSICA</h2>
@@ -38,47 +56,47 @@
           <div class="form-group">
             <label for="nome">NOME *</label>
             <input
-              type="text"
               id="nome"
               v-model="form.nome"
+              type="text"
               class="form-control"
               readonly
               required
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="nomeComercial">NOME COMERCIAL *</label>
             <input
-              type="text"
               id="nomeComercial"
               v-model="form.nomeComercial"
+              type="text"
               class="form-control"
               readonly
               required
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="nomeSocial">NOME SOCIAL</label>
             <input
-              type="text"
               id="nomeSocial"
               v-model="form.nomeSocial"
+              type="text"
               class="form-control"
               readonly
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="contribuinte">CONTRIBUINTE</label>
             <input
-              type="text"
               id="contribuinte"
               v-model="form.contribuinte"
+              type="text"
               class="form-control"
               readonly
-            />
+            >
           </div>
         </div>
       </section>
@@ -89,12 +107,24 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="contacto">CONTACTO</label>
-            <input type="tel" id="contacto" v-model="form.contacto" class="form-control" readonly />
+            <input
+              id="contacto"
+              v-model="form.contacto"
+              type="tel"
+              class="form-control"
+              readonly
+            >
           </div>
 
           <div class="form-group">
             <label for="email">E-MAIL</label>
-            <input type="email" id="email" v-model="form.email" class="form-control" readonly />
+            <input
+              id="email"
+              v-model="form.email"
+              type="email"
+              class="form-control"
+              readonly
+            >
           </div>
 
           <div class="form-group full-width">
@@ -105,7 +135,7 @@
               class="form-control"
               rows="2"
               readonly
-            ></textarea>
+            />
           </div>
         </div>
       </section>
@@ -123,19 +153,25 @@
             <h3>CPA - Cashlogy</h3>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="hasCPA"
                 v-model="form.hasCPAContract"
+                type="checkbox"
                 class="toggle-input"
                 @change="onCPAToggle"
-              />
-              <label for="hasCPA" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="hasCPA"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
 
-          <div v-if="form.hasCPAContract" class="contract-type-content">
+          <div
+            v-if="form.hasCPAContract"
+            class="contract-type-content"
+          >
             <div class="form-grid">
               <div class="form-group">
                 <label for="cpaContractType">TIPO DE CONTRATO CPA *</label>
@@ -146,13 +182,22 @@
                   :required="form.hasCPAContract"
                   @change="onCPAContractTypeChange"
                 >
-                  <option value="">Selecione o tipo...</option>
-                  <option value="CPA">CPA - Cashlogy (2023)</option>
-                  <option value="CPA_1500">CPA - Cashlogy (1500)</option>
+                  <option value="">
+                    Selecione o tipo...
+                  </option>
+                  <option value="CPA">
+                    CPA - Cashlogy (2023)
+                  </option>
+                  <option value="CPA_1500">
+                    CPA - Cashlogy (1500)
+                  </option>
                 </select>
               </div>
 
-              <div class="form-group" v-if="form.cpaContractType">
+              <div
+                v-if="form.cpaContractType"
+                class="form-group"
+              >
                 <label for="planIdCPA">PLANO CPA *</label>
                 <select
                   id="planIdCPA"
@@ -161,14 +206,23 @@
                   :required="form.hasCPAContract"
                   @change="onCPAPlanChange"
                 >
-                  <option value="">Selecione o plano...</option>
-                  <option v-for="plan in availableCPAPlans" :key="plan.id" :value="plan.id">
+                  <option value="">
+                    Selecione o plano...
+                  </option>
+                  <option
+                    v-for="plan in availableCPAPlans"
+                    :key="plan.id"
+                    :value="plan.id"
+                  >
                     {{ plan.name }}
                   </option>
                 </select>
               </div>
 
-              <div class="form-group" v-if="form.planIdCPA && form.cpaContractType === 'CPA'">
+              <div
+                v-if="form.planIdCPA && form.cpaContractType === 'CPA'"
+                class="form-group"
+              >
                 <label for="distanceCPA">DISTÂNCIA *</label>
                 <select
                   id="distanceCPA"
@@ -177,9 +231,15 @@
                   :required="form.hasCPAContract && form.cpaContractType === 'CPA'"
                   @change="onCPADistanceChange"
                 >
-                  <option value="">Selecione a distância...</option>
-                  <option value="under180km">Menos de 180 km</option>
-                  <option value="over180km">Mais de 180 km</option>
+                  <option value="">
+                    Selecione a distância...
+                  </option>
+                  <option value="under180km">
+                    Menos de 180 km
+                  </option>
+                  <option value="over180km">
+                    Mais de 180 km
+                  </option>
                 </select>
               </div>
             </div>
@@ -188,17 +248,22 @@
             <div class="equipment-info-section">
               <div class="equipment-header">
                 <h5>Equipamentos CPA</h5>
-                <button type="button" @click="addCPAEquipment" class="btn btn-add-equipment">
+                <button
+                  type="button"
+                  class="btn btn-add-equipment"
+                  @click="addCPAEquipment"
+                >
                   ➕ Adicionar Equipamento
                 </button>
               </div>
 
-              <div class="equipment-note" v-if="form.cpaEquipments.length > 0">
+              <div
+                v-if="form.cpaEquipments.length > 0"
+                class="equipment-note"
+              >
                 <span class="note-icon">ℹ️</span>
-                <span
-                  >O desconto aplica-se apenas aos equipamentos adicionais (2º, 3º, etc.). O
-                  primeiro equipamento não tem desconto.</span
-                >
+                <span>O desconto aplica-se apenas aos equipamentos adicionais (2º, 3º, etc.). O
+                  primeiro equipamento não tem desconto.</span>
               </div>
 
               <!-- Equipment Cards -->
@@ -210,10 +275,10 @@
                 <div class="equipment-card-header">
                   <h6>Equipamento {{ index + 1 }}</h6>
                   <button
-                    type="button"
-                    @click="removeCPAEquipment(index)"
-                    class="btn btn-remove-equipment"
                     v-if="form.cpaEquipments.length > 1"
+                    type="button"
+                    class="btn btn-remove-equipment"
+                    @click="removeCPAEquipment(index)"
                   >
                     ❌
                   </button>
@@ -223,41 +288,47 @@
                   <div class="form-group">
                     <label :for="`modeloCPA-${equipment.id}`">MODELO</label>
                     <input
-                      type="text"
                       :id="`modeloCPA-${equipment.id}`"
                       v-model="equipment.modelo"
+                      type="text"
                       class="form-control"
                       placeholder="Ex: GEST 15"
-                    />
+                    >
                   </div>
 
                   <div class="form-group">
                     <label :for="`numeroSerieCPA-${equipment.id}`">Nº SÉRIE</label>
                     <input
-                      type="text"
                       :id="`numeroSerieCPA-${equipment.id}`"
                       v-model="equipment.numeroSerie"
+                      type="text"
                       class="form-control"
                       placeholder="Ex: 1234567"
-                    />
+                    >
                   </div>
 
                   <!-- Discount only for 2nd equipment onwards (N+1) -->
-                  <div class="form-group" v-if="index > 0">
+                  <div
+                    v-if="index > 0"
+                    class="form-group"
+                  >
                     <label :for="`descontoCPA-${equipment.id}`">DESCONTO (%)</label>
                     <input
-                      type="number"
                       :id="`descontoCPA-${equipment.id}`"
                       v-model.number="equipment.desconto"
+                      type="number"
                       class="form-control"
                       placeholder="0"
                       min="0"
                       max="100"
                       step="0.01"
-                    />
+                    >
                   </div>
 
-                  <div class="form-group" :class="{ 'full-width-field': index === 0 }">
+                  <div
+                    class="form-group"
+                    :class="{ 'full-width-field': index === 0 }"
+                  >
                     <label :for="`observacoesCPA-${equipment.id}`">OBSERVAÇÕES</label>
                     <textarea
                       :id="`observacoesCPA-${equipment.id}`"
@@ -265,13 +336,16 @@
                       class="form-control"
                       placeholder="Observações sobre este equipamento..."
                       rows="2"
-                    ></textarea>
+                    />
                   </div>
                 </div>
               </div>
 
               <!-- Empty state -->
-              <div v-if="form.cpaEquipments.length === 0" class="no-equipment-message">
+              <div
+                v-if="form.cpaEquipments.length === 0"
+                class="no-equipment-message"
+              >
                 Nenhum equipamento adicionado. Clique em "Adicionar Equipamento" para começar.
               </div>
             </div>
@@ -283,21 +357,21 @@
                 <div class="form-group">
                   <label for="inicioContratoCPA">INÍCIO DE CONTRATO</label>
                   <input
-                    type="date"
                     id="inicioContratoCPA"
                     v-model="form.inicioContratoCPA"
+                    type="date"
                     class="form-control"
-                  />
+                  >
                 </div>
 
                 <div class="form-group">
                   <label for="fimContratoCPA">FIM DE CONTRATO</label>
                   <input
-                    type="date"
                     id="fimContratoCPA"
                     v-model="form.fimContratoCPA"
+                    type="date"
                     class="form-control"
-                  />
+                  >
                 </div>
               </div>
             </div>
@@ -327,17 +401,21 @@
                   <span class="feature-icon">💻</span>
                   <span>{{ selectedCPAPlanDetails.remoteSupport }}</span>
                 </div>
-                <div class="feature-item" v-if="selectedCPAPlanDetails.weekendSupport">
+                <div
+                  v-if="selectedCPAPlanDetails.weekendSupport"
+                  class="feature-item"
+                >
                   <span class="feature-icon">📅</span>
                   <span>Suporte ao fim de semana</span>
                 </div>
-                <div class="feature-item" v-if="selectedCPAPlanDetails.additionalPackage">
+                <div
+                  v-if="selectedCPAPlanDetails.additionalPackage"
+                  class="feature-item"
+                >
                   <span class="feature-icon">📦</span>
-                  <span
-                    >{{ selectedCPAPlanDetails.additionalPackage.description }} (+{{
-                      formatPrice(selectedCPAPlanDetails.additionalPackage.price)
-                    }})</span
-                  >
+                  <span>{{ selectedCPAPlanDetails.additionalPackage.description }} (+{{
+                    formatPrice(selectedCPAPlanDetails.additionalPackage.price)
+                  }})</span>
                 </div>
               </div>
 
@@ -356,13 +434,16 @@
                   </div>
                   <div class="toggle-switch">
                     <input
-                      type="checkbox"
                       id="hasPOSPackage"
                       v-model="form.hasPOSPackage"
+                      type="checkbox"
                       class="toggle-input"
-                    />
-                    <label for="hasPOSPackage" class="toggle-label">
-                      <span class="toggle-slider"></span>
+                    >
+                    <label
+                      for="hasPOSPackage"
+                      class="toggle-label"
+                    >
+                      <span class="toggle-slider" />
                     </label>
                   </div>
                 </div>
@@ -381,21 +462,21 @@
                     <span class="price-value">{{ formatPrice(getCPAPrice('monthly')) }}</span>
                   </button>
                   <button
+                    v-if="getCPAPrice('quarterly')"
                     type="button"
                     class="price-item"
                     :class="{ selected: form.modalidadePagamentoCPA === 'TRIMESTRAL' }"
                     @click="selectCPAPaymentMethod('TRIMESTRAL')"
-                    v-if="getCPAPrice('quarterly')"
                   >
                     <span class="price-label">Trimestral</span>
                     <span class="price-value">{{ formatPrice(getCPAPrice('quarterly')) }}</span>
                   </button>
                   <button
+                    v-if="getCPAPrice('semiannual')"
                     type="button"
                     class="price-item"
                     :class="{ selected: form.modalidadePagamentoCPA === 'SEMESTRAL' }"
                     @click="selectCPAPaymentMethod('SEMESTRAL')"
-                    v-if="getCPAPrice('semiannual')"
                   >
                     <span class="price-label">Semestral</span>
                     <span class="price-value">{{ formatPrice(getCPAPrice('semiannual')) }}</span>
@@ -421,19 +502,25 @@
             <h3>S&H - Software e Hardware</h3>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="hasSH"
                 v-model="form.hasSHContract"
+                type="checkbox"
                 class="toggle-input"
                 @change="onSHToggle"
-              />
-              <label for="hasSH" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="hasSH"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
 
-          <div v-if="form.hasSHContract" class="contract-type-content">
+          <div
+            v-if="form.hasSHContract"
+            class="contract-type-content"
+          >
             <div class="form-grid">
               <div class="form-group">
                 <label for="planIdSH">PLANO S&H *</label>
@@ -444,7 +531,9 @@
                   :required="form.hasSHContract"
                   @change="onSHPlanChange"
                 >
-                  <option value="">Selecione o plano...</option>
+                  <option value="">
+                    Selecione o plano...
+                  </option>
                   <option
                     v-for="plan in contractPlans['S&H'].plans"
                     :key="plan.id"
@@ -455,7 +544,10 @@
                 </select>
               </div>
 
-              <div class="form-group" v-if="form.planIdSH">
+              <div
+                v-if="form.planIdSH"
+                class="form-group"
+              >
                 <label for="distanceSH">DISTÂNCIA *</label>
                 <select
                   id="distanceSH"
@@ -464,9 +556,15 @@
                   :required="form.hasSHContract"
                   @change="onSHDistanceChange"
                 >
-                  <option value="">Selecione a distância...</option>
-                  <option value="under180km">Menos de 180 km</option>
-                  <option value="over180km">Mais de 180 km</option>
+                  <option value="">
+                    Selecione a distância...
+                  </option>
+                  <option value="under180km">
+                    Menos de 180 km
+                  </option>
+                  <option value="over180km">
+                    Mais de 180 km
+                  </option>
                 </select>
               </div>
             </div>
@@ -478,34 +576,34 @@
                 <div class="form-group">
                   <label for="modeloPSO">MODELO</label>
                   <input
-                    type="text"
                     id="modeloPSO"
                     v-model="form.modeloPSO"
+                    type="text"
                     class="form-control"
                     placeholder="Ex: Dell Optiplex 7090"
-                  />
+                  >
                 </div>
 
                 <div class="form-group">
                   <label for="numeroSeriePSO">Nº SÉRIE</label>
                   <input
-                    type="text"
                     id="numeroSeriePSO"
                     v-model="form.numeroSeriePSO"
+                    type="text"
                     class="form-control"
                     placeholder="Ex: ABC123456"
-                  />
+                  >
                 </div>
 
                 <div class="form-group">
                   <label for="softwarePSO">SOFTWARE</label>
                   <input
-                    type="text"
                     id="softwarePSO"
                     v-model="form.softwarePSO"
+                    type="text"
                     class="form-control"
                     placeholder="Ex: Windows 11 Pro"
-                  />
+                  >
                 </div>
               </div>
             </div>
@@ -517,27 +615,30 @@
                 <div class="form-group">
                   <label for="inicioContratoSH">INÍCIO DE CONTRATO</label>
                   <input
-                    type="date"
                     id="inicioContratoSH"
                     v-model="form.inicioContratoSH"
+                    type="date"
                     class="form-control"
-                  />
+                  >
                 </div>
 
                 <div class="form-group">
                   <label for="fimContratoSH">FIM DE CONTRATO</label>
                   <input
-                    type="date"
                     id="fimContratoSH"
                     v-model="form.fimContratoSH"
+                    type="date"
                     class="form-control"
-                  />
+                  >
                 </div>
               </div>
             </div>
 
             <!-- S&H Plan Details Display -->
-            <div v-if="selectedSHPlanDetails && form.distanceSH" class="plan-details-card">
+            <div
+              v-if="selectedSHPlanDetails && form.distanceSH"
+              class="plan-details-card"
+            >
               <h4>{{ selectedSHPlanDetails.name }}</h4>
               <div class="plan-description">
                 {{ selectedSHPlanDetails.description }}
@@ -560,15 +661,24 @@
                   <span class="feature-icon">💻</span>
                   <span>{{ selectedSHPlanDetails.remoteSupport }}</span>
                 </div>
-                <div class="feature-item" v-if="selectedSHPlanDetails.softwareUpdates">
+                <div
+                  v-if="selectedSHPlanDetails.softwareUpdates"
+                  class="feature-item"
+                >
                   <span class="feature-icon">🔄</span>
                   <span>Atualizações de software incluídas</span>
                 </div>
-                <div class="feature-item" v-if="selectedSHPlanDetails.prioritySupport">
+                <div
+                  v-if="selectedSHPlanDetails.prioritySupport"
+                  class="feature-item"
+                >
                   <span class="feature-icon">⭐</span>
                   <span>Suporte prioritário</span>
                 </div>
-                <div class="feature-item" v-if="selectedSHPlanDetails.dedicatedManager">
+                <div
+                  v-if="selectedSHPlanDetails.dedicatedManager"
+                  class="feature-item"
+                >
                   <span class="feature-icon">👤</span>
                   <span>Gestor de conta dedicado</span>
                 </div>
@@ -611,7 +721,10 @@
         </div>
 
         <!-- Warning if no contract type selected -->
-        <div v-if="!form.hasCPAContract && !form.hasSHContract" class="warning-message">
+        <div
+          v-if="!form.hasCPAContract && !form.hasSHContract"
+          class="warning-message"
+        >
           ⚠️ Selecione pelo menos um tipo de contrato (CPA e/ou S&H)
         </div>
       </section>
@@ -622,14 +735,32 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="metodoPagamento">MÉTODO DE PAGAMENTO</label>
-            <select id="metodoPagamento" v-model="form.metodoPagamento" class="form-control">
-              <option value="">Selecione o método...</option>
-              <option value="TRANSFERENCIA_BANCARIA">Transferência Bancária</option>
-              <option value="DEBITO_DIRETO">Débito Direto</option>
-              <option value="MULTIBANCO">Multibanco</option>
-              <option value="CHEQUE">Cheque</option>
-              <option value="NUMERARIO">Numerário</option>
-              <option value="MB_WAY">MB WAY</option>
+            <select
+              id="metodoPagamento"
+              v-model="form.metodoPagamento"
+              class="form-control"
+            >
+              <option value="">
+                Selecione o método...
+              </option>
+              <option value="TRANSFERENCIA_BANCARIA">
+                Transferência Bancária
+              </option>
+              <option value="DEBITO_DIRETO">
+                Débito Direto
+              </option>
+              <option value="MULTIBANCO">
+                Multibanco
+              </option>
+              <option value="CHEQUE">
+                Cheque
+              </option>
+              <option value="NUMERARIO">
+                Numerário
+              </option>
+              <option value="MB_WAY">
+                MB WAY
+              </option>
             </select>
           </div>
         </div>
@@ -637,8 +768,18 @@
 
       <!-- Form Actions -->
       <div class="form-actions">
-        <button type="button" @click="navigateBack" class="btn btn-secondary">Cancelar</button>
-        <button type="submit" class="btn btn-primary" :disabled="!validateForm()">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          @click="navigateBack"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          :disabled="!validateForm()"
+        >
           {{ isEditing ? 'Atualizar' : 'Criar' }} Contrato
         </button>
       </div>
@@ -1055,10 +1196,10 @@ const selectSHPaymentMethod = method => {
 const updateCombinedPlanoContrato = () => {
   const parts = [];
   if (form.hasCPAContract && form.planoCPA) {
-    parts.push('=== CPA - CASHLOGY ===\n' + form.planoCPA);
+    parts.push(`=== CPA - CASHLOGY ===\n${  form.planoCPA}`);
   }
   if (form.hasSHContract && form.planoSH) {
-    parts.push('=== S&H - SOFTWARE E HARDWARE ===\n' + form.planoSH);
+    parts.push(`=== S&H - SOFTWARE E HARDWARE ===\n${  form.planoSH}`);
   }
   form.planoContrato = parts.join('\n\n');
 };

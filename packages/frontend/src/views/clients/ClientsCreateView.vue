@@ -20,11 +20,16 @@
         <div class="mb-4">
           <button
             type="button"
-            @click="addSoftware(formData)"
             class="btn-secondary inline-flex items-center"
             :disabled="editingSoftwareId !== null"
+            @click="addSoftware(formData)"
           >
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -37,7 +42,10 @@
         </div>
 
         <!-- Software Items -->
-        <div v-if="formData.softwares && formData.softwares.length > 0" class="space-y-4">
+        <div
+          v-if="formData.softwares && formData.softwares.length > 0"
+          class="space-y-4"
+        >
           <div
             v-for="(software, index) in formData.softwares"
             :key="software.id"
@@ -53,18 +61,18 @@
                 <template v-if="isSoftwareEditing(software.id)">
                   <button
                     type="button"
-                    @click="saveSoftware(software.id)"
                     class="btn-icon-action btn-save"
                     :disabled="!software.name"
                     title="Guardar"
+                    @click="saveSoftware(software.id)"
                   >
                     ✓
                   </button>
                   <button
                     type="button"
-                    @click="cancelEditSoftware(software.id)"
                     class="btn-icon-action btn-cancel"
                     title="Cancelar"
+                    @click="cancelEditSoftware(software.id)"
                   >
                     ✕
                   </button>
@@ -73,17 +81,17 @@
                 <template v-else>
                   <button
                     type="button"
-                    @click="editSoftware(software.id)"
                     class="btn-icon-action btn-edit"
                     title="Editar"
+                    @click="editSoftware(software.id)"
                   >
                     ✏️
                   </button>
                   <button
                     type="button"
-                    @click="removeSoftware(formData, Number(index))"
                     class="btn-icon-action btn-delete"
                     title="Eliminar"
+                    @click="removeSoftware(formData, Number(index))"
                   >
                     🗑️
                   </button>
@@ -96,51 +104,96 @@
               <div class="form-grid">
                 <!-- Software Selection -->
                 <div class="form-group">
-                  <label :for="`software-${software.id}`" class="form-label required"
-                    >Software</label
-                  >
+                  <label
+                    :for="`software-${software.id}`"
+                    class="form-label required"
+                  >Software</label>
                   <select
                     :id="`software-${software.id}`"
                     v-model="software.name"
                     class="form-select"
                     :disabled="!isSoftwareEditing(software.id)"
-                    @change="onSoftwareChange(Number(index))"
                     required
+                    @change="onSoftwareChange(Number(index))"
                   >
-                    <option value="">Selecione...</option>
-                    <option value="Vectron">Vectron</option>
-                    <option value="Pix">Pix</option>
-                    <option value="Zone Soft">Zone Soft</option>
-                    <option value="Pt CERT">Pt CERT</option>
-                    <option value="Dream Soft">Dream Soft</option>
-                    <option value="Contas Certas">Contas Certas</option>
+                    <option value="">
+                      Selecione...
+                    </option>
+                    <option value="Vectron">
+                      Vectron
+                    </option>
+                    <option value="Pix">
+                      Pix
+                    </option>
+                    <option value="Zone Soft">
+                      Zone Soft
+                    </option>
+                    <option value="Pt CERT">
+                      Pt CERT
+                    </option>
+                    <option value="Dream Soft">
+                      Dream Soft
+                    </option>
+                    <option value="Contas Certas">
+                      Contas Certas
+                    </option>
                   </select>
                 </div>
 
                 <!-- Vectron Model -->
-                <div v-if="software.name === 'Vectron'" class="form-group">
-                  <label :for="`vectron-model-${software.id}`" class="form-label">Modelo</label>
+                <div
+                  v-if="software.name === 'Vectron'"
+                  class="form-group"
+                >
+                  <label
+                    :for="`vectron-model-${software.id}`"
+                    class="form-label"
+                  >Modelo</label>
                   <select
                     :id="`vectron-model-${software.id}`"
                     v-model="software.model"
                     class="form-select"
                     :disabled="!isSoftwareEditing(software.id)"
                   >
-                    <option value="">Selecione o modelo...</option>
-                    <option value="Vectron Wide 14">Vectron Wide 14</option>
-                    <option value="Vectron Pos 7">Vectron Pos 7</option>
-                    <option value="Vectron Pos PC">Vectron Pos PC</option>
-                    <option value="Vectron Pos Touch K6">Vectron Pos Touch K6</option>
-                    <option value="Vectron Pos Touch K5 15">Vectron Pos Touch K5 15</option>
-                    <option value="Vectron Pos Touch K5 12">Vectron Pos Touch K5 12</option>
-                    <option value="Vectron Mobil Pro III">Vectron Mobil Pro III</option>
-                    <option value="Vectron Mobil Pro IV">Vectron Mobil Pro IV</option>
+                    <option value="">
+                      Selecione o modelo...
+                    </option>
+                    <option value="Vectron Wide 14">
+                      Vectron Wide 14
+                    </option>
+                    <option value="Vectron Pos 7">
+                      Vectron Pos 7
+                    </option>
+                    <option value="Vectron Pos PC">
+                      Vectron Pos PC
+                    </option>
+                    <option value="Vectron Pos Touch K6">
+                      Vectron Pos Touch K6
+                    </option>
+                    <option value="Vectron Pos Touch K5 15">
+                      Vectron Pos Touch K5 15
+                    </option>
+                    <option value="Vectron Pos Touch K5 12">
+                      Vectron Pos Touch K5 12
+                    </option>
+                    <option value="Vectron Mobil Pro III">
+                      Vectron Mobil Pro III
+                    </option>
+                    <option value="Vectron Mobil Pro IV">
+                      Vectron Mobil Pro IV
+                    </option>
                   </select>
                 </div>
 
                 <!-- Pix Product -->
-                <div v-if="software.name === 'Pix'" class="form-group">
-                  <label :for="`pix-product-${software.id}`" class="form-label">Produto</label>
+                <div
+                  v-if="software.name === 'Pix'"
+                  class="form-group"
+                >
+                  <label
+                    :for="`pix-product-${software.id}`"
+                    class="form-label"
+                  >Produto</label>
                   <select
                     :id="`pix-product-${software.id}`"
                     v-model="software.product"
@@ -148,33 +201,69 @@
                     :disabled="!isSoftwareEditing(software.id)"
                     @change="onPixProductChange(Number(index))"
                   >
-                    <option value="">Selecione o produto...</option>
-                    <option value="Pix rest">Pix rest</option>
-                    <option value="Pix Gest">Pix Gest</option>
-                    <option value="Pix POS">Pix POS</option>
-                    <option value="Pix AutoVenda">Pix AutoVenda</option>
-                    <option value="Pix Orders">Pix Orders</option>
-                    <option value="Pix Order Posto adicional">Pix Order Posto adicional</option>
-                    <option value="Pix Monitor Pedidos">Pix Monitor Pedidos</option>
-                    <option value="Pix RestFest">Pix RestFest</option>
+                    <option value="">
+                      Selecione o produto...
+                    </option>
+                    <option value="Pix rest">
+                      Pix rest
+                    </option>
+                    <option value="Pix Gest">
+                      Pix Gest
+                    </option>
+                    <option value="Pix POS">
+                      Pix POS
+                    </option>
+                    <option value="Pix AutoVenda">
+                      Pix AutoVenda
+                    </option>
+                    <option value="Pix Orders">
+                      Pix Orders
+                    </option>
+                    <option value="Pix Order Posto adicional">
+                      Pix Order Posto adicional
+                    </option>
+                    <option value="Pix Monitor Pedidos">
+                      Pix Monitor Pedidos
+                    </option>
+                    <option value="Pix RestFest">
+                      Pix RestFest
+                    </option>
                   </select>
                 </div>
 
                 <!-- Zone Soft Product -->
-                <div v-if="software.name === 'Zone Soft'" class="form-group">
-                  <label :for="`zonsoft-product-${software.id}`" class="form-label">Produto</label>
+                <div
+                  v-if="software.name === 'Zone Soft'"
+                  class="form-group"
+                >
+                  <label
+                    :for="`zonsoft-product-${software.id}`"
+                    class="form-label"
+                  >Produto</label>
                   <select
                     :id="`zonsoft-product-${software.id}`"
                     v-model="software.product"
                     class="form-select"
                     :disabled="!isSoftwareEditing(software.id)"
                   >
-                    <option value="">Selecione o produto...</option>
-                    <option value="ZSFACT">ZSFACT</option>
-                    <option value="ZSGO">ZSGO</option>
-                    <option value="ZSPOS">ZSPOS</option>
-                    <option value="ZSPOS MOBILE (ANDRIOD)">ZSPOS MOBILE (ANDRIOD)</option>
-                    <option value="ZSREST">ZSREST</option>
+                    <option value="">
+                      Selecione o produto...
+                    </option>
+                    <option value="ZSFACT">
+                      ZSFACT
+                    </option>
+                    <option value="ZSGO">
+                      ZSGO
+                    </option>
+                    <option value="ZSPOS">
+                      ZSPOS
+                    </option>
+                    <option value="ZSPOS MOBILE (ANDRIOD)">
+                      ZSPOS MOBILE (ANDRIOD)
+                    </option>
+                    <option value="ZSREST">
+                      ZSREST
+                    </option>
                   </select>
                 </div>
 
@@ -182,39 +271,60 @@
                 <div
                   v-if="
                     software.name === 'Zone Soft' &&
-                    software.product &&
-                    software.product !== 'ZSFACT'
+                      software.product &&
+                      software.product !== 'ZSFACT'
                   "
                   class="form-group"
                 >
-                  <label :for="`zonsoft-version-${software.id}`" class="form-label">Versão</label>
+                  <label
+                    :for="`zonsoft-version-${software.id}`"
+                    class="form-label"
+                  >Versão</label>
                   <select
                     :id="`zonsoft-version-${software.id}`"
                     v-model="software.version"
                     class="form-select"
                     :disabled="!isSoftwareEditing(software.id)"
                   >
-                    <option value="">Selecione a versão...</option>
-                    <option value="Pro">Pro</option>
-                    <option value="Lite">Lite</option>
-                    <option value="Basic">Basic</option>
+                    <option value="">
+                      Selecione a versão...
+                    </option>
+                    <option value="Pro">
+                      Pro
+                    </option>
+                    <option value="Lite">
+                      Lite
+                    </option>
+                    <option value="Basic">
+                      Basic
+                    </option>
                   </select>
                 </div>
 
                 <!-- Pt CERT License Type -->
-                <div v-if="software.name === 'Pt CERT'" class="form-group">
-                  <label :for="`ptcert-license-${software.id}`" class="form-label"
-                    >Tipo de Licença</label
-                  >
+                <div
+                  v-if="software.name === 'Pt CERT'"
+                  class="form-group"
+                >
+                  <label
+                    :for="`ptcert-license-${software.id}`"
+                    class="form-label"
+                  >Tipo de Licença</label>
                   <select
                     :id="`ptcert-license-${software.id}`"
                     v-model="software.licenseType"
                     class="form-select"
                     :disabled="!isSoftwareEditing(software.id)"
                   >
-                    <option value="">Selecione o tipo...</option>
-                    <option value="Licença Definitiva">Licença Definitiva</option>
-                    <option value="Licença Anual">Licença Anual</option>
+                    <option value="">
+                      Selecione o tipo...
+                    </option>
+                    <option value="Licença Definitiva">
+                      Licença Definitiva
+                    </option>
+                    <option value="Licença Anual">
+                      Licença Anual
+                    </option>
                   </select>
                 </div>
               </div>
@@ -228,116 +338,124 @@
                 <div class="modules-checkboxes">
                   <label class="module-checkbox">
                     <input
+                      v-model="software.modules"
                       type="checkbox"
                       value="Modulo 1"
-                      v-model="software.modules"
                       :disabled="!isSoftwareEditing(software.id)"
-                    />
+                    >
                     Módulo 1
                   </label>
                   <label class="module-checkbox">
                     <input
+                      v-model="software.modules"
                       type="checkbox"
                       value="Modulo 2"
-                      v-model="software.modules"
                       :disabled="!isSoftwareEditing(software.id)"
-                    />
+                    >
                     Módulo 2
                   </label>
                   <label class="module-checkbox">
                     <input
+                      v-model="software.modules"
                       type="checkbox"
                       value="Modulo 3"
-                      v-model="software.modules"
                       :disabled="!isSoftwareEditing(software.id)"
-                    />
+                    >
                     Módulo 3
                   </label>
                   <label class="module-checkbox">
                     <input
+                      v-model="software.modules"
                       type="checkbox"
                       value="Posto adicional"
-                      v-model="software.modules"
                       :disabled="!isSoftwareEditing(software.id)"
-                    />
+                    >
                     Posto adicional
                   </label>
                 </div>
               </div>
 
               <!-- Additional Fields -->
-              <div v-if="software.name" class="additional-fields mt-4">
+              <div
+                v-if="software.name"
+                class="additional-fields mt-4"
+              >
                 <div class="form-grid">
                   <!-- Vectron Fields -->
                   <template v-if="software.name === 'Vectron'">
                     <div class="form-group">
-                      <label :for="`n-equipamento-${software.id}`" class="form-label"
-                        >Nº Equipamento</label
-                      >
+                      <label
+                        :for="`n-equipamento-${software.id}`"
+                        class="form-label"
+                      >Nº Equipamento</label>
                       <input
-                        type="text"
                         :id="`n-equipamento-${software.id}`"
                         v-model="software.nEquipamento"
+                        type="text"
                         class="form-input"
                         :disabled="!isSoftwareEditing(software.id)"
                         placeholder="Nº do equipamento"
-                      />
+                      >
                     </div>
                     <div class="form-group">
-                      <label :for="`versao-software-${software.id}`" class="form-label"
-                        >Versão do Software</label
-                      >
+                      <label
+                        :for="`versao-software-${software.id}`"
+                        class="form-label"
+                      >Versão do Software</label>
                       <input
-                        type="text"
                         :id="`versao-software-${software.id}`"
                         v-model="software.versaoSoftware"
+                        type="text"
                         class="form-input"
                         :disabled="!isSoftwareEditing(software.id)"
                         placeholder="Ex: 1.2.3"
-                      />
+                      >
                     </div>
                   </template>
 
                   <!-- Common Fields (for all except Vectron) -->
                   <template v-else>
                     <div class="form-group">
-                      <label :for="`numero-serie-${software.id}`" class="form-label"
-                        >Número Série</label
-                      >
+                      <label
+                        :for="`numero-serie-${software.id}`"
+                        class="form-label"
+                      >Número Série</label>
                       <input
-                        type="text"
                         :id="`numero-serie-${software.id}`"
                         v-model="software.numeroSerie"
+                        type="text"
                         class="form-input"
                         :disabled="!isSoftwareEditing(software.id)"
                         placeholder="Nº de série"
-                      />
+                      >
                     </div>
                     <div class="form-group">
-                      <label :for="`versao-software-${software.id}`" class="form-label"
-                        >Versão Software</label
-                      >
+                      <label
+                        :for="`versao-software-${software.id}`"
+                        class="form-label"
+                      >Versão Software</label>
                       <input
-                        type="text"
                         :id="`versao-software-${software.id}`"
                         v-model="software.versaoSoftware"
+                        type="text"
                         class="form-input"
                         :disabled="!isSoftwareEditing(software.id)"
                         placeholder="Ex: 1.2.3"
-                      />
+                      >
                     </div>
                     <div class="form-group">
-                      <label :for="`versao-licenca-${software.id}`" class="form-label"
-                        >Versão Licença</label
-                      >
+                      <label
+                        :for="`versao-licenca-${software.id}`"
+                        class="form-label"
+                      >Versão Licença</label>
                       <input
-                        type="text"
                         :id="`versao-licenca-${software.id}`"
                         v-model="software.versaoLicenca"
+                        type="text"
                         class="form-input"
                         :disabled="!isSoftwareEditing(software.id)"
                         placeholder="Versão da licença"
-                      />
+                      >
                     </div>
                   </template>
                 </div>
@@ -347,10 +465,17 @@
         </div>
 
         <!-- Empty state -->
-        <div v-else class="empty-software-state">
+        <div
+          v-else
+          class="empty-software-state"
+        >
           <div class="text-center py-8">
-            <div class="text-4xl mb-2">💻</div>
-            <p class="text-gray-500">Nenhum software adicionado</p>
+            <div class="text-4xl mb-2">
+              💻
+            </div>
+            <p class="text-gray-500">
+              Nenhum software adicionado
+            </p>
           </div>
         </div>
       </div>

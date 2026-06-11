@@ -27,7 +27,12 @@
         @update:model-value="value => updateFieldValue('clientId', value)"
         @client-selected="handleClientSelected"
       />
-      <p v-if="error" class="form-error text-red-600 text-sm mt-1">{{ error }}</p>
+      <p
+        v-if="error"
+        class="form-error text-red-600 text-sm mt-1"
+      >
+        {{ error }}
+      </p>
       <p class="form-help text-xs text-gray-500 mt-1">
         <svg
           class="w-4 h-4 text-gray-400 inline mr-1"
@@ -48,7 +53,10 @@
 
     <!-- Custom contract types field with display toggle system -->
     <template #field-contractTypes="{ formData, updateFieldValue }">
-      <div v-if="formData" class="contract-types-wrapper">
+      <div
+        v-if="formData"
+        class="contract-types-wrapper"
+      >
         <div class="contract-types-section">
           <div class="section-header">
             <h2>PLANOS DE CONTRATO</h2>
@@ -68,7 +76,10 @@
             />
 
             <!-- CPA Configuration (appears directly below CPA toggle when enabled) -->
-            <Transition name="section-slide" mode="out-in">
+            <Transition
+              name="section-slide"
+              mode="out-in"
+            >
               <CPAContractSection
                 v-if="showCPASection"
                 :form-data="formData || {}"
@@ -92,7 +103,10 @@
             />
 
             <!-- S&H Configuration (appears directly below S&H toggle when enabled) -->
-            <Transition name="section-slide" mode="out-in">
+            <Transition
+              name="section-slide"
+              mode="out-in"
+            >
               <SHContractSection
                 v-if="showSHSection"
                 :form-data="formData || {}"
@@ -115,19 +129,38 @@
         <label class="form-label required">Método de Pagamento</label>
         <select
           :value="formData?.metodoPagamento || ''"
-          @change="e => updateFieldValue('metodoPagamento', (e.target as HTMLSelectElement).value)"
           class="form-select"
           :class="{ error: !!error }"
+          @change="e => updateFieldValue('metodoPagamento', (e.target as HTMLSelectElement).value)"
         >
-          <option value="">Selecione o método...</option>
-          <option value="TRANSFERENCIA_BANCARIA">Transferência Bancária</option>
-          <option value="DEBITO_DIRETO">Débito Direto</option>
-          <option value="MULTIBANCO">Multibanco</option>
-          <option value="CHEQUE">Cheque</option>
-          <option value="NUMERARIO">Numerário</option>
-          <option value="MB_WAY">MB WAY</option>
+          <option value="">
+            Selecione o método...
+          </option>
+          <option value="TRANSFERENCIA_BANCARIA">
+            Transferência Bancária
+          </option>
+          <option value="DEBITO_DIRETO">
+            Débito Direto
+          </option>
+          <option value="MULTIBANCO">
+            Multibanco
+          </option>
+          <option value="CHEQUE">
+            Cheque
+          </option>
+          <option value="NUMERARIO">
+            Numerário
+          </option>
+          <option value="MB_WAY">
+            MB WAY
+          </option>
         </select>
-        <div v-if="error" class="form-error">{{ error }}</div>
+        <div
+          v-if="error"
+          class="form-error"
+        >
+          {{ error }}
+        </div>
         <p class="form-help text-xs text-gray-500 mt-1">
           Método de pagamento aplicável a ambos os tipos de contrato (CPA e S&H).
         </p>

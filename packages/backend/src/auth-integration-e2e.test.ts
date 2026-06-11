@@ -19,7 +19,7 @@ describe.skip('Authentication Integration E2E Tests', () => {
   let devProcess: ChildProcess | null = null;
   const DEV_PORT = 8787;
   const DEV_URL = `http://localhost:${DEV_PORT}`;
-  const PROJECT_ROOT = process.cwd() + '/../..';
+  const PROJECT_ROOT = `${process.cwd()  }/../..`;
 
   // Helper function to make HTTP requests with timeout
   const fetchWithTimeout = async (

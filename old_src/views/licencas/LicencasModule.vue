@@ -1,24 +1,37 @@
 <template>
   <div class="licencas-module">
     <div class="module-header">
-      <BackButton to="/" variant="inline" />
+      <BackButton
+        to="/"
+        variant="inline"
+      />
       <div class="module-info">
-        <div class="module-icon">🔑</div>
+        <div class="module-icon">
+          🔑
+        </div>
         <div class="module-content">
           <h1>Gestor de Licenças</h1>
-          <p class="module-description">Gestão e controlo de licenças de software</p>
+          <p class="module-description">
+            Gestão e controlo de licenças de software
+          </p>
         </div>
       </div>
     </div>
 
     <div class="module-actions">
-      <button @click="navigateToList" class="action-btn primary">
+      <button
+        class="action-btn primary"
+        @click="navigateToList"
+      >
         <span class="action-icon">📋</span>
         <span class="action-label">CONSULTAR</span>
         <span class="action-description">Ver lista de licenças</span>
       </button>
 
-      <button @click="navigateToCreate" class="action-btn secondary">
+      <button
+        class="action-btn secondary"
+        @click="navigateToCreate"
+      >
         <span class="action-icon">➕</span>
         <span class="action-label">NOVA LICENÇA</span>
         <span class="action-description">Criar uma nova licença</span>

@@ -59,7 +59,7 @@ describe('Property 1: Type Sharing Consistency', () => {
           const interfaceDefinition = generateInterfaceDefinition(interfaceSpec);
 
           // Step 2: Modify the shared types file
-          const modifiedTypesContent = ORIGINAL_TYPES_CONTENT + '\n\n' + interfaceDefinition;
+          const modifiedTypesContent = `${ORIGINAL_TYPES_CONTENT  }\n\n${  interfaceDefinition}`;
           writeFileSync(SHARED_TYPES_PATH, modifiedTypesContent);
 
           // Step 3: Verify the interface was added correctly by checking file content

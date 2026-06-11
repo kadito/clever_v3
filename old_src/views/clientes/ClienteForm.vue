@@ -1,23 +1,41 @@
 <template>
   <div class="cliente-form-container">
     <div class="form-header">
-      <BackButton :to="cancelRoute" variant="inline" />
+      <BackButton
+        :to="cancelRoute"
+        variant="inline"
+      />
       <h1>{{ isEditing ? 'Editar' : 'Novo' }} Cliente</h1>
     </div>
 
     <!-- Loading state -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A processar...</p>
     </div>
 
     <!-- Error state -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Form -->
-    <form @submit.prevent="handleSubmit" class="cliente-form" v-if="!loading">
+    <form
+      v-if="!loading"
+      class="cliente-form"
+      @submit.prevent="handleSubmit"
+    >
       <!-- Basic Information Section -->
       <section class="form-section">
         <h2>INFORMAÇÃO BÁSICA</h2>
@@ -25,39 +43,44 @@
           <div class="form-group">
             <label for="nomeEmpresa">NOME DA EMPRESA *</label>
             <input
-              type="text"
               id="nomeEmpresa"
               v-model="form.nomeEmpresa"
+              type="text"
               class="form-control"
               required
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="nomeComercial">NOME COMERCIAL *</label>
             <input
-              type="text"
               id="nomeComercial"
               v-model="form.nomeComercial"
+              type="text"
               class="form-control"
               required
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="contribuinte">CONTRIBUINTE</label>
             <input
-              type="text"
               id="contribuinte"
               v-model="form.contribuinte"
+              type="text"
               class="form-control"
               placeholder="123456789"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="responsavel">RESPONSÁVEL</label>
-            <input type="text" id="responsavel" v-model="form.responsavel" class="form-control" />
+            <input
+              id="responsavel"
+              v-model="form.responsavel"
+              type="text"
+              class="form-control"
+            >
           </div>
         </div>
       </section>
@@ -68,32 +91,42 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="telefone">TELEFONE</label>
-            <input type="tel" id="telefone" v-model="form.telefone" class="form-control" />
+            <input
+              id="telefone"
+              v-model="form.telefone"
+              type="tel"
+              class="form-control"
+            >
           </div>
 
           <div class="form-group">
             <label for="telefoneContato">TELEFONE DO CONTACTO</label>
             <input
-              type="tel"
               id="telefoneContato"
               v-model="form.telefoneContato"
+              type="tel"
               class="form-control"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="email">E-MAIL</label>
-            <input type="email" id="email" v-model="form.email" class="form-control" />
+            <input
+              id="email"
+              v-model="form.email"
+              type="email"
+              class="form-control"
+            >
           </div>
 
           <div class="form-group">
             <label for="emailContato">E-MAIL DO CONTACTO</label>
             <input
-              type="email"
               id="emailContato"
               v-model="form.emailContato"
+              type="email"
               class="form-control"
-            />
+            >
           </div>
         </div>
       </section>
@@ -104,23 +137,33 @@
         <div class="form-grid">
           <div class="form-group full-width">
             <label for="morada">MORADA</label>
-            <textarea id="morada" v-model="form.morada" class="form-control" rows="3"></textarea>
+            <textarea
+              id="morada"
+              v-model="form.morada"
+              class="form-control"
+              rows="3"
+            />
           </div>
 
           <div class="form-group">
             <label for="codigoPostal">CÓDIGO POSTAL</label>
             <input
-              type="text"
               id="codigoPostal"
               v-model="form.codigoPostal"
+              type="text"
               class="form-control"
               placeholder="0000-000"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="localidade">LOCALIDADE</label>
-            <input type="text" id="localidade" v-model="form.localidade" class="form-control" />
+            <input
+              id="localidade"
+              v-model="form.localidade"
+              type="text"
+              class="form-control"
+            >
           </div>
         </div>
       </section>
@@ -132,12 +175,12 @@
           <div class="form-group full-width">
             <label for="iban">IBAN</label>
             <input
-              type="text"
               id="iban"
               v-model="form.iban"
+              type="text"
               class="form-control"
               placeholder="PT50 0000 0000 0000 0000 0000 0"
-            />
+            >
           </div>
         </div>
       </section>
@@ -149,9 +192,9 @@
         <div class="add-software-buttons">
           <button
             type="button"
-            @click="addSoftware"
             class="btn-add-software"
             :disabled="editingSoftwareId !== null"
+            @click="addSoftware"
           >
             <span class="btn-icon">➕</span>
             Adicionar Software
@@ -175,18 +218,18 @@
               <template v-if="isSoftwareEditing(software.id)">
                 <button
                   type="button"
-                  @click="saveSoftware(software.id)"
                   class="btn-icon-action btn-save"
                   :disabled="!software.name"
                   title="Guardar"
+                  @click="saveSoftware(software.id)"
                 >
                   ✓
                 </button>
                 <button
                   type="button"
-                  @click="cancelEditSoftware(software.id)"
                   class="btn-icon-action btn-cancel"
                   title="Cancelar"
+                  @click="cancelEditSoftware(software.id)"
                 >
                   ✕
                 </button>
@@ -195,17 +238,17 @@
               <template v-else>
                 <button
                   type="button"
-                  @click="editSoftware(software.id)"
                   class="btn-icon-action btn-edit"
                   title="Editar"
+                  @click="editSoftware(software.id)"
                 >
                   ✏️
                 </button>
                 <button
                   type="button"
-                  @click="removeSoftware(index)"
                   class="btn-icon-action btn-delete"
                   title="Eliminar"
+                  @click="removeSoftware(index)"
                 >
                   🗑️
                 </button>
@@ -220,22 +263,39 @@
                 :id="`software-${software.id}`"
                 v-model="software.name"
                 class="form-control"
-                @change="onSoftwareChange(index)"
                 :disabled="!isSoftwareEditing(software.id)"
                 required
+                @change="onSoftwareChange(index)"
               >
-                <option value="">Selecione...</option>
-                <option value="Vectron">Vectron</option>
-                <option value="Pix">Pix</option>
-                <option value="Zon Soft">Zon Soft</option>
-                <option value="Pt CERT">Pt CERT</option>
-                <option value="Dream Soft">Dream Soft</option>
-                <option value="Contas Certas">Contas Certas</option>
+                <option value="">
+                  Selecione...
+                </option>
+                <option value="Vectron">
+                  Vectron
+                </option>
+                <option value="Pix">
+                  Pix
+                </option>
+                <option value="Zon Soft">
+                  Zon Soft
+                </option>
+                <option value="Pt CERT">
+                  Pt CERT
+                </option>
+                <option value="Dream Soft">
+                  Dream Soft
+                </option>
+                <option value="Contas Certas">
+                  Contas Certas
+                </option>
               </select>
             </div>
 
             <!-- Vectron Models -->
-            <div class="form-group" v-if="software.name === 'Vectron'">
+            <div
+              v-if="software.name === 'Vectron'"
+              class="form-group"
+            >
               <label :for="`vectron-model-${software.id}`">MODELO</label>
               <select
                 :id="`vectron-model-${software.id}`"
@@ -243,15 +303,33 @@
                 class="form-control"
                 :disabled="!isSoftwareEditing(software.id)"
               >
-                <option value="">Selecione o modelo...</option>
-                <option value="Vectron Wide 14">Vectron Wide 14"</option>
-                <option value="Vectron Pos 7">Vectron Pos 7</option>
-                <option value="Vectron Pos PC">Vectron Pos PC</option>
-                <option value="Vectron Pos Touch K6">Vectron Pos Touch K6</option>
-                <option value="Vectron Pos Touch K5 15">Vectron Pos Touch K5 15"</option>
-                <option value="Vectron Pos Touch K5 12">Vectron Pos Touch K5 12"</option>
-                <option value="Vectron Mobil Pro III">Vectron Mobil Pro III</option>
-                <option value="Vectron Mobil Pro IV">Vectron Mobil Pro IV</option>
+                <option value="">
+                  Selecione o modelo...
+                </option>
+                <option value="Vectron Wide 14">
+                  Vectron Wide 14"
+                </option>
+                <option value="Vectron Pos 7">
+                  Vectron Pos 7
+                </option>
+                <option value="Vectron Pos PC">
+                  Vectron Pos PC
+                </option>
+                <option value="Vectron Pos Touch K6">
+                  Vectron Pos Touch K6
+                </option>
+                <option value="Vectron Pos Touch K5 15">
+                  Vectron Pos Touch K5 15"
+                </option>
+                <option value="Vectron Pos Touch K5 12">
+                  Vectron Pos Touch K5 12"
+                </option>
+                <option value="Vectron Mobil Pro III">
+                  Vectron Mobil Pro III
+                </option>
+                <option value="Vectron Mobil Pro IV">
+                  Vectron Mobil Pro IV
+                </option>
               </select>
             </div>
 
@@ -266,56 +344,77 @@
                   :disabled="!isSoftwareEditing(software.id)"
                   @change="onPixProductChange(index)"
                 >
-                  <option value="">Selecione o produto...</option>
-                  <option value="Pix rest">Pix rest</option>
-                  <option value="Pix Gest">Pix Gest</option>
-                  <option value="Pix POS">Pix POS</option>
-                  <option value="Pix AutoVenda">Pix AutoVenda</option>
-                  <option value="Pix Orders">Pix Orders</option>
-                  <option value="Pix Order Posto adicional">Pix Order Posto adicional</option>
-                  <option value="Pix Monitor Pedidos">Pix Monitor Pedidos</option>
-                  <option value="Pix RestFest">Pix RestFest</option>
+                  <option value="">
+                    Selecione o produto...
+                  </option>
+                  <option value="Pix rest">
+                    Pix rest
+                  </option>
+                  <option value="Pix Gest">
+                    Pix Gest
+                  </option>
+                  <option value="Pix POS">
+                    Pix POS
+                  </option>
+                  <option value="Pix AutoVenda">
+                    Pix AutoVenda
+                  </option>
+                  <option value="Pix Orders">
+                    Pix Orders
+                  </option>
+                  <option value="Pix Order Posto adicional">
+                    Pix Order Posto adicional
+                  </option>
+                  <option value="Pix Monitor Pedidos">
+                    Pix Monitor Pedidos
+                  </option>
+                  <option value="Pix RestFest">
+                    Pix RestFest
+                  </option>
                 </select>
               </div>
 
               <!-- Pix Modules (for products that have modules) -->
-              <div class="form-group full-width" v-if="pixHasModules(software.product)">
+              <div
+                v-if="pixHasModules(software.product)"
+                class="form-group full-width"
+              >
                 <label>MÓDULOS</label>
                 <div class="modules-checkboxes">
                   <label class="module-checkbox">
                     <input
+                      v-model="software.modules"
                       type="checkbox"
                       value="Modulo 1"
-                      v-model="software.modules"
                       :disabled="!isSoftwareEditing(software.id)"
-                    />
+                    >
                     Módulo 1
                   </label>
                   <label class="module-checkbox">
                     <input
+                      v-model="software.modules"
                       type="checkbox"
                       value="Modulo 2"
-                      v-model="software.modules"
                       :disabled="!isSoftwareEditing(software.id)"
-                    />
+                    >
                     Módulo 2
                   </label>
                   <label class="module-checkbox">
                     <input
+                      v-model="software.modules"
                       type="checkbox"
                       value="Modulo 3"
-                      v-model="software.modules"
                       :disabled="!isSoftwareEditing(software.id)"
-                    />
+                    >
                     Módulo 3
                   </label>
                   <label class="module-checkbox">
                     <input
+                      v-model="software.modules"
                       type="checkbox"
                       value="Posto adicional"
-                      v-model="software.modules"
                       :disabled="!isSoftwareEditing(software.id)"
-                    />
+                    >
                     Posto adicional
                   </label>
                 </div>
@@ -332,16 +431,31 @@
                   class="form-control"
                   :disabled="!isSoftwareEditing(software.id)"
                 >
-                  <option value="">Selecione o produto...</option>
-                  <option value="ZSFACT">ZSFACT</option>
-                  <option value="ZSGO">ZSGO</option>
-                  <option value="ZSPOS">ZSPOS</option>
-                  <option value="ZSPOS MOBILE (ANDRIOD)">ZSPOS MOBILE (ANDRIOD)</option>
-                  <option value="ZSREST">ZSREST</option>
+                  <option value="">
+                    Selecione o produto...
+                  </option>
+                  <option value="ZSFACT">
+                    ZSFACT
+                  </option>
+                  <option value="ZSGO">
+                    ZSGO
+                  </option>
+                  <option value="ZSPOS">
+                    ZSPOS
+                  </option>
+                  <option value="ZSPOS MOBILE (ANDRIOD)">
+                    ZSPOS MOBILE (ANDRIOD)
+                  </option>
+                  <option value="ZSREST">
+                    ZSREST
+                  </option>
                 </select>
               </div>
 
-              <div class="form-group" v-if="software.product && software.product !== 'ZSFACT'">
+              <div
+                v-if="software.product && software.product !== 'ZSFACT'"
+                class="form-group"
+              >
                 <label :for="`zonsoft-version-${software.id}`">VERSÃO</label>
                 <select
                   :id="`zonsoft-version-${software.id}`"
@@ -349,16 +463,27 @@
                   class="form-control"
                   :disabled="!isSoftwareEditing(software.id)"
                 >
-                  <option value="">Selecione a versão...</option>
-                  <option value="Pro">Pro</option>
-                  <option value="Lite">Lite</option>
-                  <option value="Basic">Basic</option>
+                  <option value="">
+                    Selecione a versão...
+                  </option>
+                  <option value="Pro">
+                    Pro
+                  </option>
+                  <option value="Lite">
+                    Lite
+                  </option>
+                  <option value="Basic">
+                    Basic
+                  </option>
                 </select>
               </div>
             </template>
 
             <!-- Pt CERT License Type -->
-            <div class="form-group" v-if="software.name === 'Pt CERT'">
+            <div
+              v-if="software.name === 'Pt CERT'"
+              class="form-group"
+            >
               <label :for="`ptcert-license-${software.id}`">TIPO DE LICENÇA</label>
               <select
                 :id="`ptcert-license-${software.id}`"
@@ -366,40 +491,49 @@
                 class="form-control"
                 :disabled="!isSoftwareEditing(software.id)"
               >
-                <option value="">Selecione o tipo...</option>
-                <option value="Licença Definitiva">Licença Definitiva</option>
-                <option value="Licença Anual">Licença Anual</option>
+                <option value="">
+                  Selecione o tipo...
+                </option>
+                <option value="Licença Definitiva">
+                  Licença Definitiva
+                </option>
+                <option value="Licença Anual">
+                  Licença Anual
+                </option>
               </select>
             </div>
           </div>
 
           <!-- Additional Fields -->
-          <div v-if="software.name" class="software-additional-fields">
+          <div
+            v-if="software.name"
+            class="software-additional-fields"
+          >
             <!-- Vectron Fields (only for Vectron) -->
             <template v-if="software.name === 'Vectron'">
               <div class="form-grid">
                 <div class="form-group">
                   <label :for="`n-equipamento-${software.id}`">Nº EQUIPAMENTO</label>
                   <input
-                    type="text"
                     :id="`n-equipamento-${software.id}`"
                     v-model="software.nEquipamento"
+                    type="text"
                     class="form-control"
                     :disabled="!isSoftwareEditing(software.id)"
                     placeholder="Nº do equipamento"
-                  />
+                  >
                 </div>
 
                 <div class="form-group">
                   <label :for="`versao-software-${software.id}`">VERSÃO DO SOFTWARE</label>
                   <input
-                    type="text"
                     :id="`versao-software-${software.id}`"
                     v-model="software.versaoSoftware"
+                    type="text"
                     class="form-control"
                     :disabled="!isSoftwareEditing(software.id)"
                     placeholder="Ex: 1.2.3"
-                  />
+                  >
                 </div>
               </div>
             </template>
@@ -410,37 +544,37 @@
                 <div class="form-group">
                   <label :for="`numero-serie-${software.id}`">NÚMERO SÉRIE</label>
                   <input
-                    type="text"
                     :id="`numero-serie-${software.id}`"
                     v-model="software.numeroSerie"
+                    type="text"
                     class="form-control"
                     :disabled="!isSoftwareEditing(software.id)"
                     placeholder="Nº de série"
-                  />
+                  >
                 </div>
 
                 <div class="form-group">
                   <label :for="`versao-software-${software.id}`">VERSÃO SOFTWARE</label>
                   <input
-                    type="text"
                     :id="`versao-software-${software.id}`"
                     v-model="software.versaoSoftware"
+                    type="text"
                     class="form-control"
                     :disabled="!isSoftwareEditing(software.id)"
                     placeholder="Ex: 1.2.3"
-                  />
+                  >
                 </div>
 
                 <div class="form-group">
                   <label :for="`versao-licenca-${software.id}`">VERSÃO LICENÇA</label>
                   <input
-                    type="text"
                     :id="`versao-licenca-${software.id}`"
                     v-model="software.versaoLicenca"
+                    type="text"
                     class="form-control"
                     :disabled="!isSoftwareEditing(software.id)"
                     placeholder="Versão da licença"
-                  />
+                  >
                 </div>
               </div>
             </template>
@@ -448,7 +582,10 @@
         </div>
 
         <!-- Empty state -->
-        <div v-if="form.softwares.length === 0" class="no-software-message">
+        <div
+          v-if="form.softwares.length === 0"
+          class="no-software-message"
+        >
           Nenhum software adicionado
         </div>
       </section>
@@ -461,13 +598,16 @@
             <label>TEM ANYDESK</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="temAnydesk"
                 v-model="form.temAnydesk"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="temAnydesk" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="temAnydesk"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -476,13 +616,16 @@
             <label>MANUTENÇÃO</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="manutencao"
                 v-model="form.manutencao"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="manutencao" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="manutencao"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -491,13 +634,16 @@
             <label>MANUTENÇÃO 24H</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="manutencao24"
                 v-model="form.manutencao24"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="manutencao24" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="manutencao24"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -505,9 +651,17 @@
           <div class="form-group">
             <label>DUMPS</label>
             <div class="toggle-switch">
-              <input type="checkbox" id="dumps" v-model="form.dumps" class="toggle-input" />
-              <label for="dumps" class="toggle-label">
-                <span class="toggle-slider"></span>
+              <input
+                id="dumps"
+                v-model="form.dumps"
+                type="checkbox"
+                class="toggle-input"
+              >
+              <label
+                for="dumps"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -515,9 +669,17 @@
           <div class="form-group">
             <label>ATCUD</label>
             <div class="toggle-switch">
-              <input type="checkbox" id="atcud" v-model="form.atcud" class="toggle-input" />
-              <label for="atcud" class="toggle-label">
-                <span class="toggle-slider"></span>
+              <input
+                id="atcud"
+                v-model="form.atcud"
+                type="checkbox"
+                class="toggle-input"
+              >
+              <label
+                for="atcud"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -526,81 +688,93 @@
             <label>VECTRON CONNECT</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="vectronConnect"
                 v-model="form.vectronConnect"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="vectronConnect" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="vectronConnect"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
         </div>
 
         <!-- DUMPS Conditional Field -->
-        <div v-if="form.dumps" class="conditional-fields">
+        <div
+          v-if="form.dumps"
+          class="conditional-fields"
+        >
           <div class="form-group full-width">
             <label for="dumpsLink">LINK GOOGLE DRIVE</label>
             <input
-              type="url"
               id="dumpsLink"
               v-model="form.dumpsLink"
+              type="url"
               class="form-control"
               placeholder="https://drive.google.com/..."
-            />
+            >
           </div>
         </div>
 
         <!-- ATCUD Conditional Fields -->
-        <div v-if="form.atcud" class="conditional-fields">
+        <div
+          v-if="form.atcud"
+          class="conditional-fields"
+        >
           <div class="form-grid">
             <div class="form-group">
               <label for="seriesDocumentos">SÉRIES DE DOCUMENTOS</label>
               <input
-                type="text"
                 id="seriesDocumentos"
                 v-model="form.seriesDocumentos"
+                type="text"
                 class="form-control"
                 placeholder="Ex: A, B, C"
-              />
+              >
             </div>
 
             <div class="form-group">
               <label for="atUsername">AT USERNAME</label>
               <input
-                type="text"
                 id="atUsername"
                 v-model="form.atUsername"
+                type="text"
                 class="form-control"
                 placeholder="Username AT"
-              />
+              >
             </div>
 
             <div class="form-group">
               <label for="atPassword">AT PASSWORD</label>
               <input
-                type="password"
                 id="atPassword"
                 v-model="form.atPassword"
+                type="password"
                 class="form-control"
                 placeholder="Password AT"
-              />
+              >
             </div>
           </div>
         </div>
 
         <!-- Vectron Connect Conditional Field -->
-        <div v-if="form.vectronConnect" class="conditional-fields">
+        <div
+          v-if="form.vectronConnect"
+          class="conditional-fields"
+        >
           <div class="form-group full-width">
             <label for="vectronAddress">VECTRON ADDRESS</label>
             <input
-              type="text"
               id="vectronAddress"
               v-model="form.vectronAddress"
+              type="text"
               class="form-control"
               placeholder="Ex: 192.168.1.100 ou vectron.empresa.com"
-            />
+            >
           </div>
         </div>
       </section>
@@ -616,14 +790,24 @@
             class="form-control"
             rows="4"
             placeholder="Notas adicionais sobre o cliente..."
-          ></textarea>
+          />
         </div>
       </section>
 
       <!-- Form Actions -->
       <div class="form-actions">
-        <button type="button" @click="navigateBack" class="btn btn-secondary">Cancelar</button>
-        <button type="submit" class="btn btn-primary" :disabled="!validateForm()">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          @click="navigateBack"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          :disabled="!validateForm()"
+        >
           {{ isEditing ? 'Atualizar' : 'Criar' }} Cliente
         </button>
       </div>

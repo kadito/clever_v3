@@ -34,12 +34,14 @@
                 fontFamily: 'system-ui, sans-serif',
               },
             }"
-            :redirectUrl="'/'"
+            :redirect-url="'/'"
           />
         </div>
 
         <div class="security-notice">
-          <div class="security-icon">🔒</div>
+          <div class="security-icon">
+            🔒
+          </div>
           <p>Acesso seguro e protegido</p>
         </div>
       </div>

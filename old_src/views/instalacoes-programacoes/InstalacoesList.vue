@@ -3,7 +3,10 @@
     <!-- Header -->
     <div class="list-header">
       <div class="header-top">
-        <BackButton to="/instalacoes-programacoes" variant="inline" />
+        <BackButton
+          to="/instalacoes-programacoes"
+          variant="inline"
+        />
         <h1>Lista de Instalações</h1>
       </div>
 
@@ -24,28 +27,53 @@
             placeholder="Pesquisar por cliente, equipamento, técnico..."
             class="search-input"
             @input="handleSearch"
-          />
-          <button v-if="searchQuery" @click="clearSearch" class="clear-search">✕</button>
+          >
+          <button
+            v-if="searchQuery"
+            class="clear-search"
+            @click="clearSearch"
+          >
+            ✕
+          </button>
         </div>
 
         <!-- Add Button -->
-        <router-link :to="{ name: 'instalacao-form' }" class="btn btn-success">
+        <router-link
+          :to="{ name: 'instalacao-form' }"
+          class="btn btn-success"
+        >
           ➕ Nova Instalação
         </router-link>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div v-if="instalacoesStore.loading" class="loading">Carregando instalações...</div>
+    <div
+      v-if="instalacoesStore.loading"
+      class="loading"
+    >
+      Carregando instalações...
+    </div>
 
     <!-- Error State -->
-    <div v-else-if="instalacoesStore.error" class="error">
+    <div
+      v-else-if="instalacoesStore.error"
+      class="error"
+    >
       Erro: {{ instalacoesStore.error }}
-      <button @click="retry" class="btn btn-primary btn-sm">Tentar novamente</button>
+      <button
+        class="btn btn-primary btn-sm"
+        @click="retry"
+      >
+        Tentar novamente
+      </button>
     </div>
 
     <!-- Search Results -->
-    <div v-else-if="isSearching && searchResults.length > 0" class="search-results">
+    <div
+      v-else-if="isSearching && searchResults.length > 0"
+      class="search-results"
+    >
       <h3>Resultados da pesquisa "{{ searchQuery }}" ({{ searchResults.length }})</h3>
       <div class="instalacoes-grid">
         <div
@@ -54,18 +82,27 @@
           class="instalacao-card"
           @click="navigateToDetail(instalacao)"
         >
-          <InstallationCard :instalacao="instalacao" :show-year="!searchYear" />
+          <InstallationCard
+            :instalacao="instalacao"
+            :show-year="!searchYear"
+          />
         </div>
       </div>
     </div>
 
     <!-- No Search Results -->
-    <div v-else-if="isSearching && searchResults.length === 0" class="no-data">
+    <div
+      v-else-if="isSearching && searchResults.length === 0"
+      class="no-data"
+    >
       Nenhuma instalação encontrada para "{{ searchQuery }}".
     </div>
 
     <!-- Regular List -->
-    <div v-else-if="instalacoesStore.instalacoes.length > 0" class="instalacoes-container">
+    <div
+      v-else-if="instalacoesStore.instalacoes.length > 0"
+      class="instalacoes-container"
+    >
       <div class="list-info">
         <p>
           {{ instalacoesStore.getInstalacoesCount }} instalações em
@@ -86,12 +123,20 @@
     </div>
 
     <!-- No Data -->
-    <div v-else class="no-data">
+    <div
+      v-else
+      class="no-data"
+    >
       <div class="no-data-content">
-        <div class="no-data-icon">📦</div>
+        <div class="no-data-icon">
+          📦
+        </div>
         <h3>Nenhuma instalação encontrada</h3>
         <p>Não existem instalações registadas para o ano {{ instalacoesStore.currentYear }}.</p>
-        <router-link :to="{ name: 'instalacao-form' }" class="btn btn-success">
+        <router-link
+          :to="{ name: 'instalacao-form' }"
+          class="btn btn-success"
+        >
           ➕ Criar primeira instalação
         </router-link>
       </div>

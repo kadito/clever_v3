@@ -33,7 +33,7 @@ async function simulateFileSelect(wrapper: ReturnType<typeof mount>, files: File
   const fileList = {
     length: files.length,
     item: (i: number) => files[i] || null,
-    [Symbol.iterator]: function* () {
+    *[Symbol.iterator] () {
       for (let i = 0; i < files.length; i++) yield files[i];
     },
   } as unknown as FileList;

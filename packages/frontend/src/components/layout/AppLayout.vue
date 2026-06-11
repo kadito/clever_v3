@@ -6,16 +6,21 @@
         <div class="flex justify-between items-center h-16">
           <!-- Logo and title -->
           <div class="flex items-center">
-            <router-link to="/" class="flex items-center">
-              <h1 class="text-xl font-bold text-primary-600">CLEVER</h1>
+            <router-link
+              to="/"
+              class="flex items-center"
+            >
+              <h1 class="text-xl font-bold text-primary-600">
+                CLEVER
+              </h1>
             </router-link>
           </div>
 
           <!-- Mobile menu button -->
           <button
-            @click="toggleMobileMenu"
             class="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500 touch-target"
             aria-label="Abrir menu"
+            @click="toggleMobileMenu"
           >
             <svg
               class="w-6 h-6"
@@ -60,7 +65,11 @@
             </nav>
 
             <!-- User profile for authenticated users -->
-            <UserProfile v-if="isAuthenticated && user" :user="user" :is-mobile="false" />
+            <UserProfile
+              v-if="isAuthenticated && user"
+              :user="user"
+              :is-mobile="false"
+            />
 
             <!-- Sign in link for unauthenticated users -->
             <router-link
@@ -75,23 +84,43 @@
       </div>
 
       <!-- Mobile navigation menu -->
-      <div class="md:hidden" :class="{ block: isMobileMenuOpen, hidden: !isMobileMenuOpen }">
+      <div
+        class="md:hidden"
+        :class="{ block: isMobileMenuOpen, hidden: !isMobileMenuOpen }"
+      >
         <div class="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-gray-200">
-          <AppNavigation :is-mobile="true" @navigate="closeMobileMenu" />
+          <AppNavigation
+            :is-mobile="true"
+            @navigate="closeMobileMenu"
+          />
 
           <!-- Mobile user profile -->
-          <div v-if="isAuthenticated && user" class="border-t border-gray-200 pt-3 mt-3">
-            <UserProfile :user="user" :is-mobile="true" />
+          <div
+            v-if="isAuthenticated && user"
+            class="border-t border-gray-200 pt-3 mt-3"
+          >
+            <UserProfile
+              :user="user"
+              :is-mobile="true"
+            />
           </div>
 
           <!-- Mobile sign in link -->
-          <div v-else-if="isLoaded && !isAuthenticated" class="border-t border-gray-200 pt-3 mt-3">
+          <div
+            v-else-if="isLoaded && !isAuthenticated"
+            class="border-t border-gray-200 pt-3 mt-3"
+          >
             <router-link
               to="/entrar"
               class="flex items-center px-4 py-3 text-sm font-medium text-primary-600 hover:bg-primary-50 rounded-lg mx-2 touch-target"
               @click="closeMobileMenu"
             >
-              <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                class="w-5 h-5 mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -126,7 +155,7 @@
       v-if="isMobileMenuOpen"
       class="fixed inset-0 z-40 bg-black bg-opacity-25 md:hidden"
       @click="closeMobileMenu"
-    ></div>
+    />
   </div>
 </template>
 

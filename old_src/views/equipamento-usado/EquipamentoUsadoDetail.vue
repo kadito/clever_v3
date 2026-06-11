@@ -5,8 +5,8 @@
       <div class="detail-title">
         <h1>{{ equipamento ? getEquipamentoSummary(equipamento) : 'Equipamento' }}</h1>
         <div
-          class="status-badge"
           v-if="equipamento"
+          class="status-badge"
           :class="getEquipamentoStatus(equipamento).status"
         >
           {{ getEquipamentoStatus(equipamento).label }}
@@ -15,18 +15,32 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A carregar equipamento...</p>
     </div>
 
     <!-- Error State -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Equipment Details -->
-    <div v-if="equipamento && !loading" class="detail-content">
+    <div
+      v-if="equipamento && !loading"
+      class="detail-content"
+    >
       <!-- Equipment Information -->
       <section class="detail-section">
         <h2>📦 INFORMAÇÕES DO EQUIPAMENTO</h2>
@@ -75,13 +89,19 @@
         <div class="condition-grid">
           <div class="condition-item">
             <span class="condition-label">VISOR:</span>
-            <span class="condition-value" :class="getConditionClass(equipamento.visor)">
+            <span
+              class="condition-value"
+              :class="getConditionClass(equipamento.visor)"
+            >
               {{ equipamento.visor || 'N/A' }}
             </span>
           </div>
           <div class="condition-item">
             <span class="condition-label">CORPO DO EQUIPAMENTO:</span>
-            <span class="condition-value" :class="getConditionClass(equipamento.corpoEquipamento)">
+            <span
+              class="condition-value"
+              :class="getConditionClass(equipamento.corpoEquipamento)"
+            >
               {{ equipamento.corpoEquipamento || 'N/A' }}
             </span>
           </div>
@@ -96,7 +116,10 @@
           </div>
           <div class="condition-item overall">
             <span class="condition-label">ESTADO GERAL:</span>
-            <span class="condition-value" :class="getConditionClass(equipamento.estadoGeral)">
+            <span
+              class="condition-value"
+              :class="getConditionClass(equipamento.estadoGeral)"
+            >
               {{ equipamento.estadoGeral || 'N/A' }}
             </span>
           </div>
@@ -128,37 +151,76 @@
 
       <!-- Actions -->
       <div class="detail-actions">
-        <button @click="goToEdit" class="btn btn-primary">✏️ Editar Equipamento</button>
-        <button @click="confirmDelete" class="btn btn-danger">🗑️ Eliminar</button>
+        <button
+          class="btn btn-primary"
+          @click="goToEdit"
+        >
+          ✏️ Editar Equipamento
+        </button>
+        <button
+          class="btn btn-danger"
+          @click="confirmDelete"
+        >
+          🗑️ Eliminar
+        </button>
       </div>
     </div>
 
     <!-- Not Found State -->
-    <div v-if="!loading && !error && !equipamento" class="not-found-state">
+    <div
+      v-if="!loading && !error && !equipamento"
+      class="not-found-state"
+    >
       <h2>Equipamento não encontrado</h2>
       <p>O equipamento pode ainda não estar disponível no sistema. Tentar novamente?</p>
       <div class="retry-actions">
-        <button @click="retryLoad" class="btn btn-primary" :disabled="loading">
+        <button
+          class="btn btn-primary"
+          :disabled="loading"
+          @click="retryLoad"
+        >
           {{ loading ? 'A carregar...' : 'Tentar novamente' }}
         </button>
-        <BackButton :to="backRoute" variant="full-width" />
+        <BackButton
+          :to="backRoute"
+          variant="full-width"
+        />
       </div>
-      <p v-if="autoRetryCountdown > 0" class="auto-retry-info">
+      <p
+        v-if="autoRetryCountdown > 0"
+        class="auto-retry-info"
+      >
         Tentativa automática em {{ autoRetryCountdown }}s...
       </p>
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div v-if="showDeleteModal" class="modal-overlay" @click="showDeleteModal = false">
-      <div class="modal-content" @click.stop>
+    <div
+      v-if="showDeleteModal"
+      class="modal-overlay"
+      @click="showDeleteModal = false"
+    >
+      <div
+        class="modal-content"
+        @click.stop
+      >
         <h3>Confirmar Eliminação</h3>
         <p>Tem a certeza que pretende eliminar este equipamento?</p>
         <p>
           <strong>{{ equipamento ? getEquipamentoSummary(equipamento) : '' }}</strong>
         </p>
         <div class="modal-actions">
-          <button @click="showDeleteModal = false" class="btn btn-secondary">Cancelar</button>
-          <button @click="handleDelete" class="btn btn-danger" :disabled="loading">
+          <button
+            class="btn btn-secondary"
+            @click="showDeleteModal = false"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn btn-danger"
+            :disabled="loading"
+            @click="handleDelete"
+          >
             {{ loading ? 'A eliminar...' : 'Eliminar' }}
           </button>
         </div>

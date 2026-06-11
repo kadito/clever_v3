@@ -5,18 +5,23 @@
       <!-- Mobile-first navigation -->
       <nav class="navbar">
         <div class="nav-container">
-          <h1 class="nav-title">Clever</h1>
+          <h1 class="nav-title">
+            Clever
+          </h1>
 
           <!-- User controls for desktop -->
           <div class="user-controls desktop-only">
-            <span class="user-welcome" v-if="user">
+            <span
+              v-if="user"
+              class="user-welcome"
+            >
               Olá, {{ user.firstName || user.emailAddresses?.[0]?.emailAddress }}
             </span>
             <button
               v-if="isAdmin"
-              @click="goToUserManagement"
               class="nav-link admin-link"
               title="Gestão de Utilizadores"
+              @click="goToUserManagement"
             >
               <span class="nav-icon">👥</span>
               Admin
@@ -26,27 +31,42 @@
 
           <button
             class="mobile-menu-toggle"
-            @click="toggleMobileMenu"
             :class="{ active: isMobileMenuOpen }"
+            @click="toggleMobileMenu"
           >
-            <span></span>
-            <span></span>
-            <span></span>
+            <span />
+            <span />
+            <span />
           </button>
 
-          <div class="nav-links" :class="{ 'mobile-open': isMobileMenuOpen }">
-            <router-link to="/" class="nav-link" @click="closeMobileMenu">
+          <div
+            class="nav-links"
+            :class="{ 'mobile-open': isMobileMenuOpen }"
+          >
+            <router-link
+              to="/"
+              class="nav-link"
+              @click="closeMobileMenu"
+            >
               <span class="nav-icon">🏠</span>
               Home
             </router-link>
-            <router-link to="/dashboard" class="nav-link" @click="closeMobileMenu">
+            <router-link
+              to="/dashboard"
+              class="nav-link"
+              @click="closeMobileMenu"
+            >
               <span class="nav-icon">📊</span>
               Dashboard
             </router-link>
 
             <!-- Mobile user controls -->
             <div class="mobile-user-controls mobile-only">
-              <button v-if="isAdmin" @click="goToUserManagement" class="nav-link admin-link">
+              <button
+                v-if="isAdmin"
+                class="nav-link admin-link"
+                @click="goToUserManagement"
+              >
                 <span class="nav-icon">👥</span>
                 Gestão de Utilizadores
               </button>
@@ -59,7 +79,10 @@
       </nav>
     </SignedIn>
 
-    <main class="main-content" :class="{ 'no-nav': !isSignedIn }">
+    <main
+      class="main-content"
+      :class="{ 'no-nav': !isSignedIn }"
+    >
       <router-view />
     </main>
   </div>

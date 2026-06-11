@@ -2,34 +2,75 @@
   <div class="transaction-history-view">
     <!-- Header -->
     <div class="view-header">
-      <button @click="handleBack" class="back-button">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      <button
+        class="back-button"
+        @click="handleBack"
+      >
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          />
         </svg>
         <span>Voltar</span>
       </button>
       
       <div class="header-content">
-        <h1 class="view-title">Histórico de Transações</h1>
-        <p v-if="clientName" class="view-subtitle">{{ clientName }}</p>
+        <h1 class="view-title">
+          Histórico de Transações
+        </h1>
+        <p
+          v-if="clientName"
+          class="view-subtitle"
+        >
+          {{ clientName }}
+        </p>
       </div>
     </div>
 
     <!-- Error State -->
-    <div v-if="error" class="error-container">
+    <div
+      v-if="error"
+      class="error-container"
+    >
       <div class="error-content">
-        <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <svg
+          class="error-icon"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
         </svg>
-        <p class="error-message">{{ error }}</p>
-        <button @click="loadClientInfo" class="retry-button">
+        <p class="error-message">
+          {{ error }}
+        </p>
+        <button
+          class="retry-button"
+          @click="loadClientInfo"
+        >
           Tentar Novamente
         </button>
       </div>
     </div>
 
     <!-- Transaction History Component -->
-    <div v-else class="history-container">
+    <div
+      v-else
+      class="history-container"
+    >
       <TransactionHistoryDisplay :client-id="clientId" />
     </div>
   </div>

@@ -27,7 +27,7 @@ import {
   validateWorkSheetCreation,
   validateWorkSheetUpdate,
   getWorkSheetSummary,
-  calculateWorkSheetTotals,
+  calculateWorkSheetPricing,
 } from '@clever/shared';
 import { autoAssignTechnician, validateTechnicianAssignment } from '../utils/technician-assignment';
 import { createBalanceService, ValidationError } from '../services/balance-service';
@@ -247,7 +247,13 @@ workSheetConfig.extractSearchableText = (content: WorkSheet) => {
 workSheetConfig.extractIndexFields = (content: WorkSheet) => {
   const data = content.data;
   const summary = getWorkSheetSummary(content);
-  const totals = calculateWorkSheetTotals(data);
+  const pricing = calculateWorkSheetPricing({
+    weekendHoliday: data.displacement?.weekendHoliday ?? false,
+    hasDisplacement: data.displacement?.hasDisplacement ?? false,
+    totalKms: data.displacement?.totalKms ?? 0,
+    arrivalTime: data.request?.arrivalTime ?? '',
+    departureTime: data.request?.departureTime ?? '',
+  });
 
   return {
     // Basic information for search and display
@@ -260,7 +266,7 @@ workSheetConfig.extractIndexFields = (content: WorkSheet) => {
     reason: data.request?.reason || '',
     arrivalTime: data.request?.arrivalTime || '',
     departureTime: data.request?.departureTime || '',
-    totalHours: totals.totalHours,
+    totalHours: pricing.laborHours,
 
     // Service information
     serviceType: data.otherData?.serviceType || '',
@@ -290,11 +296,11 @@ workSheetConfig.extractIndexFields = (content: WorkSheet) => {
     anydesk: data.otherData?.anydesk || false,
 
     // Pricing information (calculated)
-    displacementRate: totals.displacementRate,
-    kmsPrice: totals.kmsPrice,
-    hourlyRate: totals.hourlyRate,
-    laborPrice: totals.laborPrice,
-    totalPrice: totals.totalPrice,
+    displacementRate: pricing.travelFee,
+    kmsPrice: pricing.mileagePrice,
+    hourlyRate: pricing.hourlyRate,
+    laborPrice: pricing.laborPrice,
+    totalPrice: pricing.totalPrice,
 
     // Summary for display
     summary,

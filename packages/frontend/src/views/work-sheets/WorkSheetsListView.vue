@@ -17,16 +17,16 @@
     :get-item-subtitle="getWorkSheetSubtitle"
     :get-item-meta1="getWorkSheetMeta1"
     :get-item-meta2="getWorkSheetMeta2"
-    @search="handleSearch"
-    @clear-search="handleClearSearch"
-    @item-click="handleWorkSheetClick"
-    @create="handleCreate"
-    @edit="handleEdit"
     :current-page="api.pagination.value.page"
     :total-pages="api.pagination.value.totalPages"
     :total-count="api.pagination.value.total"
     :items-per-page="itemsPerPage"
     :show-pagination="api.pagination.value.total > 0"
+    @search="handleSearch"
+    @clear-search="handleClearSearch"
+    @item-click="handleWorkSheetClick"
+    @create="handleCreate"
+    @edit="handleEdit"
     @page-change="handlePageChange"
     @items-per-page-change="handleItemsPerPageChange"
     @clear-error="clearError"
@@ -34,7 +34,10 @@
     <!-- Custom work sheet icon -->
     <template #itemIcon="{ item }">
       <div class="work-sheet-icon">
-        <div class="icon-circle" :class="getWorkSheetIconClass(item)">
+        <div
+          class="icon-circle"
+          :class="getWorkSheetIconClass(item)"
+        >
           {{ getWorkSheetInitials(item) }}
         </div>
       </div>
@@ -44,7 +47,10 @@
     <template #itemMeta="{ item }">
       <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
         <!-- Work sheet status -->
-        <span class="work-sheet-status-badge" :class="getWorkSheetStatusClass(item)">
+        <span
+          class="work-sheet-status-badge"
+          :class="getWorkSheetStatusClass(item)"
+        >
           {{ getWorkSheetStatusText(item) }}
         </span>
 
@@ -53,7 +59,12 @@
           v-if="item.data.request?.assistanceDate"
           class="flex items-center before:content-['•'] before:mx-1"
         >
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -65,8 +76,16 @@
         </span>
 
         <!-- Displacement indicator -->
-        <span v-if="item.data.displacement?.hasDisplacement" class="displacement-badge">
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <span
+          v-if="item.data.displacement?.hasDisplacement"
+          class="displacement-badge"
+        >
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -88,7 +107,12 @@
           v-if="item.data.otherData?.serviceType"
           class="flex items-center before:content-['•'] before:mx-1"
         >
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -104,7 +128,12 @@
           v-if="item.data.request?.totalHours"
           class="flex items-center before:content-['•'] before:mx-1"
         >
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -120,7 +149,12 @@
           v-if="item.data.displacement?.paymentMethod"
           class="flex items-center before:content-['•'] before:mx-1"
         >
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"

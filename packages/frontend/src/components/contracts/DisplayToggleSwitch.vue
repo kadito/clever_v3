@@ -1,7 +1,12 @@
 <template>
   <div class="display-toggle-container">
-    <div class="toggle-item" :class="{ inactive: !isActive }">
-      <h3 class="toggle-title">{{ title }}</h3>
+    <div
+      class="toggle-item"
+      :class="{ inactive: !isActive }"
+    >
+      <h3 class="toggle-title">
+        {{ title }}
+      </h3>
       <button
         type="button"
         class="toggle-switch"
@@ -11,7 +16,10 @@
         :aria-label="`${isActive ? 'Desativar' : 'Ativar'} ${title}`"
         @click="handleToggle"
       >
-        <span class="toggle-slider" :class="{ active: isActive }"></span>
+        <span
+          class="toggle-slider"
+          :class="{ active: isActive }"
+        />
       </button>
     </div>
   </div>

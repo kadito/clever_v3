@@ -17,16 +17,16 @@
     :get-item-subtitle="getDailyRecordSubtitle"
     :get-item-meta1="getDailyRecordMeta1"
     :get-item-meta2="getDailyRecordMeta2"
-    @search="handleSearch"
-    @clear-search="handleClearSearch"
-    @item-click="handleDailyRecordClick"
-    @create="handleCreate"
-    @edit="handleEdit"
     :current-page="api.pagination.value.page"
     :total-pages="api.pagination.value.totalPages"
     :total-count="api.pagination.value.total"
     :items-per-page="itemsPerPage"
     :show-pagination="api.pagination.value.total > 0"
+    @search="handleSearch"
+    @clear-search="handleClearSearch"
+    @item-click="handleDailyRecordClick"
+    @create="handleCreate"
+    @edit="handleEdit"
     @page-change="handlePageChange"
     @items-per-page-change="handleItemsPerPageChange"
     @clear-error="clearError"
@@ -34,7 +34,10 @@
     <!-- Custom daily record icon -->
     <template #itemIcon="{ item }">
       <div class="daily-record-icon">
-        <div class="icon-circle" :class="getDailyRecordIconClass(item)">
+        <div
+          class="icon-circle"
+          :class="getDailyRecordIconClass(item)"
+        >
           {{ getDailyRecordInitials(item) }}
         </div>
       </div>
@@ -45,7 +48,12 @@
       <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
         <!-- Date badge -->
         <span class="date-badge">
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -58,7 +66,12 @@
 
         <!-- Activity count badge -->
         <span class="activity-count-badge">
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -71,7 +84,12 @@
 
         <!-- Total hours badge -->
         <span class="total-hours-badge">
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -83,12 +101,20 @@
         </span>
 
         <!-- Activity type breakdown -->
-        <div v-if="getActivityTypeBreakdown(item)" class="flex flex-wrap gap-1">
+        <div
+          v-if="getActivityTypeBreakdown(item)"
+          class="flex flex-wrap gap-1"
+        >
           <span
             v-if="getActivityTypeBreakdown(item).interno > 0"
             class="activity-type-badge bg-blue-100 text-blue-800"
           >
-            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-3 h-3 mr-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -102,7 +128,12 @@
             v-if="getActivityTypeBreakdown(item).externo > 0"
             class="activity-type-badge bg-green-100 text-green-800"
           >
-            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-3 h-3 mr-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -115,12 +146,20 @@
         </div>
 
         <!-- Linked content indicators -->
-        <div v-if="hasLinkedContent(item)" class="flex flex-wrap gap-1">
+        <div
+          v-if="hasLinkedContent(item)"
+          class="flex flex-wrap gap-1"
+        >
           <span
             v-if="hasWorkSheetLinks(item)"
             class="linked-content-badge bg-purple-100 text-purple-800"
           >
-            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-3 h-3 mr-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -134,7 +173,12 @@
             v-if="hasRemoteAssistanceLinks(item)"
             class="linked-content-badge bg-indigo-100 text-indigo-800"
           >
-            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-3 h-3 mr-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"

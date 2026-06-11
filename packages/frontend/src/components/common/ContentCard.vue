@@ -20,7 +20,10 @@
         <h3 class="content-card__title">
           {{ title }}
         </h3>
-        <p v-if="subtitle" class="content-card__subtitle">
+        <p
+          v-if="subtitle"
+          class="content-card__subtitle"
+        >
           {{ subtitle }}
         </p>
       </div>
@@ -31,10 +34,15 @@
           <button
             v-if="clickable"
             class="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors duration-200 touch-target"
-            @click.stop="$emit('action')"
             aria-label="Mais opções"
+            @click.stop="$emit('action')"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -48,18 +56,30 @@
     </div>
 
     <!-- Card content -->
-    <div v-if="$slots.default || description" class="content-card__content">
+    <div
+      v-if="$slots.default || description"
+      class="content-card__content"
+    >
       <slot>
-        <p v-if="description" class="text-gray-600 text-sm">
+        <p
+          v-if="description"
+          class="text-gray-600 text-sm"
+        >
           {{ description }}
         </p>
       </slot>
     </div>
 
     <!-- Card footer -->
-    <div v-if="$slots.footer || showMetadata" class="content-card__footer">
+    <div
+      v-if="$slots.footer || showMetadata"
+      class="content-card__footer"
+    >
       <slot name="footer">
-        <div v-if="showMetadata" class="flex items-center justify-between text-xs text-gray-500">
+        <div
+          v-if="showMetadata"
+          class="flex items-center justify-between text-xs text-gray-500"
+        >
           <span v-if="createdAt"> Criado: {{ formatDate(createdAt) }} </span>
           <span v-if="updatedAt"> Atualizado: {{ formatDate(updatedAt) }} </span>
         </div>
@@ -67,8 +87,12 @@
     </div>
 
     <!-- Status indicator -->
-    <div v-if="status" class="content-card__status" :class="`content-card__status--${status}`">
-      <div class="w-2 h-2 rounded-full"></div>
+    <div
+      v-if="status"
+      class="content-card__status"
+      :class="`content-card__status--${status}`"
+    >
+      <div class="w-2 h-2 rounded-full" />
     </div>
   </div>
 </template>

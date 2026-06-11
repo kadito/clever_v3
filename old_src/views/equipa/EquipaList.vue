@@ -1,7 +1,10 @@
 <template>
   <div class="equipa-container">
     <div class="equipa-header">
-      <BackButton to="/equipa" variant="inline" />
+      <BackButton
+        to="/equipa"
+        variant="inline"
+      />
     </div>
 
     <!-- Controls -->
@@ -10,22 +13,42 @@
         <h2>Colaboradores ({{ collaborators.length }})</h2>
       </div>
 
-      <button @click="refreshData" :disabled="loading" class="btn btn-refresh">🔄 Atualizar</button>
+      <button
+        :disabled="loading"
+        class="btn btn-refresh"
+        @click="refreshData"
+      >
+        🔄 Atualizar
+      </button>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A carregar colaboradores...</p>
     </div>
 
     <!-- Error State -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Collaborators List -->
-    <div v-if="!loading && collaborators.length > 0" class="collaborators-list">
+    <div
+      v-if="!loading && collaborators.length > 0"
+      class="collaborators-list"
+    >
       <div
         v-for="collaborator in collaborators"
         :key="collaborator.id"
@@ -36,25 +59,53 @@
           <h3>{{ collaborator.name }}</h3>
         </div>
         <div class="collaborator-actions">
-          <button class="action-btn" @click.stop="showActions(collaborator)">⋮</button>
+          <button
+            class="action-btn"
+            @click.stop="showActions(collaborator)"
+          >
+            ⋮
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Empty State -->
-    <div v-if="!loading && collaborators.length === 0" class="empty-state">
+    <div
+      v-if="!loading && collaborators.length === 0"
+      class="empty-state"
+    >
       <h3>Nenhum colaborador encontrado</h3>
       <p>Não há colaboradores cadastrados no sistema.</p>
     </div>
 
     <!-- Actions Modal -->
-    <div v-if="showActionsModal" class="actions-modal-overlay" @click="closeActions">
-      <div class="actions-modal" @click.stop>
+    <div
+      v-if="showActionsModal"
+      class="actions-modal-overlay"
+      @click="closeActions"
+    >
+      <div
+        class="actions-modal"
+        @click.stop
+      >
         <h3>{{ selectedCollaboratorForActions?.name }}</h3>
         <div class="modal-actions">
-          <button @click="viewCollaborator" class="modal-btn view-btn">📋 Ver Detalhes</button>
-          <button @click="editCollaborator" class="modal-btn edit-btn">✏️ Editar</button>
-          <button @click="deleteCollaboratorAction" class="modal-btn delete-btn">
+          <button
+            class="modal-btn view-btn"
+            @click="viewCollaborator"
+          >
+            📋 Ver Detalhes
+          </button>
+          <button
+            class="modal-btn edit-btn"
+            @click="editCollaborator"
+          >
+            ✏️ Editar
+          </button>
+          <button
+            class="modal-btn delete-btn"
+            @click="deleteCollaboratorAction"
+          >
             🗑️ Eliminar
           </button>
         </div>
@@ -62,7 +113,12 @@
     </div>
 
     <!-- Floating Action Button -->
-    <button @click="navigateToCreate" class="fab">➕</button>
+    <button
+      class="fab"
+      @click="navigateToCreate"
+    >
+      ➕
+    </button>
   </div>
 </template>
 

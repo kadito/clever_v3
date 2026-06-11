@@ -2,28 +2,50 @@
   <div class="collaborator-detail-container">
     <!-- Header -->
     <div class="detail-header">
-      <BackButton to="/equipa/list" variant="inline" />
+      <BackButton
+        to="/equipa/list"
+        variant="inline"
+      />
       <div class="header-content">
         <h1>{{ collaborator?.name || 'Colaborador' }}</h1>
       </div>
       <div class="header-actions">
-        <button @click="navigateToEdit" class="btn btn-edit">✏️ Editar</button>
+        <button
+          class="btn btn-edit"
+          @click="navigateToEdit"
+        >
+          ✏️ Editar
+        </button>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A carregar colaborador...</p>
     </div>
 
     <!-- Error State -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Collaborator Details -->
-    <div v-if="!loading && collaborator" class="detail-content">
+    <div
+      v-if="!loading && collaborator"
+      class="detail-content"
+    >
       <!-- Basic Information Section -->
       <section class="detail-section">
         <h3>INFORMAÇÃO BÁSICA</h3>
@@ -32,11 +54,17 @@
             <label>NOME</label>
             <span>{{ collaborator.name }}</span>
           </div>
-          <div class="detail-item" v-if="collaborator.createdAt">
+          <div
+            v-if="collaborator.createdAt"
+            class="detail-item"
+          >
             <label>DATA DE CRIAÇÃO</label>
             <span>{{ formatDate(collaborator.createdAt) }}</span>
           </div>
-          <div class="detail-item" v-if="collaborator.updatedAt">
+          <div
+            v-if="collaborator.updatedAt"
+            class="detail-item"
+          >
             <label>ÚLTIMA ATUALIZAÇÃO</label>
             <span>{{ formatDate(collaborator.updatedAt) }}</span>
           </div>
@@ -45,24 +73,50 @@
     </div>
 
     <!-- Not Found State -->
-    <div v-if="!loading && !error && !collaborator" class="not-found-state">
+    <div
+      v-if="!loading && !error && !collaborator"
+      class="not-found-state"
+    >
       <h2>Colaborador não encontrado</h2>
       <p>O colaborador pode ainda não estar disponível no sistema. Tentar novamente?</p>
       <div class="retry-actions">
-        <button @click="retryLoad" class="btn btn-primary" :disabled="loading">
+        <button
+          class="btn btn-primary"
+          :disabled="loading"
+          @click="retryLoad"
+        >
           {{ loading ? 'A carregar...' : 'Tentar novamente' }}
         </button>
-        <BackButton to="/equipa/list" variant="full-width" />
+        <BackButton
+          to="/equipa/list"
+          variant="full-width"
+        />
       </div>
-      <p v-if="autoRetryCountdown > 0" class="auto-retry-info">
+      <p
+        v-if="autoRetryCountdown > 0"
+        class="auto-retry-info"
+      >
         Tentativa automática em {{ autoRetryCountdown }}s...
       </p>
     </div>
 
     <!-- Action Buttons -->
-    <div v-if="!loading && collaborator" class="action-buttons">
-      <button @click="navigateToEdit" class="btn btn-primary">✏️ Editar Colaborador</button>
-      <button @click="navigateToList" class="btn btn-secondary">📋 Lista de Colaboradores</button>
+    <div
+      v-if="!loading && collaborator"
+      class="action-buttons"
+    >
+      <button
+        class="btn btn-primary"
+        @click="navigateToEdit"
+      >
+        ✏️ Editar Colaborador
+      </button>
+      <button
+        class="btn btn-secondary"
+        @click="navigateToList"
+      >
+        📋 Lista de Colaboradores
+      </button>
     </div>
   </div>
 </template>

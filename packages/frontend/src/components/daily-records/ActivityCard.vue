@@ -1,9 +1,20 @@
 <template>
-  <div class="activity-card" :class="{ 'view-mode': !isEditMode }">
+  <div
+    class="activity-card"
+    :class="{ 'view-mode': !isEditMode }"
+  >
     <!-- Card Header -->
     <div class="activity-card-header">
-      <div class="activity-type-indicator" :class="activityTypeClass">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div
+        class="activity-type-indicator"
+        :class="activityTypeClass"
+      >
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path
             v-if="localActivity.tipoAtividade === 'Interno'"
             stroke-linecap="round"
@@ -26,10 +37,15 @@
         v-if="isEditMode"
         type="button"
         class="remove-button"
-        @click="handleRemove"
         aria-label="Remover atividade"
+        @click="handleRemove"
       >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -43,15 +59,22 @@
     <!-- Card Body -->
     <div class="activity-card-body">
       <!-- Activity Type Selection (Edit Mode) -->
-      <div v-if="isEditMode" class="form-field">
+      <div
+        v-if="isEditMode"
+        class="form-field"
+      >
         <label class="form-label">Tipo de Atividade *</label>
         <select
           v-model="localActivity.tipoAtividade"
           class="form-select"
           @change="handleActivityTypeChange"
         >
-          <option value="Interno">Interno</option>
-          <option value="Externo">Externo</option>
+          <option value="Interno">
+            Interno
+          </option>
+          <option value="Externo">
+            Externo
+          </option>
         </select>
       </div>
 
@@ -76,16 +99,30 @@
           :disabled="!localActivity.clientId && !isLegacyActivity"
           @change="handleLinkTypeChange"
         >
-          <option value="Nenhuma">Nenhuma</option>
-          <option value="Folha de Obra">Folha de Obra</option>
-          <option value="Assistência Remota">Assistência Remota</option>
+          <option value="Nenhuma">
+            Nenhuma
+          </option>
+          <option value="Folha de Obra">
+            Folha de Obra
+          </option>
+          <option value="Assistência Remota">
+            Assistência Remota
+          </option>
         </select>
-        <div v-else class="form-value">{{ localActivity.tipoLigacao }}</div>
+        <div
+          v-else
+          class="form-value"
+        >
+          {{ localActivity.tipoLigacao }}
+        </div>
       </div>
 
       <!-- Conditional Fields: Work Sheet Search -->
       <Transition name="field-slide">
-        <div v-if="(localActivity.clientId || isLegacyActivity) && localActivity.tipoLigacao === 'Folha de Obra'" class="form-field">
+        <div
+          v-if="(localActivity.clientId || isLegacyActivity) && localActivity.tipoLigacao === 'Folha de Obra'"
+          class="form-field"
+        >
           <label class="form-label">Folha de Obra *</label>
           <WorkSheetSearchInput
             v-model="localActivity.workSheetId"
@@ -99,7 +136,10 @@
 
       <!-- Conditional Fields: Remote Assistance Search -->
       <Transition name="field-slide">
-        <div v-if="(localActivity.clientId || isLegacyActivity) && localActivity.tipoLigacao === 'Assistência Remota'" class="form-field">
+        <div
+          v-if="(localActivity.clientId || isLegacyActivity) && localActivity.tipoLigacao === 'Assistência Remota'"
+          class="form-field"
+        >
           <label class="form-label">Assistência Remota *</label>
           <RemoteAssistanceSearchInput
             v-model="localActivity.remoteAssistanceId"
@@ -121,8 +161,13 @@
           class="form-input"
           placeholder="Descreva o assunto da atividade"
           @input="emitUpdate"
-        />
-        <div v-else class="form-value">{{ localActivity.assunto || 'N/A' }}</div>
+        >
+        <div
+          v-else
+          class="form-value"
+        >
+          {{ localActivity.assunto || 'N/A' }}
+        </div>
       </div>
 
       <!-- Time Tracking Row -->
@@ -139,8 +184,13 @@
             maxlength="5"
             @input="handleTimeInput($event, 'horaInicio')"
             @blur="validateTimeFormat('horaInicio')"
-          />
-          <div v-else class="form-value">{{ localActivity.horaInicio || 'N/A' }}</div>
+          >
+          <div
+            v-else
+            class="form-value"
+          >
+            {{ localActivity.horaInicio || 'N/A' }}
+          </div>
         </div>
 
         <!-- End Time -->
@@ -155,8 +205,13 @@
             maxlength="5"
             @input="handleTimeInput($event, 'horaFim')"
             @blur="validateTimeFormat('horaFim')"
-          />
-          <div v-else class="form-value">{{ localActivity.horaFim || 'N/A' }}</div>
+          >
+          <div
+            v-else
+            class="form-value"
+          >
+            {{ localActivity.horaFim || 'N/A' }}
+          </div>
         </div>
 
         <!-- Break Time -->
@@ -170,14 +225,21 @@
             placeholder="0"
             min="0"
             @input="emitUpdate"
-          />
-          <div v-else class="form-value">{{ localActivity.tempoPausa ?? 0 }} min</div>
+          >
+          <div
+            v-else
+            class="form-value"
+          >
+            {{ localActivity.tempoPausa ?? 0 }} min
+          </div>
         </div>
 
         <!-- Total Hours (Calculated) -->
         <div class="form-field">
           <label class="form-label">Total Horas</label>
-          <div class="form-value total-hours">{{ calculatedTotalHours }}</div>
+          <div class="form-value total-hours">
+            {{ calculatedTotalHours }}
+          </div>
         </div>
       </div>
 
@@ -191,8 +253,13 @@
           rows="3"
           placeholder="Descrição detalhada da atividade (opcional)"
           @input="emitUpdate"
-        ></textarea>
-        <div v-else class="form-value">{{ localActivity.descricao || 'N/A' }}</div>
+        />
+        <div
+          v-else
+          class="form-value"
+        >
+          {{ localActivity.descricao || 'N/A' }}
+        </div>
       </div>
     </div>
   </div>
@@ -327,7 +394,7 @@ const handleTimeInput = (event: Event, field: 'horaInicio' | 'horaFim') => {
     input.value = value;
   } else if (value.length > 2 && !value.includes(':')) {
     // Add colon after 2 digits
-    value = value.substring(0, 2) + ':' + value.substring(2);
+    value = `${value.substring(0, 2)  }:${  value.substring(2)}`;
     localActivity.value[field] = value;
     input.value = value;
   }

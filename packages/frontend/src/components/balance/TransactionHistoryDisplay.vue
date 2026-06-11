@@ -3,66 +3,104 @@
     <!-- Filters Section -->
     <div class="filters-section">
       <div class="filter-group">
-        <label for="type-filter" class="filter-label">Tipo</label>
+        <label
+          for="type-filter"
+          class="filter-label"
+        >Tipo</label>
         <select 
           id="type-filter" 
           v-model="filters.type" 
           class="filter-select"
           @change="loadTransactions"
         >
-          <option value="">Todos</option>
-          <option value="ADD">Adição (ADD)</option>
-          <option value="DEBT">Dívida (DEBT)</option>
+          <option value="">
+            Todos
+          </option>
+          <option value="ADD">
+            Adição (ADD)
+          </option>
+          <option value="DEBT">
+            Dívida (DEBT)
+          </option>
         </select>
       </div>
 
       <div class="filter-group">
-        <label for="start-date" class="filter-label">Data Início</label>
+        <label
+          for="start-date"
+          class="filter-label"
+        >Data Início</label>
         <input 
           id="start-date"
           v-model="filters.startDate" 
           type="date" 
           class="filter-input"
           @change="loadTransactions"
-        />
+        >
       </div>
 
       <div class="filter-group">
-        <label for="end-date" class="filter-label">Data Fim</label>
+        <label
+          for="end-date"
+          class="filter-label"
+        >Data Fim</label>
         <input 
           id="end-date"
           v-model="filters.endDate" 
           type="date" 
           class="filter-input"
           @change="loadTransactions"
-        />
+        >
       </div>
 
       <button 
         class="clear-filters-btn" 
-        @click="clearFilters"
         :disabled="!hasActiveFilters"
+        @click="clearFilters"
       >
         Limpar Filtros
       </button>
     </div>
 
     <!-- Loading State -->
-    <div v-if="isLoading" class="loading-state">
-      <div class="spinner"></div>
-      <p class="loading-text">A carregar histórico...</p>
+    <div
+      v-if="isLoading"
+      class="loading-state"
+    >
+      <div class="spinner" />
+      <p class="loading-text">
+        A carregar histórico...
+      </p>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="error-state">
-      <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <div
+      v-else-if="error"
+      class="error-state"
+    >
+      <svg
+        class="error-icon"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
       </svg>
-      <p class="error-message">{{ error }}</p>
+      <p class="error-message">
+        {{ error }}
+      </p>
     </div>
 
     <!-- Transactions List -->
-    <div v-else-if="transactions.length > 0" class="transactions-list">
+    <div
+      v-else-if="transactions.length > 0"
+      class="transactions-list"
+    >
       <div 
         v-for="transaction in paginatedTransactions" 
         :key="transaction.uuid"
@@ -71,7 +109,10 @@
       >
         <!-- Transaction Header -->
         <div class="transaction-header">
-          <span class="transaction-type" :class="`type-${transaction.type.toLowerCase()}`">
+          <span
+            class="transaction-type"
+            :class="`type-${transaction.type.toLowerCase()}`"
+          >
             {{ transaction.type }}
           </span>
           <span class="transaction-date">
@@ -89,31 +130,48 @@
           >
             {{ formatSourceType(transaction.source) }}
           </a>
-          <span v-else class="source-text">
+          <span
+            v-else
+            class="source-text"
+          >
             {{ formatSourceType(transaction.source) }}
           </span>
         </div>
 
         <!-- Transaction Changes -->
         <div class="transaction-changes">
-          <h4 class="changes-title">Alterações:</h4>
+          <h4 class="changes-title">
+            Alterações:
+          </h4>
           
           <!-- Balance Change -->
-          <div v-if="transaction.changes.balanceChange" class="change-item">
+          <div
+            v-if="transaction.changes.balanceChange"
+            class="change-item"
+          >
             <span class="change-label">Dívida:</span>
-            <span class="change-value" :class="{ 'positive': transaction.changes.balanceChange > 0 }">
+            <span
+              class="change-value"
+              :class="{ 'positive': transaction.changes.balanceChange > 0 }"
+            >
               {{ formatCurrencyChange(transaction.changes.balanceChange) }}
             </span>
           </div>
 
           <!-- Contract Usage Changes -->
-          <div v-if="transaction.changes.contractUsageChanges" class="contract-changes">
+          <div
+            v-if="transaction.changes.contractUsageChanges"
+            class="contract-changes"
+          >
             <div 
               v-if="transaction.changes.contractUsageChanges.manutencoesPorAno !== undefined"
               class="change-item"
             >
               <span class="change-label">Manutenções:</span>
-              <span class="change-value" :class="getChangeClass(transaction.changes.contractUsageChanges.manutencoesPorAno)">
+              <span
+                class="change-value"
+                :class="getChangeClass(transaction.changes.contractUsageChanges.manutencoesPorAno)"
+              >
                 {{ formatUsageChange(transaction.changes.contractUsageChanges.manutencoesPorAno) }}
               </span>
             </div>
@@ -123,7 +181,10 @@
               class="change-item"
             >
               <span class="change-label">Deslocações:</span>
-              <span class="change-value" :class="getChangeClass(transaction.changes.contractUsageChanges.deslocacoesPorAno)">
+              <span
+                class="change-value"
+                :class="getChangeClass(transaction.changes.contractUsageChanges.deslocacoesPorAno)"
+              >
                 {{ formatUsageChange(transaction.changes.contractUsageChanges.deslocacoesPorAno) }}
               </span>
             </div>
@@ -133,7 +194,10 @@
               class="change-item"
             >
               <span class="change-label">Horas Assistência:</span>
-              <span class="change-value" :class="getChangeClass(transaction.changes.contractUsageChanges.horasAssistenciaAnuais)">
+              <span
+                class="change-value"
+                :class="getChangeClass(transaction.changes.contractUsageChanges.horasAssistenciaAnuais)"
+              >
                 {{ formatUsageChange(transaction.changes.contractUsageChanges.horasAssistenciaAnuais) }}
               </span>
             </div>
@@ -147,7 +211,10 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="totalPages > 1" class="pagination">
+      <div
+        v-if="totalPages > 1"
+        class="pagination"
+      >
         <button 
           class="pagination-btn"
           :disabled="currentPage === 1"
@@ -171,8 +238,13 @@
     </div>
 
     <!-- Empty State -->
-    <div v-else class="empty-state">
-      <p class="empty-message">Sem transações disponíveis</p>
+    <div
+      v-else
+      class="empty-state"
+    >
+      <p class="empty-message">
+        Sem transações disponíveis
+      </p>
     </div>
   </div>
 </template>

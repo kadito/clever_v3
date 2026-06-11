@@ -5,7 +5,10 @@
       <header class="mb-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div class="flex items-center space-x-3">
-            <BackButton :to="backRoute" variant="inline" />
+            <BackButton
+              :to="backRoute"
+              variant="inline"
+            />
             <div>
               <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
                 {{ displayName }}
@@ -22,10 +25,15 @@
           <!-- Create button - desktop -->
           <button
             v-if="showCreateButton"
-            @click="handleCreate"
             class="btn-primary hidden sm:inline-flex items-center"
+            @click="handleCreate"
           >
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -42,27 +50,43 @@
       <div class="mb-6 flex flex-col sm:flex-row gap-3">
         <SearchBar
           :model-value="localSearchQuery"
-          @update:model-value="localSearchQuery = $event"
           :placeholder="searchPlaceholder"
           :debounce-ms="300"
+          class="flex-1"
+          @update:model-value="localSearchQuery = $event"
           @search="handleSearch"
           @clear="handleClearSearch"
-          class="flex-1"
         />
         <slot name="filters" />
       </div>
 
       <!-- Loading state -->
-      <div v-if="isLoading" class="space-y-3">
-        <div v-for="i in 5" :key="i" class="loading-skeleton h-20 rounded-touch"></div>
+      <div
+        v-if="isLoading"
+        class="space-y-3"
+      >
+        <div
+          v-for="i in 5"
+          :key="i"
+          class="loading-skeleton h-20 rounded-touch"
+        />
       </div>
 
       <!-- Error state -->
-      <ErrorComponent v-else-if="error" :error="error" @close="clearError" />
+      <ErrorComponent
+        v-else-if="error"
+        :error="error"
+        @close="clearError"
+      />
 
       <!-- Empty state -->
-      <div v-else-if="displayedItems.length === 0" class="empty-state">
-        <div class="text-6xl mb-4">{{ emptyIcon }}</div>
+      <div
+        v-else-if="displayedItems.length === 0"
+        class="empty-state"
+      >
+        <div class="text-6xl mb-4">
+          {{ emptyIcon }}
+        </div>
         <h3 class="empty-title">
           {{ searchQuery ? 'Nenhum resultado encontrado' : emptyTitle }}
         </h3>
@@ -71,10 +95,15 @@
         </p>
         <button
           v-if="!searchQuery && showCreateButton"
-          @click="handleCreate"
           class="btn-primary inline-flex items-center"
+          @click="handleCreate"
         >
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -87,7 +116,10 @@
       </div>
 
       <!-- Content list -->
-      <div v-else class="content-list">
+      <div
+        v-else
+        class="content-list"
+      >
         <div
           v-for="item in displayedItems"
           :key="item.uuid"
@@ -99,30 +131,51 @@
               <!-- Main content -->
               <div class="flex items-start space-x-3">
                 <!-- Icon/Avatar slot -->
-                <div v-if="$slots.itemIcon" class="flex-shrink-0 mt-1">
-                  <slot name="itemIcon" :item="item" />
+                <div
+                  v-if="$slots.itemIcon"
+                  class="flex-shrink-0 mt-1"
+                >
+                  <slot
+                    name="itemIcon"
+                    :item="item"
+                  />
                 </div>
 
                 <div class="flex-1 min-w-0">
                   <!-- Title -->
                   <h3 class="text-base font-semibold text-gray-900 truncate">
-                    <slot name="itemTitle" :item="item">
+                    <slot
+                      name="itemTitle"
+                      :item="item"
+                    >
                       {{ getItemTitle(item) }}
                     </slot>
                   </h3>
 
                   <!-- Subtitle -->
-                  <p v-if="getItemSubtitle(item)" class="text-sm text-gray-600 truncate mt-1">
-                    <slot name="itemSubtitle" :item="item">
+                  <p
+                    v-if="getItemSubtitle(item)"
+                    class="text-sm text-gray-600 truncate mt-1"
+                  >
+                    <slot
+                      name="itemSubtitle"
+                      :item="item"
+                    >
                       {{ getItemSubtitle(item) }}
                     </slot>
                   </p>
 
                   <!-- Meta information -->
                   <div class="flex flex-wrap items-center gap-2 mt-2 text-xs text-gray-500">
-                    <slot name="itemMeta" :item="item">
+                    <slot
+                      name="itemMeta"
+                      :item="item"
+                    >
                       <span v-if="getItemMeta1(item)">{{ getItemMeta1(item) }}</span>
-                      <span v-if="getItemMeta2(item)" class="before:content-['•'] before:mx-1">
+                      <span
+                        v-if="getItemMeta2(item)"
+                        class="before:content-['•'] before:mx-1"
+                      >
                         {{ getItemMeta2(item) }}
                       </span>
                     </slot>
@@ -133,13 +186,21 @@
 
             <!-- Actions -->
             <div class="flex items-center space-x-1 ml-3">
-              <slot name="itemActions" :item="item">
+              <slot
+                name="itemActions"
+                :item="item"
+              >
                 <button
-                  @click.stop="handleEdit(item)"
                   class="p-2 text-gray-400 hover:text-primary-600 rounded-touch hover:bg-primary-50 transition-colors duration-200 touch-target"
                   :aria-label="`Editar ${displayName.slice(0, -1).toLowerCase()}`"
+                  @click.stop="handleEdit(item)"
                 >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -149,11 +210,16 @@
                   </svg>
                 </button>
                 <button
-                  @click.stop="handleItemClick(item)"
                   class="p-2 text-gray-400 hover:text-gray-600 rounded-touch hover:bg-gray-100 transition-colors duration-200 touch-target"
                   :aria-label="`Ver detalhes de ${displayName.slice(0, -1).toLowerCase()}`"
+                  @click.stop="handleItemClick(item)"
                 >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -177,14 +243,22 @@
         <!-- Desktop: single row -->
         <div class="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
           <!-- Page navigation (shown first on mobile for quick access) -->
-          <div v-if="totalPages > 1" class="flex items-center gap-1 order-1 sm:order-2">
+          <div
+            v-if="totalPages > 1"
+            class="flex items-center gap-1 order-1 sm:order-2"
+          >
             <button
-              @click="handlePreviousPage"
               :disabled="currentPage === 1"
               class="pagination-btn"
               aria-label="Página anterior"
+              @click="handlePreviousPage"
             >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -199,12 +273,17 @@
             </span>
 
             <button
-              @click="handleNextPage"
               :disabled="currentPage === totalPages"
               class="pagination-btn"
               aria-label="Próxima página"
+              @click="handleNextPage"
             >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -225,13 +304,19 @@
 
             <select
               :value="itemsPerPage"
-              @change="handleItemsPerPageChange(Number(($event.target as HTMLSelectElement).value))"
               class="pagination-select"
               aria-label="Resultados por página"
+              @change="handleItemsPerPageChange(Number(($event.target as HTMLSelectElement).value))"
             >
-              <option :value="10">10 / pág</option>
-              <option :value="20">20 / pág</option>
-              <option :value="50">50 / pág</option>
+              <option :value="10">
+                10 / pág
+              </option>
+              <option :value="20">
+                20 / pág
+              </option>
+              <option :value="50">
+                50 / pág
+              </option>
             </select>
           </div>
         </div>
@@ -241,12 +326,22 @@
     <!-- Mobile FAB -->
     <button
       v-if="showCreateButton"
-      @click="handleCreate"
       class="fab sm:hidden"
       :aria-label="createButtonText"
+      @click="handleCreate"
     >
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      <svg
+        class="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 4v16m8-8H4"
+        />
       </svg>
     </button>
   </div>

@@ -1,7 +1,10 @@
 <template>
   <div class="folhas-obra-container">
     <div class="folhas-obra-header">
-      <BackButton to="/folhas-obra" variant="inline" />
+      <BackButton
+        to="/folhas-obra"
+        variant="inline"
+      />
     </div>
 
     <!-- Controls -->
@@ -13,10 +16,18 @@
       <div class="controls-actions">
         <!-- Year selector -->
         <div class="year-selector-container">
-          <YearSelector v-model="selectedYear" :years="availableYears" @change="onYearChange" />
+          <YearSelector
+            v-model="selectedYear"
+            :years="availableYears"
+            @change="onYearChange"
+          />
         </div>
 
-        <button @click="refreshData" :disabled="loading" class="btn btn-refresh">
+        <button
+          :disabled="loading"
+          class="btn btn-refresh"
+          @click="refreshData"
+        >
           🔄 Atualizar
         </button>
       </div>
@@ -25,28 +36,42 @@
     <!-- Search -->
     <div class="search-container">
       <input
-        type="text"
         v-model="searchQuery"
-        @input="onSearchInput"
+        type="text"
         placeholder="Pesquisar por cliente, número..."
         class="search-input"
-      />
+        @input="onSearchInput"
+      >
       <span class="search-icon">🔍</span>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A carregar folhas de obra...</p>
     </div>
 
     <!-- Error State -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Folhas de Obra List -->
-    <div v-if="!loading && displayedFolhas.length > 0" class="folhas-obra-list">
+    <div
+      v-if="!loading && displayedFolhas.length > 0"
+      class="folhas-obra-list"
+    >
       <div
         v-for="folha in displayedFolhas"
         :key="`${folha.year || selectedYear}-${folha.id}`"
@@ -59,35 +84,58 @@
             <span class="folha-number">{{ folha.number }}</span>
             <span class="folha-date">{{ formatDate(folha.date) }}</span>
           </div>
-          <div class="folha-details" v-if="folha.request?.reason || folha.otherData?.technician">
-            <span v-if="folha.request?.reason" class="folha-reason">{{
+          <div
+            v-if="folha.request?.reason || folha.otherData?.technician"
+            class="folha-details"
+          >
+            <span
+              v-if="folha.request?.reason"
+              class="folha-reason"
+            >{{
               folha.request.reason
             }}</span>
-            <span v-if="folha.otherData?.technician" class="folha-technician"
-              >👨‍🔧 {{ folha.otherData.technician }}</span
-            >
+            <span
+              v-if="folha.otherData?.technician"
+              class="folha-technician"
+            >👨‍🔧 {{ folha.otherData.technician }}</span>
           </div>
-          <div v-if="isSearching && folha.year" class="folha-year">
+          <div
+            v-if="isSearching && folha.year"
+            class="folha-year"
+          >
             <span>Ano: {{ folha.year }}</span>
           </div>
         </div>
         <div class="folha-actions">
-          <button class="action-btn" @click.stop="showActions(folha)">⋮</button>
+          <button
+            class="action-btn"
+            @click.stop="showActions(folha)"
+          >
+            ⋮
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Empty State -->
-    <div v-if="!loading && displayedFolhas.length === 0" class="empty-state">
+    <div
+      v-if="!loading && displayedFolhas.length === 0"
+      class="empty-state"
+    >
       <h3>Nenhuma folha de obra encontrada</h3>
       <p v-if="searchQuery">
         Não foram encontradas folhas de obra com o termo "{{ searchQuery }}".
       </p>
-      <p v-else>Não há folhas de obra para o ano {{ selectedYear }}.</p>
+      <p v-else>
+        Não há folhas de obra para o ano {{ selectedYear }}.
+      </p>
     </div>
 
     <!-- Search Results Info -->
-    <div v-if="searchResults && searchQuery" class="search-info">
+    <div
+      v-if="searchResults && searchQuery"
+      class="search-info"
+    >
       <p>
         {{ searchResults.count }} resultado(s) encontrado(s) para "{{ searchQuery }}"
         {{ searchYear ? `no ano ${searchYear}` : 'em todos os anos' }}
@@ -95,15 +143,42 @@
     </div>
 
     <!-- Actions Modal -->
-    <div v-if="showActionsModal" class="actions-modal-overlay" @click="closeActions">
-      <div class="actions-modal" @click.stop>
+    <div
+      v-if="showActionsModal"
+      class="actions-modal-overlay"
+      @click="closeActions"
+    >
+      <div
+        class="actions-modal"
+        @click.stop
+      >
         <h3>{{ selectedFolhaForActions?.clientName }}</h3>
         <div class="modal-actions">
-          <button @click="viewFolha" class="modal-btn view-btn">📋 Ver Detalhes</button>
-          <button @click="editFolha" class="modal-btn edit-btn">✏️ Editar</button>
-          <button @click="deleteFolhaAction" class="modal-btn delete-btn">🗑️ Eliminar</button>
+          <button
+            class="modal-btn view-btn"
+            @click="viewFolha"
+          >
+            📋 Ver Detalhes
+          </button>
+          <button
+            class="modal-btn edit-btn"
+            @click="editFolha"
+          >
+            ✏️ Editar
+          </button>
+          <button
+            class="modal-btn delete-btn"
+            @click="deleteFolhaAction"
+          >
+            🗑️ Eliminar
+          </button>
         </div>
-        <button @click="closeActions" class="modal-btn cancel-btn">Cancelar</button>
+        <button
+          class="modal-btn cancel-btn"
+          @click="closeActions"
+        >
+          Cancelar
+        </button>
       </div>
     </div>
   </div>

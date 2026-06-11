@@ -1,7 +1,10 @@
 <template>
   <div class="agendamentos-container">
     <div class="agendamentos-header">
-      <BackButton to="/agendamentos" variant="inline" />
+      <BackButton
+        to="/agendamentos"
+        variant="inline"
+      />
     </div>
 
     <!-- Controls -->
@@ -18,7 +21,11 @@
           @change="handleYearChange"
         />
 
-        <button @click="refreshData" :disabled="loading" class="btn btn-refresh">
+        <button
+          :disabled="loading"
+          class="btn btn-refresh"
+          @click="refreshData"
+        >
           🔄 Atualizar
         </button>
       </div>
@@ -27,29 +34,43 @@
     <!-- Search -->
     <div class="search-container">
       <input
-        type="text"
         v-model="searchQuery"
-        @input="handleSearch"
+        type="text"
         placeholder="Pesquisar agendamentos..."
         class="search-input"
-      />
+        @input="handleSearch"
+      >
       <span class="search-icon">🔍</span>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-container">
-      <div class="loading-spinner"></div>
+    <div
+      v-if="loading"
+      class="loading-container"
+    >
+      <div class="loading-spinner" />
       <p>Carregando agendamentos...</p>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="error-container">
+    <div
+      v-else-if="error"
+      class="error-container"
+    >
       <p>❌ {{ error }}</p>
-      <button @click="refreshData" class="btn secondary">Tentar Novamente</button>
+      <button
+        class="btn secondary"
+        @click="refreshData"
+      >
+        Tentar Novamente
+      </button>
     </div>
 
     <!-- Agendamentos List -->
-    <div v-if="!loading && currentCount > 0" class="agendamentos-list">
+    <div
+      v-if="!loading && currentCount > 0"
+      class="agendamentos-list"
+    >
       <div
         v-for="agendamento in currentAgendamentos"
         :key="`${agendamento.year || selectedYear}-${agendamento.id}`"
@@ -64,13 +85,18 @@
               formatDate(agendamento.dataPrevistaAssistencia) || 'Sem data'
             }}</span>
           </div>
-          <div class="agendamento-details" v-if="agendamento.tecnico || agendamento.assunto">
-            <span v-if="agendamento.tecnico" class="agendamento-technician"
-              >👨‍🔧 {{ agendamento.tecnico }}</span
-            >
-            <span v-if="agendamento.assunto" class="agendamento-subject"
-              >📋 {{ agendamento.assunto }}</span
-            >
+          <div
+            v-if="agendamento.tecnico || agendamento.assunto"
+            class="agendamento-details"
+          >
+            <span
+              v-if="agendamento.tecnico"
+              class="agendamento-technician"
+            >👨‍🔧 {{ agendamento.tecnico }}</span>
+            <span
+              v-if="agendamento.assunto"
+              class="agendamento-subject"
+            >📋 {{ agendamento.assunto }}</span>
           </div>
           <div class="agendamento-status">
             <span
@@ -94,26 +120,46 @@
               <span v-else>Pendente</span>
             </span>
           </div>
-          <div v-if="searchResults && agendamento.year" class="agendamento-year">
+          <div
+            v-if="searchResults && agendamento.year"
+            class="agendamento-year"
+          >
             <span>Ano: {{ agendamento.year }}</span>
           </div>
         </div>
         <div class="agendamento-actions">
-          <button class="action-btn" @click.stop="showActions(agendamento)">⋮</button>
+          <button
+            class="action-btn"
+            @click.stop="showActions(agendamento)"
+          >
+            ⋮
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Empty State -->
-    <div v-if="!loading && currentCount === 0" class="empty-state">
+    <div
+      v-if="!loading && currentCount === 0"
+      class="empty-state"
+    >
       <h3>Nenhum agendamento encontrado</h3>
-      <p v-if="searchResults">Nenhum agendamento encontrado com o termo "{{ searchQuery }}".</p>
-      <p v-else-if="selectedYear">Não há agendamentos para o ano {{ selectedYear }}.</p>
-      <p v-else>Não há agendamentos cadastrados no sistema.</p>
+      <p v-if="searchResults">
+        Nenhum agendamento encontrado com o termo "{{ searchQuery }}".
+      </p>
+      <p v-else-if="selectedYear">
+        Não há agendamentos para o ano {{ selectedYear }}.
+      </p>
+      <p v-else>
+        Não há agendamentos cadastrados no sistema.
+      </p>
     </div>
 
     <!-- Search Results Info -->
-    <div v-if="searchResults && searchQuery" class="search-info">
+    <div
+      v-if="searchResults && searchQuery"
+      class="search-info"
+    >
       <p>
         {{ searchResults.count || 0 }} resultado(s) encontrado(s) para "{{ searchQuery }}"
         {{ selectedYear ? `no ano ${selectedYear}` : 'em todos os anos' }}
@@ -121,46 +167,75 @@
     </div>
 
     <!-- Actions Modal -->
-    <div v-if="showActionsModal" class="actions-modal-overlay" @click="closeActions">
-      <div class="actions-modal" @click.stop>
+    <div
+      v-if="showActionsModal"
+      class="actions-modal-overlay"
+      @click="closeActions"
+    >
+      <div
+        class="actions-modal"
+        @click.stop
+      >
         <h3>{{ selectedAgendamentoForActions?.nomeCliente }}</h3>
         <div class="modal-actions">
           <button
-            @click="viewAgendamento(selectedAgendamentoForActions)"
             class="modal-btn view-btn"
+            @click="viewAgendamento(selectedAgendamentoForActions)"
           >
             📋 Ver Detalhes
           </button>
           <button
-            @click="editAgendamento(selectedAgendamentoForActions)"
             class="modal-btn edit-btn"
+            @click="editAgendamento(selectedAgendamentoForActions)"
           >
             ✏️ Editar
           </button>
           <button
-            @click="confirmDelete(selectedAgendamentoForActions)"
             class="modal-btn delete-btn"
+            @click="confirmDelete(selectedAgendamentoForActions)"
           >
             🗑️ Eliminar
           </button>
         </div>
-        <button @click="closeActions" class="modal-btn cancel-btn">Cancelar</button>
+        <button
+          class="modal-btn cancel-btn"
+          @click="closeActions"
+        >
+          Cancelar
+        </button>
       </div>
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div v-if="agendamentoToDelete" class="modal-overlay" @click="cancelDelete">
-      <div class="modal" @click.stop>
+    <div
+      v-if="agendamentoToDelete"
+      class="modal-overlay"
+      @click="cancelDelete"
+    >
+      <div
+        class="modal"
+        @click.stop
+      >
         <h3>Confirmar Eliminação</h3>
         <p>
           Tem a certeza que pretende eliminar o agendamento de
-          <strong>{{ agendamentoToDelete.nomeCliente }}</strong
-          >?
+          <strong>{{ agendamentoToDelete.nomeCliente }}</strong>?
         </p>
-        <p class="warning">Esta ação não pode ser desfeita.</p>
+        <p class="warning">
+          Esta ação não pode ser desfeita.
+        </p>
         <div class="modal-actions">
-          <button @click="cancelDelete" class="btn secondary">Cancelar</button>
-          <button @click="deleteAgendamento" class="btn danger" :disabled="loading">
+          <button
+            class="btn secondary"
+            @click="cancelDelete"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn danger"
+            :disabled="loading"
+            @click="deleteAgendamento"
+          >
             {{ loading ? 'Eliminando...' : 'Eliminar' }}
           </button>
         </div>
@@ -168,7 +243,12 @@
     </div>
 
     <!-- Floating Action Button -->
-    <button @click="navigateToCreate" class="fab">➕</button>
+    <button
+      class="fab"
+      @click="navigateToCreate"
+    >
+      ➕
+    </button>
   </div>
 </template>
 

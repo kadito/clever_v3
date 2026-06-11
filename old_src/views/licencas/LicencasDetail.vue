@@ -1,24 +1,48 @@
 <template>
   <div class="licenca-detail">
     <div class="page-header">
-      <BackButton to="/licencas/list" variant="inline" />
+      <BackButton
+        to="/licencas/list"
+        variant="inline"
+      />
 
-      <div v-if="loading" class="loading-state">
-        <div class="loading-spinner"></div>
+      <div
+        v-if="loading"
+        class="loading-state"
+      >
+        <div class="loading-spinner" />
         <p>A carregar licença...</p>
       </div>
 
-      <div v-else-if="error" class="error-state">
-        <div class="error-icon">⚠️</div>
+      <div
+        v-else-if="error"
+        class="error-state"
+      >
+        <div class="error-icon">
+          ⚠️
+        </div>
         <h2>Erro ao carregar licença</h2>
         <p>{{ error }}</p>
-        <button @click="loadData" class="btn btn-secondary">Tentar Novamente</button>
+        <button
+          class="btn btn-secondary"
+          @click="loadData"
+        >
+          Tentar Novamente
+        </button>
       </div>
 
-      <div v-else-if="licenca" class="header-content">
+      <div
+        v-else-if="licenca"
+        class="header-content"
+      >
         <div class="title-section">
-          <h1 class="page-title">{{ licenca.cliente }}</h1>
-          <span class="status-badge" :class="getLicenseStatus(licenca)">
+          <h1 class="page-title">
+            {{ licenca.cliente }}
+          </h1>
+          <span
+            class="status-badge"
+            :class="getLicenseStatus(licenca)"
+          >
             {{ getLicenseStatusText(licenca) }}
           </span>
         </div>
@@ -28,11 +52,17 @@
         </p>
 
         <div class="header-actions">
-          <router-link :to="`/licencas/${year}/${licenca.id}/edit`" class="btn btn-primary">
+          <router-link
+            :to="`/licencas/${year}/${licenca.id}/edit`"
+            class="btn btn-primary"
+          >
             <span class="btn-icon">✏️</span>
             Editar
           </router-link>
-          <button @click="confirmDelete" class="btn btn-danger">
+          <button
+            class="btn btn-danger"
+            @click="confirmDelete"
+          >
             <span class="btn-icon">🗑️</span>
             Eliminar
           </button>
@@ -40,7 +70,10 @@
       </div>
     </div>
 
-    <div v-if="licenca && !loading" class="detail-content">
+    <div
+      v-if="licenca && !loading"
+      class="detail-content"
+    >
       <!-- Basic Information -->
       <div class="info-section">
         <h2 class="section-title">
@@ -96,14 +129,23 @@
       </div>
 
       <!-- Invoice Information -->
-      <div class="info-section" v-if="licenca.invoices && licenca.invoices.length > 0">
+      <div
+        v-if="licenca.invoices && licenca.invoices.length > 0"
+        class="info-section"
+      >
         <h2 class="section-title">
           <span class="section-icon">💰</span>
           INFORMAÇÕES DE FATURAÇÃO
         </h2>
         <div class="invoice-list">
-          <div v-for="(fatura, index) in licenca.invoices" :key="index" class="invoice-item">
-            <h3 class="invoice-title">Fatura {{ index + 1 }}</h3>
+          <div
+            v-for="(fatura, index) in licenca.invoices"
+            :key="index"
+            class="invoice-item"
+          >
+            <h3 class="invoice-title">
+              Fatura {{ index + 1 }}
+            </h3>
             <div class="info-grid">
               <div class="info-item">
                 <span class="info-label">ANO:</span>
@@ -146,33 +188,63 @@
     </div>
 
     <!-- Not Found State -->
-    <div v-if="!loading && !error && !licenca" class="not-found-state">
+    <div
+      v-if="!loading && !error && !licenca"
+      class="not-found-state"
+    >
       <h2>Licença não encontrada</h2>
       <p>A licença pode ainda não estar disponível no sistema. Tentar novamente?</p>
       <div class="retry-actions">
-        <button @click="retryLoad" class="btn btn-primary" :disabled="loading">
+        <button
+          class="btn btn-primary"
+          :disabled="loading"
+          @click="retryLoad"
+        >
           {{ loading ? 'A carregar...' : 'Tentar novamente' }}
         </button>
-        <BackButton to="/licencas/list" variant="full-width" />
+        <BackButton
+          to="/licencas/list"
+          variant="full-width"
+        />
       </div>
-      <p v-if="autoRetryCountdown > 0" class="auto-retry-info">
+      <p
+        v-if="autoRetryCountdown > 0"
+        class="auto-retry-info"
+      >
         Tentativa automática em {{ autoRetryCountdown }}s...
       </p>
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div v-if="showDeleteModal" class="modal-overlay" @click="cancelDelete">
-      <div class="modal-content" @click.stop>
+    <div
+      v-if="showDeleteModal"
+      class="modal-overlay"
+      @click="cancelDelete"
+    >
+      <div
+        class="modal-content"
+        @click.stop
+      >
         <h3>Confirmar Eliminação</h3>
         <p>
           Tem a certeza que pretende eliminar a licença de
-          <strong>{{ licenca?.cliente }}</strong
-          >?
+          <strong>{{ licenca?.cliente }}</strong>?
         </p>
-        <p class="warning-text">Esta ação não pode ser desfeita.</p>
+        <p class="warning-text">
+          Esta ação não pode ser desfeita.
+        </p>
         <div class="modal-actions">
-          <button @click="cancelDelete" class="btn btn-secondary">Cancelar</button>
-          <button @click="deleteLicencaAction" class="btn btn-danger" :disabled="loading">
+          <button
+            class="btn btn-secondary"
+            @click="cancelDelete"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn btn-danger"
+            :disabled="loading"
+            @click="deleteLicencaAction"
+          >
             {{ loading ? 'A eliminar...' : 'Eliminar' }}
           </button>
         </div>

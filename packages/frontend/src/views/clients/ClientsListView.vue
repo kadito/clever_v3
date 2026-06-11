@@ -17,16 +17,16 @@
     :get-item-subtitle="getClientSubtitle"
     :get-item-meta1="getClientMeta1"
     :get-item-meta2="getClientMeta2"
-    @search="handleSearch"
-    @clear-search="handleClearSearch"
-    @item-click="handleClientClick"
-    @create="handleCreate"
-    @edit="handleEdit"
     :current-page="api.pagination.value.page"
     :total-pages="api.pagination.value.totalPages"
     :total-count="api.pagination.value.total"
     :items-per-page="itemsPerPage"
     :show-pagination="api.pagination.value.total > 0"
+    @search="handleSearch"
+    @clear-search="handleClearSearch"
+    @item-click="handleClientClick"
+    @create="handleCreate"
+    @edit="handleEdit"
     @page-change="handlePageChange"
     @items-per-page-change="handleItemsPerPageChange"
     @clear-error="clearError"
@@ -34,7 +34,10 @@
     <!-- Custom client icon -->
     <template #itemIcon="{ item }">
       <div class="client-icon">
-        <div class="icon-circle" :class="getClientIconClass(item)">
+        <div
+          class="icon-circle"
+          :class="getClientIconClass(item)"
+        >
           {{ getClientInitials(item) }}
         </div>
       </div>
@@ -44,8 +47,16 @@
     <template #itemMeta="{ item }">
       <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
         <!-- Location -->
-        <span v-if="item.data.localidade" class="flex items-center">
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <span
+          v-if="item.data.localidade"
+          class="flex items-center"
+        >
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -67,7 +78,12 @@
           v-if="item.data.telefoneContato"
           class="flex items-center before:content-['•'] before:mx-1"
         >
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -80,19 +96,34 @@
 
         <!-- Service badges -->
         <div class="flex flex-wrap gap-1 mt-1">
-          <span v-if="item.data.temAnydesk" class="service-badge bg-blue-100 text-blue-800">
+          <span
+            v-if="item.data.temAnydesk"
+            class="service-badge bg-blue-100 text-blue-800"
+          >
             AnyDesk
           </span>
-          <span v-if="item.data.manutencao" class="service-badge bg-green-100 text-green-800">
+          <span
+            v-if="item.data.manutencao"
+            class="service-badge bg-green-100 text-green-800"
+          >
             Manutenção
           </span>
-          <span v-if="item.data.manutencao24" class="service-badge bg-orange-100 text-orange-800">
+          <span
+            v-if="item.data.manutencao24"
+            class="service-badge bg-orange-100 text-orange-800"
+          >
             24h
           </span>
-          <span v-if="item.data.atcud" class="service-badge bg-purple-100 text-purple-800">
+          <span
+            v-if="item.data.atcud"
+            class="service-badge bg-purple-100 text-purple-800"
+          >
             ATCUD
           </span>
-          <span v-if="item.data.vectronConnect" class="service-badge bg-indigo-100 text-indigo-800">
+          <span
+            v-if="item.data.vectronConnect"
+            class="service-badge bg-indigo-100 text-indigo-800"
+          >
             Vectron
           </span>
         </div>
@@ -109,7 +140,10 @@
           >
             {{ software.name }}
           </span>
-          <span v-if="item.data.softwares.length > 3" class="text-gray-400">
+          <span
+            v-if="item.data.softwares.length > 3"
+            class="text-gray-400"
+          >
             +{{ item.data.softwares.length - 3 }} mais
           </span>
         </div>

@@ -2,13 +2,9 @@
   <div class="cliente-search-select">
     <div class="search-input-wrapper">
       <input
-        type="text"
         :id="inputId"
         v-model="searchQuery"
-        @input="handleSearch"
-        @focus="handleFocus"
-        @blur="handleBlur"
-        @click="handleFocus"
+        type="text"
         :placeholder="
           selectedCliente
             ? selectedCliente.name || selectedCliente.nomeComercial || selectedCliente.nomeEmpresa
@@ -18,13 +14,26 @@
         :required="required"
         class="form-control search-input"
         autocomplete="off"
-      />
-      <span v-if="loading" class="search-loading">⏳</span>
-      <span v-else class="search-icon">🔍</span>
+        @input="handleSearch"
+        @focus="handleFocus"
+        @blur="handleBlur"
+        @click="handleFocus"
+      >
+      <span
+        v-if="loading"
+        class="search-loading"
+      >⏳</span>
+      <span
+        v-else
+        class="search-icon"
+      >🔍</span>
     </div>
 
     <!-- Dropdown with search results -->
-    <div v-if="showDropdown" class="dropdown-results">
+    <div
+      v-if="showDropdown"
+      class="dropdown-results"
+    >
       <div
         v-if="filteredClientes.length === 0 && !loading && searchQuery.length === 0"
         class="dropdown-item no-results"
@@ -37,22 +46,31 @@
       >
         Nenhum cliente encontrado
       </div>
-      <div v-else-if="loading" class="dropdown-item no-results">A carregar...</div>
+      <div
+        v-else-if="loading"
+        class="dropdown-item no-results"
+      >
+        A carregar...
+      </div>
       <div
         v-for="cliente in filteredClientes"
         :key="cliente.id"
-        @mousedown.prevent="selectCliente(cliente)"
         class="dropdown-item"
         :class="{ selected: selectedCliente?.id === cliente.id }"
+        @mousedown.prevent="selectCliente(cliente)"
       >
         <div class="cliente-name">
           {{ cliente.name || cliente.nomeComercial || cliente.nomeEmpresa || 'Sem nome' }}
         </div>
         <div class="cliente-meta">
-          <span v-if="cliente.nif || cliente.contribuinte" class="cliente-nif"
-            >NIF: {{ cliente.nif || cliente.contribuinte }}</span
-          >
-          <span v-if="cliente.responsavel" class="cliente-responsavel">{{
+          <span
+            v-if="cliente.nif || cliente.contribuinte"
+            class="cliente-nif"
+          >NIF: {{ cliente.nif || cliente.contribuinte }}</span>
+          <span
+            v-if="cliente.responsavel"
+            class="cliente-responsavel"
+          >{{
             cliente.responsavel
           }}</span>
         </div>

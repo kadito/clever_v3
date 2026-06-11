@@ -5,12 +5,18 @@
       <div class="px-4 py-3 sm:px-6 sm:py-4">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3 min-w-0 flex-1">
-            <BackButton :to="cancelRoute" variant="inline" />
+            <BackButton
+              :to="cancelRoute"
+              variant="inline"
+            />
             <div class="min-w-0 flex-1">
               <h1 class="text-lg sm:text-xl font-bold text-gray-900">
                 {{ isEditing ? editTitle : createTitle }}
               </h1>
-              <p v-if="subtitle" class="text-sm text-gray-600">
+              <p
+                v-if="subtitle"
+                class="text-sm text-gray-600"
+              >
                 {{ subtitle }}
               </p>
             </div>
@@ -18,7 +24,11 @@
 
           <!-- Desktop save button -->
           <div class="hidden sm:flex items-center space-x-2">
-            <button type="button" @click="handleCancel" class="btn-secondary-consistent text-sm">
+            <button
+              type="button"
+              class="btn-secondary-consistent text-sm"
+              @click="handleCancel"
+            >
               Cancelar
             </button>
             <button
@@ -57,41 +67,75 @@
     </header>
 
     <!-- Loading state -->
-    <div v-if="isLoading" class="p-4 sm:p-6">
+    <div
+      v-if="isLoading"
+      class="p-4 sm:p-6"
+    >
       <div class="max-w-4xl mx-auto space-y-6">
-        <div v-for="i in 3" :key="i" class="bg-white rounded-touch p-6">
-          <div class="loading-skeleton h-6 w-1/3 mb-4"></div>
+        <div
+          v-for="i in 3"
+          :key="i"
+          class="bg-white rounded-touch p-6"
+        >
+          <div class="loading-skeleton h-6 w-1/3 mb-4" />
           <div class="space-y-4">
-            <div class="loading-skeleton h-10 w-full"></div>
-            <div class="loading-skeleton h-10 w-full"></div>
-            <div class="loading-skeleton h-20 w-full"></div>
+            <div class="loading-skeleton h-10 w-full" />
+            <div class="loading-skeleton h-10 w-full" />
+            <div class="loading-skeleton h-20 w-full" />
           </div>
         </div>
       </div>
     </div>
 
     <!-- Error state (only for non-validation errors) -->
-    <div v-if="error" class="p-4 sm:p-6">
+    <div
+      v-if="error"
+      class="p-4 sm:p-6"
+    >
       <div class="max-w-4xl mx-auto">
-        <ErrorComponent :error="error" @close="clearError" />
+        <ErrorComponent
+          :error="error"
+          @close="clearError"
+        />
       </div>
     </div>
 
     <!-- Form content (always visible when not loading) -->
-    <main v-if="!isLoading" class="p-4 sm:p-6 pb-24">
+    <main
+      v-if="!isLoading"
+      class="p-4 sm:p-6 pb-24"
+    >
       <div class="max-w-4xl mx-auto">
-        <form id="content-form" @submit.prevent="handleSubmit()" class="space-y-6" novalidate>
+        <form
+          id="content-form"
+          class="space-y-6"
+          novalidate
+          @submit.prevent="handleSubmit()"
+        >
           <!-- Form sections -->
           <div class="space-y-6">
-            <slot name="form" :form-data="formData" :errors="validationErrors">
+            <slot
+              name="form"
+              :form-data="formData"
+              :errors="validationErrors"
+            >
               <!-- Default form sections -->
-              <div v-for="section in formSections" :key="section.key" class="form-section">
+              <div
+                v-for="section in formSections"
+                :key="section.key"
+                class="form-section"
+              >
                 <div class="bg-white rounded-touch border border-gray-200">
                   <div
                     class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
                   >
-                    <h2 class="text-lg font-semibold text-gray-900">{{ section.title }}</h2>
-                    <p v-if="section.description" class="text-sm text-gray-600 mt-1">
+                    <h2 class="text-lg font-semibold text-gray-900">
+                      {{ section.title }}
+                    </h2>
+                    <p
+                      v-if="section.description"
+                      class="text-sm text-gray-600 mt-1"
+                    >
                       {{ section.description }}
                     </p>
                   </div>
@@ -110,7 +154,10 @@
                           :class="{ required: field.required || isConditionallyRequired(field, formData || {}) }"
                         >
                           {{ field.label }}
-                          <span v-if="field.required || isConditionallyRequired(field, formData || {})" class="text-red-500 ml-1">*</span>
+                          <span
+                            v-if="field.required || isConditionallyRequired(field, formData || {})"
+                            class="text-red-500 ml-1"
+                          >*</span>
                         </label>
 
                         <!-- Field input based on type -->
@@ -119,10 +166,10 @@
                           <input
                             v-if="
                               field.type === 'text' ||
-                              field.type === 'email' ||
-                              field.type === 'tel' ||
-                              field.type === 'url' ||
-                              field.type === 'password'
+                                field.type === 'email' ||
+                                field.type === 'tel' ||
+                                field.type === 'url' ||
+                                field.type === 'password'
                             "
                             :id="field.key"
                             :value="formData?.[field.key] || ''"
@@ -140,7 +187,7 @@
                                 clearFieldError(field.key);
                               }
                             "
-                          />
+                          >
 
                           <!-- Number input -->
                           <input
@@ -166,7 +213,7 @@
                                 clearFieldError(field.key);
                               }
                             "
-                          />
+                          >
 
                           <!-- Textarea -->
                           <textarea
@@ -209,7 +256,10 @@
                               }
                             "
                           >
-                            <option value="" disabled>
+                            <option
+                              value=""
+                              disabled
+                            >
                               {{ field.placeholder || 'Selecionar...' }}
                             </option>
                             <option
@@ -237,7 +287,10 @@
                               >
                                 {{ field.placeholder || 'Selecionar...' }}
                               </div>
-                              <div v-else class="multiselect-selected">
+                              <div
+                                v-else
+                                class="multiselect-selected"
+                              >
                                 <span
                                   v-for="option in getSelectedOptions(field, formData?.[field.key])"
                                   :key="option.value"
@@ -246,8 +299,8 @@
                                   {{ option.label }}
                                   <button
                                     type="button"
-                                    @click.stop="removeSelectedOption(field.key, option.value)"
                                     class="multiselect-tag-remove"
+                                    @click.stop="removeSelectedOption(field.key, option.value)"
                                   >
                                     ×
                                   </button>
@@ -285,14 +338,17 @@
                                   :checked="isOptionSelected(field.key, option.value)"
                                   class="multiselect-checkbox"
                                   readonly
-                                />
+                                >
                                 <span>{{ option.label }}</span>
                               </div>
                             </div>
                           </div>
 
                           <!-- Checkbox -->
-                          <div v-else-if="field.type === 'checkbox'" class="flex items-center">
+                          <div
+                            v-else-if="field.type === 'checkbox'"
+                            class="flex items-center"
+                          >
                             <input
                               :id="field.key"
                               :checked="formData?.[field.key] || false"
@@ -308,8 +364,11 @@
                                   clearFieldError(field.key);
                                 }
                               "
-                            />
-                            <label :for="field.key" class="ml-2 text-sm text-gray-700">
+                            >
+                            <label
+                              :for="field.key"
+                              class="ml-2 text-sm text-gray-700"
+                            >
                               {{ field.checkboxLabel || field.label }}
                             </label>
                           </div>
@@ -341,7 +400,7 @@
                                     clearFieldError(field.key);
                                   }
                                 "
-                              />
+                              >
                               <div
                                 class="switch-track"
                                 :class="{
@@ -350,13 +409,13 @@
                                 }"
                                 @click="
                                   !field.disabled &&
-                                  updateFieldValue(field.key, !(formData?.[field.key] || false))
+                                    updateFieldValue(field.key, !(formData?.[field.key] || false))
                                 "
                               >
                                 <div
                                   class="switch-thumb"
                                   :class="{ 'switch-thumb-active': formData?.[field.key] || false }"
-                                ></div>
+                                />
                               </div>
                             </div>
                           </div>
@@ -380,7 +439,7 @@
                                 clearFieldError(field.key);
                               }
                             "
-                          />
+                          >
 
                           <!-- Custom field slot -->
                           <div v-else-if="field.type === 'custom' && field.key === 'clientId'">
@@ -415,12 +474,18 @@
                         </div>
 
                         <!-- Field help text -->
-                        <p v-if="field.help" class="form-help">
+                        <p
+                          v-if="field.help"
+                          class="form-help"
+                        >
                           {{ field.help }}
                         </p>
 
                         <!-- Field error -->
-                        <p v-if="validationErrors[field.key]" class="form-error">
+                        <p
+                          v-if="validationErrors[field.key]"
+                          class="form-error"
+                        >
                           {{ validationErrors[field.key] }}
                         </p>
                       </div>
@@ -448,7 +513,10 @@
           />
 
           <!-- Validation errors summary (shown at bottom of form when there are errors) -->
-          <div v-if="Object.keys(validationErrors).length > 0 && hasValidated" class="mt-6">
+          <div
+            v-if="Object.keys(validationErrors).length > 0 && hasValidated"
+            class="mt-6"
+          >
             <div class="bg-red-50 border border-red-200 rounded-lg p-4">
               <div class="flex">
                 <svg
@@ -469,7 +537,10 @@
                     Por favor corrija os seguintes erros:
                   </h3>
                   <ul class="text-sm text-red-700 list-disc list-inside space-y-1">
-                    <li v-for="(errorMsg, field) in validationErrors" :key="field">
+                    <li
+                      v-for="(errorMsg, field) in validationErrors"
+                      :key="field"
+                    >
                       {{ errorMsg }}
                     </li>
                   </ul>
@@ -483,7 +554,7 @@
             v-if="hasOpenMultiselects"
             class="multiselect-overlay"
             @click="closeAllMultiselects"
-          ></div>
+          />
         </form>
       </div>
     </main>
@@ -493,8 +564,8 @@
       <div class="flex space-x-3">
         <button
           type="button"
-          @click="handleCancel"
           class="btn-secondary-consistent flex-1 justify-center"
+          @click="handleCancel"
         >
           Cancelar
         </button>
@@ -505,7 +576,12 @@
           class="btn-primary-consistent flex-1 justify-center"
           :class="{ 'btn-loading': isSaving }"
         >
-          <svg v-if="isSaving" class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
+          <svg
+            v-if="isSaving"
+            class="w-4 h-4 mr-2 animate-spin"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
             <circle
               class="opacity-25"
               cx="12"

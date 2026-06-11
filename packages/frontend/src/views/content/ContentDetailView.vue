@@ -17,7 +17,12 @@
                   </router-link>
                 </li>
                 <li>
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -26,14 +31,18 @@
                     />
                   </svg>
                 </li>
-                <li class="text-gray-900 font-medium">Detalhes</li>
+                <li class="text-gray-900 font-medium">
+                  Detalhes
+                </li>
               </ol>
             </nav>
 
             <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
               {{ itemTitle }}
             </h1>
-            <p class="text-gray-600">ID: {{ route.params.id }}</p>
+            <p class="text-gray-600">
+              ID: {{ route.params.id }}
+            </p>
           </div>
 
           <!-- Action buttons -->
@@ -42,7 +51,12 @@
               :to="{ name: `${contentType}-edit`, params: { id: route.params.id } }"
               class="btn-primary inline-flex items-center justify-center"
             >
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                class="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -57,7 +71,12 @@
               :to="{ name: `${contentType}-list` }"
               class="btn-outline inline-flex items-center justify-center"
             >
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                class="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -72,25 +91,31 @@
       </header>
 
       <!-- Loading state -->
-      <div v-if="isLoading" class="animate-pulse space-y-6">
+      <div
+        v-if="isLoading"
+        class="animate-pulse space-y-6"
+      >
         <div class="bg-white rounded-lg border border-gray-200 p-6">
           <div class="space-y-4">
-            <div class="h-4 bg-gray-200 rounded w-1/4"></div>
-            <div class="h-6 bg-gray-200 rounded w-3/4"></div>
-            <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div class="h-4 bg-gray-200 rounded w-1/4" />
+            <div class="h-6 bg-gray-200 rounded w-3/4" />
+            <div class="h-4 bg-gray-200 rounded w-1/2" />
           </div>
         </div>
         <div class="bg-white rounded-lg border border-gray-200 p-6">
           <div class="space-y-3">
-            <div class="h-4 bg-gray-200 rounded w-full"></div>
-            <div class="h-4 bg-gray-200 rounded w-5/6"></div>
-            <div class="h-4 bg-gray-200 rounded w-4/6"></div>
+            <div class="h-4 bg-gray-200 rounded w-full" />
+            <div class="h-4 bg-gray-200 rounded w-5/6" />
+            <div class="h-4 bg-gray-200 rounded w-4/6" />
           </div>
         </div>
       </div>
 
       <!-- Content -->
-      <div v-else class="space-y-6">
+      <div
+        v-else
+        class="space-y-6"
+      >
         <!-- Main information card -->
         <div class="bg-white rounded-lg border border-gray-200 p-6">
           <div class="flex items-start space-x-4">
@@ -106,17 +131,23 @@
               <h2 class="text-xl font-semibold text-gray-900 mb-2">
                 {{
                   itemData.title ||
-                  itemData.name ||
-                  `${displayName.slice(0, -1)} #${route.params.id}`
+                    itemData.name ||
+                    `${displayName.slice(0, -1)} #${route.params.id}`
                 }}
               </h2>
 
-              <p v-if="itemData.description" class="text-gray-600 mb-4">
+              <p
+                v-if="itemData.description"
+                class="text-gray-600 mb-4"
+              >
                 {{ itemData.description }}
               </p>
 
               <!-- Status badge -->
-              <div v-if="itemData.status" class="inline-flex items-center">
+              <div
+                v-if="itemData.status"
+                class="inline-flex items-center"
+              >
                 <span
                   class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                   :class="getStatusClasses(itemData.status)"
@@ -124,7 +155,7 @@
                   <span
                     class="w-1.5 h-1.5 rounded-full mr-1.5"
                     :class="getStatusDotClasses(itemData.status)"
-                  ></span>
+                  />
                   {{ getStatusLabel(itemData.status) }}
                 </span>
               </div>
@@ -136,44 +167,77 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <!-- Basic information -->
           <div class="bg-white rounded-lg border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Informações Básicas</h3>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+              Informações Básicas
+            </h3>
 
             <dl class="space-y-3">
-              <div v-for="(value, key) in basicInfo" :key="key" class="flex justify-between">
-                <dt class="text-sm font-medium text-gray-500">{{ key }}:</dt>
-                <dd class="text-sm text-gray-900">{{ value || '-' }}</dd>
+              <div
+                v-for="(value, key) in basicInfo"
+                :key="key"
+                class="flex justify-between"
+              >
+                <dt class="text-sm font-medium text-gray-500">
+                  {{ key }}:
+                </dt>
+                <dd class="text-sm text-gray-900">
+                  {{ value || '-' }}
+                </dd>
               </div>
             </dl>
           </div>
 
           <!-- Metadata -->
           <div class="bg-white rounded-lg border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Metadados</h3>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+              Metadados
+            </h3>
 
             <dl class="space-y-3">
               <div class="flex justify-between">
-                <dt class="text-sm font-medium text-gray-500">Criado em:</dt>
-                <dd class="text-sm text-gray-900">{{ formatDate(itemData.createdAt) }}</dd>
+                <dt class="text-sm font-medium text-gray-500">
+                  Criado em:
+                </dt>
+                <dd class="text-sm text-gray-900">
+                  {{ formatDate(itemData.createdAt) }}
+                </dd>
               </div>
               <div class="flex justify-between">
-                <dt class="text-sm font-medium text-gray-500">Atualizado em:</dt>
-                <dd class="text-sm text-gray-900">{{ formatDate(itemData.updatedAt) }}</dd>
+                <dt class="text-sm font-medium text-gray-500">
+                  Atualizado em:
+                </dt>
+                <dd class="text-sm text-gray-900">
+                  {{ formatDate(itemData.updatedAt) }}
+                </dd>
               </div>
               <div class="flex justify-between">
-                <dt class="text-sm font-medium text-gray-500">Criado por:</dt>
-                <dd class="text-sm text-gray-900">{{ itemData.createdBy || 'Sistema' }}</dd>
+                <dt class="text-sm font-medium text-gray-500">
+                  Criado por:
+                </dt>
+                <dd class="text-sm text-gray-900">
+                  {{ itemData.createdBy || 'Sistema' }}
+                </dd>
               </div>
               <div class="flex justify-between">
-                <dt class="text-sm font-medium text-gray-500">Versão:</dt>
-                <dd class="text-sm text-gray-900">{{ itemData.version || '1' }}</dd>
+                <dt class="text-sm font-medium text-gray-500">
+                  Versão:
+                </dt>
+                <dd class="text-sm text-gray-900">
+                  {{ itemData.version || '1' }}
+                </dd>
               </div>
             </dl>
           </div>
         </div>
 
         <!-- Additional content sections -->
-        <div v-if="itemData.additionalData" class="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Dados Adicionais</h3>
+        <div
+          v-if="itemData.additionalData"
+          class="bg-white rounded-lg border border-gray-200 p-6"
+        >
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">
+            Dados Adicionais
+          </h3>
 
           <div class="prose prose-sm max-w-none">
             <pre class="bg-gray-50 rounded-lg p-4 text-xs overflow-x-auto">{{

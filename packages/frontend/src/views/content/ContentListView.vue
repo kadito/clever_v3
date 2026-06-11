@@ -8,7 +8,9 @@
             <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
               {{ displayName }}
             </h1>
-            <p class="text-gray-600">Gerir {{ displayName.toLowerCase() }} do sistema</p>
+            <p class="text-gray-600">
+              Gerir {{ displayName.toLowerCase() }} do sistema
+            </p>
           </div>
 
           <!-- Create button -->
@@ -16,7 +18,12 @@
             :to="{ name: `${contentType}-create` }"
             class="btn-primary inline-flex items-center"
           >
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -43,14 +50,21 @@
       <!-- Content list -->
       <div class="space-y-4">
         <!-- Loading state -->
-        <div v-if="isLoading" class="space-y-4">
-          <div v-for="i in 3" :key="i" class="animate-pulse">
+        <div
+          v-if="isLoading"
+          class="space-y-4"
+        >
+          <div
+            v-for="i in 3"
+            :key="i"
+            class="animate-pulse"
+          >
             <div class="bg-white rounded-lg border border-gray-200 p-4">
               <div class="flex items-start space-x-3">
-                <div class="w-10 h-10 bg-gray-200 rounded-lg"></div>
+                <div class="w-10 h-10 bg-gray-200 rounded-lg" />
                 <div class="flex-1 space-y-2">
-                  <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+                  <div class="h-4 bg-gray-200 rounded w-3/4" />
+                  <div class="h-3 bg-gray-200 rounded w-1/2" />
                 </div>
               </div>
             </div>
@@ -58,8 +72,13 @@
         </div>
 
         <!-- Empty state -->
-        <div v-else-if="displayItems.length === 0" class="text-center py-12">
-          <div class="text-6xl mb-4">{{ contentIcon }}</div>
+        <div
+          v-else-if="displayItems.length === 0"
+          class="text-center py-12"
+        >
+          <div class="text-6xl mb-4">
+            {{ contentIcon }}
+          </div>
           <h3 class="text-lg font-medium text-gray-900 mb-2">
             {{
               searchQuery
@@ -79,7 +98,12 @@
             :to="{ name: `${contentType}-create` }"
             class="btn-primary inline-flex items-center"
           >
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -92,12 +116,29 @@
         </div>
 
         <!-- Error state -->
-        <div v-else-if="error" class="text-center py-12">
-          <div class="text-6xl mb-4">⚠️</div>
-          <h3 class="text-lg font-medium text-red-900 mb-2">Erro ao carregar dados</h3>
-          <p class="text-red-600 mb-6">{{ error }}</p>
-          <button @click="refresh" class="btn-primary inline-flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div
+          v-else-if="error"
+          class="text-center py-12"
+        >
+          <div class="text-6xl mb-4">
+            ⚠️
+          </div>
+          <h3 class="text-lg font-medium text-red-900 mb-2">
+            Erro ao carregar dados
+          </h3>
+          <p class="text-red-600 mb-6">
+            {{ error }}
+          </p>
+          <button
+            class="btn-primary inline-flex items-center"
+            @click="refresh"
+          >
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -110,7 +151,10 @@
         </div>
 
         <!-- Content items -->
-        <div v-else class="space-y-3">
+        <div
+          v-else
+          class="space-y-3"
+        >
           <ContentCard
             v-for="item in displayItems"
             :key="item.id"
@@ -127,11 +171,16 @@
             <template #actions>
               <div class="flex items-center space-x-2">
                 <button
-                  @click.stop="navigateToEdit(item.id)"
                   class="p-2 text-gray-400 hover:text-primary-600 rounded-lg hover:bg-primary-50 transition-colors duration-200 touch-target"
                   :aria-label="`Editar ${displayName.slice(0, -1)}`"
+                  @click.stop="navigateToEdit(item.id)"
                 >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -141,11 +190,16 @@
                   </svg>
                 </button>
                 <button
-                  @click.stop="navigateToDetail(item.id)"
                   class="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors duration-200 touch-target"
                   :aria-label="`Ver detalhes de ${displayName.slice(0, -1)}`"
+                  @click.stop="navigateToDetail(item.id)"
                 >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -160,17 +214,28 @@
         </div>
 
         <!-- Pagination -->
-        <div v-if="totalItems > 0" class="pt-6">
+        <div
+          v-if="totalItems > 0"
+          class="pt-6"
+        >
           <div class="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
             <!-- Page navigation (shown first on mobile for quick access) -->
-            <div v-if="totalPages > 1" class="flex items-center gap-1 order-1 sm:order-2">
+            <div
+              v-if="totalPages > 1"
+              class="flex items-center gap-1 order-1 sm:order-2"
+            >
               <button
-                @click="previousPage"
                 :disabled="currentPage === 1"
                 class="flex items-center justify-center w-11 h-11 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-200"
                 aria-label="Página anterior"
+                @click="previousPage"
               >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -185,12 +250,17 @@
               </span>
 
               <button
-                @click="nextPage"
                 :disabled="currentPage === totalPages"
                 class="flex items-center justify-center w-11 h-11 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-200"
                 aria-label="Próxima página"
+                @click="nextPage"
               >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -211,14 +281,20 @@
 
               <select
                 :value="itemsPerPage"
-                @change="handleItemsPerPageChange(Number(($event.target as HTMLSelectElement).value))"
                 class="text-sm border border-gray-300 rounded-lg px-3 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 cursor-pointer"
                 style="min-height: 44px"
                 aria-label="Resultados por página"
+                @change="handleItemsPerPageChange(Number(($event.target as HTMLSelectElement).value))"
               >
-                <option :value="10">10 / pág</option>
-                <option :value="20">20 / pág</option>
-                <option :value="50">50 / pág</option>
+                <option :value="10">
+                  10 / pág
+                </option>
+                <option :value="20">
+                  20 / pág
+                </option>
+                <option :value="50">
+                  50 / pág
+                </option>
               </select>
             </div>
           </div>

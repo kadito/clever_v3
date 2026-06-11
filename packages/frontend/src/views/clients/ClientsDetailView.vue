@@ -22,32 +22,45 @@
   >
     <!-- Custom content sections -->
     <template #content="{ item }">
-      <div v-if="item && item.data" class="space-y-6">
+      <div
+        v-if="item && item.data"
+        class="space-y-6"
+      >
         <!-- Basic Information Section -->
         <div class="detail-section">
           <div class="bg-white rounded-touch border border-gray-200">
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Informação Básica</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Informação Básica
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
                 <div class="detail-item">
                   <label class="detail-label">Nome da Empresa</label>
-                  <div class="detail-value">{{ item.data.nomeEmpresa || '-' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.nomeEmpresa || '-' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Nome Comercial</label>
-                  <div class="detail-value">{{ item.data.nomeComercial || '-' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.nomeComercial || '-' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Contribuinte</label>
-                  <div class="detail-value">{{ item.data.contribuinte || '-' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.contribuinte || '-' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Responsável</label>
-                  <div class="detail-value">{{ item.data.responsavel || '-' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.responsavel || '-' }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -56,10 +69,12 @@
 
         <!-- Contract Section -->
         <div class="detail-section">
-          <div class="bg-white rounded-touch border border-gray-200"
-               :class="{
-                 'border-red-200 bg-red-50': contractIsError
-               }">
+          <div
+            class="bg-white rounded-touch border border-gray-200"
+            :class="{
+              'border-red-200 bg-red-50': contractIsError
+            }"
+          >
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
               :class="{
@@ -68,21 +83,46 @@
             >
               <div class="flex items-center justify-between w-full">
                 <div class="flex items-center flex-1 min-w-0">
-                  <div class="flex-shrink-0 mr-3 text-gray-600"
-                       :class="{ 'text-red-600': contractIsError }">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  <div
+                    class="flex-shrink-0 mr-3 text-gray-600"
+                    :class="{ 'text-red-600': contractIsError }"
+                  >
+                    <svg
+                      class="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
                     </svg>
                   </div>
-                  <h2 class="text-lg font-semibold text-gray-900"
-                      :class="{ 'text-red-900': contractIsError }">
+                  <h2
+                    class="text-lg font-semibold text-gray-900"
+                    :class="{ 'text-red-900': contractIsError }"
+                  >
                     Contrato
                   </h2>
-                  <div v-if="contractIsError" class="ml-2">
-                    <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  <div
+                    v-if="contractIsError"
+                    class="ml-2"
+                  >
+                    <svg
+                      class="w-4 h-4 text-red-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                      />
                     </svg>
                   </div>
                 </div>
@@ -94,16 +134,28 @@
                   style="min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center;"
                   title="Ver detalhes do contrato"
                 >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
                   </svg>
                 </router-link>
               </div>
             </div>
             <div class="p-4 sm:p-6">
               <!-- Error state -->
-              <div v-if="contractIsError" class="text-center py-2">
+              <div
+                v-if="contractIsError"
+                class="text-center py-2"
+              >
                 <RelationInfoDisplay
                   :relation-data="contractRelation"
                   relation-type="contract"
@@ -112,7 +164,10 @@
               </div>
 
               <!-- Contract exists — show summary -->
-              <div v-else-if="hasContract && contractRelation" class="detail-grid">
+              <div
+                v-else-if="hasContract && contractRelation"
+                class="detail-grid"
+              >
                 <div class="detail-item">
                   <label class="detail-label">Tipo de Contrato</label>
                   <div class="detail-value">
@@ -129,15 +184,21 @@
                 </div>
                 <div class="detail-item col-span-full">
                   <label class="detail-label">Plano(s)</label>
-                  <div class="detail-value font-medium">{{ getContractPlanDisplay(contractRelation) }}</div>
+                  <div class="detail-value font-medium">
+                    {{ getContractPlanDisplay(contractRelation) }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Data Início</label>
-                  <div class="detail-value">{{ getContractDates(contractRelation).start }}</div>
+                  <div class="detail-value">
+                    {{ getContractDates(contractRelation).start }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Data Fim</label>
-                  <div class="detail-value">{{ getContractDates(contractRelation).end }}</div>
+                  <div class="detail-value">
+                    {{ getContractDates(contractRelation).end }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Estado</label>
@@ -165,8 +226,13 @@
               </div>
 
               <!-- No contract -->
-              <div v-else class="text-center py-4">
-                <p class="text-gray-500 mb-4">Sem contrato ativo</p>
+              <div
+                v-else
+                class="text-center py-4"
+              >
+                <p class="text-gray-500 mb-4">
+                  Sem contrato ativo
+                </p>
                 <router-link
                   :to="`/contracts/create?clientId=${item.uuid}`"
                   class="inline-flex items-center justify-center px-4 py-2 rounded-touch text-white font-medium transition-colors hover:opacity-90"
@@ -185,14 +251,16 @@
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch flex justify-between items-center"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Saldo</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Saldo
+              </h2>
               <div class="flex gap-2">
                 <button
                   v-if="permissions.canViewAuditTrail"
-                  @click="handleRecalculateBalance"
                   class="text-sm px-3 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700 transition-colors"
                   style="min-height: 44px; min-width: 44px;"
                   :disabled="isRecalculating"
+                  @click="handleRecalculateBalance"
                 >
                   {{ isRecalculating ? 'A recalcular...' : 'Recalcular saldo' }}
                 </button>
@@ -208,17 +276,26 @@
             </div>
             <div class="p-4 sm:p-6">
               <!-- Loading State -->
-              <div v-if="isBalanceLoading" class="flex items-center justify-center py-4">
-                <div class="balance-spinner"></div>
+              <div
+                v-if="isBalanceLoading"
+                class="flex items-center justify-center py-4"
+              >
+                <div class="balance-spinner" />
                 <span class="ml-2 text-sm text-gray-500">A carregar saldo...</span>
               </div>
 
               <!-- Balance Display -->
-              <div v-else class="detail-grid">
+              <div
+                v-else
+                class="detail-grid"
+              >
                 <!-- Dívida -->
                 <div class="detail-item">
                   <label class="detail-label">Dívida</label>
-                  <div class="detail-value text-lg font-semibold" :class="balanceData.balance > 0 ? 'text-red-600' : 'text-gray-900'">
+                  <div
+                    class="detail-value text-lg font-semibold"
+                    :class="balanceData.balance > 0 ? 'text-red-600' : 'text-gray-900'"
+                  >
                     {{ balanceData.balance }}€
                   </div>
                 </div>
@@ -231,7 +308,10 @@
                     :class="isResourceLow('manutencoesPorAno') ? 'bg-yellow-50 text-yellow-800 border border-yellow-400' : ''"
                   >
                     <span>{{ formatResourceValue(balanceData.contracts.manutencoesPorAno) }}</span>
-                    <span v-if="isResourceLow('manutencoesPorAno')" class="ml-1">⚠️</span>
+                    <span
+                      v-if="isResourceLow('manutencoesPorAno')"
+                      class="ml-1"
+                    >⚠️</span>
                   </div>
                 </div>
 
@@ -243,7 +323,10 @@
                     :class="isResourceLow('deslocacoesPorAno') ? 'bg-yellow-50 text-yellow-800 border border-yellow-400' : ''"
                   >
                     <span>{{ formatResourceValue(balanceData.contracts.deslocacoesPorAno) }}</span>
-                    <span v-if="isResourceLow('deslocacoesPorAno')" class="ml-1">⚠️</span>
+                    <span
+                      v-if="isResourceLow('deslocacoesPorAno')"
+                      class="ml-1"
+                    >⚠️</span>
                   </div>
                 </div>
 
@@ -255,7 +338,10 @@
                     :class="isResourceLow('horasAssistenciaAnuais') ? 'bg-yellow-50 text-yellow-800 border border-yellow-400' : ''"
                   >
                     <span>{{ formatResourceValue(balanceData.contracts.horasAssistenciaAnuais) }}</span>
-                    <span v-if="isResourceLow('horasAssistenciaAnuais')" class="ml-1">⚠️</span>
+                    <span
+                      v-if="isResourceLow('horasAssistenciaAnuais')"
+                      class="ml-1"
+                    >⚠️</span>
                   </div>
                 </div>
               </div>
@@ -269,7 +355,9 @@
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Contactos</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Contactos
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
@@ -336,21 +424,29 @@
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Morada</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Morada
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
                 <div class="detail-item col-span-full">
                   <label class="detail-label">Morada</label>
-                  <div class="detail-value whitespace-pre-line">{{ item.data.morada || '-' }}</div>
+                  <div class="detail-value whitespace-pre-line">
+                    {{ item.data.morada || '-' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Código Postal</label>
-                  <div class="detail-value">{{ item.data.codigoPostal || '-' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.codigoPostal || '-' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Localidade</label>
-                  <div class="detail-value">{{ item.data.localidade || '-' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.localidade || '-' }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -358,18 +454,25 @@
         </div>
 
         <!-- Financial Information Section -->
-        <div v-if="item.data.iban" class="detail-section">
+        <div
+          v-if="item.data.iban"
+          class="detail-section"
+        >
           <div class="bg-white rounded-touch border border-gray-200">
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Informação Financeira</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Informação Financeira
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
                 <div class="detail-item col-span-full">
                   <label class="detail-label">IBAN</label>
-                  <div class="detail-value font-mono">{{ item.data.iban }}</div>
+                  <div class="detail-value font-mono">
+                    {{ item.data.iban }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -382,43 +485,63 @@
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Serviços</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Serviços
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="services-grid">
                 <div class="service-item">
                   <label class="service-label">AnyDesk</label>
-                  <div class="service-status" :class="{ active: item.data.temAnydesk }">
+                  <div
+                    class="service-status"
+                    :class="{ active: item.data.temAnydesk }"
+                  >
                     {{ item.data.temAnydesk ? 'Sim' : 'Não' }}
                   </div>
                 </div>
                 <div class="service-item">
                   <label class="service-label">Manutenção</label>
-                  <div class="service-status" :class="{ active: item.data.manutencao }">
+                  <div
+                    class="service-status"
+                    :class="{ active: item.data.manutencao }"
+                  >
                     {{ item.data.manutencao ? 'Sim' : 'Não' }}
                   </div>
                 </div>
                 <div class="service-item">
                   <label class="service-label">Manutenção 24h</label>
-                  <div class="service-status" :class="{ active: item.data.manutencao24 }">
+                  <div
+                    class="service-status"
+                    :class="{ active: item.data.manutencao24 }"
+                  >
                     {{ item.data.manutencao24 ? 'Sim' : 'Não' }}
                   </div>
                 </div>
                 <div class="service-item">
                   <label class="service-label">DUMPS</label>
-                  <div class="service-status" :class="{ active: item.data.dumps }">
+                  <div
+                    class="service-status"
+                    :class="{ active: item.data.dumps }"
+                  >
                     {{ item.data.dumps ? 'Sim' : 'Não' }}
                   </div>
                 </div>
                 <div class="service-item">
                   <label class="service-label">ATCUD</label>
-                  <div class="service-status" :class="{ active: item.data.atcud }">
+                  <div
+                    class="service-status"
+                    :class="{ active: item.data.atcud }"
+                  >
                     {{ item.data.atcud ? 'Sim' : 'Não' }}
                   </div>
                 </div>
                 <div class="service-item">
                   <label class="service-label">Vectron Connect</label>
-                  <div class="service-status" :class="{ active: item.data.vectronConnect }">
+                  <div
+                    class="service-status"
+                    :class="{ active: item.data.vectronConnect }"
+                  >
                     {{ item.data.vectronConnect ? 'Sim' : 'Não' }}
                   </div>
                 </div>
@@ -429,7 +552,9 @@
                 v-if="hasConditionalFields(item.data)"
                 class="mt-6 pt-6 border-t border-gray-200"
               >
-                <h3 class="text-sm font-semibold text-gray-900 mb-4">Configurações Adicionais</h3>
+                <h3 class="text-sm font-semibold text-gray-900 mb-4">
+                  Configurações Adicionais
+                </h3>
                 <div class="detail-grid">
                   <!-- DUMPS Link -->
                   <div
@@ -438,7 +563,11 @@
                   >
                     <label class="detail-label">Link Google Drive</label>
                     <div class="detail-value">
-                      <a :href="item.data.dumpsLink" target="_blank" class="contact-link">
+                      <a
+                        :href="item.data.dumpsLink"
+                        target="_blank"
+                        class="contact-link"
+                      >
                         {{ item.data.dumpsLink }}
                       </a>
                     </div>
@@ -446,24 +575,37 @@
 
                   <!-- ATCUD Fields -->
                   <template v-if="item.data.atcud">
-                    <div v-if="item.data.seriesDocumentos" class="detail-item">
+                    <div
+                      v-if="item.data.seriesDocumentos"
+                      class="detail-item"
+                    >
                       <label class="detail-label">Séries de Documentos</label>
-                      <div class="detail-value">{{ item.data.seriesDocumentos }}</div>
+                      <div class="detail-value">
+                        {{ item.data.seriesDocumentos }}
+                      </div>
                     </div>
-                    <div v-if="item.data.atUsername" class="detail-item">
+                    <div
+                      v-if="item.data.atUsername"
+                      class="detail-item"
+                    >
                       <label class="detail-label">AT Username</label>
-                      <div class="detail-value">{{ item.data.atUsername }}</div>
+                      <div class="detail-value">
+                        {{ item.data.atUsername }}
+                      </div>
                     </div>
-                    <div v-if="item.data.atPassword" class="detail-item">
+                    <div
+                      v-if="item.data.atPassword"
+                      class="detail-item"
+                    >
                       <label class="detail-label">AT Password</label>
                       <div class="detail-value flex items-center space-x-2">
                         <span class="font-mono">
                           {{ showATPassword ? item.data.atPassword : '••••••••' }}
                         </span>
                         <button
-                          @click="toggleATPassword"
                           class="password-toggle-btn"
                           :title="showATPassword ? 'Ocultar password' : 'Mostrar password'"
+                          @click="toggleATPassword"
                         >
                           <svg
                             v-if="showATPassword"
@@ -510,7 +652,9 @@
                     class="detail-item col-span-full"
                   >
                     <label class="detail-label">Vectron Address</label>
-                    <div class="detail-value font-mono">{{ item.data.vectronAddress }}</div>
+                    <div class="detail-value font-mono">
+                      {{ item.data.vectronAddress }}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -519,12 +663,17 @@
         </div>
 
         <!-- Software Section -->
-        <div v-if="item.data.softwares && item.data.softwares.length > 0" class="detail-section">
+        <div
+          v-if="item.data.softwares && item.data.softwares.length > 0"
+          class="detail-section"
+        >
           <div class="bg-white rounded-touch border border-gray-200">
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Software</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Software
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="space-y-4">
@@ -536,7 +685,10 @@
                   <div class="flex items-start justify-between mb-3">
                     <h3 class="text-base font-semibold text-gray-900">
                       {{ software.name }}
-                      <span v-if="software.product" class="text-sm font-normal text-gray-600">
+                      <span
+                        v-if="software.product"
+                        class="text-sm font-normal text-gray-600"
+                      >
                         - {{ software.product }}
                       </span>
                     </h3>
@@ -546,17 +698,32 @@
                   <div class="detail-grid">
                     <!-- Vectron-specific fields -->
                     <template v-if="software.name === 'Vectron'">
-                      <div v-if="software.model" class="detail-item">
+                      <div
+                        v-if="software.model"
+                        class="detail-item"
+                      >
                         <label class="detail-label">Modelo</label>
-                        <div class="detail-value">{{ software.model }}</div>
+                        <div class="detail-value">
+                          {{ software.model }}
+                        </div>
                       </div>
-                      <div v-if="software.nEquipamento" class="detail-item">
+                      <div
+                        v-if="software.nEquipamento"
+                        class="detail-item"
+                      >
                         <label class="detail-label">Nº Equipamento</label>
-                        <div class="detail-value">{{ software.nEquipamento }}</div>
+                        <div class="detail-value">
+                          {{ software.nEquipamento }}
+                        </div>
                       </div>
-                      <div v-if="software.versaoSoftware" class="detail-item">
+                      <div
+                        v-if="software.versaoSoftware"
+                        class="detail-item"
+                      >
                         <label class="detail-label">Versão do Software</label>
-                        <div class="detail-value">{{ software.versaoSoftware }}</div>
+                        <div class="detail-value">
+                          {{ software.versaoSoftware }}
+                        </div>
                       </div>
                     </template>
 
@@ -583,33 +750,58 @@
 
                     <!-- Zone Soft-specific fields -->
                     <template v-else-if="software.name === 'Zone Soft'">
-                      <div v-if="software.version" class="detail-item">
+                      <div
+                        v-if="software.version"
+                        class="detail-item"
+                      >
                         <label class="detail-label">Versão</label>
-                        <div class="detail-value">{{ software.version }}</div>
+                        <div class="detail-value">
+                          {{ software.version }}
+                        </div>
                       </div>
                     </template>
 
                     <!-- Pt CERT-specific fields -->
                     <template v-else-if="software.name === 'Pt CERT'">
-                      <div v-if="software.licenseType" class="detail-item">
+                      <div
+                        v-if="software.licenseType"
+                        class="detail-item"
+                      >
                         <label class="detail-label">Tipo de Licença</label>
-                        <div class="detail-value">{{ software.licenseType }}</div>
+                        <div class="detail-value">
+                          {{ software.licenseType }}
+                        </div>
                       </div>
                     </template>
 
                     <!-- Common fields (for all except Vectron) -->
                     <template v-if="software.name !== 'Vectron'">
-                      <div v-if="software.numeroSerie" class="detail-item">
+                      <div
+                        v-if="software.numeroSerie"
+                        class="detail-item"
+                      >
                         <label class="detail-label">Número Série</label>
-                        <div class="detail-value">{{ software.numeroSerie }}</div>
+                        <div class="detail-value">
+                          {{ software.numeroSerie }}
+                        </div>
                       </div>
-                      <div v-if="software.versaoSoftware" class="detail-item">
+                      <div
+                        v-if="software.versaoSoftware"
+                        class="detail-item"
+                      >
                         <label class="detail-label">Versão Software</label>
-                        <div class="detail-value">{{ software.versaoSoftware }}</div>
+                        <div class="detail-value">
+                          {{ software.versaoSoftware }}
+                        </div>
                       </div>
-                      <div v-if="software.versaoLicenca" class="detail-item">
+                      <div
+                        v-if="software.versaoLicenca"
+                        class="detail-item"
+                      >
                         <label class="detail-label">Versão Licença</label>
-                        <div class="detail-value">{{ software.versaoLicenca }}</div>
+                        <div class="detail-value">
+                          {{ software.versaoLicenca }}
+                        </div>
                       </div>
                     </template>
                   </div>
@@ -620,15 +812,22 @@
         </div>
 
         <!-- Observations Section -->
-        <div v-if="item.data.observacoes" class="detail-section">
+        <div
+          v-if="item.data.observacoes"
+          class="detail-section"
+        >
           <div class="bg-white rounded-touch border border-gray-200">
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Observações</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Observações
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
-              <div class="detail-value whitespace-pre-line">{{ item.data.observacoes }}</div>
+              <div class="detail-value whitespace-pre-line">
+                {{ item.data.observacoes }}
+              </div>
             </div>
           </div>
         </div>

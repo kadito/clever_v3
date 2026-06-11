@@ -24,18 +24,23 @@ export type {
   ValidMinute,
 } from './types';
 
+// Export pricing interfaces
+export type {
+  RemoteAssistancePricingInput,
+  RemoteAssistancePricingResult,
+  TimeSegment,
+} from './validation';
+
 // Export constants
 export { REMOTE_ASSISTANCE_CONSTANTS } from './types';
 
 // Export all validation functions
 export {
+  calculateRemoteAssistancePricing,
   validateAndFormatTime,
   validateTimeSequence,
   calculateTotalHours,
   calculateRoundedTotalHours,
-  isBusinessHours,
-  calculateAssistanceValue,
-  calculateAssistanceValueWithBusinessHours,
   validateRemoteAssistanceCreation,
   validateRemoteAssistanceUpdate,
   validateRemoteAssistanceForDisplay,

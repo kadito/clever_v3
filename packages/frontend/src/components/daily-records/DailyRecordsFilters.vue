@@ -2,7 +2,10 @@
   <div class="flex flex-col sm:flex-row gap-3 w-full">
     <!-- Collaborator filter -->
     <div class="flex flex-col gap-1 flex-1">
-      <label for="filter-collaborator" class="text-sm font-medium text-gray-700">
+      <label
+        for="filter-collaborator"
+        class="text-sm font-medium text-gray-700"
+      >
         Colaborador
       </label>
       <select
@@ -18,7 +21,11 @@
         ]"
         @change="onCollaboratorChange"
       >
-        <option value="" disabled hidden>
+        <option
+          value=""
+          disabled
+          hidden
+        >
           {{ isLoadingCollaborators ? 'A carregar...' : 'Todos os colaboradores' }}
         </option>
         <template v-if="!isLoadingCollaborators">
@@ -30,14 +37,22 @@
           >
             {{ collaborator.name }}
           </option>
-          <option v-if="selectedCollaborator" value="">Limpar filtro</option>
+          <option
+            v-if="selectedCollaborator"
+            value=""
+          >
+            Limpar filtro
+          </option>
         </template>
       </select>
     </div>
 
     <!-- Date filter -->
     <div class="flex flex-col gap-1 flex-1">
-      <label for="filter-date" class="text-sm font-medium text-gray-700">
+      <label
+        for="filter-date"
+        class="text-sm font-medium text-gray-700"
+      >
         Data
       </label>
       <input
@@ -51,7 +66,7 @@
           selectedDate ? 'text-gray-700' : 'text-gray-400',
         ]"
         @input="onDateChange"
-      />
+      >
     </div>
   </div>
 </template>

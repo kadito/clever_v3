@@ -6,10 +6,8 @@
 
     <div class="equipment-info-callout">
       <span class="info-icon">ℹ️</span>
-      <span
-        >O desconto aplica-se apenas aos equipamentos adicionais (2º, 3º, etc.). O primeiro
-        equipamento não tem desconto.</span
-      >
+      <span>O desconto aplica-se apenas aos equipamentos adicionais (2º, 3º, etc.). O primeiro
+        equipamento não tem desconto.</span>
     </div>
 
     <div class="equipment-list">
@@ -24,7 +22,11 @@
       />
     </div>
 
-    <button type="button" class="add-equipment-btn" @click="addEquipment">
+    <button
+      type="button"
+      class="add-equipment-btn"
+      @click="addEquipment"
+    >
       + ADICIONAR EQUIPAMENTO
     </button>
   </div>

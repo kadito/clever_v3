@@ -32,7 +32,10 @@
           </svg>
           <span class="category-name">{{ CHECKLIST_CATEGORY_LABELS[categoryKey] }}</span>
         </div>
-        <span class="category-progress" :class="getCategoryProgressClass(categoryKey)">
+        <span
+          class="category-progress"
+          :class="getCategoryProgressClass(categoryKey)"
+        >
           {{ getCategoryCheckedCount(categoryKey) }}/{{ CHECKLIST_CATEGORIES[categoryKey].length }}
         </span>
       </button>

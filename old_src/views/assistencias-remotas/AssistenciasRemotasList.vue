@@ -1,7 +1,10 @@
 <template>
   <div class="assistencias-container">
     <div class="assistencias-header">
-      <BackButton to="/assistencias-remotas" variant="inline" />
+      <BackButton
+        to="/assistencias-remotas"
+        variant="inline"
+      />
     </div>
 
     <!-- Controls -->
@@ -23,7 +26,11 @@
           @change="onYearChange"
         />
 
-        <button @click="refreshData" :disabled="loading" class="btn btn-refresh">
+        <button
+          :disabled="loading"
+          class="btn btn-refresh"
+          @click="refreshData"
+        >
           🔄 Atualizar
         </button>
       </div>
@@ -32,28 +39,42 @@
     <!-- Search -->
     <div class="search-container">
       <input
-        type="text"
         v-model="searchQuery"
-        @input="handleSearch"
+        type="text"
         placeholder="Pesquisar por cliente, número, técnico..."
         class="search-input"
-      />
+        @input="handleSearch"
+      >
       <span class="search-icon">🔍</span>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A carregar assistências...</p>
     </div>
 
     <!-- Error State -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Assistencias List -->
-    <div v-if="!loading && displayedAssistencias.length > 0" class="assistencias-list">
+    <div
+      v-if="!loading && displayedAssistencias.length > 0"
+      class="assistencias-list"
+    >
       <div
         v-for="assistencia in displayedAssistencias"
         :key="assistencia.id"
@@ -63,7 +84,10 @@
         <div class="assistencia-main">
           <div class="assistencia-header-info">
             <h3>{{ assistencia.assistNumero }}</h3>
-            <span class="assistencia-tipo" :class="getTipoClass(assistencia.tipoAssistencia)">
+            <span
+              class="assistencia-tipo"
+              :class="getTipoClass(assistencia.tipoAssistencia)"
+            >
               {{ assistencia.tipoAssistencia }}
             </span>
           </div>
@@ -77,54 +101,120 @@
             <span class="assistencia-tecnico">👨‍💻 {{ assistencia.tecnicoResponsavel }}</span>
           </div>
 
-          <div class="assistencia-details" v-if="assistencia.motivoPedido">
-            <p class="motivo">{{ assistencia.motivoPedido }}</p>
+          <div
+            v-if="assistencia.motivoPedido"
+            class="assistencia-details"
+          >
+            <p class="motivo">
+              {{ assistencia.motivoPedido }}
+            </p>
           </div>
 
           <div class="assistencia-status">
-            <span v-if="assistencia.contrato" class="status-badge contract">Contrato</span>
-            <span v-if="assistencia.garantia" class="status-badge warranty">Garantia</span>
-            <span v-if="assistencia.valorAssist > 0" class="value-badge"
-              >€{{ assistencia.valorAssist.toFixed(2) }}</span
-            >
+            <span
+              v-if="assistencia.contrato"
+              class="status-badge contract"
+            >Contrato</span>
+            <span
+              v-if="assistencia.garantia"
+              class="status-badge warranty"
+            >Garantia</span>
+            <span
+              v-if="assistencia.valorAssist > 0"
+              class="value-badge"
+            >€{{ assistencia.valorAssist.toFixed(2) }}</span>
           </div>
         </div>
 
         <div class="assistencia-actions">
-          <button class="action-btn" @click.stop="showActions(assistencia)">⋮</button>
+          <button
+            class="action-btn"
+            @click.stop="showActions(assistencia)"
+          >
+            ⋮
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Empty State -->
-    <div v-if="!loading && displayedAssistencias.length === 0" class="empty-state">
+    <div
+      v-if="!loading && displayedAssistencias.length === 0"
+      class="empty-state"
+    >
       <h3>Nenhuma assistência encontrada</h3>
-      <p v-if="searchQuery">Não foram encontradas assistências com o termo "{{ searchQuery }}".</p>
-      <p v-else-if="currentYear">Não há assistências cadastradas para o ano {{ currentYear }}.</p>
-      <p v-else>Não há assistências cadastradas no sistema.</p>
-      <button @click="navigateToCreate" class="btn btn-primary">➕ Criar Nova Assistência</button>
+      <p v-if="searchQuery">
+        Não foram encontradas assistências com o termo "{{ searchQuery }}".
+      </p>
+      <p v-else-if="currentYear">
+        Não há assistências cadastradas para o ano {{ currentYear }}.
+      </p>
+      <p v-else>
+        Não há assistências cadastradas no sistema.
+      </p>
+      <button
+        class="btn btn-primary"
+        @click="navigateToCreate"
+      >
+        ➕ Criar Nova Assistência
+      </button>
     </div>
 
     <!-- Search Results Info -->
-    <div v-if="searchResults && searchQuery" class="search-info">
+    <div
+      v-if="searchResults && searchQuery"
+      class="search-info"
+    >
       <p>{{ searchResults.count }} resultado(s) encontrado(s) para "{{ searchQuery }}"</p>
     </div>
 
     <!-- Actions Modal -->
-    <div v-if="showActionsModal" class="actions-modal-overlay" @click="closeActions">
-      <div class="actions-modal" @click.stop>
+    <div
+      v-if="showActionsModal"
+      class="actions-modal-overlay"
+      @click="closeActions"
+    >
+      <div
+        class="actions-modal"
+        @click.stop
+      >
         <h3>{{ selectedAssistenciaForActions?.assistNumero }}</h3>
         <div class="modal-actions">
-          <button @click="viewAssistencia" class="modal-btn view-btn">📋 Ver Detalhes</button>
-          <button @click="editAssistencia" class="modal-btn edit-btn">✏️ Editar</button>
-          <button @click="deleteAssistenciaAction" class="modal-btn delete-btn">🗑️ Eliminar</button>
+          <button
+            class="modal-btn view-btn"
+            @click="viewAssistencia"
+          >
+            📋 Ver Detalhes
+          </button>
+          <button
+            class="modal-btn edit-btn"
+            @click="editAssistencia"
+          >
+            ✏️ Editar
+          </button>
+          <button
+            class="modal-btn delete-btn"
+            @click="deleteAssistenciaAction"
+          >
+            🗑️ Eliminar
+          </button>
         </div>
-        <button @click="closeActions" class="modal-btn cancel-btn">Cancelar</button>
+        <button
+          class="modal-btn cancel-btn"
+          @click="closeActions"
+        >
+          Cancelar
+        </button>
       </div>
     </div>
 
     <!-- Floating Action Button -->
-    <button @click="navigateToCreate" class="fab">➕</button>
+    <button
+      class="fab"
+      @click="navigateToCreate"
+    >
+      ➕
+    </button>
   </div>
 </template>
 

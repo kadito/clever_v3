@@ -2,7 +2,12 @@
   <div class="sh-equipment-card">
     <div class="equipment-header">
       <h5>EQUIPAMENTO S&H {{ equipmentNumber }}</h5>
-      <button v-if="equipmentNumber > 1" type="button" class="remove-btn" @click="$emit('remove')">
+      <button
+        v-if="equipmentNumber > 1"
+        type="button"
+        class="remove-btn"
+        @click="$emit('remove')"
+      >
         ✕
       </button>
     </div>
@@ -16,7 +21,7 @@
           class="form-input"
           placeholder="Ex: Dell Optiplex 7090"
           @input="updateEquipment"
-        />
+        >
       </div>
 
       <div class="form-field">
@@ -27,7 +32,7 @@
           class="form-input"
           placeholder="Ex: ABC123456"
           @input="updateEquipment"
-        />
+        >
       </div>
 
       <div class="form-field">
@@ -38,7 +43,7 @@
           class="form-input"
           placeholder="Ex: Windows 11 Pro"
           @input="updateEquipment"
-        />
+        >
       </div>
     </div>
 

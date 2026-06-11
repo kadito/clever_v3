@@ -1,7 +1,9 @@
 <template>
   <div class="responsive-test-container">
     <div class="test-header">
-      <h2 class="test-title">Responsive Design Test Grid</h2>
+      <h2 class="test-title">
+        Responsive Design Test Grid
+      </h2>
       <div class="current-breakpoint">
         <span class="breakpoint-indicator xs-only">XS (< 475px)</span>
         <span class="breakpoint-indicator sm-only">SM (475px - 640px)</span>
@@ -13,15 +15,23 @@
 
     <!-- Form Grid Test -->
     <div class="test-section">
-      <h3 class="section-title">Form Grid Layout</h3>
+      <h3 class="section-title">
+        Form Grid Layout
+      </h3>
       <div class="form-grid-consistent">
         <div class="test-field">
           <label class="form-label-consistent">Field 1</label>
-          <input class="form-input-consistent" placeholder="Test input 1" />
+          <input
+            class="form-input-consistent"
+            placeholder="Test input 1"
+          >
         </div>
         <div class="test-field">
           <label class="form-label-consistent">Field 2</label>
-          <input class="form-input-consistent" placeholder="Test input 2" />
+          <input
+            class="form-input-consistent"
+            placeholder="Test input 2"
+          >
         </div>
         <div class="test-field">
           <label class="form-label-consistent">Field 3</label>
@@ -32,25 +42,40 @@
         </div>
         <div class="test-field form-field-full-width">
           <label class="form-label-consistent">Full Width Field</label>
-          <textarea class="form-textarea-consistent" placeholder="Full width textarea"></textarea>
+          <textarea
+            class="form-textarea-consistent"
+            placeholder="Full width textarea"
+          />
         </div>
       </div>
     </div>
 
     <!-- Button Layout Test -->
     <div class="test-section">
-      <h3 class="section-title">Button Layout</h3>
+      <h3 class="section-title">
+        Button Layout
+      </h3>
       <div class="button-test-grid">
-        <button class="btn-primary-consistent">Primary</button>
-        <button class="btn-secondary-consistent">Secondary</button>
-        <button class="btn-outline-consistent">Outline</button>
-        <button class="btn-danger-consistent">Danger</button>
+        <button class="btn-primary-consistent">
+          Primary
+        </button>
+        <button class="btn-secondary-consistent">
+          Secondary
+        </button>
+        <button class="btn-outline-consistent">
+          Outline
+        </button>
+        <button class="btn-danger-consistent">
+          Danger
+        </button>
       </div>
     </div>
 
     <!-- Toggle Switch Test -->
     <div class="test-section">
-      <h3 class="section-title">Toggle Switch</h3>
+      <h3 class="section-title">
+        Toggle Switch
+      </h3>
       <div class="toggle-test">
         <div class="toggle-item">
           <span class="toggle-label">Test Toggle</span>
@@ -59,7 +84,10 @@
             :class="{ active: testToggle }"
             @click="testToggle = !testToggle"
           >
-            <span class="toggle-slider-consistent" :class="{ active: testToggle }"></span>
+            <span
+              class="toggle-slider-consistent"
+              :class="{ active: testToggle }"
+            />
           </button>
         </div>
       </div>
@@ -67,11 +95,22 @@
 
     <!-- Touch Target Test -->
     <div class="test-section">
-      <h3 class="section-title">Touch Targets (44px minimum)</h3>
+      <h3 class="section-title">
+        Touch Targets (44px minimum)
+      </h3>
       <div class="touch-target-test">
-        <button class="touch-target-button">Touch Me</button>
-        <input type="checkbox" class="form-checkbox-consistent" />
-        <input type="radio" class="form-radio-consistent" name="test-radio" />
+        <button class="touch-target-button">
+          Touch Me
+        </button>
+        <input
+          type="checkbox"
+          class="form-checkbox-consistent"
+        >
+        <input
+          type="radio"
+          class="form-radio-consistent"
+          name="test-radio"
+        >
         <select class="form-select-consistent touch-target">
           <option>Touch-friendly select</option>
         </select>
@@ -80,27 +119,46 @@
 
     <!-- Loading States Test -->
     <div class="test-section">
-      <h3 class="section-title">Loading States</h3>
+      <h3 class="section-title">
+        Loading States
+      </h3>
       <div class="loading-test-grid">
         <div class="loading-test-item">
-          <LoadingIndicator type="spinner" size="sm" text="Loading..." />
+          <LoadingIndicator
+            type="spinner"
+            size="sm"
+            text="Loading..."
+          />
         </div>
         <div class="loading-test-item">
-          <LoadingIndicator type="dots" size="md" />
+          <LoadingIndicator
+            type="dots"
+            size="md"
+          />
         </div>
         <div class="loading-test-item">
-          <LoadingIndicator type="pulse" size="lg" color="primary" />
+          <LoadingIndicator
+            type="pulse"
+            size="lg"
+            color="primary"
+          />
         </div>
       </div>
     </div>
 
     <!-- Mobile Action Bar Test -->
     <div class="test-section">
-      <h3 class="section-title">Mobile Action Bar</h3>
+      <h3 class="section-title">
+        Mobile Action Bar
+      </h3>
       <div class="mobile-action-bar-test">
         <div class="mobile-actions">
-          <button class="btn-secondary-consistent flex-1">Cancel</button>
-          <button class="btn-primary-consistent flex-1">Save</button>
+          <button class="btn-secondary-consistent flex-1">
+            Cancel
+          </button>
+          <button class="btn-primary-consistent flex-1">
+            Save
+          </button>
         </div>
       </div>
     </div>

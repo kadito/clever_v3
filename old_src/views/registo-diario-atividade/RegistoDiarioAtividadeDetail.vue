@@ -1,26 +1,42 @@
 <template>
   <div class="registo-detail-container">
     <!-- Error message -->
-    <div v-if="error" class="error-message">
+    <div
+      v-if="error"
+      class="error-message"
+    >
       <div class="error-content">
         <span class="error-text">{{ error }}</span>
-        <button @click="clearError" class="error-close">&times;</button>
+        <button
+          class="error-close"
+          @click="clearError"
+        >
+          &times;
+        </button>
       </div>
     </div>
 
     <!-- Loading overlay -->
-    <div v-if="loading" class="loading-overlay">
-      <div class="loading-spinner"></div>
+    <div
+      v-if="loading"
+      class="loading-overlay"
+    >
+      <div class="loading-spinner" />
       <p>Carregando registo...</p>
     </div>
 
     <BackButton variant="inline" />
 
-    <div v-if="registro" class="detail-container">
+    <div
+      v-if="registro"
+      class="detail-container"
+    >
       <!-- Header -->
       <div class="detail-header">
         <div class="header-content">
-          <h1 class="page-title">📋 Registo Diário de Atividade</h1>
+          <h1 class="page-title">
+            📋 Registo Diário de Atividade
+          </h1>
           <p class="page-subtitle">
             {{ formatDate(registro.dataRegistro) }} • {{ registro.cliente }}
           </p>
@@ -35,33 +51,60 @@
           >
             ✏️ Editar
           </router-link>
-          <button @click="confirmDelete" class="btn btn-danger">🗑️ Eliminar</button>
+          <button
+            class="btn btn-danger"
+            @click="confirmDelete"
+          >
+            🗑️ Eliminar
+          </button>
         </div>
       </div>
 
       <!-- Quick Info Cards -->
       <div class="quick-info-grid">
         <div class="info-card">
-          <div class="info-card-icon">📅</div>
+          <div class="info-card-icon">
+            📅
+          </div>
           <div class="info-card-content">
-            <div class="info-card-label">Data do Registo</div>
-            <div class="info-card-value">{{ formatDateTime(registro.dataRegistro) || 'N/A' }}</div>
+            <div class="info-card-label">
+              Data do Registo
+            </div>
+            <div class="info-card-value">
+              {{ formatDateTime(registro.dataRegistro) || 'N/A' }}
+            </div>
           </div>
         </div>
-        <div class="info-card" v-if="registro.totalHorasCalculado || registro.totalHoras">
-          <div class="info-card-icon">⏱️</div>
+        <div
+          v-if="registro.totalHorasCalculado || registro.totalHoras"
+          class="info-card"
+        >
+          <div class="info-card-icon">
+            ⏱️
+          </div>
           <div class="info-card-content">
-            <div class="info-card-label">Total de Horas</div>
+            <div class="info-card-label">
+              Total de Horas
+            </div>
             <div class="info-card-value highlight">
               {{ registro.totalHorasCalculado || registro.totalHoras || 'N/A' }}
             </div>
           </div>
         </div>
-        <div class="info-card" v-if="registro.respRegisto">
-          <div class="info-card-icon">👤</div>
+        <div
+          v-if="registro.respRegisto"
+          class="info-card"
+        >
+          <div class="info-card-icon">
+            👤
+          </div>
           <div class="info-card-content">
-            <div class="info-card-label">Responsável</div>
-            <div class="info-card-value">{{ registro.respRegisto || 'N/A' }}</div>
+            <div class="info-card-label">
+              Responsável
+            </div>
+            <div class="info-card-value">
+              {{ registro.respRegisto || 'N/A' }}
+            </div>
           </div>
         </div>
         <div class="info-card">
@@ -69,7 +112,9 @@
             {{ registro.internoOuExterno === 'INTERNO' ? '🏢' : '🚗' }}
           </div>
           <div class="info-card-content">
-            <div class="info-card-label">Tipo</div>
+            <div class="info-card-label">
+              Tipo
+            </div>
             <div class="info-card-value">
               <span
                 class="type-badge"
@@ -88,14 +133,18 @@
       <!-- Primary Activity -->
       <div class="detail-section">
         <div class="section-header">
-          <h2 class="section-title">🎯 Atividade Principal</h2>
+          <h2 class="section-title">
+            🎯 Atividade Principal
+          </h2>
         </div>
         <div class="section-content">
           <div class="info-grid">
             <div class="info-row">
               <div class="info-item">
                 <label class="info-label">Cliente</label>
-                <div class="info-value">{{ registro.cliente || 'N/A' }}</div>
+                <div class="info-value">
+                  {{ registro.cliente || 'N/A' }}
+                </div>
               </div>
               <div class="info-item">
                 <label class="info-label">Tipo de Atividade</label>
@@ -115,37 +164,54 @@
             <div class="info-row">
               <div class="info-item">
                 <label class="info-label">Assunto</label>
-                <div class="info-value">{{ registro.assunto || 'N/A' }}</div>
+                <div class="info-value">
+                  {{ registro.assunto || 'N/A' }}
+                </div>
               </div>
               <div class="info-item">
                 <label class="info-label">Responsável</label>
-                <div class="info-value">{{ registro.respRegisto || 'N/A' }}</div>
+                <div class="info-value">
+                  {{ registro.respRegisto || 'N/A' }}
+                </div>
               </div>
             </div>
             <div class="info-row">
               <div class="info-item">
                 <label class="info-label">Hora de Início</label>
-                <div class="info-value">{{ registro.horaInicio || 'N/A' }}</div>
+                <div class="info-value">
+                  {{ registro.horaInicio || 'N/A' }}
+                </div>
               </div>
               <div class="info-item">
                 <label class="info-label">Hora de Fim</label>
-                <div class="info-value">{{ registro.horaFim || 'N/A' }}</div>
+                <div class="info-value">
+                  {{ registro.horaFim || 'N/A' }}
+                </div>
               </div>
             </div>
             <div class="info-row">
               <div class="info-item">
                 <label class="info-label">Tempo de Pausa</label>
-                <div class="info-value">{{ registro.tempoPausa || 'N/A' }} min</div>
+                <div class="info-value">
+                  {{ registro.tempoPausa || 'N/A' }} min
+                </div>
               </div>
               <div class="info-item highlight-item">
                 <label class="info-label">Total de Horas (Calculado)</label>
-                <div class="info-value highlight">{{ registro.totalHorasCalculado || 'N/A' }}</div>
+                <div class="info-value highlight">
+                  {{ registro.totalHorasCalculado || 'N/A' }}
+                </div>
               </div>
             </div>
-            <div class="info-row full-width" v-if="registro.descricao">
+            <div
+              v-if="registro.descricao"
+              class="info-row full-width"
+            >
               <div class="info-item">
                 <label class="info-label">Descrição</label>
-                <div class="description-text">{{ registro.descricao || 'N/A' }}</div>
+                <div class="description-text">
+                  {{ registro.descricao || 'N/A' }}
+                </div>
               </div>
             </div>
           </div>
@@ -153,52 +219,76 @@
       </div>
 
       <!-- Secondary Activities -->
-      <div class="detail-section" v-if="registro.teveCliente2 || registro.cliente2">
+      <div
+        v-if="registro.teveCliente2 || registro.cliente2"
+        class="detail-section"
+      >
         <div class="section-header">
-          <h2 class="section-title">👥 Atividades Secundárias</h2>
+          <h2 class="section-title">
+            👥 Atividades Secundárias
+          </h2>
         </div>
         <div class="section-content">
           <div class="info-grid">
             <div class="info-row">
               <div class="info-item">
                 <label class="info-label">Cliente 2</label>
-                <div class="info-value">{{ registro.cliente2 || 'N/A' }}</div>
+                <div class="info-value">
+                  {{ registro.cliente2 || 'N/A' }}
+                </div>
               </div>
               <div class="info-item">
                 <label class="info-label">Tipo de Atividade</label>
-                <div class="info-value">{{ registro.interOuExter2 || 'N/A' }}</div>
+                <div class="info-value">
+                  {{ registro.interOuExter2 || 'N/A' }}
+                </div>
               </div>
             </div>
             <div class="info-row">
               <div class="info-item">
                 <label class="info-label">Assunto</label>
-                <div class="info-value">{{ registro.assunto2 || 'N/A' }}</div>
+                <div class="info-value">
+                  {{ registro.assunto2 || 'N/A' }}
+                </div>
               </div>
               <div class="info-item">
                 <label class="info-label">Total de Horas</label>
-                <div class="info-value">{{ registro.totalHoras2 || 'N/A' }}</div>
+                <div class="info-value">
+                  {{ registro.totalHoras2 || 'N/A' }}
+                </div>
               </div>
             </div>
             <div class="info-row">
               <div class="info-item">
                 <label class="info-label">Responsável</label>
-                <div class="info-value">{{ registro.respRegisto2 || 'N/A' }}</div>
+                <div class="info-value">
+                  {{ registro.respRegisto2 || 'N/A' }}
+                </div>
               </div>
               <div class="info-item">
                 <label class="info-label">Folha de Obra</label>
-                <div class="info-value">{{ registro.folhaObra2 ? 'Sim' : 'Não' }}</div>
+                <div class="info-value">
+                  {{ registro.folhaObra2 ? 'Sim' : 'Não' }}
+                </div>
               </div>
             </div>
             <div class="info-row">
               <div class="info-item">
                 <label class="info-label">Assistência Remota</label>
-                <div class="info-value">{{ registro.assistRemota2 ? 'Sim' : 'Não' }}</div>
+                <div class="info-value">
+                  {{ registro.assistRemota2 ? 'Sim' : 'Não' }}
+                </div>
               </div>
             </div>
-            <div class="info-row full-width" v-if="registro.descricao2">
+            <div
+              v-if="registro.descricao2"
+              class="info-row full-width"
+            >
               <div class="info-item">
                 <label class="info-label">Descrição</label>
-                <div class="description-text">{{ registro.descricao2 || 'N/A' }}</div>
+                <div class="description-text">
+                  {{ registro.descricao2 || 'N/A' }}
+                </div>
               </div>
             </div>
           </div>
@@ -207,38 +297,50 @@
 
       <!-- Distances and Displacements -->
       <div
-        class="detail-section"
         v-if="registro.internoOuExterno === 'EXTERNO' && (registro.kmsSaida || registro.kmsChegada)"
+        class="detail-section"
       >
         <div class="section-header">
-          <h2 class="section-title">🚗 Distâncias e Deslocações</h2>
+          <h2 class="section-title">
+            🚗 Distâncias e Deslocações
+          </h2>
         </div>
         <div class="section-content">
           <div class="info-grid">
             <div class="info-row">
               <div class="info-item">
                 <label class="info-label">Kms Saída</label>
-                <div class="info-value">{{ registro.kmsSaidaSede || 'N/A' }}</div>
+                <div class="info-value">
+                  {{ registro.kmsSaidaSede || 'N/A' }}
+                </div>
               </div>
               <div class="info-item">
                 <label class="info-label">Kms Chegada</label>
-                <div class="info-value">{{ registro.kmsChegadaSede || 'N/A' }}</div>
+                <div class="info-value">
+                  {{ registro.kmsChegadaSede || 'N/A' }}
+                </div>
               </div>
             </div>
             <div class="info-row">
               <div class="info-item">
                 <label class="info-label">Hora Saída</label>
-                <div class="info-value">{{ registro.horaSaida || 'N/A' }}</div>
+                <div class="info-value">
+                  {{ registro.horaSaida || 'N/A' }}
+                </div>
               </div>
               <div class="info-item">
                 <label class="info-label">Hora Chegada</label>
-                <div class="info-value">{{ registro.horaChegada || 'N/A' }}</div>
+                <div class="info-value">
+                  {{ registro.horaChegada || 'N/A' }}
+                </div>
               </div>
             </div>
             <div class="info-row">
               <div class="info-item">
                 <label class="info-label">Kms Abastecimento</label>
-                <div class="info-value">{{ registro.kmsAbastecimento || 'N/A' }}</div>
+                <div class="info-value">
+                  {{ registro.kmsAbastecimento || 'N/A' }}
+                </div>
               </div>
             </div>
           </div>
@@ -247,11 +349,13 @@
 
       <!-- Additional Activities -->
       <div
-        class="detail-section"
         v-if="registro.atividadesAdicionais && registro.atividadesAdicionais.length > 0"
+        class="detail-section"
       >
         <div class="section-header">
-          <h2 class="section-title">➕ Atividades Adicionais</h2>
+          <h2 class="section-title">
+            ➕ Atividades Adicionais
+          </h2>
         </div>
         <div class="section-content">
           <div class="additional-activities-list">
@@ -266,7 +370,9 @@
             >
               <div class="activity-card-header">
                 <div class="activity-header-left">
-                  <h3 class="activity-title">Atividade {{ index + 1 }}</h3>
+                  <h3 class="activity-title">
+                    Atividade {{ index + 1 }}
+                  </h3>
                 </div>
                 <span
                   class="activity-type-badge"
@@ -286,53 +392,76 @@
                 <div class="info-row">
                   <div class="info-item">
                     <label class="info-label">Referência</label>
-                    <div class="info-value">{{ atividade.referencia || 'N/A' }}</div>
+                    <div class="info-value">
+                      {{ atividade.referencia || 'N/A' }}
+                    </div>
                   </div>
                   <div class="info-item">
                     <label class="info-label">Cliente</label>
-                    <div class="info-value">{{ atividade.cliente || 'N/A' }}</div>
+                    <div class="info-value">
+                      {{ atividade.cliente || 'N/A' }}
+                    </div>
                   </div>
                 </div>
                 <div class="info-row">
                   <div class="info-item">
                     <label class="info-label">Tipo de Atividade</label>
-                    <div class="info-value">{{ atividade.tipoAtividade || 'N/A' }}</div>
+                    <div class="info-value">
+                      {{ atividade.tipoAtividade || 'N/A' }}
+                    </div>
                   </div>
                   <div class="info-item">
                     <label class="info-label">Assunto</label>
-                    <div class="info-value">{{ atividade.assunto || 'N/A' }}</div>
+                    <div class="info-value">
+                      {{ atividade.assunto || 'N/A' }}
+                    </div>
                   </div>
                 </div>
                 <div class="info-row">
                   <div class="info-item">
                     <label class="info-label">Hora de Início</label>
-                    <div class="info-value">{{ atividade.horaInicio || 'N/A' }}</div>
+                    <div class="info-value">
+                      {{ atividade.horaInicio || 'N/A' }}
+                    </div>
                   </div>
                   <div class="info-item">
                     <label class="info-label">Hora de Fim</label>
-                    <div class="info-value">{{ atividade.horaFim || 'N/A' }}</div>
+                    <div class="info-value">
+                      {{ atividade.horaFim || 'N/A' }}
+                    </div>
                   </div>
                 </div>
                 <div class="info-row">
                   <div class="info-item">
                     <label class="info-label">Tempo de Pausa</label>
-                    <div class="info-value">{{ atividade.tempoPausa || 'N/A' }} min</div>
+                    <div class="info-value">
+                      {{ atividade.tempoPausa || 'N/A' }} min
+                    </div>
                   </div>
                   <div class="info-item">
                     <label class="info-label">Total de Horas</label>
-                    <div class="info-value">{{ atividade.totalHoras || 'N/A' }}</div>
+                    <div class="info-value">
+                      {{ atividade.totalHoras || 'N/A' }}
+                    </div>
                   </div>
                 </div>
                 <div class="info-row">
                   <div class="info-item">
                     <label class="info-label">Responsável</label>
-                    <div class="info-value">{{ atividade.responsavel || 'N/A' }}</div>
+                    <div class="info-value">
+                      {{ atividade.responsavel || 'N/A' }}
+                    </div>
                   </div>
                 </div>
-                <div class="info-row full-width" v-if="atividade.descricao">
+                <div
+                  v-if="atividade.descricao"
+                  class="info-row full-width"
+                >
                   <div class="info-item">
                     <label class="info-label">Descrição</label>
-                    <div class="description-text">{{ atividade.descricao || 'N/A' }}</div>
+                    <div class="description-text">
+                      {{ atividade.descricao || 'N/A' }}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -344,18 +473,24 @@
       <!-- System Information -->
       <div class="detail-section system-info">
         <div class="section-header">
-          <h2 class="section-title">ℹ️ Informações do Sistema</h2>
+          <h2 class="section-title">
+            ℹ️ Informações do Sistema
+          </h2>
         </div>
         <div class="section-content">
           <div class="info-grid">
             <div class="info-row">
               <div class="info-item">
                 <label class="info-label">Criado em</label>
-                <div class="info-value">{{ formatDateTime(registro.createdAt) || 'N/A' }}</div>
+                <div class="info-value">
+                  {{ formatDateTime(registro.createdAt) || 'N/A' }}
+                </div>
               </div>
               <div class="info-item">
                 <label class="info-label">Última Atualização</label>
-                <div class="info-value">{{ formatDateTime(registro.updatedAt) || 'N/A' }}</div>
+                <div class="info-value">
+                  {{ formatDateTime(registro.updatedAt) || 'N/A' }}
+                </div>
               </div>
             </div>
           </div>
@@ -364,36 +499,68 @@
     </div>
 
     <!-- Empty state -->
-    <div v-else-if="!loading" class="empty-state">
-      <div class="empty-icon">📋</div>
+    <div
+      v-else-if="!loading"
+      class="empty-state"
+    >
+      <div class="empty-icon">
+        📋
+      </div>
       <h3>Registo não encontrado</h3>
       <p>O registo pode ainda não estar disponível no sistema. Tentar novamente?</p>
       <div class="retry-actions">
-        <button @click="retryLoad" class="btn btn-primary" :disabled="loading">
+        <button
+          class="btn btn-primary"
+          :disabled="loading"
+          @click="retryLoad"
+        >
           {{ loading ? 'A carregar...' : 'Tentar novamente' }}
         </button>
-        <router-link :to="{ name: 'registo-diario-atividade-list' }" class="btn btn-secondary">
+        <router-link
+          :to="{ name: 'registo-diario-atividade-list' }"
+          class="btn btn-secondary"
+        >
           ← Voltar à Lista
         </router-link>
       </div>
-      <p v-if="autoRetryCountdown > 0" class="auto-retry-info">
+      <p
+        v-if="autoRetryCountdown > 0"
+        class="auto-retry-info"
+      >
         Tentativa automática em {{ autoRetryCountdown }}s...
       </p>
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div v-if="showDeleteModal" class="modal-overlay" @click="cancelDelete">
-      <div class="modal-content" @click.stop>
+    <div
+      v-if="showDeleteModal"
+      class="modal-overlay"
+      @click="cancelDelete"
+    >
+      <div
+        class="modal-content"
+        @click.stop
+      >
         <h3>Confirmar Eliminação</h3>
         <p>
           Tem a certeza que pretende eliminar o registo de
-          <strong>{{ registro?.cliente }}</strong
-          >?
+          <strong>{{ registro?.cliente }}</strong>?
         </p>
-        <p class="warning-text">Esta ação não pode ser desfeita.</p>
+        <p class="warning-text">
+          Esta ação não pode ser desfeita.
+        </p>
         <div class="modal-actions">
-          <button @click="cancelDelete" class="btn btn-secondary">Cancelar</button>
-          <button @click="deleteRegistro" class="btn btn-danger" :disabled="loading">
+          <button
+            class="btn btn-secondary"
+            @click="cancelDelete"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn btn-danger"
+            :disabled="loading"
+            @click="deleteRegistro"
+          >
             {{ loading ? 'A eliminar...' : 'Eliminar' }}
           </button>
         </div>

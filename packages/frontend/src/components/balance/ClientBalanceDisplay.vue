@@ -1,58 +1,115 @@
 <template>
   <div class="balance-display">
     <!-- Loading State -->
-    <div v-if="isLoading" class="loading-state">
-      <div class="spinner"></div>
-      <p class="loading-text">A carregar saldo...</p>
+    <div
+      v-if="isLoading"
+      class="loading-state"
+    >
+      <div class="spinner" />
+      <p class="loading-text">
+        A carregar saldo...
+      </p>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="error-state">
-      <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <div
+      v-else-if="error"
+      class="error-state"
+    >
+      <svg
+        class="error-icon"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
       </svg>
-      <p class="error-message">{{ error }}</p>
+      <p class="error-message">
+        {{ error }}
+      </p>
     </div>
 
     <!-- Balance Display -->
-    <div v-else-if="balance" class="balance-content">
+    <div
+      v-else-if="balance"
+      class="balance-content"
+    >
       <!-- Debt Section -->
       <div class="balance-section debt-section">
-        <h3 class="section-title">Dívida Atual</h3>
-        <div class="balance-value" :class="{ 'has-debt': balance.balance > 0 }">
+        <h3 class="section-title">
+          Dívida Atual
+        </h3>
+        <div
+          class="balance-value"
+          :class="{ 'has-debt': balance.balance > 0 }"
+        >
           {{ formatCurrency(balance.balance) }}
         </div>
       </div>
 
       <!-- Contract Usage Section -->
       <div class="balance-section usage-section">
-        <h3 class="section-title">Recursos de Contrato</h3>
+        <h3 class="section-title">
+          Recursos de Contrato
+        </h3>
         
         <div class="usage-grid">
           <!-- Maintenance Visits -->
-          <div class="usage-item" :class="{ 'low-usage': isLowUsage('manutencoesPorAno') }">
-            <div class="usage-label">Manutenções por Ano</div>
+          <div
+            class="usage-item"
+            :class="{ 'low-usage': isLowUsage('manutencoesPorAno') }"
+          >
+            <div class="usage-label">
+              Manutenções por Ano
+            </div>
             <div class="usage-value">
               {{ formatUsageValue(balance.contracts.manutencoesPorAno) }}
-              <span v-if="isLowUsage('manutencoesPorAno')" class="warning-icon" title="Uso baixo">⚠️</span>
+              <span
+                v-if="isLowUsage('manutencoesPorAno')"
+                class="warning-icon"
+                title="Uso baixo"
+              >⚠️</span>
             </div>
           </div>
 
           <!-- Displacements -->
-          <div class="usage-item" :class="{ 'low-usage': isLowUsage('deslocacoesPorAno') }">
-            <div class="usage-label">Deslocações por Ano</div>
+          <div
+            class="usage-item"
+            :class="{ 'low-usage': isLowUsage('deslocacoesPorAno') }"
+          >
+            <div class="usage-label">
+              Deslocações por Ano
+            </div>
             <div class="usage-value">
               {{ formatUsageValue(balance.contracts.deslocacoesPorAno) }}
-              <span v-if="isLowUsage('deslocacoesPorAno')" class="warning-icon" title="Uso baixo">⚠️</span>
+              <span
+                v-if="isLowUsage('deslocacoesPorAno')"
+                class="warning-icon"
+                title="Uso baixo"
+              >⚠️</span>
             </div>
           </div>
 
           <!-- Assistance Hours -->
-          <div class="usage-item" :class="{ 'low-usage': isLowUsage('horasAssistenciaAnuais') }">
-            <div class="usage-label">Horas de Assistência Anuais</div>
+          <div
+            class="usage-item"
+            :class="{ 'low-usage': isLowUsage('horasAssistenciaAnuais') }"
+          >
+            <div class="usage-label">
+              Horas de Assistência Anuais
+            </div>
             <div class="usage-value">
               {{ formatUsageValue(balance.contracts.horasAssistenciaAnuais) }}
-              <span v-if="isLowUsage('horasAssistenciaAnuais')" class="warning-icon" title="Uso baixo">⚠️</span>
+              <span
+                v-if="isLowUsage('horasAssistenciaAnuais')"
+                class="warning-icon"
+                title="Uso baixo"
+              >⚠️</span>
             </div>
           </div>
         </div>
@@ -67,12 +124,29 @@
     </div>
 
     <!-- No Balance State -->
-    <div v-else class="no-balance-state">
-      <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <div
+      v-else
+      class="no-balance-state"
+    >
+      <svg
+        class="info-icon"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
       </svg>
-      <p class="no-balance-message">Sem informação de saldo disponível</p>
-      <p class="no-balance-hint">O saldo será criado automaticamente quando um contrato for adicionado a este cliente.</p>
+      <p class="no-balance-message">
+        Sem informação de saldo disponível
+      </p>
+      <p class="no-balance-hint">
+        O saldo será criado automaticamente quando um contrato for adicionado a este cliente.
+      </p>
     </div>
   </div>
 </template>

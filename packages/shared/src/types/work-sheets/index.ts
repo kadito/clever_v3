@@ -20,14 +20,21 @@ export type {
   WorkSheetSearchFilters,
 } from './types';
 
+// Export constants
+export { WORK_SHEET_CONSTANTS } from './types';
+
 // Export all validation functions
 export {
   validateWorkSheetCreation,
   validateWorkSheetUpdate,
   validateWorkSheetForDisplay,
   calculateWorkSheetTotals,
+  calculateWorkSheetPricing,
   getWorkSheetSummary,
 } from './validation';
+
+// Export pricing interfaces
+export type { WorkSheetPricingInput, WorkSheetPricingResult } from './validation';
 
 // Content type constant
 export const WORK_SHEETS_CONTENT_TYPE = 'work-sheets' as const;

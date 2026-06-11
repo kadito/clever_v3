@@ -27,7 +27,7 @@ import {
   validateRemoteAssistanceCreation,
   validateRemoteAssistanceUpdate,
   getRemoteAssistanceSummary,
-  calculateAssistanceValue,
+  calculateRemoteAssistancePricing,
   validateAndFormatTime,
   generateAssistanceNumber,
   getYearFromAssistanceDate,
@@ -289,9 +289,7 @@ remoteAssistanceConfig.extractIndexFields = (content: RemoteAssistance) => {
     horasTotais: data.horasTotais || '',
     year: getYearFromAssistanceDate(data.dataAssistencia),
 
-    // Value and billing information
-    valorAssist: data.valorAssist || 0,
-    hasBillableValue: hasBillableValue(data),
+    // Value and billing information (calculated by split billing below)
 
     // Status flags
     paymentMethod: data.paymentMethod || '',
@@ -314,23 +312,21 @@ remoteAssistanceConfig.extractIndexFields = (content: RemoteAssistance) => {
     // Time validation results (for debugging)
     hasValidTimes: !!(data.inicioAssistencia && data.fimAssistencia),
 
-    // Business hours calculation (if times are available)
-    businessHoursValue:
-      data.inicioAssistencia && data.fimAssistencia
-        ? calculateAssistanceValue(
-            data.inicioAssistencia,
-            data.fimAssistencia,
-            data.paymentMethod
-          ).businessHoursValue
-        : 0,
-    afterHoursValue:
-      data.inicioAssistencia && data.fimAssistencia
-        ? calculateAssistanceValue(
-            data.inicioAssistencia,
-            data.fimAssistencia,
-            data.paymentMethod
-          ).afterHoursValue
-        : 0,
+    // Business hours calculation using split billing (if times are available)
+    ...(() => {
+      const pricing = calculateRemoteAssistancePricing({
+        startTime: data.inicioAssistencia ?? '',
+        endTime: data.fimAssistencia ?? '',
+        isWeekendOrHoliday: ((data as unknown) as Record<string, unknown>).weekendHoliday as boolean ?? false,
+        paymentMethod: data.paymentMethod ?? '',
+      });
+      return {
+        businessHoursValue: pricing.businessHoursValue,
+        afterHoursValue: pricing.offHoursValue,
+        valorAssist: pricing.totalValue,
+        hasBillableValue: data.paymentMethod === 'Faturação' && pricing.totalValue > 0,
+      };
+    })(),
   };
 };
 
@@ -589,7 +585,7 @@ remoteAssistanceRouter.delete('/:uuid', requireDeletePermission, async (c: Conte
 remoteAssistanceRouter.post('/calculate-value', async c => {
   try {
     const requestData = await c.req.json();
-    const { inicioAssistencia, fimAssistencia, paymentMethod = '' } = requestData;
+    const { inicioAssistencia, fimAssistencia, paymentMethod = '', weekendHoliday = false } = requestData;
 
     if (!inicioAssistencia || !fimAssistencia) {
       return c.json(
@@ -618,24 +614,33 @@ remoteAssistanceRouter.post('/calculate-value', async c => {
       );
     }
 
-    // Calculate assistance value
-    const calculation = calculateAssistanceValue(
-      startTimeValidation.formattedTime || inicioAssistencia,
-      endTimeValidation.formattedTime || fimAssistencia,
-      paymentMethod
-    );
+    // Calculate assistance value using split billing
+    const result = calculateRemoteAssistancePricing({
+      startTime: startTimeValidation.formattedTime || inicioAssistencia,
+      endTime: endTimeValidation.formattedTime || fimAssistencia,
+      isWeekendOrHoliday: weekendHoliday,
+      paymentMethod,
+    });
 
     return c.json({
       success: true,
       data: {
-        ...calculation,
+        totalValue: result.totalValue,
+        businessHoursValue: result.businessHoursValue,
+        afterHoursValue: result.offHoursValue,
+        totalHours: result.billingMinutes / 60,
+        businessHours: result.businessMinutes / 60,
+        afterHours: result.offHoursMinutes / 60,
+        breakdown: result.breakdown,
         formattedStartTime: startTimeValidation.formattedTime,
         formattedEndTime: endTimeValidation.formattedTime,
         constants: {
           businessHoursRate: REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS,
           afterHoursRate: REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS,
-          businessHoursStart: REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_START,
-          businessHoursEnd: REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_END,
+          businessHoursMorningStart: REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_MORNING_START,
+          businessHoursMorningEnd: REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_MORNING_END,
+          businessHoursAfternoonStart: REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_AFTERNOON_START,
+          businessHoursAfternoonEnd: REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_AFTERNOON_END,
         },
       },
       timestamp: new Date().toISOString(),

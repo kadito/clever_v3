@@ -5,15 +5,27 @@
       <div class="px-4 py-3 sm:px-6 sm:py-4">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3 min-w-0 flex-1">
-            <BackButton :to="backRoute" variant="inline" />
+            <BackButton
+              :to="backRoute"
+              variant="inline"
+            />
             <div class="min-w-0 flex-1">
               <h1 class="text-lg sm:text-xl font-bold text-gray-900 truncate">
-                <slot name="title" :item="item">
+                <slot
+                  name="title"
+                  :item="item"
+                >
                   {{ getTitle(item) }}
                 </slot>
               </h1>
-              <p v-if="getSubtitle(item)" class="text-sm text-gray-600 truncate">
-                <slot name="subtitle" :item="item">
+              <p
+                v-if="getSubtitle(item)"
+                class="text-sm text-gray-600 truncate"
+              >
+                <slot
+                  name="subtitle"
+                  :item="item"
+                >
                   {{ getSubtitle(item) }}
                 </slot>
               </p>
@@ -22,16 +34,28 @@
 
           <!-- Actions -->
           <div class="flex items-center space-x-2 ml-3">
-            <slot name="headerActions" :item="item">
+            <slot
+              name="headerActions"
+              :item="item"
+            >
               <!-- Delete button slot for customization -->
-              <slot name="deleteButton" :item="item" :handleDelete="handleDelete">
+              <slot
+                name="deleteButton"
+                :item="item"
+                :handle-delete="handleDelete"
+              >
                 <!-- Delete button - visible on desktop, hidden on mobile -->
                 <button
                   v-if="shouldShowDeleteButton"
-                  @click="handleDelete"
                   class="hidden sm:inline-flex btn-danger text-sm"
+                  @click="handleDelete"
                 >
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    class="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -46,10 +70,15 @@
               <!-- Edit button - visible on desktop, hidden on mobile -->
               <button
                 v-if="showEditButton"
-                @click="handleEdit"
                 class="hidden sm:inline-flex btn-secondary text-sm"
+                @click="handleEdit"
               >
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  class="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -66,38 +95,66 @@
     </header>
 
     <!-- Loading state -->
-    <div v-if="isLoading" class="p-4 sm:p-6">
+    <div
+      v-if="isLoading"
+      class="p-4 sm:p-6"
+    >
       <div class="max-w-4xl mx-auto space-y-6">
-        <div v-for="i in 3" :key="i" class="bg-white rounded-touch p-6">
-          <div class="loading-skeleton h-6 w-1/3 mb-4"></div>
+        <div
+          v-for="i in 3"
+          :key="i"
+          class="bg-white rounded-touch p-6"
+        >
+          <div class="loading-skeleton h-6 w-1/3 mb-4" />
           <div class="space-y-3">
-            <div class="loading-skeleton h-4 w-full"></div>
-            <div class="loading-skeleton h-4 w-3/4"></div>
-            <div class="loading-skeleton h-4 w-1/2"></div>
+            <div class="loading-skeleton h-4 w-full" />
+            <div class="loading-skeleton h-4 w-3/4" />
+            <div class="loading-skeleton h-4 w-1/2" />
           </div>
         </div>
       </div>
     </div>
 
     <!-- Error state -->
-    <div v-else-if="error" class="p-4 sm:p-6">
+    <div
+      v-else-if="error"
+      class="p-4 sm:p-6"
+    >
       <div class="max-w-4xl mx-auto">
-        <ErrorComponent :error="error" @close="clearError" />
+        <ErrorComponent
+          :error="error"
+          @close="clearError"
+        />
       </div>
     </div>
 
     <!-- Content -->
-    <main v-else-if="item" class="p-4 sm:p-6 pb-20">
+    <main
+      v-else-if="item"
+      class="p-4 sm:p-6 pb-20"
+    >
       <div class="max-w-4xl mx-auto space-y-6">
         <!-- Status/Meta bar -->
-        <div v-if="showMetaBar" class="bg-white rounded-touch p-4 border border-gray-200">
+        <div
+          v-if="showMetaBar"
+          class="bg-white rounded-touch p-4 border border-gray-200"
+        >
           <div class="flex flex-wrap items-center gap-4 text-sm">
-            <slot name="metaBar" :item="item">
-              <div v-if="getStatus(item)" class="flex items-center">
+            <slot
+              name="metaBar"
+              :item="item"
+            >
+              <div
+                v-if="getStatus(item)"
+                class="flex items-center"
+              >
                 <span class="text-gray-500 mr-2">Estado:</span>
                 <span class="badge badge-primary">{{ getStatus(item) }}</span>
               </div>
-              <div v-if="item.updatedAt !== item.createdAt" class="flex items-center">
+              <div
+                v-if="item.updatedAt !== item.createdAt"
+                class="flex items-center"
+              >
                 <span class="text-gray-500 mr-2">Atualizado:</span>
                 <span class="text-gray-900">{{ formatDate(item.updatedAt) }}</span>
               </div>
@@ -107,21 +164,38 @@
 
         <!-- Main content sections -->
         <div class="space-y-6">
-          <slot name="content" :item="item">
+          <slot
+            name="content"
+            :item="item"
+          >
             <!-- Default sections based on item data -->
-            <div v-for="section in defaultSections" :key="section.key" class="detail-section">
+            <div
+              v-for="section in defaultSections"
+              :key="section.key"
+              class="detail-section"
+            >
               <div class="bg-white rounded-touch border border-gray-200">
                 <div
                   class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
                 >
-                  <h2 class="text-lg font-semibold text-gray-900">{{ section.title }}</h2>
+                  <h2 class="text-lg font-semibold text-gray-900">
+                    {{ section.title }}
+                  </h2>
                 </div>
                 <div class="p-4 sm:p-6">
                   <div class="detail-grid">
-                    <div v-for="field in section.fields" :key="field.key" class="detail-item">
+                    <div
+                      v-for="field in section.fields"
+                      :key="field.key"
+                      class="detail-item"
+                    >
                       <label class="detail-label">{{ field.label }}</label>
                       <div class="detail-value">
-                        <slot :name="`field-${field.key}`" :item="item" :value="field.value">
+                        <slot
+                          :name="`field-${field.key}`"
+                          :item="item"
+                          :value="field.value"
+                        >
                           {{ field.value || '-' }}
                         </slot>
                       </div>
@@ -134,43 +208,63 @@
         </div>
 
         <!-- Custom sections slot -->
-        <slot name="customSections" :item="item" />
+        <slot
+          name="customSections"
+          :item="item"
+        />
 
         <!-- Audit trail section -->
-        <div v-if="showAuditTrail && permissions.canViewAuditTrail" class="detail-section">
+        <div
+          v-if="showAuditTrail && permissions.canViewAuditTrail"
+          class="detail-section"
+        >
           <div class="bg-white rounded-touch border border-gray-200">
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Histórico</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Histórico
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="space-y-4">
                 <div class="flex items-start space-x-3">
-                  <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                  <div class="w-2 h-2 bg-green-500 rounded-full mt-2" />
                   <div class="flex-1">
                     <p class="text-sm text-gray-900">
                       <strong>Criado</strong> por {{ getUserDisplayName(item.createdBy) }}
                     </p>
-                    <p class="text-xs text-gray-500">{{ formatDateTime(item.createdAt) }}</p>
+                    <p class="text-xs text-gray-500">
+                      {{ formatDateTime(item.createdAt) }}
+                    </p>
                   </div>
                 </div>
-                <div v-if="item.updatedAt !== item.createdAt" class="flex items-start space-x-3">
-                  <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                <div
+                  v-if="item.updatedAt !== item.createdAt"
+                  class="flex items-start space-x-3"
+                >
+                  <div class="w-2 h-2 bg-blue-500 rounded-full mt-2" />
                   <div class="flex-1">
                     <p class="text-sm text-gray-900">
                       <strong>Atualizado</strong> por {{ getUserDisplayName(item.updatedBy) }}
                     </p>
-                    <p class="text-xs text-gray-500">{{ formatDateTime(item.updatedAt) }}</p>
+                    <p class="text-xs text-gray-500">
+                      {{ formatDateTime(item.updatedAt) }}
+                    </p>
                   </div>
                 </div>
-                <div v-if="item.isDeleted" class="flex items-start space-x-3">
-                  <div class="w-2 h-2 bg-red-500 rounded-full mt-2"></div>
+                <div
+                  v-if="item.isDeleted"
+                  class="flex items-start space-x-3"
+                >
+                  <div class="w-2 h-2 bg-red-500 rounded-full mt-2" />
                   <div class="flex-1">
                     <p class="text-sm text-gray-900">
                       <strong>Eliminado</strong> por {{ item.deletedBy || 'Sistema' }}
                     </p>
-                    <p class="text-xs text-gray-500">{{ formatDateTime(item.deletedAt) }}</p>
+                    <p class="text-xs text-gray-500">
+                      {{ formatDateTime(item.deletedAt) }}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -181,13 +275,27 @@
     </main>
 
     <!-- Not found state -->
-    <div v-else class="p-4 sm:p-6">
+    <div
+      v-else
+      class="p-4 sm:p-6"
+    >
       <div class="max-w-4xl mx-auto">
         <div class="empty-state">
-          <div class="text-6xl mb-4">❓</div>
-          <h3 class="empty-title">Item não encontrado</h3>
-          <p class="empty-message">O item solicitado não existe ou foi removido.</p>
-          <button @click="handleBack" class="btn-primary mt-4">Voltar à lista</button>
+          <div class="text-6xl mb-4">
+            ❓
+          </div>
+          <h3 class="empty-title">
+            Item não encontrado
+          </h3>
+          <p class="empty-message">
+            O item solicitado não existe ou foi removido.
+          </p>
+          <button
+            class="btn-primary mt-4"
+            @click="handleBack"
+          >
+            Voltar à lista
+          </button>
         </div>
       </div>
     </div>
@@ -198,13 +306,21 @@
       class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 sm:hidden"
     >
       <div class="flex space-x-3">
-        <slot name="mobileActions" :item="item">
+        <slot
+          name="mobileActions"
+          :item="item"
+        >
           <button
             v-if="shouldShowDeleteButton"
-            @click="handleDelete"
             class="btn-danger flex-1 justify-center"
+            @click="handleDelete"
           >
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -217,10 +333,15 @@
 
           <button
             v-if="showEditButton"
-            @click="handleEdit"
             class="btn-primary flex-1 justify-center"
+            @click="handleEdit"
           >
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"

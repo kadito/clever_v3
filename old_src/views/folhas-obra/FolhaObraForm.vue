@@ -1,23 +1,41 @@
 <template>
   <div class="folha-form-container">
     <div class="form-header">
-      <BackButton :to="cancelRoute" variant="inline" />
+      <BackButton
+        :to="cancelRoute"
+        variant="inline"
+      />
       <h1>{{ isEditing ? 'Editar' : 'Nova' }} Folha de Obra</h1>
     </div>
 
     <!-- Loading state -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A processar...</p>
     </div>
 
     <!-- Error state -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Form -->
-    <form @submit.prevent="handleSubmit" class="folha-form" v-if="!loading">
+    <form
+      v-if="!loading"
+      class="folha-form"
+      @submit.prevent="handleSubmit"
+    >
       <!-- Client Data Section -->
       <section class="form-section">
         <h2>DADOS DO CLIENTE</h2>
@@ -44,11 +62,11 @@
           <div class="form-group">
             <label for="requestDate">DATA DO PEDIDO</label>
             <input
-              type="datetime-local"
               id="requestDate"
               v-model="form.request.date"
+              type="datetime-local"
               class="form-control"
-            />
+            >
           </div>
 
           <div class="form-group">
@@ -75,11 +93,11 @@
           <div class="form-group">
             <label for="assistanceDate">DATA DA ASSISTÊNCIA</label>
             <input
-              type="datetime-local"
               id="assistanceDate"
               v-model="form.request.assistanceDate"
+              type="datetime-local"
               class="form-control"
-            />
+            >
           </div>
 
           <div class="form-group full-width">
@@ -90,7 +108,7 @@
               class="form-control"
               rows="3"
               placeholder="Descreva o motivo do pedido..."
-            ></textarea>
+            />
           </div>
         </div>
       </section>
@@ -103,15 +121,15 @@
             <label for="arrivalTime">HORA CHEGADA</label>
             <div class="time-input-wrapper">
               <input
-                type="text"
                 id="arrivalTime"
                 v-model="form.request.arrivalTime"
+                type="text"
                 class="form-control time-input"
                 placeholder="HH:MM"
                 maxlength="5"
                 @input="formatTimeInput($event, 'arrivalTime')"
                 @blur="calculateTotals"
-              />
+              >
             </div>
           </div>
 
@@ -119,28 +137,28 @@
             <label for="departureTime">HORA SAÍDA</label>
             <div class="time-input-wrapper">
               <input
-                type="text"
                 id="departureTime"
                 v-model="form.request.departureTime"
+                type="text"
                 class="form-control time-input"
                 placeholder="HH:MM"
                 maxlength="5"
                 @input="formatTimeInput($event, 'departureTime')"
                 @blur="calculateTotals"
-              />
+              >
             </div>
           </div>
 
           <div class="form-group">
             <label for="totalHours">TOTAL HORAS</label>
             <input
-              type="text"
               id="totalHours"
               v-model="form.request.totalHours"
+              type="text"
               class="form-control"
               readonly
               placeholder="Calculado automaticamente"
-            />
+            >
           </div>
         </div>
       </section>
@@ -151,11 +169,23 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="serviceType">TIPO DE SERVIÇO</label>
-            <select id="serviceType" v-model="form.otherData.serviceType" class="form-control">
-              <option value="">--</option>
-              <option value="ASSISTÊNCIA PRESENCIAL">ASSISTÊNCIA PRESENCIAL</option>
-              <option value="MANUTENÇÃO">MANUTENÇÃO</option>
-              <option value="INSTALAÇÃO">INSTALAÇÃO</option>
+            <select
+              id="serviceType"
+              v-model="form.otherData.serviceType"
+              class="form-control"
+            >
+              <option value="">
+                --
+              </option>
+              <option value="ASSISTÊNCIA PRESENCIAL">
+                ASSISTÊNCIA PRESENCIAL
+              </option>
+              <option value="MANUTENÇÃO">
+                MANUTENÇÃO
+              </option>
+              <option value="INSTALAÇÃO">
+                INSTALAÇÃO
+              </option>
             </select>
           </div>
 
@@ -192,20 +222,20 @@
             <div class="radio-group">
               <label :class="['radio-label', form.displacement.hasDisplacement ? 'selected' : '']">
                 <input
-                  type="radio"
                   v-model="form.displacement.hasDisplacement"
+                  type="radio"
                   :value="true"
                   name="displacement"
-                />
+                >
                 <span>SIM</span>
               </label>
               <label :class="['radio-label', !form.displacement.hasDisplacement ? 'selected' : '']">
                 <input
-                  type="radio"
                   v-model="form.displacement.hasDisplacement"
+                  type="radio"
                   :value="false"
                   name="displacement"
-                />
+                >
                 <span>NÃO</span>
               </label>
             </div>
@@ -215,13 +245,16 @@
             <label>FINAL SEMANA - FERIADO</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="weekendHoliday"
                 v-model="form.displacement.weekendHoliday"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="weekendHoliday" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="weekendHoliday"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -231,65 +264,58 @@
             <div class="form-group">
               <label for="oneWayKms">KMS (IDA)</label>
               <input
-                type="number"
                 id="oneWayKms"
                 v-model.number="form.displacement.oneWayKms"
+                type="number"
                 class="form-control"
                 placeholder="Quilómetros de ida"
                 min="0"
                 step="1"
                 @input="calculateTotalKms"
-              />
+              >
             </div>
 
             <div class="form-group">
               <label for="totalKms">TOTAL KMS (IDA E VOLTA)</label>
               <input
-                type="number"
                 id="totalKms"
                 v-model.number="form.displacement.totalKms"
+                type="number"
                 class="form-control"
                 placeholder="Total automático"
                 readonly
                 disabled
-              />
+              >
             </div>
           </template>
         </div>
 
         <!-- Calculated Pricing - only shown when displacement is true -->
-        <div v-if="form.displacement.hasDisplacement" class="pricing-section">
+        <div
+          v-if="form.displacement.hasDisplacement"
+          class="pricing-section"
+        >
           <h3>CÁLCULO DE PREÇOS <span class="vat-note">(sem IVA)</span></h3>
           <div class="pricing-table">
             <div class="pricing-row">
               <span class="pricing-label">Taxa Deslocação:</span>
-              <span class="pricing-value"
-                >{{ getDisplacementRate() }}€ <span class="vat-indicator">sem IVA</span></span
-              >
+              <span class="pricing-value">{{ getDisplacementRate() }}€ <span class="vat-indicator">sem IVA</span></span>
             </div>
             <div class="pricing-row">
               <span class="pricing-label">Preço KMs:</span>
-              <span class="pricing-value"
-                >{{ getKmsPrice() }}€ <span class="vat-indicator">sem IVA</span></span
-              >
+              <span class="pricing-value">{{ getKmsPrice() }}€ <span class="vat-indicator">sem IVA</span></span>
             </div>
             <div class="pricing-row">
               <span class="pricing-label">Valor Hora:</span>
-              <span class="pricing-value"
-                >{{ getHourlyRate() }}€ <span class="vat-indicator">sem IVA</span></span
-              >
+              <span class="pricing-value">{{ getHourlyRate() }}€ <span class="vat-indicator">sem IVA</span></span>
             </div>
             <div class="pricing-row">
               <span class="pricing-label">Preço Mão Obra:</span>
-              <span class="pricing-value"
-                >{{ getLaborPrice() }}€ <span class="vat-indicator">sem IVA</span></span
-              >
+              <span class="pricing-value">{{ getLaborPrice() }}€ <span class="vat-indicator">sem IVA</span></span>
             </div>
             <div class="pricing-row total">
               <span class="pricing-label">PREÇO TOTAL:</span>
-              <span class="pricing-value"
-                >{{ getTotalPrice() }}€ <span class="vat-indicator">sem IVA</span></span
-              >
+              <span class="pricing-value">{{ getTotalPrice() }}€ <span class="vat-indicator">sem IVA</span></span>
             </div>
           </div>
         </div>
@@ -307,11 +333,11 @@
               ]"
             >
               <input
-                type="radio"
                 v-model="form.displacement.paymentMethod"
+                type="radio"
                 value="PENDENTE"
                 name="payment"
-              />
+              >
               <span>PENDENTE</span>
             </label>
             <label
@@ -321,11 +347,11 @@
               ]"
             >
               <input
-                type="radio"
                 v-model="form.displacement.paymentMethod"
+                type="radio"
                 value="CARTÃO MB"
                 name="payment"
-              />
+              >
               <span>CARTÃO MB</span>
             </label>
             <label
@@ -335,11 +361,11 @@
               ]"
             >
               <input
-                type="radio"
                 v-model="form.displacement.paymentMethod"
+                type="radio"
                 value="DINHEIRO"
                 name="payment"
-              />
+              >
               <span>DINHEIRO</span>
             </label>
             <label
@@ -349,11 +375,11 @@
               ]"
             >
               <input
-                type="radio"
                 v-model="form.displacement.paymentMethod"
+                type="radio"
                 value="TRANSFERÊNCIA BANCÁRIA"
                 name="payment"
-              />
+              >
               <span>TRANSFERÊNCIA BANCÁRIA</span>
             </label>
             <label
@@ -363,11 +389,11 @@
               ]"
             >
               <input
-                type="radio"
                 v-model="form.displacement.paymentMethod"
+                type="radio"
                 value="CONTRATO"
                 name="payment"
-              />
+              >
               <span>CONTRATO</span>
             </label>
           </div>
@@ -375,20 +401,26 @@
       </section>
 
       <!-- Warranty & Contract Section - only shown when payment method is CONTRATO -->
-      <section class="form-section" v-if="form.displacement.paymentMethod === 'CONTRATO'">
+      <section
+        v-if="form.displacement.paymentMethod === 'CONTRATO'"
+        class="form-section"
+      >
         <h2>GARANTIA E CONTRATO</h2>
         <div class="form-grid">
           <div class="form-group">
             <label>GARANTIA</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="warranty"
                 v-model="form.otherData.warranty"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="warranty" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="warranty"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -397,24 +429,39 @@
             <label>CONTRATO</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="contract"
                 v-model="form.otherData.contract"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="contract" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="contract"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
 
           <div class="form-group">
             <label for="contractYear">ANO DE CONTRATO</label>
-            <select id="contractYear" v-model="form.otherData.contractYear" class="form-control">
-              <option value="2023">2023</option>
-              <option value="2024">2024</option>
-              <option value="2025">2025</option>
-              <option value="2026">2026</option>
+            <select
+              id="contractYear"
+              v-model="form.otherData.contractYear"
+              class="form-control"
+            >
+              <option value="2023">
+                2023
+              </option>
+              <option value="2024">
+                2024
+              </option>
+              <option value="2025">
+                2025
+              </option>
+              <option value="2026">
+                2026
+              </option>
             </select>
           </div>
         </div>
@@ -428,13 +475,16 @@
             <label>MATERIAL UTILIZADO</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="materialUsed"
                 v-model="form.otherData.materialUsed"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="materialUsed" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="materialUsed"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -443,19 +493,25 @@
             <label>EQUIPAMENTOS</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="equipment"
                 v-model="form.otherData.equipment"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="equipment" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="equipment"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
 
           <!-- Material Details - shown only when material is checked -->
-          <div class="form-group full-width" v-if="form.otherData.materialUsed">
+          <div
+            v-if="form.otherData.materialUsed"
+            class="form-group full-width"
+          >
             <label for="materialDetails">DESCRIÇÃO DO MATERIAL UTILIZADO</label>
             <textarea
               id="materialDetails"
@@ -463,11 +519,14 @@
               class="form-control"
               rows="3"
               placeholder="Descreva o material utilizado..."
-            ></textarea>
+            />
           </div>
 
           <!-- Equipment Details - shown only when equipment is checked -->
-          <div class="form-group full-width" v-if="form.otherData.equipment">
+          <div
+            v-if="form.otherData.equipment"
+            class="form-group full-width"
+          >
             <label for="equipmentDetails">DESCRIÇÃO DOS EQUIPAMENTOS</label>
             <textarea
               id="equipmentDetails"
@@ -475,7 +534,7 @@
               class="form-control"
               rows="3"
               placeholder="Descreva os equipamentos utilizados..."
-            ></textarea>
+            />
           </div>
         </div>
       </section>
@@ -488,13 +547,16 @@
             <label>TOTALMENTE RESOLVIDO</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="totallyResolved"
                 v-model="form.otherData.totallyResolved"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="totallyResolved" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="totallyResolved"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -503,13 +565,16 @@
             <label>LEITURA DE DUMP</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="dumpReading"
                 v-model="form.otherData.dumpReading"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="dumpReading" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="dumpReading"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -518,13 +583,16 @@
             <label>CÓPIA DE SEGURANÇA</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="backup"
                 v-model="form.otherData.backup"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="backup" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="backup"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -533,13 +601,16 @@
             <label>VERIFICAÇÃO DO ACESSO REMOTO</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="remoteAccessCheck"
                 v-model="form.otherData.remoteAccessCheck"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="remoteAccessCheck" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="remoteAccessCheck"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -548,19 +619,25 @@
             <label>ANYDESK</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="anydesk"
                 v-model="form.otherData.anydesk"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="anydesk" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="anydesk"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
 
           <!-- Resolution Issues - shown only when NOT totally resolved -->
-          <div class="form-group full-width" v-if="!form.otherData.totallyResolved">
+          <div
+            v-if="!form.otherData.totallyResolved"
+            class="form-group full-width"
+          >
             <label for="resolutionIssues">OBSERVAÇÕES SOBRE PROBLEMAS NÃO RESOLVIDOS</label>
             <textarea
               id="resolutionIssues"
@@ -568,7 +645,7 @@
               class="form-control"
               rows="4"
               placeholder="Descreva os problemas que não foram totalmente resolvidos..."
-            ></textarea>
+            />
           </div>
         </div>
       </section>
@@ -585,7 +662,7 @@
               class="form-control"
               rows="5"
               placeholder="Descrição detalhada do serviço realizado..."
-            ></textarea>
+            />
           </div>
         </div>
       </section>
@@ -597,23 +674,38 @@
           <div class="form-group full-width">
             <label for="clientSignature">ASSINATURA DO CLIENTE</label>
             <div class="signature-preview-container">
-              <div v-if="form.otherData.clientSignature" class="signature-preview-image">
-                <img :src="form.otherData.clientSignature" alt="Assinatura" />
-                <button type="button" @click="openSignatureModal" class="btn btn-primary btn-sm">
+              <div
+                v-if="form.otherData.clientSignature"
+                class="signature-preview-image"
+              >
+                <img
+                  :src="form.otherData.clientSignature"
+                  alt="Assinatura"
+                >
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  @click="openSignatureModal"
+                >
                   Editar Assinatura
                 </button>
               </div>
-              <div v-else class="signature-preview-empty">
-                <button type="button" @click="openSignatureModal" class="btn btn-primary btn-sm">
+              <div
+                v-else
+                class="signature-preview-empty"
+              >
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  @click="openSignatureModal"
+                >
                   Adicionar Assinatura
                 </button>
               </div>
             </div>
             <div>
-              <small class="form-text"
-                >Toque no botão acima para desenhar a assinatura. A assinatura será guardada
-                automaticamente ao submeter o formulário.</small
-              >
+              <small class="form-text">Toque no botão acima para desenhar a assinatura. A assinatura será guardada
+                automaticamente ao submeter o formulário.</small>
             </div>
           </div>
         </div>
@@ -630,23 +722,33 @@
             <h3>Assinatura do Cliente</h3>
             <button
               type="button"
-              @click="closeSignatureModal"
               class="modal-close-btn"
               aria-label="Fechar"
+              @click="closeSignatureModal"
             >
               ×
             </button>
           </div>
           <div class="signature-modal-body">
             <canvas
-              ref="signatureCanvas"
               id="signatureCanvas"
+              ref="signatureCanvas"
               class="signature-canvas-fullscreen"
-            ></canvas>
+            />
           </div>
           <div class="signature-modal-footer">
-            <button type="button" @click="clearSignature" class="btn btn-secondary">Limpar</button>
-            <button type="button" @click="saveAndCloseSignature" class="btn btn-primary">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="clearSignature"
+            >
+              Limpar
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="saveAndCloseSignature"
+            >
               Guardar e Fechar
             </button>
           </div>
@@ -655,11 +757,23 @@
 
       <!-- Form Actions -->
       <div class="form-actions">
-        <button type="button" @click="navigateBack" class="btn btn-cancel" :disabled="loading">
+        <button
+          type="button"
+          class="btn btn-cancel"
+          :disabled="loading"
+          @click="navigateBack"
+        >
           Cancelar
         </button>
-        <button type="submit" class="btn btn-primary" :disabled="loading">
-          <span v-if="loading" class="btn-spinner"></span>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          :disabled="loading"
+        >
+          <span
+            v-if="loading"
+            class="btn-spinner"
+          />
           {{ isEditing ? 'Atualizar' : 'Criar' }} Folha de Obra
         </button>
       </div>
@@ -882,7 +996,7 @@ const formatTimeInput = (event, field) => {
 
   // Format as HH:MM
   if (value.length > 2) {
-    value = value.slice(0, 2) + ':' + value.slice(2, 4);
+    value = `${value.slice(0, 2)  }:${  value.slice(2, 4)}`;
   }
 
   // Update the form field

@@ -5,7 +5,12 @@
       v-if="hasToastErrors"
       class="fixed top-4 right-4 z-50 space-y-2 max-w-sm w-full sm:max-w-md"
     >
-      <Transition v-for="notification in toastErrors" :key="notification.id" name="toast" appear>
+      <Transition
+        v-for="notification in toastErrors"
+        :key="notification.id"
+        name="toast"
+        appear
+      >
         <div
           class="bg-white border-l-4 rounded-lg shadow-lg p-4 flex items-start space-x-3"
           :class="getToastClasses(notification.error)"
@@ -66,17 +71,20 @@
             </p>
 
             <!-- Actions -->
-            <div v-if="getErrorActions(notification.error).length > 0" class="mt-3 flex space-x-2">
+            <div
+              v-if="getErrorActions(notification.error).length > 0"
+              class="mt-3 flex space-x-2"
+            >
               <button
                 v-for="action in getErrorActions(notification.error).slice(0, 2)"
                 :key="action.label"
-                @click="handleAction(action, notification.id)"
                 class="text-xs font-medium px-2 py-1 rounded transition-colors duration-200"
                 :class="
                   action.primary
                     ? 'bg-primary-100 text-primary-700 hover:bg-primary-200'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 "
+                @click="handleAction(action, notification.id)"
               >
                 {{ action.label }}
               </button>
@@ -85,9 +93,9 @@
 
           <!-- Dismiss button -->
           <button
-            @click="dismissError(notification.id)"
             class="flex-shrink-0 p-1 rounded-full hover:bg-gray-100 transition-colors duration-200 touch-target"
             aria-label="Dispensar"
+            @click="dismissError(notification.id)"
           >
             <svg
               class="w-4 h-4 text-gray-400"
@@ -119,16 +127,25 @@
         class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
       >
         <!-- Background overlay -->
-        <Transition name="modal-overlay" appear>
-          <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+        <Transition
+          name="modal-overlay"
+          appear
+        >
+          <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
         </Transition>
 
         <!-- Modal panel -->
-        <Transition name="modal-panel" appear>
+        <Transition
+          name="modal-panel"
+          appear
+        >
           <div
             class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
           >
-            <div v-for="notification in modalErrors" :key="notification.id">
+            <div
+              v-for="notification in modalErrors"
+              :key="notification.id"
+            >
               <div class="sm:flex sm:items-start">
                 <!-- Icon -->
                 <div
@@ -151,7 +168,10 @@
 
                 <!-- Content -->
                 <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                  <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                  <h3
+                    id="modal-title"
+                    class="text-lg leading-6 font-medium text-gray-900"
+                  >
                     {{ getErrorTitle(notification.error) }}
                   </h3>
                   <div class="mt-2">
@@ -167,7 +187,6 @@
                 <button
                   v-for="(action, index) in getErrorActions(notification.error)"
                   :key="action.label"
-                  @click="handleAction(action, notification.id)"
                   class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm transition-colors duration-200"
                   :class="[
                     action.primary
@@ -175,6 +194,7 @@
                       : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:ring-gray-500',
                     index > 0 ? 'mt-3 sm:mt-0' : '',
                   ]"
+                  @click="handleAction(action, notification.id)"
                 >
                   {{ action.label }}
                 </button>

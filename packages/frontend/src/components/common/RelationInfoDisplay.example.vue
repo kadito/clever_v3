@@ -1,10 +1,14 @@
 <template>
   <div class="relation-examples">
-    <h1 class="text-2xl font-bold mb-6">RelationInfoDisplay Component Examples</h1>
+    <h1 class="text-2xl font-bold mb-6">
+      RelationInfoDisplay Component Examples
+    </h1>
 
     <!-- Example 1: Successful client relation -->
     <section class="mb-8">
-      <h2 class="text-lg font-semibold mb-4">1. Successful Client Relation</h2>
+      <h2 class="text-lg font-semibold mb-4">
+        1. Successful Client Relation
+      </h2>
       <RelationInfoDisplay
         :relation-data="successfulClientRelation"
         relation-type="client"
@@ -14,7 +18,9 @@
 
     <!-- Example 2: Client relation with error (404) -->
     <section class="mb-8">
-      <h2 class="text-lg font-semibold mb-4">2. Client Relation Error (404)</h2>
+      <h2 class="text-lg font-semibold mb-4">
+        2. Client Relation Error (404)
+      </h2>
       <RelationInfoDisplay
         :relation-data="clientRelationError404"
         relation-type="client"
@@ -24,7 +30,9 @@
 
     <!-- Example 3: Client relation with server error (500) -->
     <section class="mb-8">
-      <h2 class="text-lg font-semibold mb-4">3. Client Relation Error (500)</h2>
+      <h2 class="text-lg font-semibold mb-4">
+        3. Client Relation Error (500)
+      </h2>
       <RelationInfoDisplay
         :relation-data="clientRelationError500"
         relation-type="client"
@@ -34,13 +42,20 @@
 
     <!-- Example 4: Missing client relation (null) -->
     <section class="mb-8">
-      <h2 class="text-lg font-semibold mb-4">4. Missing Client Relation</h2>
-      <RelationInfoDisplay :relation-data="null" relation-type="client" />
+      <h2 class="text-lg font-semibold mb-4">
+        4. Missing Client Relation
+      </h2>
+      <RelationInfoDisplay
+        :relation-data="null"
+        relation-type="client"
+      />
     </section>
 
     <!-- Example 5: Contract relation -->
     <section class="mb-8">
-      <h2 class="text-lg font-semibold mb-4">5. Contract Relation</h2>
+      <h2 class="text-lg font-semibold mb-4">
+        5. Contract Relation
+      </h2>
       <RelationInfoDisplay
         :relation-data="successfulContractRelation"
         relation-type="contract"
@@ -50,7 +65,9 @@
 
     <!-- Example 6: Custom display name and fields -->
     <section class="mb-8">
-      <h2 class="text-lg font-semibold mb-4">6. Custom Display Name and Fields</h2>
+      <h2 class="text-lg font-semibold mb-4">
+        6. Custom Display Name and Fields
+      </h2>
       <RelationInfoDisplay
         :relation-data="successfulClientRelation"
         relation-type="client"
@@ -62,7 +79,9 @@
 
     <!-- Example 7: With debug info -->
     <section class="mb-8">
-      <h2 class="text-lg font-semibold mb-4">7. With Debug Information</h2>
+      <h2 class="text-lg font-semibold mb-4">
+        7. With Debug Information
+      </h2>
       <RelationInfoDisplay
         :relation-data="successfulClientRelation"
         relation-type="client"
@@ -73,9 +92,13 @@
 
     <!-- Integration Example -->
     <section class="mb-8">
-      <h2 class="text-lg font-semibold mb-4">8. Integration Example (License Detail View)</h2>
+      <h2 class="text-lg font-semibold mb-4">
+        8. Integration Example (License Detail View)
+      </h2>
       <div class="bg-gray-50 p-4 rounded-lg">
-        <h3 class="font-medium mb-2">Before (Manual Client Section):</h3>
+        <h3 class="font-medium mb-2">
+          Before (Manual Client Section):
+        </h3>
         <pre
           class="text-sm bg-white p-3 rounded border overflow-x-auto"
         ><code>&lt;!-- Manual client information section --&gt;
@@ -96,7 +119,9 @@
   &lt;/div&gt;
 &lt;/div&gt;</code></pre>
 
-        <h3 class="font-medium mb-2 mt-4">After (Using RelationInfoDisplay):</h3>
+        <h3 class="font-medium mb-2 mt-4">
+          After (Using RelationInfoDisplay):
+        </h3>
         <pre
           class="text-sm bg-white p-3 rounded border overflow-x-auto"
         ><code>&lt;!-- Automatic relation display --&gt;

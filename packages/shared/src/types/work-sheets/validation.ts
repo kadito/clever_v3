@@ -5,6 +5,121 @@ import type {
   WorkSheetDisplayData,
   WorkSheet,
 } from './types';
+import { WORK_SHEET_CONSTANTS } from './types';
+
+/**
+ * Input for the unified work sheet pricing calculation.
+ */
+export interface WorkSheetPricingInput {
+  weekendHoliday: boolean;
+  hasDisplacement: boolean;
+  totalKms: number;
+  arrivalTime: string;   // HH:MM format
+  departureTime: string; // HH:MM format
+}
+
+/**
+ * Result of the unified work sheet pricing calculation.
+ */
+export interface WorkSheetPricingResult {
+  hourlyRate: number;
+  laborHours: number;       // actual chargeable hours (minimum 1h applied)
+  laborPrice: number;
+  hasDisplacement: boolean;
+  travelFee: number;        // 0 if no displacement
+  mileagePrice: number;     // 0 if no displacement
+  totalKms: number;
+  totalPrice: number;       // laborPrice + travelFee + mileagePrice (only displacement costs when hasDisplacement)
+}
+
+/**
+ * Calculates work sheet pricing using centralized constants.
+ * Single source of truth for all views and backend extraction.
+ */
+export function calculateWorkSheetPricing(input: WorkSheetPricingInput): WorkSheetPricingResult {
+  const { weekendHoliday, hasDisplacement, arrivalTime, departureTime } = input;
+  const totalKms = input.totalKms < 0 ? 0 : input.totalKms;
+
+  const hourlyRate = weekendHoliday
+    ? WORK_SHEET_CONSTANTS.HOURLY_RATE_WEEKEND_HOLIDAY
+    : WORK_SHEET_CONSTANTS.HOURLY_RATE_WEEKDAY;
+
+  const zeroed: WorkSheetPricingResult = {
+    hourlyRate,
+    laborHours: 0,
+    laborPrice: 0,
+    hasDisplacement,
+    travelFee: 0,
+    mileagePrice: 0,
+    totalKms,
+    totalPrice: 0,
+  };
+
+  // Parse and validate times
+  const arrivalMinutes = parseTimeToMinutes(arrivalTime);
+  const departureMinutes = parseTimeToMinutes(departureTime);
+
+  if (arrivalMinutes === null || departureMinutes === null) {
+    return zeroed;
+  }
+
+  // Calculate duration in minutes, handle overnight wrap-around
+  let durationMinutes = departureMinutes - arrivalMinutes;
+  if (durationMinutes < 0) {
+    durationMinutes += 24 * 60;
+  }
+
+  // Duration exactly 0 → zeroed result
+  if (durationMinutes === 0) {
+    return zeroed;
+  }
+
+  // Apply minimum 1 hour rule
+  const durationHours = durationMinutes / 60;
+  const laborHours = durationHours < WORK_SHEET_CONSTANTS.MINIMUM_HOURS
+    ? WORK_SHEET_CONSTANTS.MINIMUM_HOURS
+    : durationHours;
+
+  const laborPrice = Math.round(laborHours * hourlyRate * 100) / 100;
+
+  // Displacement costs
+  let travelFee = 0;
+  let mileagePrice = 0;
+
+  if (hasDisplacement) {
+    mileagePrice = Math.round(totalKms * WORK_SHEET_CONSTANTS.MILEAGE_RATE_PER_KM * 100) / 100;
+    travelFee = totalKms > WORK_SHEET_CONSTANTS.TRAVEL_FEE_THRESHOLD_KM
+      ? WORK_SHEET_CONSTANTS.TRAVEL_FEE_LONG
+      : WORK_SHEET_CONSTANTS.TRAVEL_FEE_SHORT;
+  }
+
+  const totalPrice = Math.round((laborPrice + travelFee + mileagePrice) * 100) / 100;
+
+  return {
+    hourlyRate,
+    laborHours,
+    laborPrice,
+    hasDisplacement,
+    travelFee,
+    mileagePrice,
+    totalKms,
+    totalPrice,
+  };
+}
+
+/**
+ * Parses a time string in HH:MM format to minutes from midnight.
+ * Returns null if the format is invalid or the string is empty.
+ */
+function parseTimeToMinutes(time: string): number | null {
+  if (!time || typeof time !== 'string') return null;
+  const match = time.match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) return null;
+  const hours = parseInt(match[1], 10);
+  const minutes = parseInt(match[2], 10);
+  if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return null;
+  return hours * 60 + minutes;
+}
 
 /**
  * Validates work sheet data for creation
@@ -211,6 +326,10 @@ export function validateWorkSheetForDisplay(workSheet: WorkSheet): WorkSheetDisp
 /**
  * Calculates work sheet totals (hours, pricing, etc.)
  * Based on legacy pricing calculation methods
+ *
+ * @deprecated Use `calculateWorkSheetPricing()` instead. This function uses outdated
+ * hardcoded rates (€45/€60 hourly, €40/€55 displacement). Still referenced by
+ * `packages/shared/src/balance-extraction.ts` — remove once balance extraction is migrated.
  */
 export function calculateWorkSheetTotals(data: WorkSheetData): {
   totalHours: string;

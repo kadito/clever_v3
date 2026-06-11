@@ -1,23 +1,41 @@
 <template>
   <div class="form-container">
     <div class="form-header">
-      <BackButton :to="cancelRoute" variant="inline" />
+      <BackButton
+        :to="cancelRoute"
+        variant="inline"
+      />
       <h1>{{ isEditing ? 'Editar' : 'Novo' }} Equipamento</h1>
     </div>
 
     <!-- Loading state -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A processar...</p>
     </div>
 
     <!-- Error state -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Form -->
-    <form @submit.prevent="handleSubmit" class="form" v-if="!loading">
+    <form
+      v-if="!loading"
+      class="form"
+      @submit.prevent="handleSubmit"
+    >
       <!-- Equipment Information -->
       <section class="form-section">
         <h2>📦 INFORMAÇÕES DO EQUIPAMENTO</h2>
@@ -30,43 +48,49 @@
               class="form-control"
               required
             >
-              <option value="">Seleccionar tipo</option>
-              <option value="POS">POS</option>
-              <option value="Terminal de Pagamento">Terminal de Pagamento</option>
+              <option value="">
+                Seleccionar tipo
+              </option>
+              <option value="POS">
+                POS
+              </option>
+              <option value="Terminal de Pagamento">
+                Terminal de Pagamento
+              </option>
             </select>
           </div>
 
           <div class="form-group">
             <label for="marca">MARCA</label>
             <input
-              type="text"
               id="marca"
               v-model="form.marca"
+              type="text"
               class="form-control"
               placeholder="Ex: SAM4S, INGENICO, EPSON..."
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="modelo">MODELO</label>
             <input
-              type="text"
               id="modelo"
               v-model="form.modelo"
+              type="text"
               class="form-control"
               placeholder="Ex: SPL-4700, iCT220..."
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="numeroSerie">NÚMERO DE SÉRIE</label>
             <input
-              type="text"
               id="numeroSerie"
               v-model="form.numeroSerie"
+              type="text"
               class="form-control"
               placeholder="Número de série do equipamento"
-            />
+            >
           </div>
         </div>
       </section>
@@ -83,14 +107,24 @@
               class="form-control"
               :disabled="clientesStore.loading"
             >
-              <option value="" disabled>
+              <option
+                value=""
+                disabled
+              >
                 {{ clientesStore.loading ? 'A carregar clientes...' : 'Seleccionar cliente' }}
               </option>
-              <option v-for="cliente in clientes" :key="cliente.id" :value="cliente.nomeComercial">
+              <option
+                v-for="cliente in clientes"
+                :key="cliente.id"
+                :value="cliente.nomeComercial"
+              >
                 {{ cliente.nomeComercial }}
               </option>
             </select>
-            <div v-if="clientesStore.error" class="error-message">
+            <div
+              v-if="clientesStore.error"
+              class="error-message"
+            >
               Erro ao carregar clientes: {{ clientesStore.error }}
             </div>
           </div>
@@ -98,16 +132,21 @@
           <div class="form-group">
             <label for="dataEmprestimo">DATA DE EMPRÉSTIMO</label>
             <input
-              type="date"
               id="dataEmprestimo"
               v-model="form.dataEmprestimo"
+              type="date"
               class="form-control"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="dataRetorno">DATA DE TÉRMINO DO EMPRÉSTIMO</label>
-            <input type="date" id="dataRetorno" v-model="form.dataRetorno" class="form-control" />
+            <input
+              id="dataRetorno"
+              v-model="form.dataRetorno"
+              type="date"
+              class="form-control"
+            >
           </div>
         </div>
       </section>
@@ -118,45 +157,101 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="visor">VISOR</label>
-            <select id="visor" v-model="form.visor" class="form-control">
-              <option value="">Seleccionar estado</option>
-              <option value="EQUIPAMENTO EM ÓTIMAS CONDIÇÕES">Ótimas condições</option>
-              <option value="EQUIPAMENTO EM BOAS CONDIÇÕES">Boas condições</option>
-              <option value="EQUIPAMENTO NECESSITA MANUTENÇÃO">Necessita manutenção</option>
-              <option value="EQUIPAMENTO AVARIADO">Avariado</option>
+            <select
+              id="visor"
+              v-model="form.visor"
+              class="form-control"
+            >
+              <option value="">
+                Seleccionar estado
+              </option>
+              <option value="EQUIPAMENTO EM ÓTIMAS CONDIÇÕES">
+                Ótimas condições
+              </option>
+              <option value="EQUIPAMENTO EM BOAS CONDIÇÕES">
+                Boas condições
+              </option>
+              <option value="EQUIPAMENTO NECESSITA MANUTENÇÃO">
+                Necessita manutenção
+              </option>
+              <option value="EQUIPAMENTO AVARIADO">
+                Avariado
+              </option>
             </select>
           </div>
 
           <div class="form-group">
             <label for="corpoEquipamento">CORPO DO EQUIPAMENTO</label>
-            <select id="corpoEquipamento" v-model="form.corpoEquipamento" class="form-control">
-              <option value="">Seleccionar estado</option>
-              <option value="EQUIPAMENTO EM ÓTIMAS CONDIÇÕES">Ótimas condições</option>
-              <option value="EQUIPAMENTO EM BOAS CONDIÇÕES">Boas condições</option>
-              <option value="EQUIPAMENTO NECESSITA MANUTENÇÃO">Necessita manutenção</option>
-              <option value="EQUIPAMENTO AVARIADO">Avariado</option>
+            <select
+              id="corpoEquipamento"
+              v-model="form.corpoEquipamento"
+              class="form-control"
+            >
+              <option value="">
+                Seleccionar estado
+              </option>
+              <option value="EQUIPAMENTO EM ÓTIMAS CONDIÇÕES">
+                Ótimas condições
+              </option>
+              <option value="EQUIPAMENTO EM BOAS CONDIÇÕES">
+                Boas condições
+              </option>
+              <option value="EQUIPAMENTO NECESSITA MANUTENÇÃO">
+                Necessita manutenção
+              </option>
+              <option value="EQUIPAMENTO AVARIADO">
+                Avariado
+              </option>
             </select>
           </div>
 
           <div class="form-group">
             <label for="transformadorCabos">TRANSFORMADOR E CABOS</label>
-            <select id="transformadorCabos" v-model="form.transformadorCabos" class="form-control">
-              <option value="">Seleccionar estado</option>
-              <option value="EQUIPAMENTO EM ÓTIMAS CONDIÇÕES">Ótimas condições</option>
-              <option value="EQUIPAMENTO EM BOAS CONDIÇÕES">Boas condições</option>
-              <option value="EQUIPAMENTO NECESSITA MANUTENÇÃO">Necessita manutenção</option>
-              <option value="EQUIPAMENTO AVARIADO">Avariado</option>
+            <select
+              id="transformadorCabos"
+              v-model="form.transformadorCabos"
+              class="form-control"
+            >
+              <option value="">
+                Seleccionar estado
+              </option>
+              <option value="EQUIPAMENTO EM ÓTIMAS CONDIÇÕES">
+                Ótimas condições
+              </option>
+              <option value="EQUIPAMENTO EM BOAS CONDIÇÕES">
+                Boas condições
+              </option>
+              <option value="EQUIPAMENTO NECESSITA MANUTENÇÃO">
+                Necessita manutenção
+              </option>
+              <option value="EQUIPAMENTO AVARIADO">
+                Avariado
+              </option>
             </select>
           </div>
 
           <div class="form-group">
             <label for="estadoGeral">ESTADO GERAL</label>
-            <select id="estadoGeral" v-model="form.estadoGeral" class="form-control">
-              <option value="">Seleccionar estado</option>
-              <option value="EQUIPAMENTO EM ÓTIMAS CONDIÇÕES">Ótimas condições</option>
-              <option value="EQUIPAMENTO EM BOAS CONDIÇÕES">Boas condições</option>
-              <option value="EQUIPAMENTO NECESSITA MANUTENÇÃO">Necessita manutenção</option>
-              <option value="EQUIPAMENTO AVARIADO">Avariado</option>
+            <select
+              id="estadoGeral"
+              v-model="form.estadoGeral"
+              class="form-control"
+            >
+              <option value="">
+                Seleccionar estado
+              </option>
+              <option value="EQUIPAMENTO EM ÓTIMAS CONDIÇÕES">
+                Ótimas condições
+              </option>
+              <option value="EQUIPAMENTO EM BOAS CONDIÇÕES">
+                Boas condições
+              </option>
+              <option value="EQUIPAMENTO NECESSITA MANUTENÇÃO">
+                Necessita manutenção
+              </option>
+              <option value="EQUIPAMENTO AVARIADO">
+                Avariado
+              </option>
             </select>
           </div>
         </div>
@@ -174,17 +269,26 @@
               class="form-control"
               rows="4"
               placeholder="Especificações técnicas, problemas identificados, software instalado..."
-            ></textarea>
+            />
           </div>
         </div>
       </section>
 
       <!-- Action buttons -->
       <div class="form-actions">
-        <button type="button" @click="handleCancel" class="btn btn-cancel" :disabled="loading">
+        <button
+          type="button"
+          class="btn btn-cancel"
+          :disabled="loading"
+          @click="handleCancel"
+        >
           Cancelar
         </button>
-        <button type="submit" class="btn btn-primary" :disabled="loading || !isFormValid">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          :disabled="loading || !isFormValid"
+        >
           {{ isEditing ? 'Atualizar' : 'Criar' }} Equipamento
         </button>
       </div>

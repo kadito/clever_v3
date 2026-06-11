@@ -19,7 +19,9 @@
     <!-- Custom sections for updates -->
     <template #updateSections="{ formData, errors }">
       <div class="bg-amber-50 rounded-touch p-4 border border-amber-200">
-        <h3 class="text-sm font-medium text-amber-800 mb-2">Informação de Atualização</h3>
+        <h3 class="text-sm font-medium text-amber-800 mb-2">
+          Informação de Atualização
+        </h3>
         <div class="text-xs text-amber-600 space-y-1">
           <p><strong>Criado:</strong> {{ formatDate(item?.createdAt) }}</p>
           <p><strong>Última atualização:</strong> {{ formatDate(item?.updatedAt) }}</p>

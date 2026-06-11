@@ -115,8 +115,8 @@ export function usePerformanceOptimizations() {
   const createLazyLoader = <T>(loader: () => Promise<T>) => {
     let promise: Promise<T> | null = null;
     let result: T | null = null;
-    let isLoading = ref(false);
-    let error = ref<Error | null>(null);
+    const isLoading = ref(false);
+    const error = ref<Error | null>(null);
 
     const load = async (): Promise<T> => {
       if (result !== null) {

@@ -3,13 +3,31 @@
     <!-- Header -->
     <div class="view-header">
       <div class="header-content">
-        <h1 class="view-title">Relatório de Saldos</h1>
-        <p class="view-subtitle">Visão geral dos saldos de todos os clientes</p>
+        <h1 class="view-title">
+          Relatório de Saldos
+        </h1>
+        <p class="view-subtitle">
+          Visão geral dos saldos de todos os clientes
+        </p>
       </div>
       
-      <button @click="exportToCSV" class="export-button" :disabled="isLoading">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      <button
+        class="export-button"
+        :disabled="isLoading"
+        @click="exportToCSV"
+      >
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
         </svg>
         <span>Exportar CSV</span>
       </button>
@@ -18,7 +36,10 @@
     <!-- Filters -->
     <div class="filters-section">
       <div class="filter-group">
-        <label for="min-debt" class="filter-label">Dívida Mínima (€)</label>
+        <label
+          for="min-debt"
+          class="filter-label"
+        >Dívida Mínima (€)</label>
         <input 
           id="min-debt"
           v-model.number="filters.minDebt" 
@@ -26,11 +47,14 @@
           class="filter-input"
           placeholder="0"
           @change="loadReport"
-        />
+        >
       </div>
 
       <div class="filter-group">
-        <label for="max-debt" class="filter-label">Dívida Máxima (€)</label>
+        <label
+          for="max-debt"
+          class="filter-label"
+        >Dívida Máxima (€)</label>
         <input 
           id="max-debt"
           v-model.number="filters.maxDebt" 
@@ -38,76 +62,128 @@
           class="filter-input"
           placeholder="Sem limite"
           @change="loadReport"
-        />
+        >
       </div>
 
       <div class="filter-group">
-        <label for="low-usage" class="filter-label">Apenas Uso Baixo</label>
+        <label
+          for="low-usage"
+          class="filter-label"
+        >Apenas Uso Baixo</label>
         <input 
           id="low-usage"
           v-model="filters.lowUsageOnly" 
           type="checkbox" 
           class="filter-checkbox"
           @change="loadReport"
-        />
+        >
       </div>
 
       <button 
         class="clear-filters-btn" 
-        @click="clearFilters"
         :disabled="!hasActiveFilters"
+        @click="clearFilters"
       >
         Limpar Filtros
       </button>
     </div>
 
     <!-- Summary Statistics -->
-    <div v-if="summary && !isLoading" class="summary-section">
+    <div
+      v-if="summary && !isLoading"
+      class="summary-section"
+    >
       <div class="summary-card">
-        <div class="summary-label">Total de Clientes</div>
-        <div class="summary-value">{{ summary.totalClients }}</div>
+        <div class="summary-label">
+          Total de Clientes
+        </div>
+        <div class="summary-value">
+          {{ summary.totalClients }}
+        </div>
       </div>
 
       <div class="summary-card">
-        <div class="summary-label">Clientes com Dívida</div>
-        <div class="summary-value text-red-600">{{ summary.clientsWithDebt }}</div>
+        <div class="summary-label">
+          Clientes com Dívida
+        </div>
+        <div class="summary-value text-red-600">
+          {{ summary.clientsWithDebt }}
+        </div>
       </div>
 
       <div class="summary-card">
-        <div class="summary-label">Dívida Total</div>
-        <div class="summary-value text-red-600">{{ formatCurrency(summary.totalDebt) }}</div>
+        <div class="summary-label">
+          Dívida Total
+        </div>
+        <div class="summary-value text-red-600">
+          {{ formatCurrency(summary.totalDebt) }}
+        </div>
       </div>
 
       <div class="summary-card">
-        <div class="summary-label">Dívida Média</div>
-        <div class="summary-value">{{ formatCurrency(summary.averageDebt) }}</div>
+        <div class="summary-label">
+          Dívida Média
+        </div>
+        <div class="summary-value">
+          {{ formatCurrency(summary.averageDebt) }}
+        </div>
       </div>
 
       <div class="summary-card">
-        <div class="summary-label">Uso Baixo</div>
-        <div class="summary-value text-yellow-600">{{ summary.clientsWithLowUsage }}</div>
+        <div class="summary-label">
+          Uso Baixo
+        </div>
+        <div class="summary-value text-yellow-600">
+          {{ summary.clientsWithLowUsage }}
+        </div>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div v-if="isLoading" class="loading-state">
-      <div class="spinner"></div>
-      <p class="loading-text">A carregar relatório...</p>
+    <div
+      v-if="isLoading"
+      class="loading-state"
+    >
+      <div class="spinner" />
+      <p class="loading-text">
+        A carregar relatório...
+      </p>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="error-state">
-      <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <div
+      v-else-if="error"
+      class="error-state"
+    >
+      <svg
+        class="error-icon"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
       </svg>
-      <p class="error-message">{{ error }}</p>
-      <button @click="loadReport" class="retry-button">
+      <p class="error-message">
+        {{ error }}
+      </p>
+      <button
+        class="retry-button"
+        @click="loadReport"
+      >
         Tentar Novamente
       </button>
     </div>
 
     <!-- Balances Table -->
-    <div v-else-if="balances.length > 0" class="table-container">
+    <div
+      v-else-if="balances.length > 0"
+      class="table-container"
+    >
       <table class="balances-table">
         <thead>
           <tr>
@@ -121,9 +197,15 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="balance in balances" :key="balance.clientId">
+          <tr
+            v-for="balance in balances"
+            :key="balance.clientId"
+          >
             <td>
-              <router-link :to="`/clients/${balance.clientId}`" class="client-link">
+              <router-link
+                :to="`/clients/${balance.clientId}`"
+                class="client-link"
+              >
                 {{ balance.clientId.substring(0, 8) }}...
               </router-link>
             </td>
@@ -134,18 +216,31 @@
             <td>{{ formatUsageValue(balance.contracts.deslocacoesPorAno) }}</td>
             <td>{{ formatUsageValue(balance.contracts.horasAssistenciaAnuais) }}</td>
             <td>
-              <span v-if="balance.hasLowUsage" class="low-usage-badge">Sim</span>
-              <span v-else class="normal-usage-badge">Não</span>
+              <span
+                v-if="balance.hasLowUsage"
+                class="low-usage-badge"
+              >Sim</span>
+              <span
+                v-else
+                class="normal-usage-badge"
+              >Não</span>
             </td>
-            <td class="text-sm text-gray-500">{{ formatDate(balance.lastUpdated) }}</td>
+            <td class="text-sm text-gray-500">
+              {{ formatDate(balance.lastUpdated) }}
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <!-- Empty State -->
-    <div v-else class="empty-state">
-      <p class="empty-message">Sem dados de saldo disponíveis</p>
+    <div
+      v-else
+      class="empty-state"
+    >
+      <p class="empty-message">
+        Sem dados de saldo disponíveis
+      </p>
     </div>
   </div>
 </template>

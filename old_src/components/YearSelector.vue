@@ -3,17 +3,31 @@
     <div class="dropdown-wrapper">
       <select
         :value="modelValue"
-        @change="handleChange"
         class="year-dropdown"
         :class="{ 'has-all-option': showAllOption }"
+        @change="handleChange"
       >
-        <option v-if="showAllOption" value="">Todos os anos</option>
-        <option v-for="year in years" :key="year" :value="year">
+        <option
+          v-if="showAllOption"
+          value=""
+        >
+          Todos os anos
+        </option>
+        <option
+          v-for="year in years"
+          :key="year"
+          :value="year"
+        >
           {{ year }}
         </option>
       </select>
       <div class="dropdown-icon">
-        <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
+        <svg
+          width="12"
+          height="8"
+          viewBox="0 0 12 8"
+          fill="none"
+        >
           <path
             d="M1 1.5L6 6.5L11 1.5"
             stroke="currentColor"

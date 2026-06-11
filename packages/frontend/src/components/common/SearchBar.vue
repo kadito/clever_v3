@@ -4,7 +4,12 @@
       <!-- Search input -->
       <div class="relative">
         <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-5 h-5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -22,15 +27,15 @@
           @keydown.enter="handleEnter"
           @focus="handleFocus"
           @blur="handleBlur"
-        />
+        >
 
         <!-- Clear button -->
         <button
           v-if="searchQuery"
-          @click="clearSearch"
           class="absolute inset-y-0 right-0 pr-3 flex items-center touch-target"
           type="button"
           aria-label="Limpar pesquisa"
+          @click="clearSearch"
         >
           <svg
             class="h-5 w-5 text-gray-400 hover:text-gray-600"
@@ -57,8 +62,8 @@
           <li
             v-for="(suggestion, index) in suggestions"
             :key="index"
-            @click="selectSuggestion(suggestion)"
             class="px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm"
+            @click="selectSuggestion(suggestion)"
           >
             {{ suggestion }}
           </li>
@@ -67,11 +72,13 @@
     </div>
 
     <!-- Filter buttons (mobile-optimized) -->
-    <div v-if="filters.length > 0" class="mt-3 flex flex-wrap gap-2">
+    <div
+      v-if="filters.length > 0"
+      class="mt-3 flex flex-wrap gap-2"
+    >
       <button
         v-for="filter in filters"
         :key="filter.key"
-        @click="toggleFilter(filter.key)"
         :class="[
           'px-3 py-2 text-sm font-medium rounded-full border transition-colors duration-200',
           {
@@ -79,9 +86,13 @@
             'bg-white text-gray-700 border-gray-300 hover:bg-gray-50': !filter.active,
           },
         ]"
+        @click="toggleFilter(filter.key)"
       >
         {{ filter.label }}
-        <span v-if="filter.count !== undefined" class="ml-1 text-xs"> ({{ filter.count }}) </span>
+        <span
+          v-if="filter.count !== undefined"
+          class="ml-1 text-xs"
+        > ({{ filter.count }}) </span>
       </button>
     </div>
   </div>

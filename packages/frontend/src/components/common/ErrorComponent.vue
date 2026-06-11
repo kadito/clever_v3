@@ -32,11 +32,16 @@
       <div class="ml-auto pl-3">
         <div class="-mx-1.5 -my-1.5">
           <button
-            @click="handleClose"
             class="inline-flex rounded-touch p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 touch-target"
             aria-label="Fechar erro"
+            @click="handleClose"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"

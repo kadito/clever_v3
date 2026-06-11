@@ -2,7 +2,12 @@
   <div class="equipment-card">
     <div class="equipment-header">
       <h5>EQUIPAMENTO {{ equipmentNumber }}</h5>
-      <button v-if="equipmentNumber > 1" type="button" class="remove-btn" @click="$emit('remove')">
+      <button
+        v-if="equipmentNumber > 1"
+        type="button"
+        class="remove-btn"
+        @click="$emit('remove')"
+      >
         ✕
       </button>
     </div>
@@ -16,7 +21,7 @@
           class="form-input"
           placeholder="Ex: GEST 15"
           @input="updateEquipment"
-        />
+        >
       </div>
 
       <div class="form-field">
@@ -27,10 +32,13 @@
           class="form-input"
           placeholder="Ex: 1234567"
           @input="updateEquipment"
-        />
+        >
       </div>
 
-      <div v-if="showDiscount" class="form-field">
+      <div
+        v-if="showDiscount"
+        class="form-field"
+      >
         <label class="form-label">DESCONTO (%)</label>
         <input
           v-model.number="localEquipment.desconto"
@@ -40,7 +48,7 @@
           max="100"
           placeholder="0"
           @input="updateEquipment"
-        />
+        >
       </div>
     </div>
 

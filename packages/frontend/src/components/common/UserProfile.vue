@@ -1,15 +1,21 @@
 <template>
   <div class="user-profile">
     <!-- Mobile user profile (dropdown) -->
-    <div class="relative" v-if="isMobile">
+    <div
+      v-if="isMobile"
+      class="relative"
+    >
       <button
-        @click="toggleDropdown"
         class="flex items-center w-full px-4 py-3 text-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 touch-target"
         :aria-expanded="isDropdownOpen"
         aria-haspopup="true"
+        @click="toggleDropdown"
       >
         <div class="flex-shrink-0">
-          <UserAvatar :user="user" size="sm" />
+          <UserAvatar
+            :user="user"
+            size="sm"
+          />
         </div>
         <div class="ml-3 flex-1 min-w-0">
           <p class="text-sm font-medium text-gray-900 truncate">
@@ -44,16 +50,25 @@
       >
         <div class="py-1">
           <div class="px-4 py-2 border-b border-gray-100">
-            <p class="text-xs text-gray-500">Tipo de utilizador</p>
-            <p class="text-sm font-medium text-gray-900">{{ userTypeLabel }}</p>
+            <p class="text-xs text-gray-500">
+              Tipo de utilizador
+            </p>
+            <p class="text-sm font-medium text-gray-900">
+              {{ userTypeLabel }}
+            </p>
           </div>
           <button
-            @click="handleSignOut"
             class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 touch-target"
             :disabled="isSigningOut"
+            @click="handleSignOut"
           >
             <div class="flex items-center">
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                class="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -69,17 +84,27 @@
     </div>
 
     <!-- Desktop user profile -->
-    <div v-else class="relative">
+    <div
+      v-else
+      class="relative"
+    >
       <button
-        @click="toggleDropdown"
         class="flex items-center px-3 py-2 text-sm rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
         :aria-expanded="isDropdownOpen"
         aria-haspopup="true"
+        @click="toggleDropdown"
       >
-        <UserAvatar :user="user" size="sm" />
+        <UserAvatar
+          :user="user"
+          size="sm"
+        />
         <div class="ml-2 hidden lg:block">
-          <p class="text-sm font-medium text-gray-900">{{ userName }}</p>
-          <p class="text-xs text-gray-500">{{ userTypeLabel }}</p>
+          <p class="text-sm font-medium text-gray-900">
+            {{ userName }}
+          </p>
+          <p class="text-xs text-gray-500">
+            {{ userTypeLabel }}
+          </p>
         </div>
         <svg
           class="ml-2 w-4 h-4 text-gray-400 transition-transform duration-200"
@@ -106,11 +131,20 @@
           <!-- User info -->
           <div class="px-4 py-3 border-b border-gray-100">
             <div class="flex items-center">
-              <UserAvatar :user="user" size="md" />
+              <UserAvatar
+                :user="user"
+                size="md"
+              />
               <div class="ml-3">
-                <p class="text-sm font-medium text-gray-900">{{ userName }}</p>
-                <p class="text-xs text-gray-500">{{ user.email }}</p>
-                <p class="text-xs text-gray-500 mt-1">{{ userTypeLabel }}</p>
+                <p class="text-sm font-medium text-gray-900">
+                  {{ userName }}
+                </p>
+                <p class="text-xs text-gray-500">
+                  {{ user.email }}
+                </p>
+                <p class="text-xs text-gray-500 mt-1">
+                  {{ userTypeLabel }}
+                </p>
               </div>
             </div>
           </div>
@@ -118,12 +152,17 @@
           <!-- Actions -->
           <div class="py-1">
             <button
-              @click="handleSignOut"
               class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500"
               :disabled="isSigningOut"
+              @click="handleSignOut"
             >
               <div class="flex items-center">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  class="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -144,7 +183,7 @@
       v-if="isDropdownOpen && isMobile"
       class="fixed inset-0 z-40 bg-black bg-opacity-25"
       @click="closeDropdown"
-    ></div>
+    />
   </div>
 </template>
 

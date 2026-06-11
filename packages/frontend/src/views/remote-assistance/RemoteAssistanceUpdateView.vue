@@ -1,15 +1,25 @@
 <template>
   <div class="remote-assistance-update-container">
     <!-- Loading state -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A carregar assistência remota...</p>
     </div>
 
     <!-- Error state -->
-    <ErrorComponent v-if="error" :error="error" @close="clearError" />
+    <ErrorComponent
+      v-if="error"
+      :error="error"
+      @close="clearError"
+    />
 
     <!-- Content -->
-    <div v-if="!loading && remoteAssistance" class="update-content">
+    <div
+      v-if="!loading && remoteAssistance"
+      class="update-content"
+    >
       <!-- Form -->
       <ContentUpdateTemplate
         :item="remoteAssistance"
@@ -34,7 +44,10 @@
             @update:model-value="value => updateFieldValue('clientId', value)"
             @client-selected="handleClientSelected"
           />
-          <p v-if="error" class="form-error text-red-600 text-sm mt-1">
+          <p
+            v-if="error"
+            class="form-error text-red-600 text-sm mt-1"
+          >
             {{ error }}
           </p>
         </template>
@@ -58,11 +71,14 @@
                   :checked="formData?.paymentMethod === method.value"
                   name="paymentMethod"
                   @change="updateFieldValue('paymentMethod', method.value)"
-                />
+                >
                 <span>{{ method.label }}</span>
               </label>
             </div>
-            <p v-if="error" class="form-error text-red-600 text-sm mt-1">
+            <p
+              v-if="error"
+              class="form-error text-red-600 text-sm mt-1"
+            >
               {{ error }}
             </p>
           </div>
@@ -70,10 +86,16 @@
 
         <!-- Contract auto-fetch display (conditional on paymentMethod === 'Contrato') -->
         <template #field-contractId="{ formData, error, updateFieldValue }">
-          <div v-if="isLoadingContracts" class="text-sm text-gray-500 py-2">
+          <div
+            v-if="isLoadingContracts"
+            class="text-sm text-gray-500 py-2"
+          >
             A carregar contratos...
           </div>
-          <div v-else-if="clientContracts.length === 0" class="text-sm text-red-600 py-2">
+          <div
+            v-else-if="clientContracts.length === 0"
+            class="text-sm text-red-600 py-2"
+          >
             Nenhum contrato encontrado para este cliente.
           </div>
           <div v-else>
@@ -85,7 +107,9 @@
               :class="{ 'border-red-500': !!error }"
               @change="(e: Event) => updateFieldValue('contractId', (e.target as HTMLSelectElement).value)"
             >
-              <option value="">Selecionar contrato...</option>
+              <option value="">
+                Selecionar contrato...
+              </option>
               <option
                 v-for="contract in clientContracts"
                 :key="contract.uuid"
@@ -95,14 +119,25 @@
               </option>
             </select>
             <!-- Contract info display -->
-            <div v-if="selectedContractForDisplay" class="bg-green-50 border border-green-200 rounded-lg p-3">
-              <div class="text-sm font-medium text-green-800">{{ getContractDisplayName(selectedContractForDisplay) }}</div>
-              <div v-if="getContractDates(selectedContractForDisplay)" class="text-xs text-green-600 mt-1">
+            <div
+              v-if="selectedContractForDisplay"
+              class="bg-green-50 border border-green-200 rounded-lg p-3"
+            >
+              <div class="text-sm font-medium text-green-800">
+                {{ getContractDisplayName(selectedContractForDisplay) }}
+              </div>
+              <div
+                v-if="getContractDates(selectedContractForDisplay)"
+                class="text-xs text-green-600 mt-1"
+              >
                 Período: {{ getContractDates(selectedContractForDisplay) }}
               </div>
             </div>
           </div>
-          <p v-if="error" class="form-error text-red-600 text-sm mt-1">
+          <p
+            v-if="error"
+            class="form-error text-red-600 text-sm mt-1"
+          >
             {{ error }}
           </p>
         </template>
@@ -118,8 +153,11 @@
             :class="{ 'border-red-500': !!error }"
             @input="e => handleTimeInput(e, 'inicioAssistencia', updateFieldValue)"
             @blur="e => handleTimeBlur(e, 'inicioAssistencia', updateFieldValue)"
-          />
-          <p v-if="error" class="form-error text-red-600 text-sm mt-1">
+          >
+          <p
+            v-if="error"
+            class="form-error text-red-600 text-sm mt-1"
+          >
             {{ error }}
           </p>
           <p class="form-help text-xs text-gray-500 mt-1">
@@ -150,8 +188,11 @@
             :class="{ 'border-red-500': !!error }"
             @input="e => handleTimeInput(e, 'fimAssistencia', updateFieldValue)"
             @blur="e => handleTimeBlur(e, 'fimAssistencia', updateFieldValue)"
-          />
-          <p v-if="error" class="form-error text-red-600 text-sm mt-1">
+          >
+          <p
+            v-if="error"
+            class="form-error text-red-600 text-sm mt-1"
+          >
             {{ error }}
           </p>
           <p class="form-help text-xs text-gray-500 mt-1">
@@ -181,7 +222,7 @@
             class="form-input bg-gray-100"
             disabled
             readonly
-          />
+          >
           <p class="form-help text-xs text-gray-500 mt-1">
             <svg
               class="w-4 h-4 text-gray-400 inline mr-1"
@@ -249,41 +290,50 @@
                 />
               </svg>
               <span class="text-sm text-gray-600">
-                💶 Preço: 30€/hora (09:00-18:00) | 45€/hora (outras horas) - sem IVA
+                💶 Preço: {{ REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS }}€/hora
+                (09:00-12:30, 14:30-18:00) |
+                {{ REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS }}€/hora (outras horas) + IVA
               </span>
             </div>
 
-            <!-- Pricing breakdown (always shown) -->
-            <div v-if="pricingBreakdown" class="pricing-breakdown">
+            <!-- Pricing breakdown -->
+            <div
+              v-if="pricingResult && !pricingResult.isZeroCost"
+              class="pricing-breakdown"
+            >
               <div class="pricing-table">
-                <div v-if="pricingBreakdown.businessHours > 0" class="pricing-row">
-                  <span class="pricing-label">Horário Comercial (09:00-18:00):</span>
+                <div
+                  v-if="pricingResult.businessMinutes > 0"
+                  class="pricing-row"
+                >
+                  <span class="pricing-label">Horário Comercial (09:00-12:30, 14:30-18:00):</span>
                   <span class="pricing-value">
-                    {{ formatHours(pricingBreakdown.businessHours) }} ×
+                    {{ formatMinutesAsHours(pricingResult.businessMinutes) }} ×
                     {{ formatCurrency(REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS) }}/h =
-                    {{ formatCurrency(pricingBreakdown.businessHoursValue) }}
+                    {{ formatCurrency(pricingResult.businessHoursValue) }}
                   </span>
                 </div>
-                <div v-if="pricingBreakdown.afterHours > 0" class="pricing-row">
-                  <span class="pricing-label">Fora do Horário Comercial:</span>
+                <div
+                  v-if="pricingResult.offHoursMinutes > 0"
+                  class="pricing-row"
+                >
+                  <span class="pricing-label">Fora do Horário Comercial (inclui 12:30-14:30):</span>
                   <span class="pricing-value">
-                    {{ formatHours(pricingBreakdown.afterHours) }} ×
+                    {{ formatMinutesAsHours(pricingResult.offHoursMinutes) }} ×
                     {{ formatCurrency(REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS) }}/h =
-                    {{ formatCurrency(pricingBreakdown.afterHoursValue) }}
+                    {{ formatCurrency(pricingResult.offHoursValue) }}
                   </span>
                 </div>
                 <div class="pricing-row total">
                   <span class="pricing-label">VALOR TOTAL:</span>
-                  <span class="pricing-value">{{
-                    formatCurrency(pricingBreakdown.totalValue)
-                  }}</span>
+                  <span class="pricing-value">{{ formatCurrency(pricingResult.totalValue) }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Contract/Warranty notice -->
             <div
-              v-if="slotFormData?.paymentMethod === 'Contrato' || slotFormData?.paymentMethod === 'Garantia'"
+              v-if="pricingResult?.isZeroCost"
               class="no-charge-notice"
             >
               <svg
@@ -300,12 +350,7 @@
                 />
               </svg>
               <span class="text-green-700 font-medium">
-                {{
-                  slotFormData?.paymentMethod === 'Contrato'
-                    ? 'Assistência coberta por contrato'
-                    : 'Assistência coberta por garantia'
-                }}
-                - Sem custo
+                Assistência coberta por {{ slotFormData?.paymentMethod?.toLowerCase() }} - Sem custo
               </span>
             </div>
           </div>
@@ -323,9 +368,13 @@
             :disabled="apiLoading.updating.value || uploading || deleting"
             @files-changed="handleAnexosFilesChanged"
           />
-          <p v-if="fileError" class="text-sm text-red-600 mt-2">{{ fileError }}</p>
+          <p
+            v-if="fileError"
+            class="text-sm text-red-600 mt-2"
+          >
+            {{ fileError }}
+          </p>
         </template>
-
       </ContentUpdateTemplate>
     </div>
   </div>
@@ -339,9 +388,8 @@ import type { RemoteAssistance, RemoteAssistanceUpdateData, Contract } from '@cl
 import {
   validateAndFormatTime,
   validateTimeSequence,
-  calculateTotalHours,
   calculateRoundedTotalHours,
-  calculateAssistanceValueWithBusinessHours,
+  calculateRemoteAssistancePricing,
   REMOTE_ASSISTANCE_CONSTANTS,
 } from '@clever/shared';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
@@ -847,18 +895,18 @@ const calculatedDuration = computed(() => {
   return calculateRoundedTotalHours(currentFormDataValue.inicioAssistencia, currentFormDataValue.fimAssistencia);
 });
 
-const pricingBreakdown = computed(() => {
+const pricingResult = computed(() => {
   const currentFormDataValue = currentFormData.value;
   if (!currentFormDataValue?.inicioAssistencia || !currentFormDataValue?.fimAssistencia) {
     return null;
   }
 
-  // Always calculate pricing for display purposes (pass 'Faturação' to get actual values)
-  return calculateAssistanceValueWithBusinessHours(
-    currentFormDataValue.inicioAssistencia,
-    currentFormDataValue.fimAssistencia,
-    'Faturação'
-  );
+  return calculateRemoteAssistancePricing({
+    startTime: currentFormDataValue.inicioAssistencia,
+    endTime: currentFormDataValue.fimAssistencia,
+    isWeekendOrHoliday: currentFormDataValue?.weekendHoliday ?? false,
+    paymentMethod: currentFormDataValue?.paymentMethod ?? '',
+  });
 });
 
 // Helper functions
@@ -871,15 +919,15 @@ const formatCurrency = (value: number): string => {
   }).format(value);
 };
 
-const formatHours = (hours: number): string => {
-  const wholeHours = Math.floor(hours);
-  const minutes = Math.round((hours - wholeHours) * 60);
+const formatMinutesAsHours = (minutes: number): string => {
+  const wholeHours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
 
-  if (minutes === 0) {
+  if (remainingMinutes === 0) {
     return `${wholeHours}h`;
   }
 
-  return `${wholeHours}h${minutes.toString().padStart(2, '0')}m`;
+  return `${wholeHours}h${remainingMinutes.toString().padStart(2, '0')}m`;
 };
 
 // Watchers for automatic calculations
@@ -888,17 +936,12 @@ watch(
     currentFormData.value?.inicioAssistencia,
     currentFormData.value?.fimAssistencia,
     currentFormData.value?.paymentMethod,
+    currentFormData.value?.weekendHoliday,
   ],
-  ([startTime, endTime, paymentMethod]) => {
+  ([startTime, endTime]) => {
     if (startTime && endTime) {
-      // Use the new business hours calculation logic
-      const valueCalculation = calculateAssistanceValueWithBusinessHours(
-        startTime,
-        endTime,
-        paymentMethod
-      );
-
-      updateFieldValue('valorAssist', valueCalculation.totalValue);
+      const result = pricingResult.value;
+      updateFieldValue('valorAssist', result?.totalValue ?? 0);
 
       // Update total hours field with rounded hours
       const roundedDuration = calculateRoundedTotalHours(startTime, endTime);
@@ -921,29 +964,17 @@ watch(
   }
 );
 
-// Clear value when payment method changes
+// Clear contractId when payment method changes away from Contrato
 watch(
   () => currentFormData.value?.paymentMethod,
-  (paymentMethod, oldPaymentMethod) => {
+  (paymentMethod) => {
     const currentFormDataValue = currentFormData.value;
 
-    // Clear contractId when payment method changes away from Contrato
     if (paymentMethod !== 'Contrato') {
       updateFieldValue('contractId', '');
       clientContracts.value = [];
     } else if (currentFormDataValue?.clientId) {
       fetchClientContracts(currentFormDataValue.clientId);
-    }
-    
-    if (currentFormDataValue?.inicioAssistencia && currentFormDataValue?.fimAssistencia) {
-      // Use the new business hours calculation logic
-      const valueCalculation = calculateAssistanceValueWithBusinessHours(
-        currentFormDataValue.inicioAssistencia,
-        currentFormDataValue.fimAssistencia,
-        paymentMethod
-      );
-
-      updateFieldValue('valorAssist', valueCalculation.totalValue);
     }
   }
 );

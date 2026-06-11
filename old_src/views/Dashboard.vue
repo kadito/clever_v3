@@ -15,24 +15,46 @@
             {{ user.isAuthenticated ? 'Authenticated' : 'Guest' }}
           </span>
         </p>
-        <button v-if="!user.isAuthenticated" @click="simulateLogin" class="btn primary">
+        <button
+          v-if="!user.isAuthenticated"
+          class="btn primary"
+          @click="simulateLogin"
+        >
           Simulate Login
         </button>
-        <button v-else @click="logout" class="btn secondary">Logout</button>
+        <button
+          v-else
+          class="btn secondary"
+          @click="logout"
+        >
+          Logout
+        </button>
       </div>
     </div>
 
     <div class="data-section">
       <div class="section-header">
         <h2>Data Management</h2>
-        <button @click="fetchItems" :disabled="loading" class="btn primary">
+        <button
+          :disabled="loading"
+          class="btn primary"
+          @click="fetchItems"
+        >
           {{ loading ? 'Loading...' : 'Refresh Data' }}
         </button>
       </div>
 
-      <div v-if="error" class="error-message">
+      <div
+        v-if="error"
+        class="error-message"
+      >
         <p>{{ error }}</p>
-        <button @click="clearError" class="btn small">Dismiss</button>
+        <button
+          class="btn small"
+          @click="clearError"
+        >
+          Dismiss
+        </button>
       </div>
 
       <div class="stats">
@@ -55,15 +77,19 @@
             placeholder="Item name"
             required
             class="form-input"
-          />
+          >
           <input
             v-model="newItem.description"
             type="text"
             placeholder="Description"
             required
             class="form-input"
-          />
-          <button type="submit" :disabled="loading" class="btn primary">
+          >
+          <button
+            type="submit"
+            :disabled="loading"
+            class="btn primary"
+          >
             {{ loading ? 'Adding...' : 'Add Item' }}
           </button>
         </form>
@@ -71,12 +97,27 @@
 
       <div class="items-list">
         <h3>Items ({{ itemCount }})</h3>
-        <div v-if="loading && !hasItems" class="loading">Loading items...</div>
-        <div v-else-if="!hasItems" class="no-items">
+        <div
+          v-if="loading && !hasItems"
+          class="loading"
+        >
+          Loading items...
+        </div>
+        <div
+          v-else-if="!hasItems"
+          class="no-items"
+        >
           No items found. Click "Refresh Data" to load sample data.
         </div>
-        <div v-else class="item-grid">
-          <div v-for="item in items" :key="item.id" class="item-card">
+        <div
+          v-else
+          class="item-grid"
+        >
+          <div
+            v-for="item in items"
+            :key="item.id"
+            class="item-card"
+          >
             <h4>{{ item.name }}</h4>
             <p>{{ item.description }}</p>
             <small>ID: {{ item.id }}</small>

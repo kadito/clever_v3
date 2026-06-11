@@ -13,9 +13,9 @@
       <div
         v-if="isOpen"
         class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+        tabindex="-1"
         @click="handleBackdropClick"
         @keydown.escape="handleCancel"
-        tabindex="-1"
       >
         <!-- Dialog container -->
         <Transition
@@ -59,7 +59,10 @@
 
                 <!-- Title -->
                 <div class="ml-3 flex-1">
-                  <h3 :id="titleId" class="text-lg font-semibold text-gray-900">
+                  <h3
+                    :id="titleId"
+                    class="text-lg font-semibold text-gray-900"
+                  >
                     {{ title }}
                   </h3>
                 </div>
@@ -68,7 +71,10 @@
 
             <!-- Dialog content -->
             <div class="px-4 py-4 sm:px-6 sm:py-5">
-              <p :id="messageId" class="text-sm text-gray-700 leading-relaxed">
+              <p
+                :id="messageId"
+                class="text-sm text-gray-700 leading-relaxed"
+              >
                 {{ message }}
               </p>
             </div>
@@ -83,10 +89,10 @@
                 <!-- Cancel button -->
                 <button
                   ref="cancelButtonRef"
-                  @click="handleCancel"
                   :disabled="isLoading"
                   class="btn-secondary w-full sm:w-auto touch-target"
                   :class="{ 'opacity-50 cursor-not-allowed': isLoading }"
+                  @click="handleCancel"
                 >
                   {{ cancelText }}
                 </button>
@@ -94,10 +100,10 @@
                 <!-- Confirm button -->
                 <button
                   ref="confirmButtonRef"
-                  @click="handleConfirm"
                   :disabled="isLoading"
                   class="btn-danger w-full sm:w-auto touch-target flex items-center justify-center"
                   :class="{ 'opacity-50 cursor-not-allowed': isLoading }"
+                  @click="handleConfirm"
                 >
                   <!-- Loading spinner -->
                   <svg

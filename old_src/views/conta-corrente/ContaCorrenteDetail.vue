@@ -7,24 +7,38 @@
           <span class="title-icon">💰</span>
           Detalhes da Conta Corrente
         </h1>
-        <p class="page-subtitle">Informação detalhada do registo</p>
+        <p class="page-subtitle">
+          Informação detalhada do registo
+        </p>
       </div>
 
       <div class="header-actions">
-        <router-link :to="`/conta-corrente/${year}/${id}/edit`" class="btn btn-primary">
+        <router-link
+          :to="`/conta-corrente/${year}/${id}/edit`"
+          class="btn btn-primary"
+        >
           <span class="btn-icon">✏️</span>
           Editar
         </router-link>
-        <button @click="confirmDelete" class="btn btn-danger">
+        <button
+          class="btn btn-danger"
+          @click="confirmDelete"
+        >
           <span class="btn-icon">🗑️</span>
           Eliminar
         </button>
       </div>
     </div>
 
-    <div v-if="contaCorrente" class="detail-content">
+    <div
+      v-if="contaCorrente"
+      class="detail-content"
+    >
       <!-- Status Alert -->
-      <div class="status-alert" :class="getInvoiceStatus(contaCorrente)">
+      <div
+        class="status-alert"
+        :class="getInvoiceStatus(contaCorrente)"
+      >
         <div class="alert-content">
           <span class="alert-icon">{{ getStatusIcon(contaCorrente) }}</span>
           <div class="alert-text">
@@ -45,7 +59,9 @@
           <div class="info-content">
             <div class="info-item">
               <label>NOME DO CLIENTE</label>
-              <div class="info-value primary">{{ contaCorrente.nomeCliente }}</div>
+              <div class="info-value primary">
+                {{ contaCorrente.nomeCliente }}
+              </div>
             </div>
           </div>
         </section>
@@ -61,14 +77,19 @@
               <div class="info-item">
                 <label>TIPO DE FATURA</label>
                 <div class="info-value">
-                  <span class="type-badge" :class="contaCorrente.tipoFatura.toLowerCase()">
+                  <span
+                    class="type-badge"
+                    :class="contaCorrente.tipoFatura.toLowerCase()"
+                  >
                     {{ contaCorrente.tipoFatura }}
                   </span>
                 </div>
               </div>
               <div class="info-item">
                 <label>NÚMERO DA FATURA</label>
-                <div class="info-value">{{ contaCorrente.numeroFatura || 'Não especificado' }}</div>
+                <div class="info-value">
+                  {{ contaCorrente.numeroFatura || 'Não especificado' }}
+                </div>
               </div>
             </div>
             <div class="info-row">
@@ -112,7 +133,10 @@
               </div>
               <div class="info-item">
                 <label>DATA DE VENCIMENTO</label>
-                <div class="info-value" :class="getDueDateClass(contaCorrente)">
+                <div
+                  class="info-value"
+                  :class="getDueDateClass(contaCorrente)"
+                >
                   {{
                     contaCorrente.dataVencimentoFatura
                       ? formatDate(contaCorrente.dataVencimentoFatura)
@@ -134,12 +158,17 @@
             <div class="info-row">
               <div class="info-item">
                 <label>HORAS GASTAS</label>
-                <div class="info-value">{{ contaCorrente.horasGastas || 'Não especificado' }}</div>
+                <div class="info-value">
+                  {{ contaCorrente.horasGastas || 'Não especificado' }}
+                </div>
               </div>
               <div class="info-item">
                 <label>ESTADO DO PAGAMENTO</label>
                 <div class="info-value">
-                  <span class="payment-status" :class="getPaymentStatusClass(contaCorrente)">
+                  <span
+                    class="payment-status"
+                    :class="getPaymentStatusClass(contaCorrente)"
+                  >
                     {{ getPaymentStatusText(contaCorrente) }}
                   </span>
                 </div>
@@ -148,7 +177,9 @@
             <div class="info-row">
               <div class="info-item">
                 <label>NÚMERO REMOTA</label>
-                <div class="info-value">{{ contaCorrente.numeroRemota || 'Não aplicável' }}</div>
+                <div class="info-value">
+                  {{ contaCorrente.numeroRemota || 'Não aplicável' }}
+                </div>
               </div>
               <div class="info-item">
                 <label>NÚMERO PRESENCIAL</label>
@@ -157,9 +188,14 @@
                 </div>
               </div>
             </div>
-            <div v-if="contaCorrente.motivoObs" class="info-item full-width">
+            <div
+              v-if="contaCorrente.motivoObs"
+              class="info-item full-width"
+            >
               <label>MOTIVO/OBSERVAÇÕES</label>
-              <div class="info-value description">{{ contaCorrente.motivoObs }}</div>
+              <div class="info-value description">
+                {{ contaCorrente.motivoObs }}
+              </div>
             </div>
           </div>
         </section>
@@ -174,21 +210,29 @@
             <div class="info-row">
               <div class="info-item">
                 <label>ID DO REGISTO</label>
-                <div class="info-value">{{ contaCorrente.id }}</div>
+                <div class="info-value">
+                  {{ contaCorrente.id }}
+                </div>
               </div>
               <div class="info-item">
                 <label>ANO</label>
-                <div class="info-value">{{ year }}</div>
+                <div class="info-value">
+                  {{ year }}
+                </div>
               </div>
             </div>
             <div class="info-row">
               <div class="info-item">
                 <label>CRIADO EM</label>
-                <div class="info-value">{{ formatDateTime(contaCorrente.createdAt) }}</div>
+                <div class="info-value">
+                  {{ formatDateTime(contaCorrente.createdAt) }}
+                </div>
               </div>
               <div class="info-item">
                 <label>ÚLTIMA ATUALIZAÇÃO</label>
-                <div class="info-value">{{ formatDateTime(contaCorrente.updatedAt) }}</div>
+                <div class="info-value">
+                  {{ formatDateTime(contaCorrente.updatedAt) }}
+                </div>
               </div>
             </div>
           </div>
@@ -198,15 +242,24 @@
       <!-- Action Buttons -->
       <div class="action-section">
         <div class="action-buttons">
-          <router-link to="/conta-corrente/list" class="btn btn-secondary">
+          <router-link
+            to="/conta-corrente/list"
+            class="btn btn-secondary"
+          >
             <span class="btn-icon">⬅️</span>
             Voltar à Lista
           </router-link>
-          <router-link :to="`/conta-corrente/${year}/${id}/edit`" class="btn btn-primary">
+          <router-link
+            :to="`/conta-corrente/${year}/${id}/edit`"
+            class="btn btn-primary"
+          >
             <span class="btn-icon">✏️</span>
             Editar Registo
           </router-link>
-          <router-link to="/conta-corrente/new" class="btn btn-success">
+          <router-link
+            to="/conta-corrente/new"
+            class="btn btn-success"
+          >
             <span class="btn-icon">+</span>
             Novo Registo
           </router-link>
@@ -215,46 +268,81 @@
     </div>
 
     <!-- Loading State -->
-    <div v-else-if="loading" class="loading-state">
-      <div class="loading-spinner"></div>
+    <div
+      v-else-if="loading"
+      class="loading-state"
+    >
+      <div class="loading-spinner" />
       <p>A carregar detalhes...</p>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="error-state">
-      <div class="error-icon">⚠️</div>
+    <div
+      v-else-if="error"
+      class="error-state"
+    >
+      <div class="error-icon">
+        ⚠️
+      </div>
       <h3>Erro ao carregar</h3>
       <p>{{ error }}</p>
       <div class="error-actions">
-        <button @click="retryLoad" class="btn btn-primary" :disabled="loading">
+        <button
+          class="btn btn-primary"
+          :disabled="loading"
+          @click="retryLoad"
+        >
           {{ loading ? 'A carregar...' : 'Tentar novamente' }}
         </button>
-        <router-link to="/conta-corrente/list" class="btn btn-secondary"
-          >Voltar à Lista</router-link
+        <router-link
+          to="/conta-corrente/list"
+          class="btn btn-secondary"
         >
+          Voltar à Lista
+        </router-link>
       </div>
     </div>
 
     <!-- Not Found State -->
-    <div v-else-if="!loading && !error && !contaCorrente" class="not-found-state">
+    <div
+      v-else-if="!loading && !error && !contaCorrente"
+      class="not-found-state"
+    >
       <h2>Registo não encontrado</h2>
       <p>O registo pode ainda não estar disponível no sistema. Tentar novamente?</p>
       <div class="retry-actions">
-        <button @click="retryLoad" class="btn btn-primary" :disabled="loading">
+        <button
+          class="btn btn-primary"
+          :disabled="loading"
+          @click="retryLoad"
+        >
           {{ loading ? 'A carregar...' : 'Tentar novamente' }}
         </button>
-        <router-link to="/conta-corrente/list" class="btn btn-secondary"
-          >Voltar à Lista</router-link
+        <router-link
+          to="/conta-corrente/list"
+          class="btn btn-secondary"
         >
+          Voltar à Lista
+        </router-link>
       </div>
-      <p v-if="autoRetryCountdown > 0" class="auto-retry-info">
+      <p
+        v-if="autoRetryCountdown > 0"
+        class="auto-retry-info"
+      >
         Tentativa automática em {{ autoRetryCountdown }}s...
       </p>
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div v-if="showDeleteModal" class="modal-overlay" @click="cancelDelete">
-      <div class="modal-content" @click.stop>
+    <div
+      v-if="showDeleteModal"
+      class="modal-overlay"
+      @click="cancelDelete"
+    >
+      <div
+        class="modal-content"
+        @click.stop
+      >
         <div class="modal-header">
           <h3>Confirmar Eliminação</h3>
         </div>
@@ -262,17 +350,27 @@
           <p>Tem certeza que deseja eliminar este registo de conta corrente?</p>
           <div class="delete-item-info">
             <strong>{{ contaCorrente.nomeCliente }}</strong>
-            <br />
+            <br>
             <span v-if="contaCorrente.numeroFatura">Fatura: {{ contaCorrente.numeroFatura }}</span>
             <span v-if="contaCorrente.valorFatura">
-              - {{ formatCurrency(contaCorrente.valorFatura) }}</span
-            >
+              - {{ formatCurrency(contaCorrente.valorFatura) }}</span>
           </div>
-          <p class="warning-text">Esta ação não pode ser desfeita.</p>
+          <p class="warning-text">
+            Esta ação não pode ser desfeita.
+          </p>
         </div>
         <div class="modal-actions">
-          <button @click="cancelDelete" class="btn btn-secondary">Cancelar</button>
-          <button @click="deleteContaCorrente" class="btn btn-danger" :disabled="loading">
+          <button
+            class="btn btn-secondary"
+            @click="cancelDelete"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn btn-danger"
+            :disabled="loading"
+            @click="deleteContaCorrente"
+          >
             {{ loading ? 'A eliminar...' : 'Eliminar' }}
           </button>
         </div>

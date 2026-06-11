@@ -1,5 +1,10 @@
 <template>
-  <button @click="handleBack" :class="['back-button', variant]">← Voltar</button>
+  <button
+    :class="['back-button', variant]"
+    @click="handleBack"
+  >
+    ← Voltar
+  </button>
 </template>
 
 <script setup>

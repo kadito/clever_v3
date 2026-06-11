@@ -6,27 +6,33 @@
         ref="canvasRef"
         class="signature-canvas w-full touch-none"
         :class="{ 'cursor-not-allowed': disabled }"
-      ></canvas>
+      />
     </div>
 
     <!-- Action buttons -->
-    <div v-if="!disabled" class="signature-actions flex gap-2">
+    <div
+      v-if="!disabled"
+      class="signature-actions flex gap-2"
+    >
       <button
         type="button"
-        @click="clearSignature"
         class="btn-secondary px-4 py-2 min-h-[44px] bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+        @click="clearSignature"
       >
         Limpar
       </button>
     </div>
 
     <!-- Signature preview (when disabled/viewing) -->
-    <div v-if="disabled && modelValue" class="signature-preview mt-4 w-full">
+    <div
+      v-if="disabled && modelValue"
+      class="signature-preview mt-4 w-full"
+    >
       <img
         :src="modelValue"
         alt="Assinatura do Cliente"
         class="w-full h-auto border border-gray-300 rounded-md"
-      />
+      >
     </div>
   </div>
 </template>

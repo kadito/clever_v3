@@ -22,7 +22,10 @@
   >
     <!-- Custom content sections -->
     <template #content="{ item }">
-      <div v-if="item && item.data" class="space-y-6">
+      <div
+        v-if="item && item.data"
+        class="space-y-6"
+      >
         <!-- Client Information Section -->
         <ClientInfoSection :client-relation="remoteAssistance?.relations?.client" />
 
@@ -32,7 +35,9 @@
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Informação Básica</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Informação Básica
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
@@ -49,11 +54,15 @@
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Técnico Responsável</label>
-                  <div class="detail-value">{{ getTechnicianDisplayName(item.data.tecnicoResponsavel) }}</div>
+                  <div class="detail-value">
+                    {{ getTechnicianDisplayName(item.data.tecnicoResponsavel) }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Quem Atendeu</label>
-                  <div class="detail-value">{{ item.data.quemAtendeu || '-' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.quemAtendeu || '-' }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -66,13 +75,17 @@
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Data e Horário</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Data e Horário
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
                 <div class="detail-item">
                   <label class="detail-label">Data do Pedido</label>
-                  <div class="detail-value">{{ formatDateForDisplay(item.data.dataPedido) }}</div>
+                  <div class="detail-value">
+                    {{ formatDateForDisplay(item.data.dataPedido) }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Data da Assistência</label>
@@ -92,7 +105,10 @@
                     {{ formatTimeForDisplay(item.data.fimAssistencia) }}
                   </div>
                 </div>
-                <div v-if="calculatedDuration" class="detail-item">
+                <div
+                  v-if="calculatedDuration"
+                  class="detail-item"
+                >
                   <label class="detail-label">Duração Total</label>
                   <div class="detail-value duration-display">
                     <svg
@@ -122,7 +138,9 @@
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Descrição</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Descrição
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="space-y-4">
@@ -138,9 +156,14 @@
                     {{ item.data.relatorioAssistencia || '-' }}
                   </div>
                 </div>
-                <div v-if="item.data.resolvido && item.data.relatorio" class="detail-item">
+                <div
+                  v-if="item.data.resolvido && item.data.relatorio"
+                  class="detail-item"
+                >
                   <label class="detail-label">Relatório Final</label>
-                  <div class="detail-value whitespace-pre-line">{{ item.data.relatorio }}</div>
+                  <div class="detail-value whitespace-pre-line">
+                    {{ item.data.relatorio }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -153,12 +176,17 @@
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Valores</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Valores
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="space-y-4">
                 <!-- Payment Method Display -->
-                <div v-if="item.data.paymentMethod" class="detail-item">
+                <div
+                  v-if="item.data.paymentMethod"
+                  class="detail-item"
+                >
                   <label class="detail-label">Método de Pagamento</label>
                   <div class="detail-value">
                     <span
@@ -177,9 +205,10 @@
                       <label class="detail-label">Valor da Assistência</label>
                       <div class="value-amount">
                         {{ formatCurrency(item.data.valorAssist || 0) }}
-                        <span v-if="!hasBillableValue(item.data)" class="value-note"
-                          >(sem custo)</span
-                        >
+                        <span
+                          v-if="pricingResult?.isZeroCost"
+                          class="value-note"
+                        >(sem custo)</span>
                       </div>
                     </div>
                   </div>
@@ -187,28 +216,59 @@
 
                 <!-- Pricing breakdown (if billable) -->
                 <div
-                  v-if="hasBillableValue(item.data) && pricingBreakdown"
+                  v-if="pricingResult && !pricingResult.isZeroCost"
                   class="pricing-breakdown"
                 >
-                  <h3 class="text-sm font-semibold text-gray-900 mb-3">Detalhamento do Valor</h3>
+                  <h3 class="text-sm font-semibold text-gray-900 mb-3">
+                    Detalhamento do Valor
+                  </h3>
                   <div class="breakdown-grid">
-                    <div v-if="pricingBreakdown.businessHours > 0" class="breakdown-item">
-                      <label class="breakdown-label">Horário Comercial (09:00-18:00)</label>
+                    <div
+                      v-if="pricingResult.businessMinutes > 0"
+                      class="breakdown-item"
+                    >
+                      <label class="breakdown-label">Horário Comercial (09:00-12:30, 14:30-18:00)</label>
                       <div class="breakdown-value">
-                        {{ formatHours(pricingBreakdown.businessHours) }} ×
+                        {{ formatMinutesAsHours(pricingResult.businessMinutes) }} ×
                         {{ formatCurrency(REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS) }}/h =
-                        {{ formatCurrency(pricingBreakdown.businessHoursValue) }}
+                        {{ formatCurrency(pricingResult.businessHoursValue) }}
                       </div>
                     </div>
-                    <div v-if="pricingBreakdown.afterHours > 0" class="breakdown-item">
-                      <label class="breakdown-label">Fora do Horário Comercial</label>
+                    <div
+                      v-if="pricingResult.offHoursMinutes > 0"
+                      class="breakdown-item"
+                    >
+                      <label class="breakdown-label">Fora do Horário Comercial (inclui 12:30-14:30)</label>
                       <div class="breakdown-value">
-                        {{ formatHours(pricingBreakdown.afterHours) }} ×
+                        {{ formatMinutesAsHours(pricingResult.offHoursMinutes) }} ×
                         {{ formatCurrency(REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS) }}/h =
-                        {{ formatCurrency(pricingBreakdown.afterHoursValue) }}
+                        {{ formatCurrency(pricingResult.offHoursValue) }}
                       </div>
                     </div>
                   </div>
+                </div>
+
+                <!-- Zero-cost notice -->
+                <div
+                  v-if="pricingResult?.isZeroCost"
+                  class="no-charge-notice p-3 bg-green-50 rounded-touch border border-green-200"
+                >
+                  <svg
+                    class="w-5 h-5 text-green-500 inline mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span class="text-green-700 font-medium">
+                    Assistência coberta por {{ item.data.paymentMethod?.toLowerCase() }} - Sem custo
+                  </span>
                 </div>
 
                 <!-- Pricing note -->
@@ -227,11 +287,9 @@
                     />
                   </svg>
                   <span class="text-sm text-gray-600">
-                    Tarifário:
-                    {{ formatCurrency(REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS) }}/hora
-                    (horário comercial),
-                    {{ formatCurrency(REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS) }}/hora (fora
-                    do horário comercial)
+                    💶 Preço: {{ REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS }}€/hora
+                    (09:00-12:30, 14:30-18:00) |
+                    {{ REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS }}€/hora (outras horas) + IVA
                   </span>
                 </div>
               </div>
@@ -245,13 +303,18 @@
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Estado</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Estado
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="status-grid">
                 <div class="status-item">
                   <label class="status-label">Resolvido</label>
-                  <div class="status-value" :class="{ active: item.data.resolvido }">
+                  <div
+                    class="status-value"
+                    :class="{ active: item.data.resolvido }"
+                  >
                     <svg
                       v-if="item.data.resolvido"
                       class="w-4 h-4 text-green-500 inline mr-1"
@@ -289,12 +352,17 @@
         </div>
 
         <!-- Contract Information Section (when payment method is Contrato) -->
-        <div v-if="item.data.paymentMethod === 'Contrato'" class="detail-section">
-          <div class="bg-white rounded-touch border border-gray-200"
-               :class="{
-                 'border-red-200 bg-red-50': remoteAssistance?.relations?.contract && isRelationError(remoteAssistance.relations.contract),
-                 'border-yellow-200 bg-yellow-50': !item.data.contractId
-               }">
+        <div
+          v-if="item.data.paymentMethod === 'Contrato'"
+          class="detail-section"
+        >
+          <div
+            class="bg-white rounded-touch border border-gray-200"
+            :class="{
+              'border-red-200 bg-red-50': remoteAssistance?.relations?.contract && isRelationError(remoteAssistance.relations.contract),
+              'border-yellow-200 bg-yellow-50': !item.data.contractId
+            }"
+          >
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
               :class="{
@@ -304,12 +372,19 @@
             >
               <div class="flex items-center justify-between w-full">
                 <div class="flex items-center flex-1 min-w-0">
-                  <div class="flex-shrink-0 mr-3 text-gray-600"
-                       :class="{
-                         'text-red-600': remoteAssistance?.relations?.contract && isRelationError(remoteAssistance.relations.contract),
-                         'text-yellow-600': !item.data.contractId
-                       }">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div
+                    class="flex-shrink-0 mr-3 text-gray-600"
+                    :class="{
+                      'text-red-600': remoteAssistance?.relations?.contract && isRelationError(remoteAssistance.relations.contract),
+                      'text-yellow-600': !item.data.contractId
+                    }"
+                  >
+                    <svg
+                      class="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -318,14 +393,19 @@
                       />
                     </svg>
                   </div>
-                  <h2 class="text-lg font-semibold text-gray-900"
-                      :class="{
-                        'text-red-900': remoteAssistance?.relations?.contract && isRelationError(remoteAssistance.relations.contract),
-                        'text-yellow-900': !item.data.contractId
-                      }">
+                  <h2
+                    class="text-lg font-semibold text-gray-900"
+                    :class="{
+                      'text-red-900': remoteAssistance?.relations?.contract && isRelationError(remoteAssistance.relations.contract),
+                      'text-yellow-900': !item.data.contractId
+                    }"
+                  >
                     Informação do Contrato
                   </h2>
-                  <div v-if="remoteAssistance?.relations?.contract && isRelationError(remoteAssistance.relations.contract)" class="ml-2">
+                  <div
+                    v-if="remoteAssistance?.relations?.contract && isRelationError(remoteAssistance.relations.contract)"
+                    class="ml-2"
+                  >
                     <svg
                       class="w-4 h-4 text-red-500"
                       fill="none"
@@ -345,12 +425,17 @@
                 <!-- Navigate to contract icon -->
                 <button
                   v-if="remoteAssistance?.relations?.contract && !isRelationError(remoteAssistance.relations.contract)"
-                  @click="navigateToContract"
                   class="flex-shrink-0 p-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-full transition-colors"
                   style="min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center;"
                   title="Ver detalhes do contrato"
+                  @click="navigateToContract"
                 >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -363,20 +448,33 @@
             </div>
             <div class="p-4 sm:p-6">
               <!-- Contract not specified -->
-              <div v-if="!item.data.contractId" class="text-center py-2">
-                <p class="text-yellow-800 font-medium">Contrato não especificado</p>
+              <div
+                v-if="!item.data.contractId"
+                class="text-center py-2"
+              >
+                <p class="text-yellow-800 font-medium">
+                  Contrato não especificado
+                </p>
               </div>
               
               <!-- Contract error -->
-              <div v-else-if="remoteAssistance?.relations?.contract && isRelationError(remoteAssistance.relations.contract)" class="text-center py-2">
+              <div
+                v-else-if="remoteAssistance?.relations?.contract && isRelationError(remoteAssistance.relations.contract)"
+                class="text-center py-2"
+              >
                 <p class="text-red-800 font-medium mb-1">
                   {{ remoteAssistance.relations.contract.code === 404 ? 'Contrato não encontrado' : 'Erro ao carregar contrato' }}
                 </p>
-                <p class="text-red-600 text-sm">Código: {{ remoteAssistance.relations.contract.code }}</p>
+                <p class="text-red-600 text-sm">
+                  Código: {{ remoteAssistance.relations.contract.code }}
+                </p>
               </div>
               
               <!-- Contract information -->
-              <div v-else-if="remoteAssistance?.relations?.contract" class="detail-grid">
+              <div
+                v-else-if="remoteAssistance?.relations?.contract"
+                class="detail-grid"
+              >
                 <div class="detail-item col-span-full">
                   <label class="detail-label">Tipo de Contrato</label>
                   <div class="detail-value font-medium">
@@ -389,7 +487,10 @@
                     {{ getContractDates(remoteAssistance.relations.contract) }}
                   </div>
                 </div>
-                <div v-if="remoteAssistance.relations.contract.paymentFrequency" class="detail-item">
+                <div
+                  v-if="remoteAssistance.relations.contract.paymentFrequency"
+                  class="detail-item"
+                >
                   <label class="detail-label">Frequência de Pagamento</label>
                   <div class="detail-value">
                     {{ remoteAssistance.relations.contract.paymentFrequency }}
@@ -401,12 +502,17 @@
         </div>
 
         <!-- Anexos section — file attachments + text notes together -->
-        <div v-if="anexosFiles.length > 0 || item.data.anexos" class="detail-section">
+        <div
+          v-if="anexosFiles.length > 0 || item.data.anexos"
+          class="detail-section"
+        >
           <div class="bg-white rounded-touch border border-gray-200">
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Anexos</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Anexos
+              </h2>
             </div>
             <div class="p-4 sm:p-6 space-y-4">
               <!-- File attachments -->
@@ -420,8 +526,12 @@
 
               <!-- Text notes -->
               <div v-if="item.data.anexos">
-                <h3 class="text-sm font-medium text-gray-700 mb-1">Notas Anexos</h3>
-                <div class="detail-value whitespace-pre-line">{{ item.data.anexos }}</div>
+                <h3 class="text-sm font-medium text-gray-700 mb-1">
+                  Notas Anexos
+                </h3>
+                <div class="detail-value whitespace-pre-line">
+                  {{ item.data.anexos }}
+                </div>
               </div>
             </div>
           </div>
@@ -459,8 +569,7 @@ import {
   formatDateForDisplay,
   formatTimeForDisplay,
   calculateTotalHours,
-  calculateAssistanceValue,
-  hasBillableValue,
+  calculateRemoteAssistancePricing,
   REMOTE_ASSISTANCE_CONSTANTS,
 } from '@clever/shared';
 import contractPlansConfig from '@/config/contract-plans.json';
@@ -556,7 +665,7 @@ const calculatedDuration = computed(() => {
   );
 });
 
-const pricingBreakdown = computed(() => {
+const pricingResult = computed(() => {
   if (
     !remoteAssistance.value?.data.inicioAssistencia ||
     !remoteAssistance.value?.data.fimAssistencia
@@ -564,12 +673,12 @@ const pricingBreakdown = computed(() => {
     return null;
   }
 
-  return calculateAssistanceValue(
-    remoteAssistance.value.data.inicioAssistencia,
-    remoteAssistance.value.data.fimAssistencia,
-    remoteAssistance.value.data.contrato,
-    remoteAssistance.value.data.garantia
-  );
+  return calculateRemoteAssistancePricing({
+    startTime: remoteAssistance.value.data.inicioAssistencia ?? '',
+    endTime: remoteAssistance.value.data.fimAssistencia ?? '',
+    isWeekendOrHoliday: remoteAssistance.value.data.weekendHoliday ?? false,
+    paymentMethod: remoteAssistance.value.data.paymentMethod ?? '',
+  });
 });
 
 const anexosFiles = computed((): FileReference[] => {
@@ -632,15 +741,15 @@ const formatCurrency = (value: number): string => {
   }).format(value);
 };
 
-const formatHours = (hours: number): string => {
-  const wholeHours = Math.floor(hours);
-  const minutes = Math.round((hours - wholeHours) * 60);
+const formatMinutesAsHours = (minutes: number): string => {
+  const wholeHours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
 
-  if (minutes === 0) {
+  if (remainingMinutes === 0) {
     return `${wholeHours}h`;
   }
 
-  return `${wholeHours}h${minutes.toString().padStart(2, '0')}m`;
+  return `${wholeHours}h${remainingMinutes.toString().padStart(2, '0')}m`;
 };
 
 // Contract helper functions

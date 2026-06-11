@@ -1,26 +1,48 @@
 <template>
-  <div class="loading-indicator" :class="sizeClass">
-    <div v-if="type === 'spinner'" class="loading-spinner" :class="spinnerSizeClass">
-      <div class="spinner-ring"></div>
+  <div
+    class="loading-indicator"
+    :class="sizeClass"
+  >
+    <div
+      v-if="type === 'spinner'"
+      class="loading-spinner"
+      :class="spinnerSizeClass"
+    >
+      <div class="spinner-ring" />
     </div>
 
-    <div v-else-if="type === 'dots'" class="loading-dots">
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
+    <div
+      v-else-if="type === 'dots'"
+      class="loading-dots"
+    >
+      <div class="dot" />
+      <div class="dot" />
+      <div class="dot" />
     </div>
 
-    <div v-else-if="type === 'pulse'" class="loading-pulse" :class="pulseSizeClass">
-      <div class="pulse-circle"></div>
+    <div
+      v-else-if="type === 'pulse'"
+      class="loading-pulse"
+      :class="pulseSizeClass"
+    >
+      <div class="pulse-circle" />
     </div>
 
-    <div v-else-if="type === 'skeleton'" class="loading-skeleton" :class="skeletonSizeClass">
-      <div class="skeleton-line"></div>
-      <div class="skeleton-line short"></div>
-      <div class="skeleton-line"></div>
+    <div
+      v-else-if="type === 'skeleton'"
+      class="loading-skeleton"
+      :class="skeletonSizeClass"
+    >
+      <div class="skeleton-line" />
+      <div class="skeleton-line short" />
+      <div class="skeleton-line" />
     </div>
 
-    <span v-if="text" class="loading-text" :class="textSizeClass">
+    <span
+      v-if="text"
+      class="loading-text"
+      :class="textSizeClass"
+    >
       {{ text }}
     </span>
   </div>

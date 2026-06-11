@@ -1,24 +1,37 @@
 <template>
   <div class="equipa-module">
     <div class="module-header">
-      <BackButton to="/" variant="inline" />
+      <BackButton
+        to="/"
+        variant="inline"
+      />
       <div class="module-info">
-        <div class="module-icon">👷</div>
+        <div class="module-icon">
+          👷
+        </div>
         <div class="module-content">
           <h1>Equipa</h1>
-          <p class="module-description">Gestão da equipa</p>
+          <p class="module-description">
+            Gestão da equipa
+          </p>
         </div>
       </div>
     </div>
 
     <div class="module-actions">
-      <button @click="navigateToList" class="action-btn primary">
+      <button
+        class="action-btn primary"
+        @click="navigateToList"
+      >
         <span class="action-icon">📋</span>
         <span class="action-label">CONSULTAR</span>
         <span class="action-description">Ver lista de colaboradores</span>
       </button>
 
-      <button @click="navigateToCreate" class="action-btn secondary">
+      <button
+        class="action-btn secondary"
+        @click="navigateToCreate"
+      >
         <span class="action-icon">➕</span>
         <span class="action-label">NOVO COLABORADOR</span>
         <span class="action-description">Adicionar um novo colaborador</span>

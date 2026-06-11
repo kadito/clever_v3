@@ -1,6 +1,29 @@
 import type { BaseContent } from '../base';
 import type { TechnicianUser } from '../../types';
 
+/**
+ * Centralized pricing constants for Work Sheets.
+ * Single source of truth — referenced by shared validation, frontend views, and backend index extraction.
+ */
+export const WORK_SHEET_CONSTANTS = {
+  /** Hourly rate for weekdays (€) */
+  HOURLY_RATE_WEEKDAY: 55.0,
+  /** Hourly rate for weekends/holidays (€) */
+  HOURLY_RATE_WEEKEND_HOLIDAY: 70.0,
+  /** Mileage rate per km (€) */
+  MILEAGE_RATE_PER_KM: 0.45,
+  /** Travel fee for distances up to 180km (€) */
+  TRAVEL_FEE_SHORT: 45.0,
+  /** Travel fee for distances over 180km (€) */
+  TRAVEL_FEE_LONG: 60.0,
+  /** Distance threshold for travel fee tiers (km) */
+  TRAVEL_FEE_THRESHOLD_KM: 180,
+  /** Minimum chargeable time in hours */
+  MINIMUM_HOURS: 1,
+  /** VAT rate */
+  IVA_RATE: 0.23,
+} as const;
+
 // Client information is now handled through relations (clientId -> resolved client data)
 
 /**

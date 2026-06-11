@@ -1,14 +1,28 @@
 <template>
   <div class="update-view">
     <!-- Loading state -->
-    <div v-if="isLoading" class="loading-state">
+    <div
+      v-if="isLoading"
+      class="loading-state"
+    >
       <p>A carregar registo de instalação...</p>
     </div>
 
     <!-- Load error state -->
-    <div v-if="loadError" class="error-banner" role="alert">
-      <p class="error-text">{{ loadError }}</p>
-      <router-link to="/installations-programming" class="btn btn-cancel">Voltar à lista</router-link>
+    <div
+      v-if="loadError"
+      class="error-banner"
+      role="alert"
+    >
+      <p class="error-text">
+        {{ loadError }}
+      </p>
+      <router-link
+        to="/installations-programming"
+        class="btn btn-cancel"
+      >
+        Voltar à lista
+      </router-link>
     </div>
 
     <!-- Content (only when loaded) -->
@@ -16,8 +30,12 @@
       <!-- Header -->
       <div class="view-header">
         <div class="header-content">
-          <h1 class="view-title">Editar Instalação e Programação</h1>
-          <p class="view-subtitle">Atualizar registo de instalação existente</p>
+          <h1 class="view-title">
+            Editar Instalação e Programação
+          </h1>
+          <p class="view-subtitle">
+            Atualizar registo de instalação existente
+          </p>
         </div>
       </div>
 
@@ -31,52 +49,124 @@
       </div>
 
       <!-- Error Banner -->
-      <div v-if="error" class="error-banner" role="alert">
-        <p class="error-text">{{ error }}</p>
-        <button type="button" class="error-dismiss" @click="error = null">✕</button>
+      <div
+        v-if="error"
+        class="error-banner"
+        role="alert"
+      >
+        <p class="error-text">
+          {{ error }}
+        </p>
+        <button
+          type="button"
+          class="error-dismiss"
+          @click="error = null"
+        >
+          ✕
+        </button>
       </div>
 
       <!-- Phase Content -->
-      <form class="phase-content" @submit.prevent="handleSubmit">
-
+      <form
+        class="phase-content"
+        @submit.prevent="handleSubmit"
+      >
         <!-- ═══════════ Phase 1 — Programação / Preparação ═══════════ -->
-        <div v-if="currentPhase === 1" class="phase-section">
-          <h2 class="section-title">Programação / Preparação</h2>
+        <div
+          v-if="currentPhase === 1"
+          class="phase-section"
+        >
+          <h2 class="section-title">
+            Programação / Preparação
+          </h2>
 
           <div class="form-group">
-            <label class="form-label" for="p1-tipoProgramacao">Tipo de Programação</label>
-            <input id="p1-tipoProgramacao" type="text" class="form-input" v-model="formData.phase1.tipoProgramacao" />
+            <label
+              class="form-label"
+              for="p1-tipoProgramacao"
+            >Tipo de Programação</label>
+            <input
+              id="p1-tipoProgramacao"
+              v-model="formData.phase1.tipoProgramacao"
+              type="text"
+              class="form-input"
+            >
           </div>
           <div class="form-group">
-            <label class="form-label" for="p1-numeroSerie">Número de Série</label>
-            <input id="p1-numeroSerie" type="text" class="form-input" v-model="formData.phase1.numeroSerie" />
+            <label
+              class="form-label"
+              for="p1-numeroSerie"
+            >Número de Série</label>
+            <input
+              id="p1-numeroSerie"
+              v-model="formData.phase1.numeroSerie"
+              type="text"
+              class="form-input"
+            >
           </div>
           <div class="form-group">
-            <label class="form-label" for="p1-numeroEquipamento">Nº Equipamento</label>
-            <input id="p1-numeroEquipamento" type="text" class="form-input" v-model="formData.phase1.numeroEquipamento" />
+            <label
+              class="form-label"
+              for="p1-numeroEquipamento"
+            >Nº Equipamento</label>
+            <input
+              id="p1-numeroEquipamento"
+              v-model="formData.phase1.numeroEquipamento"
+              type="text"
+              class="form-input"
+            >
           </div>
           <div class="form-group">
-            <label class="form-label" for="p1-leiturasGuardadas">Leituras Guardadas</label>
-            <textarea id="p1-leiturasGuardadas" class="form-input form-textarea" v-model="formData.phase1.leiturasGuardadas" rows="3" />
+            <label
+              class="form-label"
+              for="p1-leiturasGuardadas"
+            >Leituras Guardadas</label>
+            <textarea
+              id="p1-leiturasGuardadas"
+              v-model="formData.phase1.leiturasGuardadas"
+              class="form-input form-textarea"
+              rows="3"
+            />
           </div>
           <div class="switch-row">
             <span class="switch-label">Teste Final a todos os equipamentos e acessórios</span>
-            <button type="button" role="switch" :aria-checked="formData.phase1.testeFinal" class="switch" :class="{ 'switch--on': formData.phase1.testeFinal }" @click="formData.phase1.testeFinal = !formData.phase1.testeFinal"><span class="switch-thumb" /></button>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="formData.phase1.testeFinal"
+              class="switch"
+              :class="{ 'switch--on': formData.phase1.testeFinal }"
+              @click="formData.phase1.testeFinal = !formData.phase1.testeFinal"
+            >
+              <span class="switch-thumb" />
+            </button>
           </div>
         </div>
 
         <!-- ═══════════ Phase 2 — Preparação ═══════════ -->
-        <div v-if="currentPhase === 2" class="phase-section">
-          <h2 class="section-title">Preparação</h2>
+        <div
+          v-if="currentPhase === 2"
+          class="phase-section"
+        >
+          <h2 class="section-title">
+            Preparação
+          </h2>
           <PhaseChecklist v-model="formData.phase2.checklist" />
         </div>
 
         <!-- ═══════════ Phase 3 — Instalação no Cliente ═══════════ -->
-        <div v-if="currentPhase === 3" class="phase-section">
-          <h2 class="section-title">Instalação no Cliente</h2>
+        <div
+          v-if="currentPhase === 3"
+          class="phase-section"
+        >
+          <h2 class="section-title">
+            Instalação no Cliente
+          </h2>
 
           <!-- Dados Gerais -->
-          <h3 class="subsection-title">Dados Gerais</h3>
+          <h3 class="subsection-title">
+            Dados Gerais
+          </h3>
           <div class="form-group">
             <label class="form-label">Cliente</label>
             <ClientSearchInput
@@ -86,156 +176,446 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="p3-nrFatura">Nº Fatura</label>
-            <input id="p3-nrFatura" type="text" class="form-input" v-model="formData.phase3.nrFatura" />
+            <label
+              class="form-label"
+              for="p3-nrFatura"
+            >Nº Fatura</label>
+            <input
+              id="p3-nrFatura"
+              v-model="formData.phase3.nrFatura"
+              type="text"
+              class="form-input"
+            >
           </div>
           <div class="form-group">
-            <label class="form-label" for="p3-nrGuia">Nº Guia de Transportes</label>
-            <input id="p3-nrGuia" type="text" class="form-input" v-model="formData.phase3.nrGuiaTransportes" />
+            <label
+              class="form-label"
+              for="p3-nrGuia"
+            >Nº Guia de Transportes</label>
+            <input
+              id="p3-nrGuia"
+              v-model="formData.phase3.nrGuiaTransportes"
+              type="text"
+              class="form-input"
+            >
           </div>
 
           <!-- Detalhes da Instalação -->
-          <h3 class="subsection-title">Detalhes da Instalação</h3>
+          <h3 class="subsection-title">
+            Detalhes da Instalação
+          </h3>
           <div class="form-group">
-            <label class="form-label" for="p3-dataInstalacao">Data de Instalação</label>
-            <input id="p3-dataInstalacao" type="date" class="form-input" v-model="formData.phase3.dataInstalacao" />
+            <label
+              class="form-label"
+              for="p3-dataInstalacao"
+            >Data de Instalação</label>
+            <input
+              id="p3-dataInstalacao"
+              v-model="formData.phase3.dataInstalacao"
+              type="date"
+              class="form-input"
+            >
           </div>
           <div class="form-row">
             <div class="form-group form-group--half">
-              <label class="form-label" for="p3-horaInicialInstalacao">Hora Inicial</label>
-              <input id="p3-horaInicialInstalacao" type="time" class="form-input" v-model="formData.phase3.horaInicialInstalacao" />
+              <label
+                class="form-label"
+                for="p3-horaInicialInstalacao"
+              >Hora Inicial</label>
+              <input
+                id="p3-horaInicialInstalacao"
+                v-model="formData.phase3.horaInicialInstalacao"
+                type="time"
+                class="form-input"
+              >
             </div>
             <div class="form-group form-group--half">
-              <label class="form-label" for="p3-horaFinalInstalacao">Hora Final</label>
-              <input id="p3-horaFinalInstalacao" type="time" class="form-input" v-model="formData.phase3.horaFinalInstalacao" />
+              <label
+                class="form-label"
+                for="p3-horaFinalInstalacao"
+              >Hora Final</label>
+              <input
+                id="p3-horaFinalInstalacao"
+                v-model="formData.phase3.horaFinalInstalacao"
+                type="time"
+                class="form-input"
+              >
             </div>
           </div>
 
           <!-- Formação -->
-          <h3 class="subsection-title">Formação</h3>
+          <h3 class="subsection-title">
+            Formação
+          </h3>
           <div class="form-group">
-            <label class="form-label" for="p3-dataFormacao">Data de Formação</label>
-            <input id="p3-dataFormacao" type="date" class="form-input" v-model="formData.phase3.dataFormacao" />
+            <label
+              class="form-label"
+              for="p3-dataFormacao"
+            >Data de Formação</label>
+            <input
+              id="p3-dataFormacao"
+              v-model="formData.phase3.dataFormacao"
+              type="date"
+              class="form-input"
+            >
           </div>
           <div class="form-row">
             <div class="form-group form-group--half">
-              <label class="form-label" for="p3-horaInicialFormacao">Hora Inicial</label>
-              <input id="p3-horaInicialFormacao" type="time" class="form-input" v-model="formData.phase3.horaInicialFormacao" />
+              <label
+                class="form-label"
+                for="p3-horaInicialFormacao"
+              >Hora Inicial</label>
+              <input
+                id="p3-horaInicialFormacao"
+                v-model="formData.phase3.horaInicialFormacao"
+                type="time"
+                class="form-input"
+              >
             </div>
             <div class="form-group form-group--half">
-              <label class="form-label" for="p3-horaFinalFormacao">Hora Final</label>
-              <input id="p3-horaFinalFormacao" type="time" class="form-input" v-model="formData.phase3.horaFinalFormacao" />
+              <label
+                class="form-label"
+                for="p3-horaFinalFormacao"
+              >Hora Final</label>
+              <input
+                id="p3-horaFinalFormacao"
+                v-model="formData.phase3.horaFinalFormacao"
+                type="time"
+                class="form-input"
+              >
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label" for="p3-quemRecebeuFormacao">Quem Recebeu Formação</label>
-            <input id="p3-quemRecebeuFormacao" type="text" class="form-input" v-model="formData.phase3.quemRecebeuFormacao" />
+            <label
+              class="form-label"
+              for="p3-quemRecebeuFormacao"
+            >Quem Recebeu Formação</label>
+            <input
+              id="p3-quemRecebeuFormacao"
+              v-model="formData.phase3.quemRecebeuFormacao"
+              type="text"
+              class="form-input"
+            >
           </div>
           <div class="form-group">
-            <label class="form-label" for="p3-tecnicoFormacao">Técnico Responsável pela Formação</label>
-            <input id="p3-tecnicoFormacao" type="text" class="form-input" v-model="formData.phase3.tecnicoFormacao" />
+            <label
+              class="form-label"
+              for="p3-tecnicoFormacao"
+            >Técnico Responsável pela Formação</label>
+            <input
+              id="p3-tecnicoFormacao"
+              v-model="formData.phase3.tecnicoFormacao"
+              type="text"
+              class="form-input"
+            >
           </div>
 
           <!-- Material Instalado -->
-          <h3 class="subsection-title">Material Instalado</h3>
+          <h3 class="subsection-title">
+            Material Instalado
+          </h3>
           <div class="switch-row">
             <span class="switch-label">POS</span>
-            <button type="button" role="switch" :aria-checked="formData.phase3.materialInstalado.pos" class="switch" :class="{ 'switch--on': formData.phase3.materialInstalado.pos }" @click="formData.phase3.materialInstalado.pos = !formData.phase3.materialInstalado.pos"><span class="switch-thumb" /></button>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="formData.phase3.materialInstalado.pos"
+              class="switch"
+              :class="{ 'switch--on': formData.phase3.materialInstalado.pos }"
+              @click="formData.phase3.materialInstalado.pos = !formData.phase3.materialInstalado.pos"
+            >
+              <span class="switch-thumb" />
+            </button>
           </div>
           <div class="switch-row">
             <span class="switch-label">CPA</span>
-            <button type="button" role="switch" :aria-checked="formData.phase3.materialInstalado.cpa" class="switch" :class="{ 'switch--on': formData.phase3.materialInstalado.cpa }" @click="formData.phase3.materialInstalado.cpa = !formData.phase3.materialInstalado.cpa"><span class="switch-thumb" /></button>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="formData.phase3.materialInstalado.cpa"
+              class="switch"
+              :class="{ 'switch--on': formData.phase3.materialInstalado.cpa }"
+              @click="formData.phase3.materialInstalado.cpa = !formData.phase3.materialInstalado.cpa"
+            >
+              <span class="switch-thumb" />
+            </button>
           </div>
           <div class="switch-row">
             <span class="switch-label">Balança</span>
-            <button type="button" role="switch" :aria-checked="formData.phase3.materialInstalado.balanca" class="switch" :class="{ 'switch--on': formData.phase3.materialInstalado.balanca }" @click="formData.phase3.materialInstalado.balanca = !formData.phase3.materialInstalado.balanca"><span class="switch-thumb" /></button>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="formData.phase3.materialInstalado.balanca"
+              class="switch"
+              :class="{ 'switch--on': formData.phase3.materialInstalado.balanca }"
+              @click="formData.phase3.materialInstalado.balanca = !formData.phase3.materialInstalado.balanca"
+            >
+              <span class="switch-thumb" />
+            </button>
           </div>
           <div class="switch-row">
             <span class="switch-label">CCTV</span>
-            <button type="button" role="switch" :aria-checked="formData.phase3.materialInstalado.cctv" class="switch" :class="{ 'switch--on': formData.phase3.materialInstalado.cctv }" @click="formData.phase3.materialInstalado.cctv = !formData.phase3.materialInstalado.cctv"><span class="switch-thumb" /></button>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="formData.phase3.materialInstalado.cctv"
+              class="switch"
+              :class="{ 'switch--on': formData.phase3.materialInstalado.cctv }"
+              @click="formData.phase3.materialInstalado.cctv = !formData.phase3.materialInstalado.cctv"
+            >
+              <span class="switch-thumb" />
+            </button>
           </div>
           <div class="switch-row">
             <span class="switch-label">Alarme</span>
-            <button type="button" role="switch" :aria-checked="formData.phase3.materialInstalado.alarme" class="switch" :class="{ 'switch--on': formData.phase3.materialInstalado.alarme }" @click="formData.phase3.materialInstalado.alarme = !formData.phase3.materialInstalado.alarme"><span class="switch-thumb" /></button>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="formData.phase3.materialInstalado.alarme"
+              class="switch"
+              :class="{ 'switch--on': formData.phase3.materialInstalado.alarme }"
+              @click="formData.phase3.materialInstalado.alarme = !formData.phase3.materialInstalado.alarme"
+            >
+              <span class="switch-thumb" />
+            </button>
           </div>
           <div class="switch-row">
             <span class="switch-label">Impressora</span>
-            <button type="button" role="switch" :aria-checked="formData.phase3.materialInstalado.impressora" class="switch" :class="{ 'switch--on': formData.phase3.materialInstalado.impressora }" @click="formData.phase3.materialInstalado.impressora = !formData.phase3.materialInstalado.impressora"><span class="switch-thumb" /></button>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="formData.phase3.materialInstalado.impressora"
+              class="switch"
+              :class="{ 'switch--on': formData.phase3.materialInstalado.impressora }"
+              @click="formData.phase3.materialInstalado.impressora = !formData.phase3.materialInstalado.impressora"
+            >
+              <span class="switch-thumb" />
+            </button>
           </div>
           <div class="switch-row">
             <span class="switch-label">UPS</span>
-            <button type="button" role="switch" :aria-checked="formData.phase3.materialInstalado.ups" class="switch" :class="{ 'switch--on': formData.phase3.materialInstalado.ups }" @click="formData.phase3.materialInstalado.ups = !formData.phase3.materialInstalado.ups"><span class="switch-thumb" /></button>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="formData.phase3.materialInstalado.ups"
+              class="switch"
+              :class="{ 'switch--on': formData.phase3.materialInstalado.ups }"
+              @click="formData.phase3.materialInstalado.ups = !formData.phase3.materialInstalado.ups"
+            >
+              <span class="switch-thumb" />
+            </button>
           </div>
           <div class="switch-row">
             <span class="switch-label">Router</span>
-            <button type="button" role="switch" :aria-checked="formData.phase3.materialInstalado.router" class="switch" :class="{ 'switch--on': formData.phase3.materialInstalado.router }" @click="formData.phase3.materialInstalado.router = !formData.phase3.materialInstalado.router"><span class="switch-thumb" /></button>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="formData.phase3.materialInstalado.router"
+              class="switch"
+              :class="{ 'switch--on': formData.phase3.materialInstalado.router }"
+              @click="formData.phase3.materialInstalado.router = !formData.phase3.materialInstalado.router"
+            >
+              <span class="switch-thumb" />
+            </button>
           </div>
           <div class="switch-row">
             <span class="switch-label">Switch</span>
-            <button type="button" role="switch" :aria-checked="formData.phase3.materialInstalado.switchEquip" class="switch" :class="{ 'switch--on': formData.phase3.materialInstalado.switchEquip }" @click="formData.phase3.materialInstalado.switchEquip = !formData.phase3.materialInstalado.switchEquip"><span class="switch-thumb" /></button>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="formData.phase3.materialInstalado.switchEquip"
+              class="switch"
+              :class="{ 'switch--on': formData.phase3.materialInstalado.switchEquip }"
+              @click="formData.phase3.materialInstalado.switchEquip = !formData.phase3.materialInstalado.switchEquip"
+            >
+              <span class="switch-thumb" />
+            </button>
           </div>
           <div class="switch-row">
             <span class="switch-label">Rolos</span>
-            <button type="button" role="switch" :aria-checked="formData.phase3.materialInstalado.rolos" class="switch" :class="{ 'switch--on': formData.phase3.materialInstalado.rolos }" @click="formData.phase3.materialInstalado.rolos = !formData.phase3.materialInstalado.rolos"><span class="switch-thumb" /></button>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="formData.phase3.materialInstalado.rolos"
+              class="switch"
+              :class="{ 'switch--on': formData.phase3.materialInstalado.rolos }"
+              @click="formData.phase3.materialInstalado.rolos = !formData.phase3.materialInstalado.rolos"
+            >
+              <span class="switch-thumb" />
+            </button>
           </div>
           <!-- Conditional: rolosQuantidade -->
-          <div v-if="formData.phase3.materialInstalado.rolos" class="form-group conditional-indent">
-            <label class="form-label" for="p3-rolosQuantidade">Quantidade de Rolos</label>
-            <input id="p3-rolosQuantidade" type="number" min="0" class="form-input" v-model.number="formData.phase3.materialInstalado.rolosQuantidade" />
+          <div
+            v-if="formData.phase3.materialInstalado.rolos"
+            class="form-group conditional-indent"
+          >
+            <label
+              class="form-label"
+              for="p3-rolosQuantidade"
+            >Quantidade de Rolos</label>
+            <input
+              id="p3-rolosQuantidade"
+              v-model.number="formData.phase3.materialInstalado.rolosQuantidade"
+              type="number"
+              min="0"
+              class="form-input"
+            >
           </div>
         </div>
 
         <!-- ═══════════ Phase 4 — Testes ═══════════ -->
-        <div v-if="currentPhase === 4" class="phase-section">
-          <h2 class="section-title">Testes</h2>
+        <div
+          v-if="currentPhase === 4"
+          class="phase-section"
+        >
+          <h2 class="section-title">
+            Testes
+          </h2>
 
           <!-- Anydesk -->
           <div class="switch-row">
             <span class="switch-label">Anydesk</span>
-            <button type="button" role="switch" :aria-checked="formData.phase4.anydeskTestado" class="switch" :class="{ 'switch--on': formData.phase4.anydeskTestado }" @click="formData.phase4.anydeskTestado = !formData.phase4.anydeskTestado"><span class="switch-thumb" /></button>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="formData.phase4.anydeskTestado"
+              class="switch"
+              :class="{ 'switch--on': formData.phase4.anydeskTestado }"
+              @click="formData.phase4.anydeskTestado = !formData.phase4.anydeskTestado"
+            >
+              <span class="switch-thumb" />
+            </button>
           </div>
-          <div v-if="formData.phase4.anydeskTestado === true" class="form-group conditional-indent">
-            <label class="form-label" for="p4-anydeskCodigo">Código Anydesk</label>
-            <input id="p4-anydeskCodigo" type="text" class="form-input" v-model="formData.phase4.anydeskCodigo" />
+          <div
+            v-if="formData.phase4.anydeskTestado === true"
+            class="form-group conditional-indent"
+          >
+            <label
+              class="form-label"
+              for="p4-anydeskCodigo"
+            >Código Anydesk</label>
+            <input
+              id="p4-anydeskCodigo"
+              v-model="formData.phase4.anydeskCodigo"
+              type="text"
+              class="form-input"
+            >
           </div>
-          <div v-if="formData.phase4.anydeskTestado === false" class="form-group conditional-indent">
-            <label class="form-label" for="p4-anydeskMotivo">Motivo da Falha</label>
-            <input id="p4-anydeskMotivo" type="text" class="form-input" v-model="formData.phase4.anydeskMotivo" />
+          <div
+            v-if="formData.phase4.anydeskTestado === false"
+            class="form-group conditional-indent"
+          >
+            <label
+              class="form-label"
+              for="p4-anydeskMotivo"
+            >Motivo da Falha</label>
+            <input
+              id="p4-anydeskMotivo"
+              v-model="formData.phase4.anydeskMotivo"
+              type="text"
+              class="form-input"
+            >
           </div>
 
           <!-- Vectron Connect -->
           <div class="switch-row">
             <span class="switch-label">Vectron Connect</span>
-            <button type="button" role="switch" :aria-checked="formData.phase4.vectronConnectTestado" class="switch" :class="{ 'switch--on': formData.phase4.vectronConnectTestado }" @click="formData.phase4.vectronConnectTestado = !formData.phase4.vectronConnectTestado"><span class="switch-thumb" /></button>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="formData.phase4.vectronConnectTestado"
+              class="switch"
+              :class="{ 'switch--on': formData.phase4.vectronConnectTestado }"
+              @click="formData.phase4.vectronConnectTestado = !formData.phase4.vectronConnectTestado"
+            >
+              <span class="switch-thumb" />
+            </button>
           </div>
-          <div v-if="formData.phase4.vectronConnectTestado === true" class="form-group conditional-indent">
-            <label class="form-label" for="p4-vectronConnectCodigo">Código Vectron Connect</label>
-            <input id="p4-vectronConnectCodigo" type="text" class="form-input" v-model="formData.phase4.vectronConnectCodigo" />
+          <div
+            v-if="formData.phase4.vectronConnectTestado === true"
+            class="form-group conditional-indent"
+          >
+            <label
+              class="form-label"
+              for="p4-vectronConnectCodigo"
+            >Código Vectron Connect</label>
+            <input
+              id="p4-vectronConnectCodigo"
+              v-model="formData.phase4.vectronConnectCodigo"
+              type="text"
+              class="form-input"
+            >
           </div>
-          <div v-if="formData.phase4.vectronConnectTestado === false" class="form-group conditional-indent">
-            <label class="form-label" for="p4-vectronConnectMotivo">Motivo da Falha</label>
-            <input id="p4-vectronConnectMotivo" type="text" class="form-input" v-model="formData.phase4.vectronConnectMotivo" />
+          <div
+            v-if="formData.phase4.vectronConnectTestado === false"
+            class="form-group conditional-indent"
+          >
+            <label
+              class="form-label"
+              for="p4-vectronConnectMotivo"
+            >Motivo da Falha</label>
+            <input
+              id="p4-vectronConnectMotivo"
+              v-model="formData.phase4.vectronConnectMotivo"
+              type="text"
+              class="form-input"
+            >
           </div>
         </div>
 
         <!-- ═══════════ Phase 5 — Finalização ═══════════ -->
-        <div v-if="currentPhase === 5" class="phase-section">
-          <h2 class="section-title">Finalização</h2>
+        <div
+          v-if="currentPhase === 5"
+          class="phase-section"
+        >
+          <h2 class="section-title">
+            Finalização
+          </h2>
 
           <div class="switch-row">
             <span class="switch-label">DUMP Lido</span>
-            <button type="button" role="switch" :aria-checked="formData.phase5.dumpLido" class="switch" :class="{ 'switch--on': formData.phase5.dumpLido }" @click="formData.phase5.dumpLido = !formData.phase5.dumpLido"><span class="switch-thumb" /></button>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="formData.phase5.dumpLido"
+              class="switch"
+              :class="{ 'switch--on': formData.phase5.dumpLido }"
+              @click="formData.phase5.dumpLido = !formData.phase5.dumpLido"
+            >
+              <span class="switch-thumb" />
+            </button>
           </div>
           <div class="switch-row">
             <span class="switch-label">Cópia de Segurança</span>
-            <button type="button" role="switch" :aria-checked="formData.phase5.copiaSeguranca" class="switch" :class="{ 'switch--on': formData.phase5.copiaSeguranca }" @click="formData.phase5.copiaSeguranca = !formData.phase5.copiaSeguranca"><span class="switch-thumb" /></button>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="formData.phase5.copiaSeguranca"
+              class="switch"
+              :class="{ 'switch--on': formData.phase5.copiaSeguranca }"
+              @click="formData.phase5.copiaSeguranca = !formData.phase5.copiaSeguranca"
+            >
+              <span class="switch-thumb" />
+            </button>
           </div>
           <div class="switch-row">
             <span class="switch-label">Foto da Instalação</span>
-            <button type="button" role="switch" :aria-checked="formData.phase5.fotoInstalacao" class="switch" :class="{ 'switch--on': formData.phase5.fotoInstalacao }" @click="formData.phase5.fotoInstalacao = !formData.phase5.fotoInstalacao"><span class="switch-thumb" /></button>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="formData.phase5.fotoInstalacao"
+              class="switch"
+              :class="{ 'switch--on': formData.phase5.fotoInstalacao }"
+              @click="formData.phase5.fotoInstalacao = !formData.phase5.fotoInstalacao"
+            >
+              <span class="switch-thumb" />
+            </button>
           </div>
           <!-- Conditional: fotoURL file upload -->
-          <div v-if="formData.phase5.fotoInstalacao" class="conditional-indent">
+          <div
+            v-if="formData.phase5.fotoInstalacao"
+            class="conditional-indent"
+          >
             <FileUploadZone
               field-name="fotoURL"
               label="Foto da Instalação"
@@ -250,8 +630,17 @@
 
         <!-- Action Buttons -->
         <div class="form-actions">
-          <router-link :to="`/installations-programming/${uuid}?phase=${currentPhase}`" class="btn btn-cancel">Cancelar</router-link>
-          <button type="submit" class="btn btn-submit" :disabled="isSaving">
+          <router-link
+            :to="`/installations-programming/${uuid}?phase=${currentPhase}`"
+            class="btn btn-cancel"
+          >
+            Cancelar
+          </router-link>
+          <button
+            type="submit"
+            class="btn btn-submit"
+            :disabled="isSaving"
+          >
             {{ isSaving ? 'A guardar...' : 'Guardar Alterações' }}
           </button>
         </div>

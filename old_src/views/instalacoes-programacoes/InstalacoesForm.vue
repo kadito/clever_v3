@@ -1,23 +1,41 @@
 <template>
   <div class="instalacoes-form-container">
     <div class="form-header">
-      <BackButton :to="cancelRoute" variant="inline" />
+      <BackButton
+        :to="cancelRoute"
+        variant="inline"
+      />
       <h1>{{ isEditing ? 'Editar' : 'Nova' }} Instalação e Programação</h1>
     </div>
 
     <!-- Loading state -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A processar...</p>
     </div>
 
     <!-- Error state -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Form -->
-    <form @submit.prevent="handleSubmit" class="instalacoes-form" v-if="!loading">
+    <form
+      v-if="!loading"
+      class="instalacoes-form"
+      @submit.prevent="handleSubmit"
+    >
       <!-- Basic Information Section -->
       <section class="form-section">
         <h2>INFORMAÇÕES BÁSICAS</h2>
@@ -25,34 +43,34 @@
           <div class="form-group">
             <label for="nomeCliente">NOME DO CLIENTE</label>
             <input
-              type="text"
               id="nomeCliente"
               v-model="formData.nomeCliente"
+              type="text"
               class="form-control"
               placeholder="Nome do cliente"
               required
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="numeroEncomenda">NÚMERO DA ENCOMENDA</label>
             <input
-              type="text"
               id="numeroEncomenda"
               v-model="formData.numeroEncomenda"
+              type="text"
               class="form-control"
               placeholder="Número da encomenda"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="dataRecepcao">DATA DE RECEPÇÃO</label>
             <input
-              type="datetime-local"
               id="dataRecepcao"
               v-model="formData.dataRecepcao"
+              type="datetime-local"
               class="form-control"
-            />
+            >
           </div>
 
           <div class="form-group">
@@ -62,12 +80,24 @@
               v-model="formData.tecnicoInstalacao"
               class="form-control"
             >
-              <option value="">--</option>
-              <option value="JOSÉ BATISTA">JOSÉ BATISTA</option>
-              <option value="MARIA SILVA">MARIA SILVA</option>
-              <option value="PEDRO SANTOS">PEDRO SANTOS</option>
-              <option value="ALYSSON SOUZA">ALYSSON SOUZA</option>
-              <option value="ANA COSTA">ANA COSTA</option>
+              <option value="">
+                --
+              </option>
+              <option value="JOSÉ BATISTA">
+                JOSÉ BATISTA
+              </option>
+              <option value="MARIA SILVA">
+                MARIA SILVA
+              </option>
+              <option value="PEDRO SANTOS">
+                PEDRO SANTOS
+              </option>
+              <option value="ALYSSON SOUZA">
+                ALYSSON SOUZA
+              </option>
+              <option value="ANA COSTA">
+                ANA COSTA
+              </option>
             </select>
           </div>
         </div>
@@ -80,34 +110,37 @@
           <div class="form-group">
             <label for="dataInstalacao">DATA DA INSTALAÇÃO</label>
             <input
-              type="datetime-local"
               id="dataInstalacao"
               v-model="formData.dataInstalacao"
+              type="datetime-local"
               class="form-control"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="dataFinalInstalacao">DATA FINAL DA INSTALAÇÃO</label>
             <input
-              type="datetime-local"
               id="dataFinalInstalacao"
               v-model="formData.dataFinalInstalacao"
+              type="datetime-local"
               class="form-control"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label>TRANSFORMADOR</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="transformador"
                 v-model="formData.transformador"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="transformador" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="transformador"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -116,13 +149,16 @@
             <label>CABO DE ALIMENTAÇÃO</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="caboAlimentacao"
                 v-model="formData.caboAlimentacao"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="caboAlimentacao" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="caboAlimentacao"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -131,13 +167,16 @@
             <label>INSTALAÇÃO DE CÂMERAS</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="instalacaoCameras"
                 v-model="formData.instalacaoCameras"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="instalacaoCameras" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="instalacaoCameras"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -145,12 +184,12 @@
           <div class="form-group">
             <label for="quantidadeCamerasInstaladas">QUANTIDADE DE CÂMERAS INSTALADAS</label>
             <input
-              type="number"
               id="quantidadeCamerasInstaladas"
               v-model.number="formData.quantidadeCamerasInstaladas"
+              type="number"
               class="form-control"
               min="0"
-            />
+            >
           </div>
 
           <div class="form-group full-width">
@@ -161,7 +200,7 @@
               class="form-control"
               rows="4"
               placeholder="Descreva os equipamentos utilizados e seus modelos"
-            ></textarea>
+            />
           </div>
         </div>
       </section>
@@ -174,161 +213,220 @@
             <label>PROGRAMADO</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="programado"
                 v-model="formData.programado"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="programado" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="programado"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
 
-          <div class="form-group" v-if="formData.programado">
+          <div
+            v-if="formData.programado"
+            class="form-group"
+          >
             <label for="dataProgramacao">DATA DA PROGRAMAÇÃO</label>
             <input
-              type="datetime-local"
               id="dataProgramacao"
               v-model="formData.dataProgramacao"
+              type="datetime-local"
               class="form-control"
-            />
+            >
           </div>
 
-          <div class="form-group" v-if="formData.programado">
+          <div
+            v-if="formData.programado"
+            class="form-group"
+          >
             <label for="finalProgramacao">FINAL DA PROGRAMAÇÃO</label>
             <input
-              type="datetime-local"
               id="finalProgramacao"
               v-model="formData.finalProgramacao"
+              type="datetime-local"
               class="form-control"
-            />
+            >
           </div>
 
-          <div class="form-group" v-if="formData.programado">
+          <div
+            v-if="formData.programado"
+            class="form-group"
+          >
             <label for="programadoPor">PROGRAMADO POR</label>
-            <select id="programadoPor" v-model="formData.programadoPor" class="form-control">
-              <option value="">--</option>
-              <option value="JOSÉ BATISTA">JOSÉ BATISTA</option>
-              <option value="MARIA SILVA">MARIA SILVA</option>
-              <option value="PEDRO SANTOS">PEDRO SANTOS</option>
-              <option value="ALYSSON SOUZA">ALYSSON SOUZA</option>
-              <option value="ANA COSTA">ANA COSTA</option>
+            <select
+              id="programadoPor"
+              v-model="formData.programadoPor"
+              class="form-control"
+            >
+              <option value="">
+                --
+              </option>
+              <option value="JOSÉ BATISTA">
+                JOSÉ BATISTA
+              </option>
+              <option value="MARIA SILVA">
+                MARIA SILVA
+              </option>
+              <option value="PEDRO SANTOS">
+                PEDRO SANTOS
+              </option>
+              <option value="ALYSSON SOUZA">
+                ALYSSON SOUZA
+              </option>
+              <option value="ANA COSTA">
+                ANA COSTA
+              </option>
             </select>
           </div>
 
-          <div class="form-group" v-if="formData.programado">
+          <div
+            v-if="formData.programado"
+            class="form-group"
+          >
             <label for="programadoEmpresa">PROGRAMADO EMPRESA</label>
             <input
-              type="text"
               id="programadoEmpresa"
               v-model="formData.programadoEmpresa"
+              type="text"
               class="form-control"
               placeholder="Nome da empresa"
-            />
+            >
           </div>
 
-          <div class="form-group" v-if="formData.programado">
+          <div
+            v-if="formData.programado"
+            class="form-group"
+          >
             <label for="qualSistema">QUAL SISTEMA</label>
-            <select id="qualSistema" v-model="formData.qualSistema" class="form-control">
-              <option value="">--</option>
-              <option value="PIX REST">PIX REST</option>
-              <option value="VECTRON POS">VECTRON POS</option>
-              <option value="DREAM SOFT">DREAM SOFT</option>
-              <option value="ZSREST">ZSREST</option>
-              <option value="OUTROS">OUTROS</option>
+            <select
+              id="qualSistema"
+              v-model="formData.qualSistema"
+              class="form-control"
+            >
+              <option value="">
+                --
+              </option>
+              <option value="PIX REST">
+                PIX REST
+              </option>
+              <option value="VECTRON POS">
+                VECTRON POS
+              </option>
+              <option value="DREAM SOFT">
+                DREAM SOFT
+              </option>
+              <option value="ZSREST">
+                ZSREST
+              </option>
+              <option value="OUTROS">
+                OUTROS
+              </option>
             </select>
           </div>
         </div>
       </section>
 
       <!-- Equipment Section -->
-      <section class="form-section" v-if="formData.programado">
+      <section
+        v-if="formData.programado"
+        class="form-section"
+      >
         <h2>EQUIPAMENTO</h2>
         <div class="form-grid">
           <div class="form-group">
             <label for="equipamento">EQUIPAMENTO</label>
             <input
-              type="text"
               id="equipamento"
               v-model="formData.equipamento"
+              type="text"
               class="form-control"
               placeholder="Tipo de equipamento"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="modeloEquipamento">MODELO EQUIPAMENTO</label>
             <input
-              type="text"
               id="modeloEquipamento"
               v-model="formData.modeloEquipamento"
+              type="text"
               class="form-control"
               placeholder="Modelo do equipamento"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="numeroSerieEquipamento">NÚMERO DE SÉRIE DO EQUIPAMENTO</label>
             <input
-              type="text"
               id="numeroSerieEquipamento"
               v-model="formData.numeroSerieEquipamento"
+              type="text"
               class="form-control"
               placeholder="Número de série"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="numeroSerie">NÚMERO DE SÉRIE</label>
             <input
-              type="text"
               id="numeroSerie"
               v-model="formData.numeroSerie"
+              type="text"
               class="form-control"
               placeholder="Número de série adicional"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="modelo">MODELO</label>
             <input
-              type="text"
               id="modelo"
               v-model="formData.modelo"
+              type="text"
               class="form-control"
               placeholder="Modelo adicional"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="versaoSistema">VERSÃO DO SISTEMA</label>
             <input
-              type="text"
               id="versaoSistema"
               v-model="formData.versaoSistema"
+              type="text"
               class="form-control"
               placeholder="Ex: V21 M1"
-            />
+            >
           </div>
         </div>
       </section>
 
       <!-- Tests and Configuration Section -->
-      <section class="form-section" v-if="formData.programado">
+      <section
+        v-if="formData.programado"
+        class="form-section"
+      >
         <h2>TESTES E CONFIGURAÇÃO</h2>
         <div class="form-grid">
           <div class="form-group">
             <label>TESTOU EQUIPAMENTO</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="testouEquipamento"
                 v-model="formData.testouEquipamento"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="testouEquipamento" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="testouEquipamento"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -337,13 +435,16 @@
             <label>ASSISTÊNCIA REMOTA</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="assistenciaRemota"
                 v-model="formData.assistenciaRemota"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="assistenciaRemota" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="assistenciaRemota"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -352,13 +453,16 @@
             <label>PREPARAÇÃO DOS PERIFÉRICOS</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="preparacaoPerificos"
                 v-model="formData.preparacaoPerificos"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="preparacaoPerificos" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="preparacaoPerificos"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -367,13 +471,16 @@
             <label>INSTALAÇÃO DE POS E CPA</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="instalacaoPosECpa"
                 v-model="formData.instalacaoPosECpa"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="instalacaoPosECpa" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="instalacaoPosECpa"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -382,13 +489,16 @@
             <label>MOVIMENTOS A ZERO</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="movimentosZero"
                 v-model="formData.movimentosZero"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="movimentosZero" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="movimentosZero"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -396,12 +506,12 @@
           <div class="form-group">
             <label for="anydesk">ANYDESK</label>
             <input
-              type="text"
               id="anydesk"
               v-model="formData.anydesk"
+              type="text"
               class="form-control"
               placeholder="ID do AnyDesk"
-            />
+            >
           </div>
 
           <div class="form-group full-width">
@@ -412,52 +522,67 @@
               class="form-control"
               rows="3"
               placeholder="Descreva os testes realizados"
-            ></textarea>
+            />
           </div>
         </div>
       </section>
 
       <!-- Training Section -->
-      <section class="form-section" v-if="formData.programado">
+      <section
+        v-if="formData.programado"
+        class="form-section"
+      >
         <h2>FORMAÇÃO</h2>
         <div class="form-grid">
           <div class="form-group">
             <label>FORMAÇÃO</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="formacao"
                 v-model="formData.formacao"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="formacao" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="formacao"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
 
-          <div class="form-group" v-if="formData.formacao">
+          <div
+            v-if="formData.formacao"
+            class="form-group"
+          >
             <label for="quemRecebeuFormacao">QUEM RECEBEU FORMAÇÃO</label>
             <input
-              type="text"
               id="quemRecebeuFormacao"
               v-model="formData.quemRecebeuFormacao"
+              type="text"
               class="form-control"
               placeholder="Nome da pessoa que recebeu formação"
-            />
+            >
           </div>
 
-          <div class="form-group" v-if="formData.formacao">
+          <div
+            v-if="formData.formacao"
+            class="form-group"
+          >
             <label>TESTE PÓS FORMAÇÃO</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="testePosFomacao"
                 v-model="formData.testePosFomacao"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="testePosFomacao" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="testePosFomacao"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -471,55 +596,78 @@
           <div class="form-group">
             <label>ASSINA</label>
             <div class="toggle-switch">
-              <input type="checkbox" id="assina" v-model="formData.assina" class="toggle-input" />
-              <label for="assina" class="toggle-label">
-                <span class="toggle-slider"></span>
+              <input
+                id="assina"
+                v-model="formData.assina"
+                type="checkbox"
+                class="toggle-input"
+              >
+              <label
+                for="assina"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
 
-          <div class="form-group" v-if="formData.assina">
+          <div
+            v-if="formData.assina"
+            class="form-group"
+          >
             <label for="quemAssinou">QUEM ASSINOU</label>
             <input
-              type="text"
               id="quemAssinou"
               v-model="formData.quemAssinou"
+              type="text"
               class="form-control"
               placeholder="Nome de quem assinou"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="assinatura">ASSINATURA (URL)</label>
             <input
-              type="url"
               id="assinatura"
               v-model="formData.assinatura"
+              type="url"
               class="form-control"
               placeholder="URL da assinatura digital"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="anexarImagem">ANEXAR IMAGEM (URL)</label>
             <input
-              type="url"
               id="anexarImagem"
               v-model="formData.anexarImagem"
+              type="url"
               class="form-control"
               placeholder="URL da imagem anexada"
-            />
+            >
           </div>
         </div>
       </section>
 
       <!-- Action buttons -->
       <div class="form-actions">
-        <button type="button" @click="handleCancel" class="btn btn-cancel" :disabled="loading">
+        <button
+          type="button"
+          class="btn btn-cancel"
+          :disabled="loading"
+          @click="handleCancel"
+        >
           Cancelar
         </button>
-        <button type="submit" class="btn btn-primary" :disabled="loading || !isFormValid">
-          <span v-if="loading" class="btn-spinner"></span>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          :disabled="loading || !isFormValid"
+        >
+          <span
+            v-if="loading"
+            class="btn-spinner"
+          />
           {{ isEditing ? 'Atualizar' : 'Criar' }} Instalação
         </button>
       </div>

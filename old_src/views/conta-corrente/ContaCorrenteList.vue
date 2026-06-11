@@ -2,17 +2,25 @@
   <div class="conta-corrente-list">
     <!-- Header -->
     <div class="page-header">
-      <BackButton to="/conta-corrente" variant="inline" />
+      <BackButton
+        to="/conta-corrente"
+        variant="inline"
+      />
       <div class="header-content">
         <h1 class="page-title">
           <span class="title-icon">💰</span>
           Conta Corrente
         </h1>
-        <p class="page-subtitle">Lista de todos os registos de conta corrente</p>
+        <p class="page-subtitle">
+          Lista de todos os registos de conta corrente
+        </p>
       </div>
 
       <div class="header-actions">
-        <router-link to="/conta-corrente/new" class="btn btn-primary">
+        <router-link
+          to="/conta-corrente/new"
+          class="btn btn-primary"
+        >
           <span class="btn-icon">+</span>
           Novo Registo
         </router-link>
@@ -22,7 +30,11 @@
     <!-- Controls -->
     <div class="list-controls">
       <div class="controls-left">
-        <YearSelector v-model="selectedYear" :years="availableYears" @change="handleYearChange" />
+        <YearSelector
+          v-model="selectedYear"
+          :years="availableYears"
+          @change="handleYearChange"
+        />
 
         <div class="search-container">
           <input
@@ -31,29 +43,62 @@
             placeholder="Pesquisar por cliente, número fatura..."
             class="search-input"
             @input="handleSearch"
-          />
-          <button v-if="searchQuery" @click="clearSearch" class="search-clear" type="button">
+          >
+          <button
+            v-if="searchQuery"
+            class="search-clear"
+            type="button"
+            @click="clearSearch"
+          >
             ✕
           </button>
         </div>
 
         <div class="filter-container">
-          <select v-model="statusFilter" @change="applyFilters" class="filter-select">
-            <option value="">Todos os Estados</option>
-            <option value="paid">Pagos</option>
-            <option value="pending">Pendentes</option>
-            <option value="overdue">Vencidos</option>
-            <option value="due_today">Vencem Hoje</option>
-            <option value="due_soon">Vencem em Breve</option>
+          <select
+            v-model="statusFilter"
+            class="filter-select"
+            @change="applyFilters"
+          >
+            <option value="">
+              Todos os Estados
+            </option>
+            <option value="paid">
+              Pagos
+            </option>
+            <option value="pending">
+              Pendentes
+            </option>
+            <option value="overdue">
+              Vencidos
+            </option>
+            <option value="due_today">
+              Vencem Hoje
+            </option>
+            <option value="due_soon">
+              Vencem em Breve
+            </option>
           </select>
         </div>
 
         <div class="filter-container">
-          <select v-model="typeFilter" @change="applyFilters" class="filter-select">
-            <option value="">Todos os Tipos</option>
-            <option value="REMOTA">Remota</option>
-            <option value="PRESENCIAL">Presencial</option>
-            <option value="OUTROS">Outros</option>
+          <select
+            v-model="typeFilter"
+            class="filter-select"
+            @change="applyFilters"
+          >
+            <option value="">
+              Todos os Tipos
+            </option>
+            <option value="REMOTA">
+              Remota
+            </option>
+            <option value="PRESENCIAL">
+              Presencial
+            </option>
+            <option value="OUTROS">
+              Outros
+            </option>
           </select>
         </div>
       </div>
@@ -84,70 +129,140 @@
       <table class="conta-corrente-table">
         <thead>
           <tr>
-            <th @click="sortBy('nomeCliente')" class="sortable">
+            <th
+              class="sortable"
+              @click="sortBy('nomeCliente')"
+            >
               Cliente
-              <span class="sort-indicator" :class="getSortClass('nomeCliente')">↕️</span>
+              <span
+                class="sort-indicator"
+                :class="getSortClass('nomeCliente')"
+              >↕️</span>
             </th>
-            <th @click="sortBy('tipoFatura')" class="sortable">
+            <th
+              class="sortable"
+              @click="sortBy('tipoFatura')"
+            >
               Tipo
-              <span class="sort-indicator" :class="getSortClass('tipoFatura')">↕️</span>
+              <span
+                class="sort-indicator"
+                :class="getSortClass('tipoFatura')"
+              >↕️</span>
             </th>
             <th>Nº Fatura</th>
-            <th @click="sortBy('valorFatura')" class="sortable">
+            <th
+              class="sortable"
+              @click="sortBy('valorFatura')"
+            >
               Valor
-              <span class="sort-indicator" :class="getSortClass('valorFatura')">↕️</span>
+              <span
+                class="sort-indicator"
+                :class="getSortClass('valorFatura')"
+              >↕️</span>
             </th>
-            <th @click="sortBy('dataFaturaGerada')" class="sortable">
+            <th
+              class="sortable"
+              @click="sortBy('dataFaturaGerada')"
+            >
               Data Gerada
-              <span class="sort-indicator" :class="getSortClass('dataFaturaGerada')">↕️</span>
+              <span
+                class="sort-indicator"
+                :class="getSortClass('dataFaturaGerada')"
+              >↕️</span>
             </th>
-            <th @click="sortBy('dataVencimentoFatura')" class="sortable">
+            <th
+              class="sortable"
+              @click="sortBy('dataVencimentoFatura')"
+            >
               Vencimento
-              <span class="sort-indicator" :class="getSortClass('dataVencimentoFatura')">↕️</span>
+              <span
+                class="sort-indicator"
+                :class="getSortClass('dataVencimentoFatura')"
+              >↕️</span>
             </th>
             <th>Estado</th>
             <th>Ações</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in paginatedItems" :key="item.id" class="table-row">
+          <tr
+            v-for="item in paginatedItems"
+            :key="item.id"
+            class="table-row"
+          >
             <td class="client-cell">
               <div class="client-info">
-                <div class="client-name">{{ item.nomeCliente }}</div>
-                <div v-if="item.motivoObs" class="client-obs">
+                <div class="client-name">
+                  {{ item.nomeCliente }}
+                </div>
+                <div
+                  v-if="item.motivoObs"
+                  class="client-obs"
+                >
                   {{ truncateText(item.motivoObs, 50) }}
                 </div>
               </div>
             </td>
             <td>
-              <span class="type-badge" :class="item.tipoFatura.toLowerCase()">
+              <span
+                class="type-badge"
+                :class="item.tipoFatura.toLowerCase()"
+              >
                 {{ item.tipoFatura }}
               </span>
             </td>
             <td>
-              <span v-if="item.numeroFatura" class="invoice-number">{{ item.numeroFatura }}</span>
-              <span v-else class="text-muted">-</span>
+              <span
+                v-if="item.numeroFatura"
+                class="invoice-number"
+              >{{ item.numeroFatura }}</span>
+              <span
+                v-else
+                class="text-muted"
+              >-</span>
             </td>
             <td>
-              <span v-if="item.valorFatura" class="currency">
+              <span
+                v-if="item.valorFatura"
+                class="currency"
+              >
                 {{ formatCurrency(item.valorFatura) }}
               </span>
-              <span v-else class="text-muted">-</span>
+              <span
+                v-else
+                class="text-muted"
+              >-</span>
             </td>
             <td>
-              <span v-if="item.dataFaturaGerada" class="date">
+              <span
+                v-if="item.dataFaturaGerada"
+                class="date"
+              >
                 {{ formatDate(item.dataFaturaGerada) }}
               </span>
-              <span v-else class="text-muted">-</span>
+              <span
+                v-else
+                class="text-muted"
+              >-</span>
             </td>
             <td>
-              <span v-if="item.dataVencimentoFatura" class="date" :class="getDueDateClass(item)">
+              <span
+                v-if="item.dataVencimentoFatura"
+                class="date"
+                :class="getDueDateClass(item)"
+              >
                 {{ formatDate(item.dataVencimentoFatura) }}
               </span>
-              <span v-else class="text-muted">-</span>
+              <span
+                v-else
+                class="text-muted"
+              >-</span>
             </td>
             <td>
-              <span class="status-badge" :class="getInvoiceStatus(item)">
+              <span
+                class="status-badge"
+                :class="getInvoiceStatus(item)"
+              >
                 {{ getStatusLabel(item) }}
               </span>
             </td>
@@ -167,7 +282,11 @@
                 >
                   ✏️
                 </router-link>
-                <button @click="confirmDelete(item)" class="btn btn-sm btn-danger" title="Eliminar">
+                <button
+                  class="btn btn-sm btn-danger"
+                  title="Eliminar"
+                  @click="confirmDelete(item)"
+                >
                   🗑️
                 </button>
               </div>
@@ -179,40 +298,67 @@
 
     <!-- Mobile Cards -->
     <div class="mobile-cards">
-      <div v-for="item in paginatedItems" :key="item.id" class="conta-corrente-card">
+      <div
+        v-for="item in paginatedItems"
+        :key="item.id"
+        class="conta-corrente-card"
+      >
         <div class="card-header">
-          <div class="card-title">{{ item.nomeCliente }}</div>
-          <span class="type-badge" :class="item.tipoFatura.toLowerCase()">
+          <div class="card-title">
+            {{ item.nomeCliente }}
+          </div>
+          <span
+            class="type-badge"
+            :class="item.tipoFatura.toLowerCase()"
+          >
             {{ item.tipoFatura }}
           </span>
         </div>
 
         <div class="card-content">
-          <div class="card-row" v-if="item.numeroFatura">
+          <div
+            v-if="item.numeroFatura"
+            class="card-row"
+          >
             <span class="label">Nº Fatura:</span>
             <span class="value">{{ item.numeroFatura }}</span>
           </div>
 
-          <div class="card-row" v-if="item.valorFatura">
+          <div
+            v-if="item.valorFatura"
+            class="card-row"
+          >
             <span class="label">Valor:</span>
             <span class="value currency">{{ formatCurrency(item.valorFatura) }}</span>
           </div>
 
-          <div class="card-row" v-if="item.dataVencimentoFatura">
+          <div
+            v-if="item.dataVencimentoFatura"
+            class="card-row"
+          >
             <span class="label">Vencimento:</span>
-            <span class="value" :class="getDueDateClass(item)">{{
+            <span
+              class="value"
+              :class="getDueDateClass(item)"
+            >{{
               formatDate(item.dataVencimentoFatura)
             }}</span>
           </div>
 
           <div class="card-row">
             <span class="label">Estado:</span>
-            <span class="status-badge" :class="getInvoiceStatus(item)">
+            <span
+              class="status-badge"
+              :class="getInvoiceStatus(item)"
+            >
               {{ getStatusLabel(item) }}
             </span>
           </div>
 
-          <div v-if="item.motivoObs" class="card-row">
+          <div
+            v-if="item.motivoObs"
+            class="card-row"
+          >
             <span class="label">Observações:</span>
             <span class="value">{{ truncateText(item.motivoObs, 100) }}</span>
           </div>
@@ -236,45 +382,88 @@
     </div>
 
     <!-- Pagination -->
-    <div v-if="totalPages > 1" class="pagination">
-      <button @click="currentPage = 1" :disabled="currentPage === 1" class="btn btn-sm">⏪</button>
-      <button @click="currentPage--" :disabled="currentPage === 1" class="btn btn-sm">⬅️</button>
+    <div
+      v-if="totalPages > 1"
+      class="pagination"
+    >
+      <button
+        :disabled="currentPage === 1"
+        class="btn btn-sm"
+        @click="currentPage = 1"
+      >
+        ⏪
+      </button>
+      <button
+        :disabled="currentPage === 1"
+        class="btn btn-sm"
+        @click="currentPage--"
+      >
+        ⬅️
+      </button>
 
       <span class="pagination-info">
         Página {{ currentPage }} de {{ totalPages }} ({{ startIndex + 1 }}-{{ endIndex }} de
         {{ filteredItems.length }})
       </span>
 
-      <button @click="currentPage++" :disabled="currentPage === totalPages" class="btn btn-sm">
+      <button
+        :disabled="currentPage === totalPages"
+        class="btn btn-sm"
+        @click="currentPage++"
+      >
         ➡️
       </button>
       <button
-        @click="currentPage = totalPages"
         :disabled="currentPage === totalPages"
         class="btn btn-sm"
+        @click="currentPage = totalPages"
       >
         ⏩
       </button>
     </div>
 
     <!-- Empty State -->
-    <div v-if="!loading && filteredItems.length === 0" class="empty-state">
-      <div class="empty-icon">📋</div>
+    <div
+      v-if="!loading && filteredItems.length === 0"
+      class="empty-state"
+    >
+      <div class="empty-icon">
+        📋
+      </div>
       <h3>Nenhum registo encontrado</h3>
-      <p v-if="hasFilters">Tente ajustar os filtros ou termos de pesquisa.</p>
-      <p v-else>Comece por adicionar o primeiro registo de conta corrente.</p>
-      <router-link to="/conta-corrente/new" class="btn btn-primary"> Novo Registo </router-link>
+      <p v-if="hasFilters">
+        Tente ajustar os filtros ou termos de pesquisa.
+      </p>
+      <p v-else>
+        Comece por adicionar o primeiro registo de conta corrente.
+      </p>
+      <router-link
+        to="/conta-corrente/new"
+        class="btn btn-primary"
+      >
+        Novo Registo
+      </router-link>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
-      <div class="loading-spinner"></div>
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
+      <div class="loading-spinner" />
       <p>A carregar registos...</p>
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div v-if="itemToDelete" class="modal-overlay" @click="cancelDelete">
-      <div class="modal-content" @click.stop>
+    <div
+      v-if="itemToDelete"
+      class="modal-overlay"
+      @click="cancelDelete"
+    >
+      <div
+        class="modal-content"
+        @click.stop
+      >
         <div class="modal-header">
           <h3>Confirmar Eliminação</h3>
         </div>
@@ -282,17 +471,27 @@
           <p>Tem certeza que deseja eliminar este registo?</p>
           <div class="delete-item-info">
             <strong>{{ itemToDelete.nomeCliente }}</strong>
-            <br />
+            <br>
             <span v-if="itemToDelete.numeroFatura">Fatura: {{ itemToDelete.numeroFatura }}</span>
             <span v-if="itemToDelete.valorFatura">
-              - {{ formatCurrency(itemToDelete.valorFatura) }}</span
-            >
+              - {{ formatCurrency(itemToDelete.valorFatura) }}</span>
           </div>
-          <p class="warning-text">Esta ação não pode ser desfeita.</p>
+          <p class="warning-text">
+            Esta ação não pode ser desfeita.
+          </p>
         </div>
         <div class="modal-actions">
-          <button @click="cancelDelete" class="btn btn-secondary">Cancelar</button>
-          <button @click="deleteItem" class="btn btn-danger" :disabled="loading">
+          <button
+            class="btn btn-secondary"
+            @click="cancelDelete"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn btn-danger"
+            :disabled="loading"
+            @click="deleteItem"
+          >
             {{ loading ? 'A eliminar...' : 'Eliminar' }}
           </button>
         </div>
@@ -300,16 +499,29 @@
     </div>
 
     <!-- Error Message -->
-    <div v-if="error" class="error-message">
+    <div
+      v-if="error"
+      class="error-message"
+    >
       <div class="error-content">
         <span class="error-icon">⚠️</span>
         <span class="error-text">{{ error }}</span>
-        <button @click="clearError" class="error-close">✕</button>
+        <button
+          class="error-close"
+          @click="clearError"
+        >
+          ✕
+        </button>
       </div>
     </div>
 
     <!-- Floating Action Button -->
-    <button @click="navigateToCreate" class="fab">➕</button>
+    <button
+      class="fab"
+      @click="navigateToCreate"
+    >
+      ➕
+    </button>
   </div>
 </template>
 
@@ -493,7 +705,7 @@ function getDueDateClass(item) {
 
 function truncateText(text, maxLength) {
   if (!text) return '';
-  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  return text.length > maxLength ? `${text.substring(0, maxLength)  }...` : text;
 }
 
 function confirmDelete(item) {

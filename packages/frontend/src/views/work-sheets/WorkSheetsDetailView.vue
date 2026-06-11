@@ -22,7 +22,10 @@
   >
     <!-- Custom content sections -->
     <template #content="{ item }">
-      <div v-if="item && item.data" class="space-y-6">
+      <div
+        v-if="item && item.data"
+        class="space-y-6"
+      >
         <!-- Client Information Section (First Priority) -->
         <ClientInfoSection :client-relation="workSheet?.relations?.client" />
 
@@ -32,13 +35,17 @@
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Informação do Pedido</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Informação do Pedido
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
                 <div class="detail-item">
                   <label class="detail-label">Data do Pedido</label>
-                  <div class="detail-value">{{ formatDate(item.data.request?.date) }}</div>
+                  <div class="detail-value">
+                    {{ formatDate(item.data.request?.date) }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Data da Assistência</label>
@@ -48,7 +55,9 @@
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Motivo do Pedido</label>
-                  <div class="detail-value">{{ item.data.request?.reason || '-' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.request?.reason || '-' }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -61,21 +70,29 @@
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Controlo de Tempo</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Controlo de Tempo
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
                 <div class="detail-item">
                   <label class="detail-label">Hora Chegada</label>
-                  <div class="detail-value">{{ item.data.request?.arrivalTime || '-' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.request?.arrivalTime || '-' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Hora Saída</label>
-                  <div class="detail-value">{{ item.data.request?.departureTime || '-' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.request?.departureTime || '-' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Total Horas</label>
-                  <div class="detail-value">{{ item.data.request?.totalHours || '-' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.request?.totalHours || '-' }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -88,24 +105,32 @@
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Informação do Serviço</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Informação do Serviço
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
                 <div class="detail-item">
                   <label class="detail-label">Tipo de Serviço</label>
-                  <div class="detail-value">{{ item.data.otherData?.serviceType || '-' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.otherData?.serviceType || '-' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Técnico Responsável</label>
-                  <div class="detail-value">{{ getTechnicianDisplayName(item.data.otherData?.technician) }}</div>
+                  <div class="detail-value">
+                    {{ getTechnicianDisplayName(item.data.otherData?.technician) }}
+                  </div>
                 </div>
                 <div
                   v-if="item.data.otherData?.serviceObservations"
                   class="detail-item col-span-full"
                 >
                   <label class="detail-label">Observações do Serviço</label>
-                  <div class="detail-value">{{ item.data.otherData.serviceObservations }}</div>
+                  <div class="detail-value">
+                    {{ item.data.otherData.serviceObservations }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -118,7 +143,9 @@
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Deslocação</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Deslocação
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
@@ -134,13 +161,23 @@
                     {{ item.data.displacement?.weekendHoliday ? 'Sim' : 'Não' }}
                   </div>
                 </div>
-                <div v-if="item.data.displacement?.hasDisplacement" class="detail-item">
+                <div
+                  v-if="item.data.displacement?.hasDisplacement"
+                  class="detail-item"
+                >
                   <label class="detail-label">KMs (Ida)</label>
-                  <div class="detail-value">{{ item.data.displacement.oneWayKms || 0 }} km</div>
+                  <div class="detail-value">
+                    {{ item.data.displacement.oneWayKms || 0 }} km
+                  </div>
                 </div>
-                <div v-if="item.data.displacement?.hasDisplacement" class="detail-item">
+                <div
+                  v-if="item.data.displacement?.hasDisplacement"
+                  class="detail-item"
+                >
                   <label class="detail-label">Total KMs (Ida e Volta)</label>
-                  <div class="detail-value">{{ item.data.displacement.totalKms || 0 }} km</div>
+                  <div class="detail-value">
+                    {{ item.data.displacement.totalKms || 0 }} km
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Método de Pagamento</label>
@@ -154,12 +191,17 @@
         </div>
 
         <!-- Contract Information Section (when payment method is CONTRATO) -->
-        <div v-if="item.data.displacement?.paymentMethod === 'CONTRATO'" class="detail-section">
-          <div class="bg-white rounded-touch border border-gray-200"
-               :class="{
-                 'border-red-200 bg-red-50': workSheet?.relations?.contract && isRelationError(workSheet.relations.contract),
-                 'border-yellow-200 bg-yellow-50': !item.data.contractId
-               }">
+        <div
+          v-if="item.data.displacement?.paymentMethod === 'CONTRATO'"
+          class="detail-section"
+        >
+          <div
+            class="bg-white rounded-touch border border-gray-200"
+            :class="{
+              'border-red-200 bg-red-50': workSheet?.relations?.contract && isRelationError(workSheet.relations.contract),
+              'border-yellow-200 bg-yellow-50': !item.data.contractId
+            }"
+          >
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
               :class="{
@@ -169,12 +211,19 @@
             >
               <div class="flex items-center justify-between w-full">
                 <div class="flex items-center flex-1 min-w-0">
-                  <div class="flex-shrink-0 mr-3 text-gray-600"
-                       :class="{
-                         'text-red-600': workSheet?.relations?.contract && isRelationError(workSheet.relations.contract),
-                         'text-yellow-600': !item.data.contractId
-                       }">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div
+                    class="flex-shrink-0 mr-3 text-gray-600"
+                    :class="{
+                      'text-red-600': workSheet?.relations?.contract && isRelationError(workSheet.relations.contract),
+                      'text-yellow-600': !item.data.contractId
+                    }"
+                  >
+                    <svg
+                      class="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -183,14 +232,19 @@
                       />
                     </svg>
                   </div>
-                  <h2 class="text-lg font-semibold text-gray-900"
-                      :class="{
-                        'text-red-900': workSheet?.relations?.contract && isRelationError(workSheet.relations.contract),
-                        'text-yellow-900': !item.data.contractId
-                      }">
+                  <h2
+                    class="text-lg font-semibold text-gray-900"
+                    :class="{
+                      'text-red-900': workSheet?.relations?.contract && isRelationError(workSheet.relations.contract),
+                      'text-yellow-900': !item.data.contractId
+                    }"
+                  >
                     Informação do Contrato
                   </h2>
-                  <div v-if="workSheet?.relations?.contract && isRelationError(workSheet.relations.contract)" class="ml-2">
+                  <div
+                    v-if="workSheet?.relations?.contract && isRelationError(workSheet.relations.contract)"
+                    class="ml-2"
+                  >
                     <svg
                       class="w-4 h-4 text-red-500"
                       fill="none"
@@ -210,12 +264,17 @@
                 <!-- Navigate to contract icon -->
                 <button
                   v-if="workSheet?.relations?.contract && !isRelationError(workSheet.relations.contract)"
-                  @click="navigateToContract"
                   class="flex-shrink-0 p-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-full transition-colors"
                   style="min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center;"
                   title="Ver detalhes do contrato"
+                  @click="navigateToContract"
                 >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -228,20 +287,33 @@
             </div>
             <div class="p-4 sm:p-6">
               <!-- Contract not specified -->
-              <div v-if="!item.data.contractId" class="text-center py-2">
-                <p class="text-yellow-800 font-medium">Contrato não especificado</p>
+              <div
+                v-if="!item.data.contractId"
+                class="text-center py-2"
+              >
+                <p class="text-yellow-800 font-medium">
+                  Contrato não especificado
+                </p>
               </div>
               
               <!-- Contract error -->
-              <div v-else-if="workSheet?.relations?.contract && isRelationError(workSheet.relations.contract)" class="text-center py-2">
+              <div
+                v-else-if="workSheet?.relations?.contract && isRelationError(workSheet.relations.contract)"
+                class="text-center py-2"
+              >
                 <p class="text-red-800 font-medium mb-1">
                   {{ workSheet.relations.contract.code === 404 ? 'Contrato não encontrado' : 'Erro ao carregar contrato' }}
                 </p>
-                <p class="text-red-600 text-sm">Código: {{ workSheet.relations.contract.code }}</p>
+                <p class="text-red-600 text-sm">
+                  Código: {{ workSheet.relations.contract.code }}
+                </p>
               </div>
               
               <!-- Contract information -->
-              <div v-else-if="workSheet?.relations?.contract" class="detail-grid">
+              <div
+                v-else-if="workSheet?.relations?.contract"
+                class="detail-grid"
+              >
                 <div class="detail-item col-span-full">
                   <label class="detail-label">Tipo de Contrato</label>
                   <div class="detail-value font-medium">
@@ -254,7 +326,10 @@
                     {{ getContractDates(workSheet.relations.contract) }}
                   </div>
                 </div>
-                <div v-if="workSheet.relations.contract.paymentFrequency" class="detail-item">
+                <div
+                  v-if="workSheet.relations.contract.paymentFrequency"
+                  class="detail-item"
+                >
                   <label class="detail-label">Frequência de Pagamento</label>
                   <div class="detail-value">
                     {{ workSheet.relations.contract.paymentFrequency }}
@@ -266,7 +341,10 @@
         </div>
 
         <!-- Pricing Section (always shown) -->
-        <div class="detail-section">
+        <div
+          v-if="pricing"
+          class="detail-section"
+        >
           <div class="bg-white rounded-touch border border-gray-200">
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
@@ -277,42 +355,41 @@
             </div>
             <div class="p-4 sm:p-6">
               <div class="pricing-table bg-gray-50 rounded-lg p-4 border-l-4 border-primary-500">
-                <div class="pricing-row">
-                  <span class="pricing-label">Taxa Deslocação:</span>
-                  <span class="pricing-value"
-                    >{{ getDisplacementRate() }}€
-                    <span class="text-xs text-red-600">sem IVA</span></span
-                  >
-                </div>
-                <div class="pricing-row">
-                  <span class="pricing-label">Preço KMs:
-                    <span class="pricing-detail">{{ workSheet?.data?.displacement?.totalKms || 0 }} km × 0,45€</span>
-                  </span>
-                  <span class="pricing-value"
-                    >{{ getKmsPrice() }}€ <span class="text-xs text-red-600">sem IVA</span></span
-                  >
-                </div>
+                <!-- Always shown: hourly rate -->
                 <div class="pricing-row">
                   <span class="pricing-label">Valor Hora:
                     <span class="pricing-detail">{{ workSheet?.data?.displacement?.weekendHoliday ? 'Fim de semana / Feriado' : 'Semana' }}</span>
                   </span>
-                  <span class="pricing-value"
-                    >{{ getHourlyRate() }}€ <span class="text-xs text-red-600">sem IVA</span></span
-                  >
+                  <span class="pricing-value">{{ pricing.hourlyRate }}€
+                    <span class="text-xs text-red-600">sem IVA</span></span>
                 </div>
+                <!-- Always shown: labor price -->
                 <div class="pricing-row">
-                  <span class="pricing-label">Preço Mão Obra:</span>
-                  <span class="pricing-value"
-                    >{{ getLaborPrice() }}€ <span class="text-xs text-red-600">sem IVA</span></span
-                  >
+                  <span class="pricing-label">Preço Mão Obra:
+                    <span class="pricing-detail">{{ pricing.laborHours }}h × {{ pricing.hourlyRate }}€</span>
+                  </span>
+                  <span class="pricing-value">{{ pricing.laborPrice }}€ <span class="text-xs text-red-600">sem IVA</span></span>
                 </div>
+                <!-- Conditional: displacement costs -->
+                <template v-if="pricing.hasDisplacement">
+                  <div class="pricing-row">
+                    <span class="pricing-label">Taxa Deslocação:</span>
+                    <span class="pricing-value">{{ pricing.travelFee }}€
+                      <span class="text-xs text-red-600">sem IVA</span></span>
+                  </div>
+                  <div class="pricing-row">
+                    <span class="pricing-label">Preço KMs:
+                      <span class="pricing-detail">{{ pricing.totalKms }} km × {{ WORK_SHEET_CONSTANTS.MILEAGE_RATE_PER_KM }}€</span>
+                    </span>
+                    <span class="pricing-value">{{ pricing.mileagePrice }}€ <span class="text-xs text-red-600">sem IVA</span></span>
+                  </div>
+                </template>
+                <!-- Always shown: total -->
                 <div
                   class="pricing-row total bg-primary-600 text-white -mx-4 -mb-4 px-4 py-3 rounded-b-lg font-bold"
                 >
                   <span class="pricing-label text-white">PREÇO TOTAL:</span>
-                  <span class="pricing-value text-white text-lg"
-                    >{{ getTotalPrice() }}€ <span class="text-xs opacity-90">sem IVA</span></span
-                  >
+                  <span class="pricing-value text-white text-lg">{{ pricing.totalPrice }}€ <span class="text-xs opacity-90">sem IVA</span></span>
                 </div>
               </div>
             </div>
@@ -325,7 +402,9 @@
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Material e Equipamentos</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Material e Equipamentos
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
@@ -346,14 +425,18 @@
                   class="detail-item col-span-full"
                 >
                   <label class="detail-label">Descrição do Material Utilizado</label>
-                  <div class="detail-value">{{ item.data.otherData.materialDetails }}</div>
+                  <div class="detail-value">
+                    {{ item.data.otherData.materialDetails }}
+                  </div>
                 </div>
                 <div
                   v-if="item.data.otherData?.equipment && item.data.otherData?.equipmentDetails"
                   class="detail-item col-span-full"
                 >
                   <label class="detail-label">Descrição dos Equipamentos</label>
-                  <div class="detail-value">{{ item.data.otherData.equipmentDetails }}</div>
+                  <div class="detail-value">
+                    {{ item.data.otherData.equipmentDetails }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -386,7 +469,9 @@
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Cópia de Segurança</label>
-                  <div class="detail-value">{{ item.data.otherData?.backup ? 'Sim' : 'Não' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.otherData?.backup ? 'Sim' : 'Não' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Verificação do Acesso Remoto</label>
@@ -396,7 +481,9 @@
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">AnyDesk</label>
-                  <div class="detail-value">{{ item.data.otherData?.anydesk ? 'Sim' : 'Não' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.otherData?.anydesk ? 'Sim' : 'Não' }}
+                  </div>
                 </div>
                 <div
                   v-if="
@@ -405,7 +492,9 @@
                   class="detail-item col-span-full"
                 >
                   <label class="detail-label">Observações sobre Problemas Não Resolvidos</label>
-                  <div class="detail-value">{{ item.data.otherData.resolutionIssues }}</div>
+                  <div class="detail-value">
+                    {{ item.data.otherData.resolutionIssues }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -418,24 +507,33 @@
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Relatório de Serviço</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Relatório de Serviço
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-item">
                 <label class="detail-label">Descrição Detalhada do Serviço</label>
-                <div class="detail-value">{{ item.data.otherData?.serviceReport || '-' }}</div>
+                <div class="detail-value">
+                  {{ item.data.otherData?.serviceReport || '-' }}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Client Signature Section -->
-        <div v-if="item.data.otherData?.clientSignature" class="detail-section">
+        <div
+          v-if="item.data.otherData?.clientSignature"
+          class="detail-section"
+        >
           <div class="bg-white rounded-touch border border-gray-200">
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Assinatura Cliente</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Assinatura Cliente
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="signature-display w-full">
@@ -444,22 +542,29 @@
                   :src="item.data.otherData.clientSignature"
                   alt="Assinatura do Cliente"
                   class="w-full h-auto border-2 border-gray-300 rounded bg-white"
-                />
+                >
               </div>
             </div>
           </div>
         </div>
 
         <!-- No Signature State -->
-        <div v-else class="detail-section">
+        <div
+          v-else
+          class="detail-section"
+        >
           <div class="bg-white rounded-touch border border-gray-200">
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Assinatura Cliente</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Assinatura Cliente
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
-              <p class="text-gray-500 italic">Sem assinatura</p>
+              <p class="text-gray-500 italic">
+                Sem assinatura
+              </p>
             </div>
           </div>
         </div>
@@ -485,7 +590,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { WorkSheet, ContentWithRelations, WorkSheetData, BaseContent, TechnicianUser } from '@clever/shared';
-import { isRelationError } from '@clever/shared';
+import { isRelationError, calculateWorkSheetPricing, WORK_SHEET_CONSTANTS } from '@clever/shared';
 import ContentDetailTemplate from '@/components/common/ContentDetailTemplate.vue';
 import ClientInfoSection from '@/components/common/ClientInfoSection.vue';
 import ConfirmationDialog from '@/components/common/ConfirmationDialog.vue';
@@ -709,63 +814,17 @@ const getTechnicianDisplayName = (technician: TechnicianUser | string | undefine
   return '-';
 };
 
-// Pricing calculation methods (based on legacy logic)
-const getDisplacementRate = (): number => {
-  if (!workSheet.value?.data?.displacement?.hasDisplacement) return 0;
-  const totalKms = workSheet.value.data.displacement.totalKms || 0;
-  return totalKms > 180 ? 55 : 40;
-};
-
-const getHourlyRate = (): number => {
-  // Always show hourly rate, even without displacement
-  if (!workSheet.value?.data?.displacement) return 45; // Default rate
-  return workSheet.value.data.displacement.weekendHoliday ? 60 : 45;
-};
-
-const getKmsPrice = (): number => {
-  if (!workSheet.value?.data?.displacement?.hasDisplacement) return 0;
-  const pricePerKm = 0.45;
-  const totalKms = workSheet.value.data.displacement.totalKms || 0;
-  return Math.round(pricePerKm * totalKms * 100) / 100;
-};
-
-const getLaborPrice = (): number => {
-  // Calculate labor price even without displacement
-  const arrivalTime = workSheet.value?.data?.request?.arrivalTime;
-  const departureTime = workSheet.value?.data?.request?.departureTime;
-
-  if (!arrivalTime || !departureTime) return 0;
-
-  try {
-    const [arrivalHours, arrivalMinutes] = arrivalTime.split(':').map(Number);
-    const [departureHours, departureMinutes] = departureTime.split(':').map(Number);
-
-    const arrivalTotalMinutes = arrivalHours * 60 + arrivalMinutes;
-    const departureTotalMinutes = departureHours * 60 + departureMinutes;
-
-    let diffMinutes = departureTotalMinutes - arrivalTotalMinutes;
-    if (diffMinutes < 0) {
-      diffMinutes += 24 * 60; // Handle next day
-    }
-
-    const totalHours = diffMinutes / 60;
-    const chargeableHours = totalHours < 1 ? 1 : totalHours; // Minimum 1 hour
-    const hourlyRate = getHourlyRate();
-
-    return Math.round(chargeableHours * hourlyRate * 100) / 100;
-  } catch {
-    return 0;
-  }
-};
-
-const getTotalPrice = (): number => {
-  // Calculate total price always, including displacement costs only when applicable
-  const displacementRate = workSheet.value?.data?.displacement?.hasDisplacement ? getDisplacementRate() : 0;
-  const kmsPrice = workSheet.value?.data?.displacement?.hasDisplacement ? getKmsPrice() : 0;
-  const laborPrice = getLaborPrice();
-
-  return Math.round((displacementRate + kmsPrice + laborPrice) * 100) / 100;
-};
+// Pricing computed property using shared calculation
+const pricing = computed(() => {
+  if (!workSheet.value?.data) return null;
+  return calculateWorkSheetPricing({
+    weekendHoliday: workSheet.value.data.displacement?.weekendHoliday ?? false,
+    hasDisplacement: workSheet.value.data.displacement?.hasDisplacement ?? false,
+    totalKms: workSheet.value.data.displacement?.totalKms ?? 0,
+    arrivalTime: workSheet.value.data.request?.arrivalTime ?? '',
+    departureTime: workSheet.value.data.request?.departureTime ?? '',
+  });
+});
 
 // Contract helper functions
 const getPlanName = (contractType: string, planId: string): string => {

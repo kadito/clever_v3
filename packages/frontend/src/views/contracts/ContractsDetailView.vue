@@ -26,12 +26,17 @@
       <ClientInfoSection :client-relation="contract.relations?.client" />
 
       <!-- CPA Contract Section -->
-      <div v-if="contract?.data.hasCPAContract" class="detail-section">
+      <div
+        v-if="contract?.data.hasCPAContract"
+        class="detail-section"
+      >
         <div class="bg-white rounded-touch border border-gray-200">
           <div
             class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-blue-50 rounded-t-touch"
           >
-            <h2 class="text-lg font-semibold text-blue-900">Contrato CPA</h2>
+            <h2 class="text-lg font-semibold text-blue-900">
+              Contrato CPA
+            </h2>
           </div>
           <div class="p-4 sm:p-6">
             <div class="detail-grid">
@@ -51,7 +56,9 @@
               </div>
               <div class="detail-item">
                 <label class="detail-label">Distância</label>
-                <div class="detail-value">{{ formatDistance(contract.data.distanceCPA) }}</div>
+                <div class="detail-value">
+                  {{ formatDistance(contract.data.distanceCPA) }}
+                </div>
               </div>
               <div class="detail-item">
                 <label class="detail-label">Modalidade de Pagamento</label>
@@ -61,13 +68,20 @@
               </div>
               <div class="detail-item">
                 <label class="detail-label">Início do Contrato</label>
-                <div class="detail-value">{{ formatDate(contract.data.inicioContratoCPA) }}</div>
+                <div class="detail-value">
+                  {{ formatDate(contract.data.inicioContratoCPA) }}
+                </div>
               </div>
               <div class="detail-item">
                 <label class="detail-label">Fim do Contrato</label>
-                <div class="detail-value">{{ formatDate(contract.data.fimContratoCPA) }}</div>
+                <div class="detail-value">
+                  {{ formatDate(contract.data.fimContratoCPA) }}
+                </div>
               </div>
-              <div v-if="contract.data.hasPOSPackage" class="detail-item">
+              <div
+                v-if="contract.data.hasPOSPackage"
+                class="detail-item"
+              >
                 <label class="detail-label">Pacote POS</label>
                 <div class="detail-value">
                   <div class="flex items-center space-x-2">
@@ -87,9 +101,7 @@
                       </svg>
                       Incluído
                     </span>
-                    <span class="text-xs text-gray-500"
-                      >Pack de 10h de assistência para POS (+€100/ano)</span
-                    >
+                    <span class="text-xs text-gray-500">Pack de 10h de assistência para POS (+€100/ano)</span>
                   </div>
                 </div>
               </div>
@@ -100,7 +112,9 @@
               v-if="contract.data.cpaEquipments && contract.data.cpaEquipments.length > 0"
               class="mt-6"
             >
-              <h3 class="text-md font-semibold text-gray-900 mb-4">Equipamentos CPA</h3>
+              <h3 class="text-md font-semibold text-gray-900 mb-4">
+                Equipamentos CPA
+              </h3>
               <div class="space-y-3">
                 <div
                   v-for="(equipment, index) in contract.data.cpaEquipments"
@@ -114,7 +128,10 @@
                         <h4 class="font-medium text-gray-900">
                           {{ equipment.modelo || 'Modelo não especificado' }}
                         </h4>
-                        <span v-if="equipment.desconto > 0" class="badge badge-orange">
+                        <span
+                          v-if="equipment.desconto > 0"
+                          class="badge badge-orange"
+                        >
                           {{ equipment.desconto }}% desconto
                         </span>
                       </div>
@@ -139,12 +156,17 @@
       </div>
 
       <!-- S&H Contract Section -->
-      <div v-if="contract?.data.hasSHContract" class="detail-section">
+      <div
+        v-if="contract?.data.hasSHContract"
+        class="detail-section"
+      >
         <div class="bg-white rounded-touch border border-gray-200">
           <div
             class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-green-50 rounded-t-touch"
           >
-            <h2 class="text-lg font-semibold text-green-900">Contrato S&H</h2>
+            <h2 class="text-lg font-semibold text-green-900">
+              Contrato S&H
+            </h2>
           </div>
           <div class="p-4 sm:p-6">
             <div class="detail-grid">
@@ -156,7 +178,9 @@
               </div>
               <div class="detail-item">
                 <label class="detail-label">Distância</label>
-                <div class="detail-value">{{ formatDistance(contract.data.distanceSH) }}</div>
+                <div class="detail-value">
+                  {{ formatDistance(contract.data.distanceSH) }}
+                </div>
               </div>
               <div class="detail-item">
                 <label class="detail-label">Modalidade de Pagamento</label>
@@ -166,11 +190,15 @@
               </div>
               <div class="detail-item">
                 <label class="detail-label">Início do Contrato</label>
-                <div class="detail-value">{{ formatDate(contract.data.inicioContratoSH) }}</div>
+                <div class="detail-value">
+                  {{ formatDate(contract.data.inicioContratoSH) }}
+                </div>
               </div>
               <div class="detail-item">
                 <label class="detail-label">Fim do Contrato</label>
-                <div class="detail-value">{{ formatDate(contract.data.fimContratoSH) }}</div>
+                <div class="detail-value">
+                  {{ formatDate(contract.data.fimContratoSH) }}
+                </div>
               </div>
             </div>
 
@@ -179,7 +207,9 @@
               v-if="contract.data.shEquipments && contract.data.shEquipments.length > 0"
               class="mt-6"
             >
-              <h3 class="text-md font-semibold text-gray-900 mb-4">Equipamentos S&H</h3>
+              <h3 class="text-md font-semibold text-gray-900 mb-4">
+                Equipamentos S&H
+              </h3>
               <div class="space-y-3">
                 <div
                   v-for="(equipment, index) in contract.data.shEquipments"
@@ -215,12 +245,17 @@
       </div>
 
       <!-- CPA Service Details Section -->
-      <div v-if="contract?.data.hasCPAContract" class="detail-section">
+      <div
+        v-if="contract?.data.hasCPAContract"
+        class="detail-section"
+      >
         <div class="bg-white rounded-touch border border-gray-200">
           <div
             class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
           >
-            <h2 class="text-lg font-semibold text-gray-900">Detalhes do Serviço CPA</h2>
+            <h2 class="text-lg font-semibold text-gray-900">
+              Detalhes do Serviço CPA
+            </h2>
           </div>
           <div class="p-4 sm:p-6">
             <div class="detail-grid">
@@ -229,8 +264,8 @@
                 <div class="detail-value">
                   {{
                     contract?.data.horasAssistenciaAnualCPA ||
-                    contract?.data.horasAssistenciaAnual ||
-                    0
+                      contract?.data.horasAssistenciaAnual ||
+                      0
                   }}
                   horas
                 </div>
@@ -257,12 +292,17 @@
       </div>
 
       <!-- S&H Service Details Section -->
-      <div v-if="contract?.data.hasSHContract" class="detail-section">
+      <div
+        v-if="contract?.data.hasSHContract"
+        class="detail-section"
+      >
         <div class="bg-white rounded-touch border border-gray-200">
           <div
             class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
           >
-            <h2 class="text-lg font-semibold text-gray-900">Detalhes do Serviço S&H</h2>
+            <h2 class="text-lg font-semibold text-gray-900">
+              Detalhes do Serviço S&H
+            </h2>
           </div>
           <div class="p-4 sm:p-6">
             <div class="detail-grid">
@@ -271,8 +311,8 @@
                 <div class="detail-value">
                   {{
                     contract?.data.horasAssistenciaAnualSH ||
-                    contract?.data.horasAssistenciaAnual ||
-                    0
+                      contract?.data.horasAssistenciaAnual ||
+                      0
                   }}
                   horas
                 </div>
@@ -304,11 +344,16 @@
           <div
             class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
           >
-            <h2 class="text-lg font-semibold text-gray-900">Método de Pagamento</h2>
+            <h2 class="text-lg font-semibold text-gray-900">
+              Método de Pagamento
+            </h2>
           </div>
           <div class="p-4 sm:p-6">
             <div class="detail-grid">
-              <div v-if="contract?.data.metodoPagamento" class="detail-item">
+              <div
+                v-if="contract?.data.metodoPagamento"
+                class="detail-item"
+              >
                 <label class="detail-label">Método de Pagamento</label>
                 <div class="detail-value">
                   {{ formatPaymentMethod(contract.data.metodoPagamento) }}
@@ -326,7 +371,10 @@
         <!-- Contract status -->
         <div class="flex items-center">
           <span class="text-gray-500 mr-2">Estado:</span>
-          <span class="badge" :class="getContractStatusBadgeClass(item)">
+          <span
+            class="badge"
+            :class="getContractStatusBadgeClass(item)"
+          >
             {{ getContractStatus(item) }}
           </span>
         </div>
@@ -335,21 +383,33 @@
         <div class="flex items-center">
           <span class="text-gray-500 mr-2">Tipos:</span>
           <div class="flex space-x-1">
-            <span v-if="item.data.hasCPAContract" class="badge badge-blue">
+            <span
+              v-if="item.data.hasCPAContract"
+              class="badge badge-blue"
+            >
               {{ item.data.cpaContractType || 'CPA' }}
             </span>
-            <span v-if="item.data.hasSHContract" class="badge badge-green"> S&H </span>
+            <span
+              v-if="item.data.hasSHContract"
+              class="badge badge-green"
+            > S&H </span>
           </div>
         </div>
 
         <!-- Equipment count -->
-        <div v-if="getEquipmentCount(item) > 0" class="flex items-center">
+        <div
+          v-if="getEquipmentCount(item) > 0"
+          class="flex items-center"
+        >
           <span class="text-gray-500 mr-2">Equipamentos:</span>
           <span class="text-gray-900">{{ getEquipmentCount(item) }}</span>
         </div>
 
         <!-- Last updated -->
-        <div v-if="item.updatedAt !== item.createdAt" class="flex items-center">
+        <div
+          v-if="item.updatedAt !== item.createdAt"
+          class="flex items-center"
+        >
           <span class="text-gray-500 mr-2">Atualizado:</span>
           <span class="text-gray-900">{{ formatDate(item.updatedAt) }}</span>
         </div>

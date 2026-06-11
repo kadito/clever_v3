@@ -1,5 +1,9 @@
 <template>
-  <nav class="phase-navigation" role="tablist" aria-label="Fases da instalação">
+  <nav
+    class="phase-navigation"
+    role="tablist"
+    aria-label="Fases da instalação"
+  >
     <div class="phase-tabs">
       <button
         v-for="phase in phases"
@@ -11,7 +15,10 @@
         :class="getPhaseClasses(phase.number)"
         @click="selectPhase(phase.number)"
       >
-        <span class="phase-indicator" :class="getIndicatorClasses(phase.number)">
+        <span
+          class="phase-indicator"
+          :class="getIndicatorClasses(phase.number)"
+        >
           <svg
             v-if="isCompleted(phase.number)"
             class="w-4 h-4"
@@ -26,7 +33,10 @@
               d="M5 13l4 4L19 7"
             />
           </svg>
-          <span v-else class="phase-number">{{ phase.number }}</span>
+          <span
+            v-else
+            class="phase-number"
+          >{{ phase.number }}</span>
         </span>
         <span class="phase-name">{{ phase.name }}</span>
       </button>

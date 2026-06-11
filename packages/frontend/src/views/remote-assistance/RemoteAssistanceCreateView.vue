@@ -11,165 +11,327 @@
     @create="handleCreateSuccess"
     @clear-error="clearError"
   >
-      <!-- Custom field templates -->
-      <template #field-clientId="{ formData, error, updateFieldValue }">
-        <ClientSearchInput
-          :model-value="formData?.clientId || ''"
-          :has-error="!!error"
-          @update:model-value="value => updateFieldValue('clientId', value)"
-          @client-selected="handleClientSelected"
-        />
-        <p v-if="error" class="form-error text-red-600 text-sm mt-1">
+    <!-- Custom field templates -->
+    <template #field-clientId="{ formData, error, updateFieldValue }">
+      <ClientSearchInput
+        :model-value="formData?.clientId || ''"
+        :has-error="!!error"
+        @update:model-value="value => updateFieldValue('clientId', value)"
+        @client-selected="handleClientSelected"
+      />
+      <p
+        v-if="error"
+        class="form-error text-red-600 text-sm mt-1"
+      >
+        {{ error }}
+      </p>
+    </template>
+
+    <!-- Custom payment method radio buttons -->
+    <template #field-paymentMethod="{ formData, error, updateFieldValue }">
+      <div class="payment-method-selector">
+        <label class="payment-label">Método de Pagamento</label>
+        <div class="payment-options">
+          <label
+            v-for="method in paymentMethods"
+            :key="method.value"
+            :class="[
+              'payment-option',
+              formData?.paymentMethod === method.value ? 'selected' : '',
+            ]"
+          >
+            <input
+              type="radio"
+              :value="method.value"
+              :checked="formData?.paymentMethod === method.value"
+              name="paymentMethod"
+              @change="updateFieldValue('paymentMethod', method.value)"
+            >
+            <span>{{ method.label }}</span>
+          </label>
+        </div>
+        <p
+          v-if="error"
+          class="form-error text-red-600 text-sm mt-1"
+        >
           {{ error }}
         </p>
-      </template>
+      </div>
+    </template>
 
-      <!-- Custom payment method radio buttons -->
-      <template #field-paymentMethod="{ formData, error, updateFieldValue }">
-        <div class="payment-method-selector">
-          <label class="payment-label">Método de Pagamento</label>
-          <div class="payment-options">
-            <label
-              v-for="method in paymentMethods"
-              :key="method.value"
-              :class="[
-                'payment-option',
-                formData?.paymentMethod === method.value ? 'selected' : '',
-              ]"
-            >
-              <input
-                type="radio"
-                :value="method.value"
-                :checked="formData?.paymentMethod === method.value"
-                name="paymentMethod"
-                @change="updateFieldValue('paymentMethod', method.value)"
-              />
-              <span>{{ method.label }}</span>
-            </label>
-          </div>
-          <p v-if="error" class="form-error text-red-600 text-sm mt-1">
-            {{ error }}
-          </p>
-        </div>
-      </template>
-
-      <!-- Contract auto-fetch display (conditional on paymentMethod === 'Contrato') -->
-      <template #field-contractId="{ formData, error, updateFieldValue }">
-        <div v-if="isLoadingContracts" class="text-sm text-gray-500 py-2">
-          A carregar contratos...
-        </div>
-        <div v-else-if="clientContracts.length === 0" class="text-sm text-red-600 py-2">
-          Nenhum contrato encontrado para este cliente.
-        </div>
-        <div v-else>
-          <!-- Simple dropdown if multiple contracts -->
-          <select
-            v-if="clientContracts.length > 1"
-            :value="formData?.contractId || ''"
-            class="form-input mb-2"
-            :class="{ 'border-red-500': !!error }"
-            @change="(e: Event) => updateFieldValue('contractId', (e.target as HTMLSelectElement).value)"
+    <!-- Contract auto-fetch display (conditional on paymentMethod === 'Contrato') -->
+    <template #field-contractId="{ formData, error, updateFieldValue }">
+      <div
+        v-if="isLoadingContracts"
+        class="text-sm text-gray-500 py-2"
+      >
+        A carregar contratos...
+      </div>
+      <div
+        v-else-if="clientContracts.length === 0"
+        class="text-sm text-red-600 py-2"
+      >
+        Nenhum contrato encontrado para este cliente.
+      </div>
+      <div v-else>
+        <!-- Simple dropdown if multiple contracts -->
+        <select
+          v-if="clientContracts.length > 1"
+          :value="formData?.contractId || ''"
+          class="form-input mb-2"
+          :class="{ 'border-red-500': !!error }"
+          @change="(e: Event) => updateFieldValue('contractId', (e.target as HTMLSelectElement).value)"
+        >
+          <option value="">
+            Selecionar contrato...
+          </option>
+          <option
+            v-for="contract in clientContracts"
+            :key="contract.uuid"
+            :value="contract.uuid"
           >
-            <option value="">Selecionar contrato...</option>
-            <option
-              v-for="contract in clientContracts"
-              :key="contract.uuid"
-              :value="contract.uuid"
+            {{ getContractDisplayName(contract) }}
+          </option>
+        </select>
+        <!-- Contract info display -->
+        <div
+          v-if="selectedContract"
+          class="bg-green-50 border border-green-200 rounded-lg p-3"
+        >
+          <div class="text-sm font-medium text-green-800">
+            {{ getContractDisplayName(selectedContract) }}
+          </div>
+          <div
+            v-if="getContractDates(selectedContract)"
+            class="text-xs text-green-600 mt-1"
+          >
+            Período: {{ getContractDates(selectedContract) }}
+          </div>
+        </div>
+      </div>
+      <p
+        v-if="error"
+        class="form-error text-red-600 text-sm mt-1"
+      >
+        {{ error }}
+      </p>
+    </template>
+
+    <!-- Time input fields with automatic formatting and validation -->
+    <template #field-inicioAssistencia="{ formData, error, updateFieldValue }">
+      <input
+        type="text"
+        :value="formData?.inicioAssistencia || ''"
+        placeholder="09:00"
+        maxlength="5"
+        class="form-input"
+        :class="{ 'border-red-500': !!error }"
+        @input="e => handleTimeInput(e, 'inicioAssistencia', updateFieldValue)"
+        @blur="e => handleTimeBlur(e, 'inicioAssistencia', updateFieldValue)"
+      >
+      <p
+        v-if="error"
+        class="form-error text-red-600 text-sm mt-1"
+      >
+        {{ error }}
+      </p>
+      <p class="form-help text-xs text-gray-500 mt-1">
+        <svg
+          class="w-4 h-4 text-gray-400 inline mr-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        Formato HH:MM. As horas totais serão arredondadas para intervalos de 15 minutos.
+      </p>
+    </template>
+
+    <template #field-fimAssistencia="{ formData, error, updateFieldValue }">
+      <input
+        type="text"
+        :value="formData?.fimAssistencia || ''"
+        placeholder="10:00"
+        maxlength="5"
+        class="form-input"
+        :class="{ 'border-red-500': !!error }"
+        @input="e => handleTimeInput(e, 'fimAssistencia', updateFieldValue)"
+        @blur="e => handleTimeBlur(e, 'fimAssistencia', updateFieldValue)"
+      >
+      <p
+        v-if="error"
+        class="form-error text-red-600 text-sm mt-1"
+      >
+        {{ error }}
+      </p>
+      <p class="form-help text-xs text-gray-500 mt-1">
+        <svg
+          class="w-4 h-4 text-gray-400 inline mr-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        Formato HH:MM. As horas totais serão arredondadas para intervalos de 15 minutos.
+      </p>
+    </template>
+
+    <!-- Total hours display field -->
+    <template #field-horasTotais="{ formData }">
+      <input
+        type="text"
+        :value="calculatedDuration || ''"
+        placeholder="Calculado automaticamente"
+        class="form-input bg-gray-100"
+        disabled
+        readonly
+      >
+      <p class="form-help text-xs text-gray-500 mt-1">
+        <svg
+          class="w-4 h-4 text-gray-400 inline mr-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        Calculado automaticamente com base no início e fim da assistência. Arredondado para intervalos de 15 minutos.
+      </p>
+    </template>
+
+    <!-- FileUploadZone for file attachments (inside Anexos section) -->
+    <template #field-anexosFiles>
+      <FileUploadZone
+        field-name="anexosFiles"
+        label="Ficheiros"
+        :multiple="true"
+        :accept-images="true"
+        :accept-documents="true"
+        :disabled="isSaving || uploading"
+        @files-changed="handleAnexosFilesChanged"
+      />
+      <p
+        v-if="uploadError"
+        class="text-sm text-red-600 mt-2"
+      >
+        {{ uploadError }}
+      </p>
+    </template>
+
+    <!-- Value calculation display section -->
+    <template #after-section-dateTime="{ formData: slotFormData }">
+      <div
+        v-if="
+          slotFormData?.inicioAssistencia && slotFormData?.fimAssistencia && calculatedDuration
+        "
+        class="calculation-section"
+      >
+        <h3>Cálculo Automático <span class="vat-note">(sem IVA)</span></h3>
+
+        <!-- Duration display -->
+        <div class="duration-display">
+          <div class="duration-item">
+            <span class="duration-label">Duração Total:</span>
+            <span class="duration-value">
+              <svg
+                class="w-4 h-4 text-gray-400 inline mr-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              {{ calculatedDuration }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Pricing note -->
+        <div class="pricing-note">
+          <svg
+            class="w-4 h-4 text-blue-500 inline mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span class="text-sm text-gray-600">
+            💶 Preço: {{ REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS }}€/hora
+            (09:00-12:30, 14:30-18:00) |
+            {{ REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS }}€/hora (outras horas) + IVA
+          </span>
+        </div>
+
+        <!-- Pricing breakdown -->
+        <div
+          v-if="pricingResult && !pricingResult.isZeroCost"
+          class="pricing-breakdown"
+        >
+          <div class="pricing-table">
+            <div
+              v-if="pricingResult.businessMinutes > 0"
+              class="pricing-row"
             >
-              {{ getContractDisplayName(contract) }}
-            </option>
-          </select>
-          <!-- Contract info display -->
-          <div v-if="selectedContract" class="bg-green-50 border border-green-200 rounded-lg p-3">
-            <div class="text-sm font-medium text-green-800">{{ getContractDisplayName(selectedContract) }}</div>
-            <div v-if="getContractDates(selectedContract)" class="text-xs text-green-600 mt-1">
-              Período: {{ getContractDates(selectedContract) }}
+              <span class="pricing-label">Horário Comercial (09:00-12:30, 14:30-18:00):</span>
+              <span class="pricing-value">
+                {{ formatMinutesAsHours(pricingResult.businessMinutes) }} ×
+                {{ formatCurrency(REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS) }}/h =
+                {{ formatCurrency(pricingResult.businessHoursValue) }}
+              </span>
+            </div>
+            <div
+              v-if="pricingResult.offHoursMinutes > 0"
+              class="pricing-row"
+            >
+              <span class="pricing-label">Fora do Horário Comercial (inclui 12:30-14:30):</span>
+              <span class="pricing-value">
+                {{ formatMinutesAsHours(pricingResult.offHoursMinutes) }} ×
+                {{ formatCurrency(REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS) }}/h =
+                {{ formatCurrency(pricingResult.offHoursValue) }}
+              </span>
+            </div>
+            <div class="pricing-row total">
+              <span class="pricing-label">VALOR TOTAL:</span>
+              <span class="pricing-value">{{ formatCurrency(pricingResult.totalValue) }}</span>
             </div>
           </div>
         </div>
-        <p v-if="error" class="form-error text-red-600 text-sm mt-1">
-          {{ error }}
-        </p>
-      </template>
 
-      <!-- Time input fields with automatic formatting and validation -->
-      <template #field-inicioAssistencia="{ formData, error, updateFieldValue }">
-        <input
-          type="text"
-          :value="formData?.inicioAssistencia || ''"
-          placeholder="09:00"
-          maxlength="5"
-          class="form-input"
-          :class="{ 'border-red-500': !!error }"
-          @input="e => handleTimeInput(e, 'inicioAssistencia', updateFieldValue)"
-          @blur="e => handleTimeBlur(e, 'inicioAssistencia', updateFieldValue)"
-        />
-        <p v-if="error" class="form-error text-red-600 text-sm mt-1">
-          {{ error }}
-        </p>
-        <p class="form-help text-xs text-gray-500 mt-1">
+        <!-- Contract/Warranty notice -->
+        <div
+          v-if="pricingResult?.isZeroCost"
+          class="no-charge-notice"
+        >
           <svg
-            class="w-4 h-4 text-gray-400 inline mr-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          Formato HH:MM. As horas totais serão arredondadas para intervalos de 15 minutos.
-        </p>
-      </template>
-
-      <template #field-fimAssistencia="{ formData, error, updateFieldValue }">
-        <input
-          type="text"
-          :value="formData?.fimAssistencia || ''"
-          placeholder="10:00"
-          maxlength="5"
-          class="form-input"
-          :class="{ 'border-red-500': !!error }"
-          @input="e => handleTimeInput(e, 'fimAssistencia', updateFieldValue)"
-          @blur="e => handleTimeBlur(e, 'fimAssistencia', updateFieldValue)"
-        />
-        <p v-if="error" class="form-error text-red-600 text-sm mt-1">
-          {{ error }}
-        </p>
-        <p class="form-help text-xs text-gray-500 mt-1">
-          <svg
-            class="w-4 h-4 text-gray-400 inline mr-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          Formato HH:MM. As horas totais serão arredondadas para intervalos de 15 minutos.
-        </p>
-      </template>
-
-      <!-- Total hours display field -->
-      <template #field-horasTotais="{ formData }">
-        <input
-          type="text"
-          :value="calculatedDuration || ''"
-          placeholder="Calculado automaticamente"
-          class="form-input bg-gray-100"
-          disabled
-          readonly
-        />
-        <p class="form-help text-xs text-gray-500 mt-1">
-          <svg
-            class="w-4 h-4 text-gray-400 inline mr-1"
+            class="w-5 h-5 text-green-500 inline mr-2"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -181,135 +343,13 @@
               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          Calculado automaticamente com base no início e fim da assistência. Arredondado para intervalos de 15 minutos.
-        </p>
-      </template>
-
-      <!-- FileUploadZone for file attachments (inside Anexos section) -->
-      <template #field-anexosFiles>
-        <FileUploadZone
-          field-name="anexosFiles"
-          label="Ficheiros"
-          :multiple="true"
-          :accept-images="true"
-          :accept-documents="true"
-          :disabled="isSaving || uploading"
-          @files-changed="handleAnexosFilesChanged"
-        />
-        <p v-if="uploadError" class="text-sm text-red-600 mt-2">{{ uploadError }}</p>
-      </template>
-
-      <!-- Value calculation display section -->
-      <template #after-section-dateTime="{ formData: slotFormData }">
-        <div
-          v-if="
-            slotFormData?.inicioAssistencia && slotFormData?.fimAssistencia && calculatedDuration
-          "
-          class="calculation-section"
-        >
-          <h3>Cálculo Automático <span class="vat-note">(sem IVA)</span></h3>
-
-          <!-- Duration display -->
-          <div class="duration-display">
-            <div class="duration-item">
-              <span class="duration-label">Duração Total:</span>
-              <span class="duration-value">
-                <svg
-                  class="w-4 h-4 text-gray-400 inline mr-1"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                {{ calculatedDuration }}
-              </span>
-            </div>
-          </div>
-
-          <!-- Pricing note -->
-          <div class="pricing-note">
-            <svg
-              class="w-4 h-4 text-blue-500 inline mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span class="text-sm text-gray-600">
-              💶 Preço: 30€/hora (09:00-18:00) | 45€/hora (outras horas) - sem IVA
-            </span>
-          </div>
-
-          <!-- Pricing breakdown (always shown) -->
-          <div v-if="pricingBreakdown" class="pricing-breakdown">
-            <div class="pricing-table">
-              <div v-if="pricingBreakdown.businessHours > 0" class="pricing-row">
-                <span class="pricing-label">Horário Comercial (09:00-18:00):</span>
-                <span class="pricing-value">
-                  {{ formatHours(pricingBreakdown.businessHours) }} ×
-                  {{ formatCurrency(REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS) }}/h =
-                  {{ formatCurrency(pricingBreakdown.businessHoursValue) }}
-                </span>
-              </div>
-              <div v-if="pricingBreakdown.afterHours > 0" class="pricing-row">
-                <span class="pricing-label">Fora do Horário Comercial:</span>
-                <span class="pricing-value">
-                  {{ formatHours(pricingBreakdown.afterHours) }} ×
-                  {{ formatCurrency(REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS) }}/h =
-                  {{ formatCurrency(pricingBreakdown.afterHoursValue) }}
-                </span>
-              </div>
-              <div class="pricing-row total">
-                <span class="pricing-label">VALOR TOTAL:</span>
-                <span class="pricing-value">{{ formatCurrency(pricingBreakdown.totalValue) }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Contract/Warranty notice -->
-          <div
-            v-if="slotFormData?.paymentMethod === 'Contrato' || slotFormData?.paymentMethod === 'Garantia'"
-            class="no-charge-notice"
-          >
-            <svg
-              class="w-5 h-5 text-green-500 inline mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span class="text-green-700 font-medium">
-              {{
-                slotFormData?.paymentMethod === 'Contrato'
-                  ? 'Assistência coberta por contrato'
-                  : 'Assistência coberta por garantia'
-              }}
-              - Sem custo
-            </span>
-          </div>
+          <span class="text-green-700 font-medium">
+            Assistência coberta por {{ slotFormData?.paymentMethod?.toLowerCase() }} - Sem custo
+          </span>
         </div>
-      </template>
-
-
-    </ContentCreateTemplate>
+      </div>
+    </template>
+  </ContentCreateTemplate>
 </template>
 
 <script setup lang="ts">
@@ -320,7 +360,7 @@ import {
   validateAndFormatTime,
   validateTimeSequence,
   calculateRoundedTotalHours,
-  calculateAssistanceValueWithBusinessHours,
+  calculateRemoteAssistancePricing,
   REMOTE_ASSISTANCE_CONSTANTS,
 } from '@clever/shared';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
@@ -502,18 +542,18 @@ const calculatedDuration = computed(() => {
   return calculateRoundedTotalHours(currentFormData.inicioAssistencia, currentFormData.fimAssistencia);
 });
 
-const pricingBreakdown = computed(() => {
+const pricingResult = computed(() => {
   const currentFormData = formData.value;
   if (!currentFormData?.inicioAssistencia || !currentFormData?.fimAssistencia) {
     return null;
   }
 
-  // Always calculate pricing for display purposes (pass 'Faturação' to get actual values)
-  return calculateAssistanceValueWithBusinessHours(
-    currentFormData.inicioAssistencia,
-    currentFormData.fimAssistencia,
-    'Faturação'
-  );
+  return calculateRemoteAssistancePricing({
+    startTime: currentFormData.inicioAssistencia,
+    endTime: currentFormData.fimAssistencia,
+    isWeekendOrHoliday: currentFormData?.weekendHoliday ?? false,
+    paymentMethod: currentFormData?.paymentMethod ?? '',
+  });
 });
 
 // Helper functions
@@ -526,15 +566,15 @@ const formatCurrency = (value: number): string => {
   }).format(value);
 };
 
-const formatHours = (hours: number): string => {
-  const wholeHours = Math.floor(hours);
-  const minutes = Math.round((hours - wholeHours) * 60);
+const formatMinutesAsHours = (minutes: number): string => {
+  const wholeHours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
 
-  if (minutes === 0) {
+  if (remainingMinutes === 0) {
     return `${wholeHours}h`;
   }
 
-  return `${wholeHours}h${minutes.toString().padStart(2, '0')}m`;
+  return `${wholeHours}h${remainingMinutes.toString().padStart(2, '0')}m`;
 };
 
 const validateCreateForm = (data: Record<string, any>): Record<string, string> => {
@@ -769,17 +809,12 @@ watch(
     formData.value?.inicioAssistencia,
     formData.value?.fimAssistencia,
     formData.value?.paymentMethod,
+    formData.value?.weekendHoliday,
   ],
-  ([startTime, endTime, paymentMethod]) => {
+  ([startTime, endTime]) => {
     if (startTime && endTime) {
-      // Use the new business hours calculation logic with payment method
-      const calculationResult = calculateAssistanceValueWithBusinessHours(
-        startTime,
-        endTime,
-        paymentMethod as 'Contrato' | 'Faturação' | 'Garantia' | ''
-      );
-
-      updateFieldValue('valorAssist', calculationResult.totalValue);
+      const result = pricingResult.value;
+      updateFieldValue('valorAssist', result?.totalValue ?? 0);
 
       // Update total hours field with rounded hours
       const roundedDuration = calculateRoundedTotalHours(startTime, endTime);

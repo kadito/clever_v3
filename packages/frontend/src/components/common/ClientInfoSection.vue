@@ -24,7 +24,12 @@
                 'text-yellow-600': isClientMissing,
               }"
             >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -42,7 +47,10 @@
             >
               Informação do Cliente
             </h2>
-            <div v-if="isClientError" class="ml-2">
+            <div
+              v-if="isClientError"
+              class="ml-2"
+            >
               <svg
                 class="w-4 h-4 text-red-500"
                 fill="none"
@@ -62,12 +70,17 @@
           <!-- Navigate to client detail icon -->
           <button
             v-if="!isClientError && !isClientMissing && clientUuid"
-            @click.stop="navigateToClient"
             class="flex-shrink-0 p-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-full transition-colors mr-2"
             style="min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center;"
             title="Ver detalhes do cliente"
+            @click.stop="navigateToClient"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -101,14 +114,20 @@
 
       <div class="p-4 sm:p-6">
         <!-- Always visible: Essential client info -->
-        <div v-if="!isClientError && !isClientMissing" class="space-y-3">
+        <div
+          v-if="!isClientError && !isClientMissing"
+          class="space-y-3"
+        >
           <div class="detail-item">
             <label class="detail-label">Nome da Empresa</label>
             <div class="detail-value font-medium">
               {{ clientData?.nomeEmpresa || '-' }}
             </div>
           </div>
-          <div v-if="clientData?.nomeComercial" class="detail-item">
+          <div
+            v-if="clientData?.nomeComercial"
+            class="detail-item"
+          >
             <label class="detail-label">Nome Comercial</label>
             <div class="detail-value">
               {{ clientData.nomeComercial }}
@@ -117,16 +136,29 @@
         </div>
 
         <!-- Error state -->
-        <div v-else-if="isClientError" class="text-center py-2">
+        <div
+          v-else-if="isClientError"
+          class="text-center py-2"
+        >
           <p class="text-red-800 font-medium mb-1">
             {{ getClientErrorMessage() }}
           </p>
-          <p v-if="clientData?.code" class="text-red-600 text-sm">Código: {{ clientData.code }}</p>
+          <p
+            v-if="clientData?.code"
+            class="text-red-600 text-sm"
+          >
+            Código: {{ clientData.code }}
+          </p>
         </div>
 
         <!-- Missing state -->
-        <div v-else-if="isClientMissing" class="text-center py-2">
-          <p class="text-yellow-800 font-medium">Cliente não encontrado</p>
+        <div
+          v-else-if="isClientMissing"
+          class="text-center py-2"
+        >
+          <p class="text-yellow-800 font-medium">
+            Cliente não encontrado
+          </p>
         </div>
 
         <!-- Collapsible: Additional client details -->
@@ -135,33 +167,48 @@
           class="mt-4 pt-4 border-t border-gray-200"
         >
           <div class="detail-grid">
-            <div v-if="clientData?.contribuinte" class="detail-item">
+            <div
+              v-if="clientData?.contribuinte"
+              class="detail-item"
+            >
               <label class="detail-label">NIF</label>
               <div class="detail-value">
                 {{ clientData.contribuinte }}
               </div>
             </div>
-            <div v-if="clientData?.localidade" class="detail-item">
+            <div
+              v-if="clientData?.localidade"
+              class="detail-item"
+            >
               <label class="detail-label">Localidade</label>
               <div class="detail-value">
                 {{ clientData.localidade }}
               </div>
             </div>
             <!-- Show additional fields that might be available -->
-            <div v-if="clientData?.telefoneContato" class="detail-item">
+            <div
+              v-if="clientData?.telefoneContato"
+              class="detail-item"
+            >
               <label class="detail-label">Telefone</label>
               <div class="detail-value">
                 {{ clientData.telefoneContato }}
               </div>
             </div>
-            <div v-if="clientData?.emailContato" class="detail-item">
+            <div
+              v-if="clientData?.emailContato"
+              class="detail-item"
+            >
               <label class="detail-label">Email</label>
               <div class="detail-value">
                 {{ clientData.emailContato }}
               </div>
             </div>
             <!-- If no additional fields are available, show a message -->
-            <div v-if="!hasAdditionalClientFields" class="detail-item col-span-full">
+            <div
+              v-if="!hasAdditionalClientFields"
+              class="detail-item col-span-full"
+            >
               <div class="text-sm text-gray-500 italic text-center py-2">
                 Não há informações adicionais disponíveis
               </div>

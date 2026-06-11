@@ -814,7 +814,7 @@ describe('migrateContracts()', () => {
     };
 
     // Track calls to understand flow
-    let fetchCallIndex = 0;
+    const fetchCallIndex = 0;
     const fetchMock = vi.fn().mockImplementation(async (url: string, opts?: RequestInit) => {
       const urlStr = url as string;
 

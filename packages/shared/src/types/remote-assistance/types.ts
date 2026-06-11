@@ -143,19 +143,26 @@ export interface ValueCalculationResult {
  * Constants for remote assistance business logic
  */
 export const REMOTE_ASSISTANCE_CONSTANTS = {
-  // Pricing (without IVA)
-  PRICE_BUSINESS_HOURS: 30.0, // €30/hour between 09:00-18:00
-  PRICE_AFTER_HOURS: 45.0, // €45/hour outside business hours
+  /** Business hours rate (€/hour) */
+  PRICE_BUSINESS_HOURS: 45.0,
+  /** Off-hours/weekends/holidays rate (€/hour) */
+  PRICE_AFTER_HOURS: 60.0,
 
-  // Business hours
-  BUSINESS_HOURS_START: 9, // 09:00
-  BUSINESS_HOURS_END: 18, // 18:00
+  /** Business hours windows (morning) */
+  BUSINESS_HOURS_MORNING_START: 9 * 60, // 09:00 in minutes
+  BUSINESS_HOURS_MORNING_END: 12 * 60 + 30, // 12:30 in minutes
+  /** Business hours windows (afternoon) */
+  BUSINESS_HOURS_AFTERNOON_START: 14 * 60 + 30, // 14:30 in minutes
+  BUSINESS_HOURS_AFTERNOON_END: 18 * 60, // 18:00 in minutes
 
-  // Valid minutes (15-minute intervals)
+  /** Billing increment in minutes */
+  BILLING_INCREMENT_MINUTES: 15,
+
+  /** VAT rate */
+  IVA_RATE: 0.23,
+
+  /** Valid billing minute intervals */
   VALID_MINUTES: [0, 15, 30, 45] as const,
-
-  // IVA rate
-  IVA_RATE: 0.23, // 23%
 
   // Assistance types
   ASSISTANCE_TYPES: ['REMOTA', 'TELEFÓNICA'] as const,

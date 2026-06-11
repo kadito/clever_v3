@@ -20,17 +20,27 @@
       :disabled="disabled"
       class="hidden"
       @change="handleFileSelect"
-    />
+    >
 
     <!-- Validation errors -->
-    <div v-if="errors.length > 0" class="mt-2 space-y-1">
-      <p v-for="(err, idx) in errors" :key="idx" class="text-sm text-red-600">
+    <div
+      v-if="errors.length > 0"
+      class="mt-2 space-y-1"
+    >
+      <p
+        v-for="(err, idx) in errors"
+        :key="idx"
+        class="text-sm text-red-600"
+      >
         {{ err }}
       </p>
     </div>
 
     <!-- Existing files -->
-    <div v-if="displayExistingFiles.length > 0" class="mt-3 space-y-2">
+    <div
+      v-if="displayExistingFiles.length > 0"
+      class="mt-3 space-y-2"
+    >
       <div
         v-for="file in displayExistingFiles"
         :key="file.key"
@@ -43,17 +53,34 @@
           :src="getExistingFileUrl(file)"
           :alt="file.name"
           class="w-12 h-12 object-cover rounded"
-        />
+        >
         <!-- Document icon -->
-        <div v-else class="w-12 h-12 flex items-center justify-center bg-gray-100 rounded">
-          <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+        <div
+          v-else
+          class="w-12 h-12 flex items-center justify-center bg-gray-100 rounded"
+        >
+          <svg
+            class="w-6 h-6 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+            />
           </svg>
         </div>
 
         <div class="flex-1 min-w-0">
-          <p class="text-sm text-gray-700 truncate">{{ file.name }}</p>
-          <p class="text-xs text-gray-500">{{ formatFileSize(file.size) }}</p>
+          <p class="text-sm text-gray-700 truncate">
+            {{ file.name }}
+          </p>
+          <p class="text-xs text-gray-500">
+            {{ formatFileSize(file.size) }}
+          </p>
         </div>
 
         <button
@@ -63,18 +90,43 @@
           :aria-label="'Remover ' + file.name"
           @click="toggleExistingFileRemoval(file.key)"
         >
-          <svg v-if="removedKeys.has(file.key)" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+          <svg
+            v-if="removedKeys.has(file.key)"
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+            />
           </svg>
-          <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          <svg
+            v-else
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            />
           </svg>
         </button>
       </div>
     </div>
 
     <!-- New files (with previews) -->
-    <div v-if="newFiles.length > 0" class="mt-3 space-y-2">
+    <div
+      v-if="newFiles.length > 0"
+      class="mt-3 space-y-2"
+    >
       <div
         v-for="(file, idx) in newFiles"
         :key="'new-' + idx"
@@ -86,17 +138,34 @@
           :src="previewUrls[idx]"
           :alt="file.name"
           class="w-12 h-12 object-cover rounded"
-        />
+        >
         <!-- Document icon for non-images -->
-        <div v-else class="w-12 h-12 flex items-center justify-center bg-gray-100 rounded">
-          <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+        <div
+          v-else
+          class="w-12 h-12 flex items-center justify-center bg-gray-100 rounded"
+        >
+          <svg
+            class="w-6 h-6 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+            />
           </svg>
         </div>
 
         <div class="flex-1 min-w-0">
-          <p class="text-sm text-gray-700 truncate">{{ file.name }}</p>
-          <p class="text-xs text-gray-500">{{ formatFileSize(file.size) }}</p>
+          <p class="text-sm text-gray-700 truncate">
+            {{ file.name }}
+          </p>
+          <p class="text-xs text-gray-500">
+            {{ formatFileSize(file.size) }}
+          </p>
         </div>
 
         <button
@@ -106,8 +175,18 @@
           :aria-label="'Remover ' + file.name"
           @click="removeNewFile(idx)"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>

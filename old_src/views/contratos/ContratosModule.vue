@@ -1,24 +1,37 @@
 <template>
   <div class="contratos-module">
     <div class="module-header">
-      <BackButton to="/" variant="inline" />
+      <BackButton
+        to="/"
+        variant="inline"
+      />
       <div class="module-info">
-        <div class="module-icon">📄</div>
+        <div class="module-icon">
+          📄
+        </div>
         <div class="module-content">
           <h1>Gestor de Contratos</h1>
-          <p class="module-description">Gestão de contratos</p>
+          <p class="module-description">
+            Gestão de contratos
+          </p>
         </div>
       </div>
     </div>
 
     <div class="module-actions">
-      <button @click="navigateToList" class="action-btn primary">
+      <button
+        class="action-btn primary"
+        @click="navigateToList"
+      >
         <span class="action-icon">📋</span>
         <span class="action-label">CONSULTAR</span>
         <span class="action-description">Ver lista de contratos</span>
       </button>
 
-      <button @click="navigateToCreate" class="action-btn secondary">
+      <button
+        class="action-btn secondary"
+        @click="navigateToCreate"
+      >
         <span class="action-icon">➕</span>
         <span class="action-label">NOVO CONTRATO</span>
         <span class="action-description">Criar um novo contrato</span>

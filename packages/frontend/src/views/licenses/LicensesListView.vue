@@ -17,16 +17,16 @@
     :get-item-subtitle="getLicenseSubtitle"
     :get-item-meta1="getLicenseMeta1"
     :get-item-meta2="getLicenseMeta2"
-    @search="handleSearch"
-    @clear-search="handleClearSearch"
-    @item-click="handleLicenseClick"
-    @create="handleCreate"
-    @edit="handleEdit"
     :current-page="api.pagination.value.page"
     :total-pages="api.pagination.value.totalPages"
     :total-count="api.pagination.value.total"
     :items-per-page="itemsPerPage"
     :show-pagination="api.pagination.value.total > 0"
+    @search="handleSearch"
+    @clear-search="handleClearSearch"
+    @item-click="handleLicenseClick"
+    @create="handleCreate"
+    @edit="handleEdit"
     @page-change="handlePageChange"
     @items-per-page-change="handleItemsPerPageChange"
     @clear-error="clearError"
@@ -42,7 +42,10 @@
     <!-- Custom license icon -->
     <template #itemIcon="{ item }">
       <div class="license-icon">
-        <div class="icon-circle" :class="getLicenseIconClass(item)">
+        <div
+          class="icon-circle"
+          :class="getLicenseIconClass(item)"
+        >
           {{ getLicenseInitials(item) }}
         </div>
       </div>
@@ -52,7 +55,10 @@
     <template #itemMeta="{ item }">
       <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
         <!-- License status -->
-        <span class="license-status-badge" :class="getLicenseStatusClass(item)">
+        <span
+          class="license-status-badge"
+          :class="getLicenseStatusClass(item)"
+        >
           {{ getLicenseStatusText(item) }}
         </span>
 
@@ -61,7 +67,12 @@
           v-if="item.data.dataVencimento"
           class="flex items-center before:content-['•'] before:mx-1"
         >
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -84,7 +95,10 @@
           >
             {{ software }}
           </span>
-          <span v-if="item.data.software.name.length > 3" class="text-gray-400">
+          <span
+            v-if="item.data.software.name.length > 3"
+            class="text-gray-400"
+          >
             +{{ item.data.software.name.length - 3 }} mais
           </span>
         </div>
@@ -94,7 +108,12 @@
           v-if="item.data.modalidade"
           class="flex items-center before:content-['•'] before:mx-1"
         >
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -110,7 +129,12 @@
           v-if="item.data.invoices && item.data.invoices.length > 0"
           class="flex items-center before:content-['•'] before:mx-1"
         >
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"

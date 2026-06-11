@@ -1,23 +1,41 @@
 <template>
   <div class="agendamentos-form-container">
     <div class="form-header">
-      <BackButton :to="cancelRoute" variant="inline" />
+      <BackButton
+        :to="cancelRoute"
+        variant="inline"
+      />
       <h1>{{ isEditing ? 'Editar' : 'Novo' }} Agendamento</h1>
     </div>
 
     <!-- Loading state -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A processar...</p>
     </div>
 
     <!-- Error state -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Form -->
-    <form @submit.prevent="handleSubmit" class="agendamentos-form" v-if="!loading">
+    <form
+      v-if="!loading"
+      class="agendamentos-form"
+      @submit.prevent="handleSubmit"
+    >
       <!-- Basic Information Section -->
       <section class="form-section">
         <h2>INFORMAÇÕES BÁSICAS</h2>
@@ -25,24 +43,24 @@
           <div class="form-group">
             <label for="nomeCliente">NOME DO CLIENTE</label>
             <input
-              type="text"
               id="nomeCliente"
               v-model="formData.nomeCliente"
+              type="text"
               class="form-control"
               placeholder="Nome do cliente"
               required
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="dataPedido">DATA DO PEDIDO</label>
             <input
-              type="datetime-local"
               id="dataPedido"
               v-model="formData.dataPedido"
+              type="datetime-local"
               class="form-control"
               required
-            />
+            >
           </div>
 
           <div class="form-group full-width">
@@ -54,7 +72,7 @@
               rows="3"
               placeholder="Descreva o motivo do agendamento"
               required
-            ></textarea>
+            />
           </div>
         </div>
       </section>
@@ -66,11 +84,11 @@
           <div class="form-group">
             <label for="dataPrevistaAssistencia">DATA PREVISTA PARA ASSISTÊNCIA</label>
             <input
-              type="datetime-local"
               id="dataPrevistaAssistencia"
               v-model="formData.dataPrevistaAssistencia"
+              type="datetime-local"
               class="form-control"
-            />
+            >
           </div>
 
           <div class="form-group">
@@ -80,37 +98,83 @@
               v-model="formData.responsavelAgendamento"
               class="form-control"
             >
-              <option value="">--</option>
-              <option value="JOSÉ BATISTA">JOSÉ BATISTA</option>
-              <option value="MARIA SILVA">MARIA SILVA</option>
-              <option value="PEDRO SANTOS">PEDRO SANTOS</option>
-              <option value="ALYSSON SOUZA">ALYSSON SOUZA</option>
-              <option value="ANA COSTA">ANA COSTA</option>
+              <option value="">
+                --
+              </option>
+              <option value="JOSÉ BATISTA">
+                JOSÉ BATISTA
+              </option>
+              <option value="MARIA SILVA">
+                MARIA SILVA
+              </option>
+              <option value="PEDRO SANTOS">
+                PEDRO SANTOS
+              </option>
+              <option value="ALYSSON SOUZA">
+                ALYSSON SOUZA
+              </option>
+              <option value="ANA COSTA">
+                ANA COSTA
+              </option>
             </select>
           </div>
 
           <div class="form-group">
             <label for="tecnico">TÉCNICO</label>
-            <select id="tecnico" v-model="formData.tecnico" class="form-control">
-              <option value="">--</option>
-              <option value="JOSÉ BATISTA">JOSÉ BATISTA</option>
-              <option value="MARIA SILVA">MARIA SILVA</option>
-              <option value="PEDRO SANTOS">PEDRO SANTOS</option>
-              <option value="ALYSSON SOUZA">ALYSSON SOUZA</option>
-              <option value="ANA COSTA">ANA COSTA</option>
+            <select
+              id="tecnico"
+              v-model="formData.tecnico"
+              class="form-control"
+            >
+              <option value="">
+                --
+              </option>
+              <option value="JOSÉ BATISTA">
+                JOSÉ BATISTA
+              </option>
+              <option value="MARIA SILVA">
+                MARIA SILVA
+              </option>
+              <option value="PEDRO SANTOS">
+                PEDRO SANTOS
+              </option>
+              <option value="ALYSSON SOUZA">
+                ALYSSON SOUZA
+              </option>
+              <option value="ANA COSTA">
+                ANA COSTA
+              </option>
             </select>
           </div>
 
           <div class="form-group">
             <label for="assunto">ASSUNTO</label>
-            <select id="assunto" v-model="formData.assunto" class="form-control">
-              <option value="">--</option>
-              <option value="Instalação">Instalação</option>
-              <option value="Manutenção">Manutenção</option>
-              <option value="Reparação">Reparação</option>
-              <option value="Cobrança">Cobrança</option>
-              <option value="Formação">Formação</option>
-              <option value="Outros">Outros</option>
+            <select
+              id="assunto"
+              v-model="formData.assunto"
+              class="form-control"
+            >
+              <option value="">
+                --
+              </option>
+              <option value="Instalação">
+                Instalação
+              </option>
+              <option value="Manutenção">
+                Manutenção
+              </option>
+              <option value="Reparação">
+                Reparação
+              </option>
+              <option value="Cobrança">
+                Cobrança
+              </option>
+              <option value="Formação">
+                Formação
+              </option>
+              <option value="Outros">
+                Outros
+              </option>
             </select>
           </div>
         </div>
@@ -124,13 +188,16 @@
             <label>INSTALAÇÃO</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="instalacao"
                 v-model="formData.instalacao"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="instalacao" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="instalacao"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -139,13 +206,16 @@
             <label>HOUVE ADIAMENTO</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="houveAdiamento"
                 v-model="formData.houveAdiamento"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="houveAdiamento" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="houveAdiamento"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -154,13 +224,16 @@
             <label>TAREFA CONCLUÍDA</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="tarefaConcluida"
                 v-model="formData.tarefaConcluida"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="tarefaConcluida" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="tarefaConcluida"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -168,7 +241,10 @@
       </section>
 
       <!-- Postponement Information Section (shown only if there was postponement) -->
-      <section class="form-section" v-if="formData.houveAdiamento">
+      <section
+        v-if="formData.houveAdiamento"
+        class="form-section"
+      >
         <h2>INFORMAÇÕES DO ADIAMENTO</h2>
         <div class="form-grid">
           <div class="form-group">
@@ -179,17 +255,17 @@
               class="form-control"
               rows="2"
               placeholder="Descreva o motivo do adiamento"
-            ></textarea>
+            />
           </div>
 
           <div class="form-group">
             <label for="novaData">NOVA DATA</label>
             <input
-              type="datetime-local"
               id="novaData"
               v-model="formData.novaData"
+              type="datetime-local"
               class="form-control"
-            />
+            >
           </div>
         </div>
       </section>
@@ -201,45 +277,57 @@
           <div class="form-group">
             <label for="folhaObra">FOLHA DE OBRA</label>
             <input
-              type="text"
               id="folhaObra"
               v-model="formData.folhaObra"
+              type="text"
               class="form-control"
               placeholder="Número da folha de obra"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="assistenciaRemota">ASSISTÊNCIA REMOTA</label>
             <input
-              type="text"
               id="assistenciaRemota"
               v-model="formData.assistenciaRemota"
+              type="text"
               class="form-control"
               placeholder="Número da assistência remota"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="contrato">CONTRATO</label>
             <input
-              type="text"
               id="contrato"
               v-model="formData.contrato"
+              type="text"
               class="form-control"
               placeholder="Número do contrato"
-            />
+            >
           </div>
         </div>
       </section>
 
       <!-- Action buttons -->
       <div class="form-actions">
-        <button type="button" @click="handleCancel" class="btn btn-cancel" :disabled="loading">
+        <button
+          type="button"
+          class="btn btn-cancel"
+          :disabled="loading"
+          @click="handleCancel"
+        >
           Cancelar
         </button>
-        <button type="submit" class="btn btn-primary" :disabled="loading || !isFormValid">
-          <span v-if="loading" class="btn-spinner"></span>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          :disabled="loading || !isFormValid"
+        >
+          <span
+            v-if="loading"
+            class="btn-spinner"
+          />
           {{ isEditing ? 'Atualizar' : 'Criar' }} Agendamento
         </button>
       </div>

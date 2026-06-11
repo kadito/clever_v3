@@ -1,7 +1,10 @@
 <template>
   <div class="licencas-container">
     <div class="licencas-header">
-      <BackButton to="/gestor-licencas" variant="inline" />
+      <BackButton
+        to="/gestor-licencas"
+        variant="inline"
+      />
     </div>
 
     <!-- Controls -->
@@ -18,7 +21,13 @@
           @change="handleYearChange"
         />
 
-        <button @click="loadData" :disabled="loading" class="btn btn-refresh">🔄 Atualizar</button>
+        <button
+          :disabled="loading"
+          class="btn btn-refresh"
+          @click="loadData"
+        >
+          🔄 Atualizar
+        </button>
       </div>
     </div>
 
@@ -26,25 +35,34 @@
     <div class="search-section">
       <div class="search-container">
         <input
-          type="text"
           v-model="searchQuery"
-          @input="handleSearch"
+          type="text"
           placeholder="Pesquisar por cliente, software, série..."
           class="search-input"
-        />
+          @input="handleSearch"
+        >
         <span class="search-icon">🔍</span>
       </div>
 
       <div class="month-filter-container">
-        <label for="month-filter" class="month-filter-label">Filtrar por mês de validade:</label>
+        <label
+          for="month-filter"
+          class="month-filter-label"
+        >Filtrar por mês de validade:</label>
         <select
           id="month-filter"
           v-model="selectedMonth"
-          @change="handleMonthChange"
           class="month-filter-select"
+          @change="handleMonthChange"
         >
-          <option value="">Todos os meses</option>
-          <option v-for="month in months" :key="month.value" :value="month.value">
+          <option value="">
+            Todos os meses
+          </option>
+          <option
+            v-for="month in months"
+            :key="month.value"
+            :value="month.value"
+          >
             {{ month.label }}
           </option>
         </select>
@@ -52,18 +70,32 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A carregar licenças...</p>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="error-alert">
+    <div
+      v-else-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Licenças List -->
-    <div v-else-if="displayItems.length > 0" class="licencas-list">
+    <div
+      v-else-if="displayItems.length > 0"
+      class="licencas-list"
+    >
       <div
         v-for="licenca in displayItems"
         :key="`${licenca.year || selectedYear}-${licenca.id}`"
@@ -78,15 +110,23 @@
             }}</span>
             <span class="licenca-version">{{ licenca.versao || 'Sem versão' }}</span>
           </div>
-          <div class="licenca-details" v-if="licenca.modalidade || licenca.numeroSerie">
-            <span v-if="licenca.modalidade" class="licenca-modalidade"
-              >📅 {{ licenca.modalidade }}</span
-            >
-            <span v-if="licenca.numeroSerie" class="licenca-serie"
-              >🔐 {{ licenca.numeroSerie }}</span
-            >
+          <div
+            v-if="licenca.modalidade || licenca.numeroSerie"
+            class="licenca-details"
+          >
+            <span
+              v-if="licenca.modalidade"
+              class="licenca-modalidade"
+            >📅 {{ licenca.modalidade }}</span>
+            <span
+              v-if="licenca.numeroSerie"
+              class="licenca-serie"
+            >🔐 {{ licenca.numeroSerie }}</span>
           </div>
-          <div class="licenca-validation" v-if="getValidationDate(licenca)">
+          <div
+            v-if="getValidationDate(licenca)"
+            class="licenca-validation"
+          >
             <span class="validation-date">📆 Validade: {{ formatValidationDate(licenca) }}</span>
           </div>
           <div class="licenca-status">
@@ -101,47 +141,81 @@
               {{ getLicenseStatus(licenca) }}
             </span>
           </div>
-          <div v-if="searchResults && licenca.year" class="licenca-year">
+          <div
+            v-if="searchResults && licenca.year"
+            class="licenca-year"
+          >
             <span>Ano: {{ licenca.year }}</span>
           </div>
         </div>
         <div class="licenca-actions">
-          <button class="action-btn" @click.stop="showActions(licenca)">⋮</button>
+          <button
+            class="action-btn"
+            @click.stop="showActions(licenca)"
+          >
+            ⋮
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Empty State -->
-    <div v-else class="empty-state">
+    <div
+      v-else
+      class="empty-state"
+    >
       <h3>Nenhuma licença encontrada</h3>
-      <p v-if="searchQuery">Não foram encontradas licenças com o termo "{{ searchQuery }}".</p>
-      <p v-else-if="selectedYear">Não há licenças para o ano {{ selectedYear }}.</p>
-      <p v-else>Não há licenças cadastradas no sistema.</p>
+      <p v-if="searchQuery">
+        Não foram encontradas licenças com o termo "{{ searchQuery }}".
+      </p>
+      <p v-else-if="selectedYear">
+        Não há licenças para o ano {{ selectedYear }}.
+      </p>
+      <p v-else>
+        Não há licenças cadastradas no sistema.
+      </p>
     </div>
 
     <!-- Search Results Info -->
-    <div v-if="searchResults && (searchQuery || selectedMonth)" class="search-info">
+    <div
+      v-if="searchResults && (searchQuery || selectedMonth)"
+      class="search-info"
+    >
       <p>
         {{ searchResults.count || 0 }} resultado(s) encontrado(s)
         <span v-if="searchQuery">para "{{ searchQuery }}"</span>
-        <span v-if="selectedMonth"
-          >no mês de {{ months.find(m => m.value === selectedMonth)?.label }}</span
-        >
+        <span v-if="selectedMonth">no mês de {{ months.find(m => m.value === selectedMonth)?.label }}</span>
         {{ selectedYear ? `no ano ${selectedYear}` : 'em todos os anos' }}
       </p>
     </div>
     <!-- Actions Modal -->
-    <div v-if="showActionsModal" class="actions-modal-overlay" @click="closeActions">
-      <div class="actions-modal" @click.stop>
+    <div
+      v-if="showActionsModal"
+      class="actions-modal-overlay"
+      @click="closeActions"
+    >
+      <div
+        class="actions-modal"
+        @click.stop
+      >
         <h3>{{ selectedLicencaForActions?.cliente }}</h3>
         <div class="modal-actions">
-          <button @click="viewDetails(selectedLicencaForActions)" class="modal-btn view-btn">
+          <button
+            class="modal-btn view-btn"
+            @click="viewDetails(selectedLicencaForActions)"
+          >
             📋 Ver Detalhes
           </button>
-          <button @click="editLicenca(selectedLicencaForActions)" class="modal-btn edit-btn">
+          <button
+            class="modal-btn edit-btn"
+            @click="editLicenca(selectedLicencaForActions)"
+          >
             ✏️ Editar
           </button>
-          <button @click="confirmDelete(selectedLicencaForActions)" class="modal-btn delete-btn">
+          <button
+            class="modal-btn delete-btn"
+            @click="confirmDelete(selectedLicencaForActions)"
+          >
             🗑️ Eliminar
           </button>
         </div>
@@ -149,17 +223,32 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div v-if="showDeleteModal" class="modal-overlay" @click="cancelDelete">
-      <div class="modal-content" @click.stop>
+    <div
+      v-if="showDeleteModal"
+      class="modal-overlay"
+      @click="cancelDelete"
+    >
+      <div
+        class="modal-content"
+        @click.stop
+      >
         <h3>Confirmar Eliminação</h3>
         <p>
           Tem a certeza que pretende eliminar a licença de
-          <strong>{{ licencaToDelete?.cliente }}</strong
-          >?
+          <strong>{{ licencaToDelete?.cliente }}</strong>?
         </p>
         <div class="modal-actions">
-          <button @click="cancelDelete" class="btn btn-secondary">Cancelar</button>
-          <button @click="deleteLicencaAction" class="btn btn-danger" :disabled="loading">
+          <button
+            class="btn btn-secondary"
+            @click="cancelDelete"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn btn-danger"
+            :disabled="loading"
+            @click="deleteLicencaAction"
+          >
             {{ loading ? 'A eliminar...' : 'Eliminar' }}
           </button>
         </div>
@@ -167,7 +256,12 @@
     </div>
 
     <!-- Floating Action Button -->
-    <button @click="navigateToCreate" class="fab">➕</button>
+    <button
+      class="fab"
+      @click="navigateToCreate"
+    >
+      ➕
+    </button>
   </div>
 </template>
 

@@ -1,15 +1,21 @@
 <template>
   <div class="dynamic-plan-details">
     <!-- Loading State -->
-    <div v-if="isLoading" class="plan-loading-state">
+    <div
+      v-if="isLoading"
+      class="plan-loading-state"
+    >
       <div class="loading-spinner">
-        <div class="spinner"></div>
+        <div class="spinner" />
         <span class="loading-text">A carregar detalhes do plano...</span>
       </div>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="hasError" class="plan-error-state">
+    <div
+      v-else-if="hasError"
+      class="plan-error-state"
+    >
       <div class="error-content">
         <span class="error-icon">⚠️</span>
         <div class="error-text">
@@ -23,7 +29,9 @@
     <div v-else>
       <!-- Plan Information Card -->
       <div class="plan-info-card">
-        <h3 class="plan-title">{{ planDetails.name }}</h3>
+        <h3 class="plan-title">
+          {{ planDetails.name }}
+        </h3>
 
         <!-- Plan Features -->
         <div class="plan-features">
@@ -32,21 +40,31 @@
           </div>
 
           <div class="feature-list">
-            <div v-if="planDetails.maintenancePerYear" class="feature-item">
+            <div
+              v-if="planDetails.maintenancePerYear"
+              class="feature-item"
+            >
               <span class="feature-icon">🔧</span>
-              <span class="feature-text"
-                >{{ planDetails.maintenancePerYear }} manutenções por ano</span
-              >
+              <span class="feature-text">{{ planDetails.maintenancePerYear }} manutenções por ano</span>
             </div>
-            <div v-if="planDetails.hoursPerYear" class="feature-item">
+            <div
+              v-if="planDetails.hoursPerYear"
+              class="feature-item"
+            >
               <span class="feature-icon">⏰</span>
               <span class="feature-text">{{ planDetails.hoursPerYear }} horas por ano</span>
             </div>
-            <div v-if="planDetails.callouts" class="feature-item">
+            <div
+              v-if="planDetails.callouts"
+              class="feature-item"
+            >
               <span class="feature-icon">📞</span>
               <span class="feature-text">{{ planDetails.callouts }}</span>
             </div>
-            <div v-if="planDetails.displacementsIncluded" class="feature-item">
+            <div
+              v-if="planDetails.displacementsIncluded"
+              class="feature-item"
+            >
               <span class="feature-icon">🚗</span>
               <span class="feature-text">{{
                 planDetails.displacementsIncluded === 'ilimitadas'
@@ -54,11 +72,17 @@
                   : `${planDetails.displacementsIncluded} deslocações incluídas`
               }}</span>
             </div>
-            <div v-if="planDetails.remoteSupport" class="feature-item">
+            <div
+              v-if="planDetails.remoteSupport"
+              class="feature-item"
+            >
               <span class="feature-icon">💻</span>
               <span class="feature-text">{{ planDetails.remoteSupport }}</span>
             </div>
-            <div v-if="planDetails.weekendSupport" class="feature-item">
+            <div
+              v-if="planDetails.weekendSupport"
+              class="feature-item"
+            >
               <span class="feature-icon">📅</span>
               <span class="feature-text">Suporte ao fim de semana</span>
             </div>
@@ -67,22 +91,29 @@
       </div>
 
       <!-- Price Breakdown (if has additional costs) -->
-      <div v-if="hasAdditionalCosts" class="price-breakdown-section">
+      <div
+        v-if="hasAdditionalCosts"
+        class="price-breakdown-section"
+      >
         <h4>COMPOSIÇÃO DO PREÇO:</h4>
         <div class="price-breakdown">
           <div class="breakdown-item">
             <span class="breakdown-label">Plano Base:</span>
             <span class="breakdown-value">Conforme modalidade selecionada</span>
           </div>
-          <div v-if="hasPOSPackage" class="breakdown-item">
+          <div
+            v-if="hasPOSPackage"
+            class="breakdown-item"
+          >
             <span class="breakdown-label">Pack POS (10h assistência):</span>
             <span class="breakdown-value">+{{ formatPrice(100) }}/ano</span>
           </div>
-          <div v-if="equipments && equipments.length > 1" class="breakdown-item">
+          <div
+            v-if="equipments && equipments.length > 1"
+            class="breakdown-item"
+          >
             <span class="breakdown-label">Equipamentos adicionais:</span>
-            <span class="breakdown-value"
-              >{{ equipments.length - 1 }} × preço do plano (com descontos aplicados)</span
-            >
+            <span class="breakdown-value">{{ equipments.length - 1 }} × preço do plano (com descontos aplicados)</span>
           </div>
         </div>
       </div>
@@ -92,13 +123,19 @@
         <h4>SELECIONE A MODALIDADE DE PAGAMENTO:</h4>
 
         <!-- Distance requirement notice for distance-based pricing -->
-        <div v-if="requiresDistanceForPricing && !distance" class="distance-notice">
+        <div
+          v-if="requiresDistanceForPricing && !distance"
+          class="distance-notice"
+        >
           <span class="notice-icon">ℹ️</span>
           <span class="notice-text">Selecione a distância para ver os preços</span>
         </div>
 
         <!-- Payment options grid -->
-        <div v-else-if="paymentOptions.length > 0" class="payment-options-grid">
+        <div
+          v-else-if="paymentOptions.length > 0"
+          class="payment-options-grid"
+        >
           <button
             v-for="option in paymentOptions"
             :key="option.id"
@@ -107,13 +144,20 @@
             :class="{ selected: selectedPayment === option.id }"
             @click="selectPayment(option.id)"
           >
-            <div class="payment-period">{{ option.period }}</div>
-            <div class="payment-amount">{{ option.amount }}</div>
+            <div class="payment-period">
+              {{ option.period }}
+            </div>
+            <div class="payment-amount">
+              {{ option.amount }}
+            </div>
           </button>
         </div>
 
         <!-- No pricing available -->
-        <div v-else class="no-pricing-notice">
+        <div
+          v-else
+          class="no-pricing-notice"
+        >
           <span class="notice-icon">⚠️</span>
           <span class="notice-text">Preços não disponíveis para este plano</span>
         </div>

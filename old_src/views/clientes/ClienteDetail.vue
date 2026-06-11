@@ -2,36 +2,64 @@
   <div class="cliente-detail-container">
     <!-- Header -->
     <div class="detail-header">
-      <BackButton to="/clientes/list" variant="inline" />
+      <BackButton
+        to="/clientes/list"
+        variant="inline"
+      />
       <div class="header-content">
         <h1>{{ cliente?.nomeComercial || cliente?.nomeEmpresa || 'Cliente' }}</h1>
         <div class="header-meta">
-          <span v-if="cliente?.contribuinte" class="contribuinte">
+          <span
+            v-if="cliente?.contribuinte"
+            class="contribuinte"
+          >
             NIF: {{ cliente.contribuinte }}
           </span>
-          <span v-if="cliente?.localidade" class="localidade">
+          <span
+            v-if="cliente?.localidade"
+            class="localidade"
+          >
             {{ cliente.localidade }}
           </span>
         </div>
       </div>
       <div class="header-actions">
-        <button @click="navigateToEdit" class="btn btn-edit">✏️ Editar</button>
+        <button
+          class="btn btn-edit"
+          @click="navigateToEdit"
+        >
+          ✏️ Editar
+        </button>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A carregar cliente...</p>
     </div>
 
     <!-- Error State -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Client Details -->
-    <div v-if="!loading && cliente" class="detail-content">
+    <div
+      v-if="!loading && cliente"
+      class="detail-content"
+    >
       <!-- Basic Information Section -->
       <section class="detail-section">
         <h3>INFORMAÇÃO BÁSICA</h3>
@@ -62,7 +90,11 @@
           <div class="detail-item">
             <label>TELEFONE</label>
             <span>
-              <a v-if="cliente.telefone" :href="`tel:${cliente.telefone}`" class="contact-link">
+              <a
+                v-if="cliente.telefone"
+                :href="`tel:${cliente.telefone}`"
+                class="contact-link"
+              >
                 {{ cliente.telefone }}
               </a>
               <span v-else>-</span>
@@ -84,7 +116,11 @@
           <div class="detail-item">
             <label>E-MAIL</label>
             <span>
-              <a v-if="cliente.email" :href="`mailto:${cliente.email}`" class="contact-link">
+              <a
+                v-if="cliente.email"
+                :href="`mailto:${cliente.email}`"
+                class="contact-link"
+              >
                 {{ cliente.email }}
               </a>
               <span v-else>-</span>
@@ -141,7 +177,10 @@
         <h3>SOFTWARE</h3>
 
         <!-- New Software Structure -->
-        <div v-if="cliente.softwares && cliente.softwares.length > 0" class="software-list">
+        <div
+          v-if="cliente.softwares && cliente.softwares.length > 0"
+          class="software-list"
+        >
           <div
             v-for="(software, index) in cliente.softwares"
             :key="software.id"
@@ -153,15 +192,24 @@
             <div class="software-details">
               <!-- Vectron -->
               <template v-if="software.name === 'Vectron'">
-                <div class="software-detail-item" v-if="software.model">
+                <div
+                  v-if="software.model"
+                  class="software-detail-item"
+                >
                   <label>Modelo:</label>
                   <span>{{ software.model }}</span>
                 </div>
-                <div class="software-detail-item" v-if="software.nEquipamento">
+                <div
+                  v-if="software.nEquipamento"
+                  class="software-detail-item"
+                >
                   <label>Nº Equipamento:</label>
                   <span>{{ software.nEquipamento }}</span>
                 </div>
-                <div class="software-detail-item" v-if="software.versaoSoftware">
+                <div
+                  v-if="software.versaoSoftware"
+                  class="software-detail-item"
+                >
                   <label>Versão do Software:</label>
                   <span>{{ software.versaoSoftware }}</span>
                 </div>
@@ -169,26 +217,38 @@
 
               <!-- Pix -->
               <template v-if="software.name === 'Pix'">
-                <div class="software-detail-item" v-if="software.product">
+                <div
+                  v-if="software.product"
+                  class="software-detail-item"
+                >
                   <label>Produto:</label>
                   <span>{{ software.product }}</span>
                 </div>
                 <div
-                  class="software-detail-item"
                   v-if="software.modules && software.modules.length > 0"
+                  class="software-detail-item"
                 >
                   <label>Módulos:</label>
                   <span>{{ software.modules.join(', ') }}</span>
                 </div>
-                <div class="software-detail-item" v-if="software.numeroSerie">
+                <div
+                  v-if="software.numeroSerie"
+                  class="software-detail-item"
+                >
                   <label>Número Série:</label>
                   <span>{{ software.numeroSerie }}</span>
                 </div>
-                <div class="software-detail-item" v-if="software.versaoSoftware">
+                <div
+                  v-if="software.versaoSoftware"
+                  class="software-detail-item"
+                >
                   <label>Versão Software:</label>
                   <span>{{ software.versaoSoftware }}</span>
                 </div>
-                <div class="software-detail-item" v-if="software.versaoLicenca">
+                <div
+                  v-if="software.versaoLicenca"
+                  class="software-detail-item"
+                >
                   <label>Versão Licença:</label>
                   <span>{{ software.versaoLicenca }}</span>
                 </div>
@@ -196,23 +256,38 @@
 
               <!-- Zon Soft -->
               <template v-if="software.name === 'Zon Soft'">
-                <div class="software-detail-item" v-if="software.product">
+                <div
+                  v-if="software.product"
+                  class="software-detail-item"
+                >
                   <label>Produto:</label>
                   <span>{{ software.product }}</span>
                 </div>
-                <div class="software-detail-item" v-if="software.version">
+                <div
+                  v-if="software.version"
+                  class="software-detail-item"
+                >
                   <label>Versão:</label>
                   <span>{{ software.version }}</span>
                 </div>
-                <div class="software-detail-item" v-if="software.numeroSerie">
+                <div
+                  v-if="software.numeroSerie"
+                  class="software-detail-item"
+                >
                   <label>Número Série:</label>
                   <span>{{ software.numeroSerie }}</span>
                 </div>
-                <div class="software-detail-item" v-if="software.versaoSoftware">
+                <div
+                  v-if="software.versaoSoftware"
+                  class="software-detail-item"
+                >
                   <label>Versão Software:</label>
                   <span>{{ software.versaoSoftware }}</span>
                 </div>
-                <div class="software-detail-item" v-if="software.versaoLicenca">
+                <div
+                  v-if="software.versaoLicenca"
+                  class="software-detail-item"
+                >
                   <label>Versão Licença:</label>
                   <span>{{ software.versaoLicenca }}</span>
                 </div>
@@ -220,19 +295,31 @@
 
               <!-- Pt CERT -->
               <template v-if="software.name === 'Pt CERT'">
-                <div class="software-detail-item" v-if="software.licenseType">
+                <div
+                  v-if="software.licenseType"
+                  class="software-detail-item"
+                >
                   <label>Tipo de Licença:</label>
                   <span>{{ software.licenseType }}</span>
                 </div>
-                <div class="software-detail-item" v-if="software.numeroSerie">
+                <div
+                  v-if="software.numeroSerie"
+                  class="software-detail-item"
+                >
                   <label>Número Série:</label>
                   <span>{{ software.numeroSerie }}</span>
                 </div>
-                <div class="software-detail-item" v-if="software.versaoSoftware">
+                <div
+                  v-if="software.versaoSoftware"
+                  class="software-detail-item"
+                >
                   <label>Versão Software:</label>
                   <span>{{ software.versaoSoftware }}</span>
                 </div>
-                <div class="software-detail-item" v-if="software.versaoLicenca">
+                <div
+                  v-if="software.versaoLicenca"
+                  class="software-detail-item"
+                >
                   <label>Versão Licença:</label>
                   <span>{{ software.versaoLicenca }}</span>
                 </div>
@@ -240,15 +327,24 @@
 
               <!-- Dream Soft & Contas Certas -->
               <template v-if="software.name === 'Dream Soft' || software.name === 'Contas Certas'">
-                <div class="software-detail-item" v-if="software.numeroSerie">
+                <div
+                  v-if="software.numeroSerie"
+                  class="software-detail-item"
+                >
                   <label>Número Série:</label>
                   <span>{{ software.numeroSerie }}</span>
                 </div>
-                <div class="software-detail-item" v-if="software.versaoSoftware">
+                <div
+                  v-if="software.versaoSoftware"
+                  class="software-detail-item"
+                >
                   <label>Versão Software:</label>
                   <span>{{ software.versaoSoftware }}</span>
                 </div>
-                <div class="software-detail-item" v-if="software.versaoLicenca">
+                <div
+                  v-if="software.versaoLicenca"
+                  class="software-detail-item"
+                >
                   <label>Versão Licença:</label>
                   <span>{{ software.versaoLicenca }}</span>
                 </div>
@@ -258,47 +354,87 @@
         </div>
 
         <!-- Legacy software display (for old data) -->
-        <div v-else-if="hasLegacySoftware(cliente)" class="services-grid legacy-services">
-          <div class="service-item active" v-if="cliente.vectron">
+        <div
+          v-else-if="hasLegacySoftware(cliente)"
+          class="services-grid legacy-services"
+        >
+          <div
+            v-if="cliente.vectron"
+            class="service-item active"
+          >
             <span class="service-icon">✅</span>
             <span class="service-name">VECTRON</span>
           </div>
-          <div class="service-item active" v-if="cliente.dreamSoft">
+          <div
+            v-if="cliente.dreamSoft"
+            class="service-item active"
+          >
             <span class="service-icon">✅</span>
             <span class="service-name">DREAM SOFT</span>
           </div>
-          <div class="service-item active" v-if="cliente.ptcert">
+          <div
+            v-if="cliente.ptcert"
+            class="service-item active"
+          >
             <span class="service-icon">✅</span>
             <span class="service-name">PTCERT</span>
           </div>
-          <div class="service-item active" v-if="cliente.pix">
+          <div
+            v-if="cliente.pix"
+            class="service-item active"
+          >
             <span class="service-icon">✅</span>
             <span class="service-name">PIX</span>
           </div>
-          <div class="service-item active" v-if="cliente.zsrest">
+          <div
+            v-if="cliente.zsrest"
+            class="service-item active"
+          >
             <span class="service-icon">✅</span>
             <span class="service-name">ZSREST</span>
           </div>
-          <div class="service-item active" v-if="cliente.contasCertas">
+          <div
+            v-if="cliente.contasCertas"
+            class="service-item active"
+          >
             <span class="service-icon">✅</span>
             <span class="service-name">CONTAS CERTAS</span>
           </div>
         </div>
 
         <!-- Empty state -->
-        <div v-else class="no-software-message">Nenhum software registado</div>
+        <div
+          v-else
+          class="no-software-message"
+        >
+          Nenhum software registado
+        </div>
       </section>
 
       <!-- Contratos Section -->
       <section class="detail-section">
         <h3>CONTRATOS</h3>
 
-        <div v-if="contractosLoading" class="loading-contracts">A carregar contratos...</div>
+        <div
+          v-if="contractosLoading"
+          class="loading-contracts"
+        >
+          A carregar contratos...
+        </div>
 
-        <div v-else-if="clienteContratos && clienteContratos.length > 0" class="contratos-list">
-          <div v-for="contrato in clienteContratos" :key="contrato.id" class="contrato-card">
+        <div
+          v-else-if="clienteContratos && clienteContratos.length > 0"
+          class="contratos-list"
+        >
+          <div
+            v-for="contrato in clienteContratos"
+            :key="contrato.id"
+            class="contrato-card"
+          >
             <div class="contrato-header">
-              <div class="contrato-icon">📄</div>
+              <div class="contrato-icon">
+                📄
+              </div>
               <div class="contrato-title">
                 <strong>{{ contrato.nomeComercial || contrato.nome }}</strong>
                 <span class="contrato-year">Ano: {{ contrato.year }}</span>
@@ -306,32 +442,53 @@
             </div>
             <div class="contrato-details">
               <!-- CPA Contract -->
-              <div v-if="contrato.hasCPAContract" class="contrato-type">
+              <div
+                v-if="contrato.hasCPAContract"
+                class="contrato-type"
+              >
                 <span class="type-badge cpa">CPA - Cashlogy</span>
                 <div class="type-details">
-                  <div class="detail-row" v-if="contrato.planIdCPA">
+                  <div
+                    v-if="contrato.planIdCPA"
+                    class="detail-row"
+                  >
                     <span class="detail-label">Plano:</span>
                     <span class="detail-value">{{ getPlanName(contrato.planIdCPA, 'CPA') }}</span>
                   </div>
-                  <div class="detail-row" v-if="contrato.distanceCPA">
+                  <div
+                    v-if="contrato.distanceCPA"
+                    class="detail-row"
+                  >
                     <span class="detail-label">Distância:</span>
                     <span class="detail-value">{{ formatDistance(contrato.distanceCPA) }}</span>
                   </div>
-                  <div class="detail-row" v-if="contrato.modalidadePagamentoCPA">
+                  <div
+                    v-if="contrato.modalidadePagamentoCPA"
+                    class="detail-row"
+                  >
                     <span class="detail-label">Pagamento:</span>
                     <span class="detail-value">{{ contrato.modalidadePagamentoCPA }}</span>
                   </div>
-                  <div class="detail-row" v-if="getContractPrice(contrato, 'CPA')">
+                  <div
+                    v-if="getContractPrice(contrato, 'CPA')"
+                    class="detail-row"
+                  >
                     <span class="detail-label">Preço:</span>
                     <span class="detail-value price-highlight">{{
                       formatPrice(getContractPrice(contrato, 'CPA'))
                     }}</span>
                   </div>
-                  <div class="detail-row" v-if="contrato.inicioContratoCPA">
+                  <div
+                    v-if="contrato.inicioContratoCPA"
+                    class="detail-row"
+                  >
                     <span class="detail-label">Início:</span>
                     <span class="detail-value">{{ formatDate(contrato.inicioContratoCPA) }}</span>
                   </div>
-                  <div class="detail-row" v-if="contrato.fimContratoCPA">
+                  <div
+                    v-if="contrato.fimContratoCPA"
+                    class="detail-row"
+                  >
                     <span class="detail-label">Fim:</span>
                     <span class="detail-value">{{ formatDate(contrato.fimContratoCPA) }}</span>
                   </div>
@@ -339,32 +496,53 @@
               </div>
 
               <!-- S&H Contract -->
-              <div v-if="contrato.hasSHContract" class="contrato-type">
+              <div
+                v-if="contrato.hasSHContract"
+                class="contrato-type"
+              >
                 <span class="type-badge sh">S&H - Software e Hardware</span>
                 <div class="type-details">
-                  <div class="detail-row" v-if="contrato.planIdSH">
+                  <div
+                    v-if="contrato.planIdSH"
+                    class="detail-row"
+                  >
                     <span class="detail-label">Plano:</span>
                     <span class="detail-value">{{ getPlanName(contrato.planIdSH, 'S&H') }}</span>
                   </div>
-                  <div class="detail-row" v-if="contrato.distanceSH">
+                  <div
+                    v-if="contrato.distanceSH"
+                    class="detail-row"
+                  >
                     <span class="detail-label">Distância:</span>
                     <span class="detail-value">{{ formatDistance(contrato.distanceSH) }}</span>
                   </div>
-                  <div class="detail-row" v-if="contrato.modalidadePagamentoSH">
+                  <div
+                    v-if="contrato.modalidadePagamentoSH"
+                    class="detail-row"
+                  >
                     <span class="detail-label">Pagamento:</span>
                     <span class="detail-value">{{ contrato.modalidadePagamentoSH }}</span>
                   </div>
-                  <div class="detail-row" v-if="getContractPrice(contrato, 'S&H')">
+                  <div
+                    v-if="getContractPrice(contrato, 'S&H')"
+                    class="detail-row"
+                  >
                     <span class="detail-label">Preço:</span>
                     <span class="detail-value price-highlight">{{
                       formatPrice(getContractPrice(contrato, 'S&H'))
                     }}</span>
                   </div>
-                  <div class="detail-row" v-if="contrato.inicioContratoSH">
+                  <div
+                    v-if="contrato.inicioContratoSH"
+                    class="detail-row"
+                  >
                     <span class="detail-label">Início:</span>
                     <span class="detail-value">{{ formatDate(contrato.inicioContratoSH) }}</span>
                   </div>
-                  <div class="detail-row" v-if="contrato.fimContratoSH">
+                  <div
+                    v-if="contrato.fimContratoSH"
+                    class="detail-row"
+                  >
                     <span class="detail-label">Fim:</span>
                     <span class="detail-value">{{ formatDate(contrato.fimContratoSH) }}</span>
                   </div>
@@ -374,7 +552,10 @@
           </div>
         </div>
 
-        <div v-else class="no-contratos-message">
+        <div
+          v-else
+          class="no-contratos-message"
+        >
           <p>Nenhum contrato registado para este cliente</p>
         </div>
       </section>
@@ -383,11 +564,17 @@
       <section class="detail-section">
         <h3>LICENÇAS</h3>
 
-        <div v-if="licencasLoading" class="loading-contracts">
+        <div
+          v-if="licencasLoading"
+          class="loading-contracts"
+        >
           <p>A carregar licenças...</p>
         </div>
 
-        <div v-else-if="clienteLicencas.length > 0" class="licencas-list">
+        <div
+          v-else-if="clienteLicencas.length > 0"
+          class="licencas-list"
+        >
           <div
             v-for="licenca in clienteLicencas"
             :key="`${licenca.year}-${licenca.id}`"
@@ -396,38 +583,58 @@
             <div class="licenca-header">
               <span class="licenca-icon">🔑</span>
               <div class="licenca-title-wrapper">
-                <h4 class="licenca-title">{{ licenca.tipoSoftware }}</h4>
+                <h4 class="licenca-title">
+                  {{ licenca.tipoSoftware }}
+                </h4>
                 <span class="licenca-year">{{ licenca.year }}</span>
               </div>
             </div>
 
             <div class="licenca-details">
-              <div class="detail-row" v-if="licenca.versao">
+              <div
+                v-if="licenca.versao"
+                class="detail-row"
+              >
                 <span class="detail-label">Versão:</span>
                 <span class="detail-value">{{ licenca.versao }}</span>
               </div>
 
-              <div class="detail-row" v-if="licenca.numeroSerie">
+              <div
+                v-if="licenca.numeroSerie"
+                class="detail-row"
+              >
                 <span class="detail-label">Número de Série:</span>
                 <span class="detail-value">{{ licenca.numeroSerie }}</span>
               </div>
 
-              <div class="detail-row" v-if="licenca.modalidade">
+              <div
+                v-if="licenca.modalidade"
+                class="detail-row"
+              >
                 <span class="detail-label">Modalidade:</span>
                 <span class="detail-value">{{ licenca.modalidade }}</span>
               </div>
 
-              <div class="detail-row" v-if="licenca.dataInicio">
+              <div
+                v-if="licenca.dataInicio"
+                class="detail-row"
+              >
                 <span class="detail-label">Data Início:</span>
                 <span class="detail-value">{{ formatDate(licenca.dataInicio) }}</span>
               </div>
 
-              <div class="detail-row" v-if="licenca.dataVencimento">
+              <div
+                v-if="licenca.dataVencimento"
+                class="detail-row"
+              >
                 <span class="detail-label">Data Vencimento:</span>
                 <span class="detail-value">{{ formatDate(licenca.dataVencimento) }}</span>
               </div>
 
-              <div class="detail-row" v-if="licenca.duracaoContrato">
+              <div
+                v-if="licenca.duracaoContrato"
+                class="detail-row"
+              >
                 <span class="detail-label">Duração:</span>
                 <span class="detail-value">{{ licenca.duracaoContrato }} meses</span>
               </div>
@@ -435,7 +642,10 @@
           </div>
         </div>
 
-        <div v-else class="no-licencas-message">
+        <div
+          v-else
+          class="no-licencas-message"
+        >
           <p>Nenhuma licença registada para este cliente</p>
         </div>
       </section>
@@ -444,27 +654,45 @@
       <section class="detail-section">
         <h3>SERVIÇOS</h3>
         <div class="services-grid">
-          <div class="service-item" :class="{ active: cliente.temAnydesk }">
+          <div
+            class="service-item"
+            :class="{ active: cliente.temAnydesk }"
+          >
             <span class="service-icon">{{ cliente.temAnydesk ? '✅' : '❌' }}</span>
             <span class="service-name">TEM ANYDESK</span>
           </div>
-          <div class="service-item" :class="{ active: cliente.manutencao }">
+          <div
+            class="service-item"
+            :class="{ active: cliente.manutencao }"
+          >
             <span class="service-icon">{{ cliente.manutencao ? '✅' : '❌' }}</span>
             <span class="service-name">MANUTENÇÃO</span>
           </div>
-          <div class="service-item" :class="{ active: cliente.manutencao24 }">
+          <div
+            class="service-item"
+            :class="{ active: cliente.manutencao24 }"
+          >
             <span class="service-icon">{{ cliente.manutencao24 ? '✅' : '❌' }}</span>
             <span class="service-name">MANUTENÇÃO 24H</span>
           </div>
-          <div class="service-item" :class="{ active: cliente.dumps }">
+          <div
+            class="service-item"
+            :class="{ active: cliente.dumps }"
+          >
             <span class="service-icon">{{ cliente.dumps ? '✅' : '❌' }}</span>
             <span class="service-name">DUMPS</span>
           </div>
-          <div class="service-item" :class="{ active: cliente.atcud }">
+          <div
+            class="service-item"
+            :class="{ active: cliente.atcud }"
+          >
             <span class="service-icon">{{ cliente.atcud ? '✅' : '❌' }}</span>
             <span class="service-name">ATCUD</span>
           </div>
-          <div class="service-item" :class="{ active: cliente.vectronConnect }">
+          <div
+            class="service-item"
+            :class="{ active: cliente.vectronConnect }"
+          >
             <span class="service-icon">{{ cliente.vectronConnect ? '✅' : '❌' }}</span>
             <span class="service-name">VECTRON CONNECT</span>
           </div>
@@ -476,18 +704,30 @@
           class="conditional-details"
         >
           <!-- ATCUD conditional fields -->
-          <div v-if="cliente.atcud" class="atcud-details">
+          <div
+            v-if="cliente.atcud"
+            class="atcud-details"
+          >
             <h4>DETALHES ATCUD</h4>
             <div class="detail-grid">
-              <div class="detail-item" v-if="cliente.seriesDocumentos">
+              <div
+                v-if="cliente.seriesDocumentos"
+                class="detail-item"
+              >
                 <label>SÉRIES DE DOCUMENTOS</label>
                 <span>{{ cliente.seriesDocumentos }}</span>
               </div>
-              <div class="detail-item" v-if="cliente.atUsername">
+              <div
+                v-if="cliente.atUsername"
+                class="detail-item"
+              >
                 <label>AT USERNAME</label>
                 <span>{{ cliente.atUsername }}</span>
               </div>
-              <div class="detail-item" v-if="cliente.atPassword">
+              <div
+                v-if="cliente.atPassword"
+                class="detail-item"
+              >
                 <label>AT PASSWORD</label>
                 <div class="password-field">
                   <span>{{
@@ -495,16 +735,19 @@
                   }}</span>
                   <button
                     type="button"
-                    @click="toggleAtPassword"
                     class="password-toggle-btn"
                     :title="showAtPassword ? 'Ocultar password' : 'Mostrar password'"
+                    @click="toggleAtPassword"
                   >
                     {{ showAtPassword ? '👁️' : '👁️‍🗨️' }}
                   </button>
                 </div>
               </div>
               <!-- Legacy atClient field -->
-              <div class="detail-item" v-if="!cliente.atUsername && cliente.atClient">
+              <div
+                v-if="!cliente.atUsername && cliente.atClient"
+                class="detail-item"
+              >
                 <label>AT CLIENT</label>
                 <span>{{ cliente.atClient }}</span>
               </div>
@@ -512,13 +755,23 @@
           </div>
 
           <!-- DUMPS conditional field -->
-          <div v-if="cliente.dumps" class="dumps-details">
+          <div
+            v-if="cliente.dumps"
+            class="dumps-details"
+          >
             <h4>DETALHES DUMPS</h4>
             <div class="detail-grid">
-              <div class="detail-item full-width" v-if="cliente.dumpsLink">
+              <div
+                v-if="cliente.dumpsLink"
+                class="detail-item full-width"
+              >
                 <label>LINK GOOGLE DRIVE</label>
                 <span>
-                  <a :href="cliente.dumpsLink" target="_blank" class="contact-link">
+                  <a
+                    :href="cliente.dumpsLink"
+                    target="_blank"
+                    class="contact-link"
+                  >
                     {{ cliente.dumpsLink }}
                   </a>
                 </span>
@@ -527,10 +780,16 @@
           </div>
 
           <!-- Vectron Connect conditional field -->
-          <div v-if="cliente.vectronConnect" class="vectron-connect-details">
+          <div
+            v-if="cliente.vectronConnect"
+            class="vectron-connect-details"
+          >
             <h4>DETALHES VECTRON CONNECT</h4>
             <div class="detail-grid">
-              <div class="detail-item full-width" v-if="cliente.vectronAddress">
+              <div
+                v-if="cliente.vectronAddress"
+                class="detail-item full-width"
+              >
                 <label>VECTRON ADDRESS</label>
                 <span>{{ cliente.vectronAddress }}</span>
               </div>
@@ -540,7 +799,10 @@
       </section>
 
       <!-- Additional Information Section -->
-      <section class="detail-section" v-if="cliente.observacoes">
+      <section
+        v-if="cliente.observacoes"
+        class="detail-section"
+      >
         <h3>OBSERVAÇÕES</h3>
         <div class="observacoes-content">
           <p>{{ cliente.observacoes }}</p>
@@ -568,22 +830,48 @@
     </div>
 
     <!-- Action Buttons -->
-    <div v-if="!loading && cliente" class="action-buttons">
-      <button @click="navigateToEdit" class="btn btn-primary">✏️ Editar Cliente</button>
-      <button @click="navigateToList" class="btn btn-secondary">📋 Lista de Clientes</button>
+    <div
+      v-if="!loading && cliente"
+      class="action-buttons"
+    >
+      <button
+        class="btn btn-primary"
+        @click="navigateToEdit"
+      >
+        ✏️ Editar Cliente
+      </button>
+      <button
+        class="btn btn-secondary"
+        @click="navigateToList"
+      >
+        📋 Lista de Clientes
+      </button>
     </div>
 
     <!-- Not Found State -->
-    <div v-if="!loading && !error && !cliente" class="not-found-state">
+    <div
+      v-if="!loading && !error && !cliente"
+      class="not-found-state"
+    >
       <h2>Cliente não encontrado</h2>
       <p>O cliente pode ainda não estar disponível no sistema. Tentar novamente?</p>
       <div class="retry-actions">
-        <button @click="retryLoad" class="btn btn-primary" :disabled="loading">
+        <button
+          class="btn btn-primary"
+          :disabled="loading"
+          @click="retryLoad"
+        >
           {{ loading ? 'A carregar...' : 'Tentar novamente' }}
         </button>
-        <BackButton to="/clientes/list" variant="full-width" />
+        <BackButton
+          to="/clientes/list"
+          variant="full-width"
+        />
       </div>
-      <p v-if="autoRetryCountdown > 0" class="auto-retry-info">
+      <p
+        v-if="autoRetryCountdown > 0"
+        class="auto-retry-info"
+      >
         Tentativa automática em {{ autoRetryCountdown }}s...
       </p>
     </div>

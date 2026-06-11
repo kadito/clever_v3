@@ -1,9 +1,14 @@
 <template>
   <div class="instalacoes-module">
     <div class="module-header">
-      <BackButton to="/" variant="inline" />
+      <BackButton
+        to="/"
+        variant="inline"
+      />
       <div class="module-info">
-        <div class="module-icon">💻</div>
+        <div class="module-icon">
+          💻
+        </div>
         <div class="module-content">
           <h1>Instalações e Programações</h1>
           <p class="module-description">
@@ -14,13 +19,19 @@
     </div>
 
     <div class="module-actions">
-      <button @click="navigateToList" class="action-btn primary">
+      <button
+        class="action-btn primary"
+        @click="navigateToList"
+      >
         <span class="action-icon">📋</span>
         <span class="action-label">CONSULTAR</span>
         <span class="action-description">Ver lista de instalações e programações</span>
       </button>
 
-      <button @click="navigateToCreate" class="action-btn secondary">
+      <button
+        class="action-btn secondary"
+        @click="navigateToCreate"
+      >
         <span class="action-icon">➕</span>
         <span class="action-label">NOVA INSTALAÇÃO</span>
         <span class="action-description">Criar uma nova instalação e programação</span>

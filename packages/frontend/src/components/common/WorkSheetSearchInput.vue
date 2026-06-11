@@ -3,8 +3,8 @@
     <!-- Search Input with Dropdown -->
     <div class="relative">
       <input
-        type="text"
         v-model="searchQuery"
+        type="text"
         :placeholder="placeholder"
         :disabled="disabled"
         :readonly="readonly"
@@ -17,7 +17,7 @@
         @focus="onFocus"
         @blur="onBlur"
         @keydown="onKeyDown"
-      />
+      >
 
       <!-- Search Icon -->
       <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -34,12 +34,12 @@
             r="10"
             stroke="currentColor"
             stroke-width="4"
-          ></circle>
+          />
           <path
             class="opacity-75"
             fill="currentColor"
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          ></path>
+          />
         </svg>
         <svg
           v-else
@@ -58,11 +58,21 @@
       </div>
 
       <!-- Dropdown Results - positioned relative to this input container -->
-      <div v-if="!readonly && !disabled && showDropdown" class="search-dropdown">
+      <div
+        v-if="!readonly && !disabled && showDropdown"
+        class="search-dropdown"
+      >
         <!-- Loading State -->
-        <div v-if="isLoading" class="search-option loading">
+        <div
+          v-if="isLoading"
+          class="search-option loading"
+        >
           <div class="flex items-center">
-            <svg class="animate-spin h-4 w-4 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24">
+            <svg
+              class="animate-spin h-4 w-4 text-gray-400 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
               <circle
                 class="opacity-25"
                 cx="12"
@@ -70,12 +80,12 @@
                 r="10"
                 stroke="currentColor"
                 stroke-width="4"
-              ></circle>
+              />
               <path
                 class="opacity-75"
                 fill="currentColor"
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
+              />
             </svg>
             <span class="text-gray-600">Pesquisando folhas de obra...</span>
           </div>
@@ -129,8 +139,8 @@
 
         <!-- Results -->
         <div
-          v-else
           v-for="workSheet in searchResults"
+          v-else
           :key="workSheet.uuid"
           class="search-option"
           @click="selectWorkSheet(workSheet)"
@@ -138,26 +148,68 @@
           <div class="work-sheet-info">
             <div class="work-sheet-header">
               <span class="work-sheet-date">{{ formatDate(workSheet.data.request.assistanceDate) }}</span>
-              <span v-if="workSheet.data.otherData.serviceType" class="service-type-badge">
+              <span
+                v-if="workSheet.data.otherData.serviceType"
+                class="service-type-badge"
+              >
                 {{ workSheet.data.otherData.serviceType }}
               </span>
             </div>
             <div class="work-sheet-details">
-              <span v-if="getClientName(workSheet)" class="detail">
-                <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              <span
+                v-if="getClientName(workSheet)"
+                class="detail"
+              >
+                <svg
+                  class="w-3 h-3 inline mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
                 </svg>
                 {{ getClientName(workSheet) }}
               </span>
-              <span v-if="getTechnicianName(workSheet)" class="detail">
-                <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              <span
+                v-if="getTechnicianName(workSheet)"
+                class="detail"
+              >
+                <svg
+                  class="w-3 h-3 inline mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
                 </svg>
                 {{ getTechnicianName(workSheet) }}
               </span>
-              <span v-if="workSheet.data.request.totalHours" class="detail">
-                <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <span
+                v-if="workSheet.data.request.totalHours"
+                class="detail"
+              >
+                <svg
+                  class="w-3 h-3 inline mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 {{ workSheet.data.request.totalHours }}
               </span>
@@ -168,30 +220,48 @@
     </div>
 
     <!-- Selected Work Sheet Info (when readonly) -->
-    <div v-if="selectedWorkSheet && (readonly || disabled)" class="selected-work-sheet-info">
+    <div
+      v-if="selectedWorkSheet && (readonly || disabled)"
+      class="selected-work-sheet-info"
+    >
       <div class="work-sheet-card">
         <div class="work-sheet-card-header">
           <h3 class="work-sheet-title">
             Folha de Obra - {{ formatDate(selectedWorkSheet.data.request.assistanceDate) }}
           </h3>
-          <span v-if="selectedWorkSheet.data.otherData.serviceType" class="service-type-badge">
+          <span
+            v-if="selectedWorkSheet.data.otherData.serviceType"
+            class="service-type-badge"
+          >
             {{ selectedWorkSheet.data.otherData.serviceType }}
           </span>
         </div>
         <div class="work-sheet-details-grid">
-          <div v-if="getClientName(selectedWorkSheet)" class="detail-item">
+          <div
+            v-if="getClientName(selectedWorkSheet)"
+            class="detail-item"
+          >
             <span class="detail-label">Cliente:</span>
             <span class="detail-value">{{ getClientName(selectedWorkSheet) }}</span>
           </div>
-          <div v-if="getTechnicianName(selectedWorkSheet)" class="detail-item">
+          <div
+            v-if="getTechnicianName(selectedWorkSheet)"
+            class="detail-item"
+          >
             <span class="detail-label">Técnico:</span>
             <span class="detail-value">{{ getTechnicianName(selectedWorkSheet) }}</span>
           </div>
-          <div v-if="selectedWorkSheet.data.request.totalHours" class="detail-item">
+          <div
+            v-if="selectedWorkSheet.data.request.totalHours"
+            class="detail-item"
+          >
             <span class="detail-label">Total Horas:</span>
             <span class="detail-value">{{ selectedWorkSheet.data.request.totalHours }}</span>
           </div>
-          <div v-if="selectedWorkSheet.data.request.reason" class="detail-item">
+          <div
+            v-if="selectedWorkSheet.data.request.reason"
+            class="detail-item"
+          >
             <span class="detail-label">Motivo:</span>
             <span class="detail-value">{{ selectedWorkSheet.data.request.reason }}</span>
           </div>
@@ -200,36 +270,68 @@
     </div>
 
     <!-- Selected Work Sheet Info (when not readonly/disabled - for forms) -->
-    <div v-if="selectedWorkSheet && !readonly && !disabled" class="selected-work-sheet-info">
+    <div
+      v-if="selectedWorkSheet && !readonly && !disabled"
+      class="selected-work-sheet-info"
+    >
       <div class="bg-white rounded-touch border border-gray-200 mt-4">
         <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-          <h3 class="text-lg font-semibold text-gray-900">Informação da Folha de Obra</h3>
+          <h3 class="text-lg font-semibold text-gray-900">
+            Informação da Folha de Obra
+          </h3>
         </div>
         <div class="p-4 sm:p-6">
           <div class="detail-grid">
             <div class="detail-item">
               <label class="detail-label">Data da Assistência</label>
-              <div class="detail-value">{{ formatDate(selectedWorkSheet.data.request.assistanceDate) }}</div>
+              <div class="detail-value">
+                {{ formatDate(selectedWorkSheet.data.request.assistanceDate) }}
+              </div>
             </div>
-            <div v-if="selectedWorkSheet.data.otherData.serviceType" class="detail-item">
+            <div
+              v-if="selectedWorkSheet.data.otherData.serviceType"
+              class="detail-item"
+            >
               <label class="detail-label">Tipo de Serviço</label>
-              <div class="detail-value">{{ selectedWorkSheet.data.otherData.serviceType }}</div>
+              <div class="detail-value">
+                {{ selectedWorkSheet.data.otherData.serviceType }}
+              </div>
             </div>
-            <div v-if="getClientName(selectedWorkSheet)" class="detail-item">
+            <div
+              v-if="getClientName(selectedWorkSheet)"
+              class="detail-item"
+            >
               <label class="detail-label">Cliente</label>
-              <div class="detail-value">{{ getClientName(selectedWorkSheet) }}</div>
+              <div class="detail-value">
+                {{ getClientName(selectedWorkSheet) }}
+              </div>
             </div>
-            <div v-if="getTechnicianName(selectedWorkSheet)" class="detail-item">
+            <div
+              v-if="getTechnicianName(selectedWorkSheet)"
+              class="detail-item"
+            >
               <label class="detail-label">Técnico</label>
-              <div class="detail-value">{{ getTechnicianName(selectedWorkSheet) }}</div>
+              <div class="detail-value">
+                {{ getTechnicianName(selectedWorkSheet) }}
+              </div>
             </div>
-            <div v-if="selectedWorkSheet.data.request.totalHours" class="detail-item">
+            <div
+              v-if="selectedWorkSheet.data.request.totalHours"
+              class="detail-item"
+            >
               <label class="detail-label">Total Horas</label>
-              <div class="detail-value">{{ selectedWorkSheet.data.request.totalHours }}</div>
+              <div class="detail-value">
+                {{ selectedWorkSheet.data.request.totalHours }}
+              </div>
             </div>
-            <div v-if="selectedWorkSheet.data.request.reason" class="detail-item">
+            <div
+              v-if="selectedWorkSheet.data.request.reason"
+              class="detail-item"
+            >
               <label class="detail-label">Motivo do Pedido</label>
-              <div class="detail-value">{{ selectedWorkSheet.data.request.reason }}</div>
+              <div class="detail-value">
+                {{ selectedWorkSheet.data.request.reason }}
+              </div>
             </div>
           </div>
         </div>

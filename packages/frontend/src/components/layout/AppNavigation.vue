@@ -6,7 +6,12 @@
       :class="['nav-item', { active: $route.name === 'home' }, { 'mobile-nav-item': isMobile }]"
       @click="handleNavigate"
     >
-      <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg
+        class="w-5 h-5 mr-3"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -24,8 +29,13 @@
     </router-link>
 
     <!-- Mobile-specific footer -->
-    <div v-if="isMobile" class="mt-6 pt-6 border-t border-gray-200">
-      <div class="px-4 text-xs text-gray-500">CLEVER Dashboard v3.0</div>
+    <div
+      v-if="isMobile"
+      class="mt-6 pt-6 border-t border-gray-200"
+    >
+      <div class="px-4 text-xs text-gray-500">
+        CLEVER Dashboard v3.0
+      </div>
     </div>
   </nav>
 </template>

@@ -15,106 +15,143 @@
     <!-- Custom form content -->
     <template #customSections="{ formData: templateFormData, errors, updateFieldValue: templateUpdateFieldValue }">
       <div class="pb-48 sm:pb-6">
-      <!-- Date Section -->
-      <div class="form-section">
-        <h2 class="section-title">Informação Geral</h2>
-        <p class="section-description">Data do registo de atividade diária</p>
-
-        <div class="form-field">
-          <label class="form-label">
-            Data do Registo *
-          </label>
-          <input
-            :value="templateFormData?.dataRegistro || formData.dataRegistro"
-            type="date"
-            class="form-input"
-            :class="{ 'border-red-500': validationErrors.dataRegistro }"
-            required
-            @input="e => {
-              const value = (e.target as HTMLInputElement).value;
-              formData.dataRegistro = value;
-              templateUpdateFieldValue('dataRegistro', value);
-            }"
-          />
-          <p v-if="validationErrors.dataRegistro" class="form-error">
-            {{ validationErrors.dataRegistro }}
+        <!-- Date Section -->
+        <div class="form-section">
+          <h2 class="section-title">
+            Informação Geral
+          </h2>
+          <p class="section-description">
+            Data do registo de atividade diária
           </p>
-          <p class="form-help">Data em que as atividades foram realizadas</p>
-        </div>
-      </div>
 
-      <!-- Activities Section -->
-      <div class="form-section">
-        <div class="section-header">
-          <div>
-            <h2 class="section-title">Atividades</h2>
-            <p class="section-description">
-              Adicione e gerencie as atividades realizadas durante o dia
+          <div class="form-field">
+            <label class="form-label">
+              Data do Registo *
+            </label>
+            <input
+              :value="templateFormData?.dataRegistro || formData.dataRegistro"
+              type="date"
+              class="form-input"
+              :class="{ 'border-red-500': validationErrors.dataRegistro }"
+              required
+              @input="e => {
+                const value = (e.target as HTMLInputElement).value;
+                formData.dataRegistro = value;
+                templateUpdateFieldValue('dataRegistro', value);
+              }"
+            >
+            <p
+              v-if="validationErrors.dataRegistro"
+              class="form-error"
+            >
+              {{ validationErrors.dataRegistro }}
+            </p>
+            <p class="form-help">
+              Data em que as atividades foram realizadas
             </p>
           </div>
         </div>
 
-        <!-- Activities List -->
-        <div v-if="!formData.atividades || formData.atividades.length === 0" class="empty-activities">
-          <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+        <!-- Activities Section -->
+        <div class="form-section">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">
+                Atividades
+              </h2>
+              <p class="section-description">
+                Adicione e gerencie as atividades realizadas durante o dia
+              </p>
+            </div>
+          </div>
+
+          <!-- Activities List -->
+          <div
+            v-if="!formData.atividades || formData.atividades.length === 0"
+            class="empty-activities"
+          >
+            <svg
+              class="w-12 h-12 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
+            </svg>
+            <p class="empty-text">
+              Nenhuma atividade adicionada
+            </p>
+            <p class="empty-subtext">
+              Clique em "Adicionar Atividade" para começar
+            </p>
+          </div>
+
+          <div
+            v-else
+            class="activities-list"
+          >
+            <ActivityCard
+              v-for="(activity, index) in formData.atividades"
+              :key="index"
+              :activity="activity"
+              :is-edit-mode="true"
+              @activity-updated="handleActivityUpdate(index, $event, templateUpdateFieldValue)"
+              @activity-removed="removeActivity(index, templateUpdateFieldValue)"
             />
-          </svg>
-          <p class="empty-text">Nenhuma atividade adicionada</p>
-          <p class="empty-subtext">Clique em "Adicionar Atividade" para começar</p>
+          </div>
+
+          <!-- Add Activity Button -->
+          <button
+            type="button"
+            class="add-activity-button-bottom"
+            :disabled="isSaving"
+            @click="addActivity(templateUpdateFieldValue)"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            <span>Adicionar Atividade</span>
+          </button>
+
+          <p
+            v-if="validationErrors.activities"
+            class="form-error mt-4"
+          >
+            {{ validationErrors.activities }}
+          </p>
         </div>
 
-        <div v-else class="activities-list">
-          <ActivityCard
-            v-for="(activity, index) in formData.atividades"
-            :key="index"
-            :activity="activity"
-            :is-edit-mode="true"
-            @activity-updated="handleActivityUpdate(index, $event, templateUpdateFieldValue)"
-            @activity-removed="removeActivity(index, templateUpdateFieldValue)"
-          />
-        </div>
-
-        <!-- Add Activity Button -->
-        <button
-          type="button"
-          class="add-activity-button-bottom"
-          @click="addActivity(templateUpdateFieldValue)"
-          :disabled="isSaving"
+        <!-- Summary Section -->
+        <div
+          v-if="formData.atividades && formData.atividades.length > 0"
+          class="summary-section mb-32"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
-          <span>Adicionar Atividade</span>
-        </button>
-
-        <p v-if="validationErrors.activities" class="form-error mt-4">
-          {{ validationErrors.activities }}
-        </p>
-      </div>
-
-      <!-- Summary Section -->
-      <div v-if="formData.atividades && formData.atividades.length > 0" class="summary-section mb-32">
-        <div class="summary-grid">
-          <div class="summary-item">
-            <span class="summary-label">Atividades</span>
-            <span class="summary-value">{{ formData.atividades.length }}</span>
-          </div>
-          <div class="summary-item">
-            <span class="summary-label">Total Horas</span>
-            <span class="summary-value">{{ totalHours }}</span>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-label">Atividades</span>
+              <span class="summary-value">{{ formData.atividades.length }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Total Horas</span>
+              <span class="summary-value">{{ totalHours }}</span>
+            </div>
           </div>
         </div>
-      </div>
       </div>
     </template>
   </ContentFormTemplate>
@@ -242,7 +279,7 @@ const validateForm = (): boolean => {
       if (!validationErrors.activities) {
         validationErrors.activities = errorMessage;
       } else {
-        validationErrors.activities += '\n' + errorMessage;
+        validationErrors.activities += `\n${  errorMessage}`;
       }
     } else {
       // Generic error

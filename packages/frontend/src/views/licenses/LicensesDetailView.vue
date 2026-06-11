@@ -22,7 +22,10 @@
   >
     <!-- Custom content sections -->
     <template #content="{ item }">
-      <div v-if="item && item.data" class="space-y-6">
+      <div
+        v-if="item && item.data"
+        class="space-y-6"
+      >
         <!-- Client Information Section (First Priority) -->
         <ClientInfoSection
           :client-relation="(license as ContentWithRelations<License['data']>)?.relations?.client"
@@ -34,22 +37,31 @@
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Informação Básica</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Informação Básica
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
                 <div class="detail-item">
                   <label class="detail-label">Versão</label>
-                  <div class="detail-value">{{ item.data.versao || '-' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.versao || '-' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Número de Série</label>
-                  <div class="detail-value font-mono">{{ item.data.numeroSerie || '-' }}</div>
+                  <div class="detail-value font-mono">
+                    {{ item.data.numeroSerie || '-' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Estado</label>
                   <div class="detail-value">
-                    <span class="status-badge" :class="getStatusClass(getLicenseStatus(item))">
+                    <span
+                      class="status-badge"
+                      :class="getStatusClass(getLicenseStatus(item))"
+                    >
                       {{ getLicenseStatus(item) }}
                     </span>
                   </div>
@@ -65,13 +77,17 @@
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Período da Licença</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Período da Licença
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
                 <div class="detail-item">
                   <label class="detail-label">Data de Início</label>
-                  <div class="detail-value">{{ formatDate(item.data.dataInicio) }}</div>
+                  <div class="detail-value">
+                    {{ formatDate(item.data.dataInicio) }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Data de Vencimento</label>
@@ -83,11 +99,15 @@
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Modalidade</label>
-                  <div class="detail-value">{{ item.data.modalidade || '-' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.modalidade || '-' }}
+                  </div>
                 </div>
                 <div class="detail-item">
                   <label class="detail-label">Duração do Contrato</label>
-                  <div class="detail-value">{{ item.data.duracaoContrato || '-' }}</div>
+                  <div class="detail-value">
+                    {{ item.data.duracaoContrato || '-' }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -103,7 +123,9 @@
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Software</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Software
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="software-list">
@@ -113,27 +135,44 @@
                   class="software-card"
                 >
                   <div class="flex items-start justify-between mb-3">
-                    <h3 class="text-base font-semibold text-gray-900">{{ softwareName }}</h3>
+                    <h3 class="text-base font-semibold text-gray-900">
+                      {{ softwareName }}
+                    </h3>
                     <span class="software-badge">{{ Number(index) + 1 }}</span>
                   </div>
 
                   <div class="detail-grid">
                     <!-- Show software-specific fields based on the software type -->
                     <template v-if="softwareName === 'Vectron'">
-                      <div v-if="item.data.software.model" class="detail-item">
+                      <div
+                        v-if="item.data.software.model"
+                        class="detail-item"
+                      >
                         <label class="detail-label">Modelo</label>
-                        <div class="detail-value">{{ item.data.software.model }}</div>
+                        <div class="detail-value">
+                          {{ item.data.software.model }}
+                        </div>
                       </div>
-                      <div v-if="item.data.software.nEquipamento" class="detail-item">
+                      <div
+                        v-if="item.data.software.nEquipamento"
+                        class="detail-item"
+                      >
                         <label class="detail-label">Nº Equipamento</label>
-                        <div class="detail-value">{{ item.data.software.nEquipamento }}</div>
+                        <div class="detail-value">
+                          {{ item.data.software.nEquipamento }}
+                        </div>
                       </div>
                     </template>
 
                     <template v-else-if="softwareName === 'Pix'">
-                      <div v-if="item.data.software.product" class="detail-item">
+                      <div
+                        v-if="item.data.software.product"
+                        class="detail-item"
+                      >
                         <label class="detail-label">Produto</label>
-                        <div class="detail-value">{{ item.data.software.product }}</div>
+                        <div class="detail-value">
+                          {{ item.data.software.product }}
+                        </div>
                       </div>
                       <div
                         v-if="item.data.software.modules && item.data.software.modules.length > 0"
@@ -155,31 +194,56 @@
                     </template>
 
                     <template v-else-if="softwareName === 'Zone Soft'">
-                      <div v-if="item.data.software.version" class="detail-item">
+                      <div
+                        v-if="item.data.software.version"
+                        class="detail-item"
+                      >
                         <label class="detail-label">Versão</label>
-                        <div class="detail-value">{{ item.data.software.version }}</div>
+                        <div class="detail-value">
+                          {{ item.data.software.version }}
+                        </div>
                       </div>
                     </template>
 
                     <template v-else-if="softwareName === 'Pt CERT'">
-                      <div v-if="item.data.software.licenseType" class="detail-item">
+                      <div
+                        v-if="item.data.software.licenseType"
+                        class="detail-item"
+                      >
                         <label class="detail-label">Tipo de Licença</label>
-                        <div class="detail-value">{{ item.data.software.licenseType }}</div>
+                        <div class="detail-value">
+                          {{ item.data.software.licenseType }}
+                        </div>
                       </div>
                     </template>
 
                     <!-- Common fields for all software types -->
-                    <div v-if="item.data.software.numeroSerie" class="detail-item">
+                    <div
+                      v-if="item.data.software.numeroSerie"
+                      class="detail-item"
+                    >
                       <label class="detail-label">Número Série</label>
-                      <div class="detail-value font-mono">{{ item.data.software.numeroSerie }}</div>
+                      <div class="detail-value font-mono">
+                        {{ item.data.software.numeroSerie }}
+                      </div>
                     </div>
-                    <div v-if="item.data.software.versaoSoftware" class="detail-item">
+                    <div
+                      v-if="item.data.software.versaoSoftware"
+                      class="detail-item"
+                    >
                       <label class="detail-label">Versão Software</label>
-                      <div class="detail-value">{{ item.data.software.versaoSoftware }}</div>
+                      <div class="detail-value">
+                        {{ item.data.software.versaoSoftware }}
+                      </div>
                     </div>
-                    <div v-if="item.data.software.versaoLicenca" class="detail-item">
+                    <div
+                      v-if="item.data.software.versaoLicenca"
+                      class="detail-item"
+                    >
                       <label class="detail-label">Versão Licença</label>
-                      <div class="detail-value">{{ item.data.software.versaoLicenca }}</div>
+                      <div class="detail-value">
+                        {{ item.data.software.versaoLicenca }}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -189,16 +253,25 @@
         </div>
 
         <!-- Invoices Section -->
-        <div v-if="item.data.invoices && item.data.invoices.length > 0" class="detail-section">
+        <div
+          v-if="item.data.invoices && item.data.invoices.length > 0"
+          class="detail-section"
+        >
           <div class="bg-white rounded-touch border border-gray-200">
             <div
               class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
             >
-              <h2 class="text-lg font-semibold text-gray-900">Faturas</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                Faturas
+              </h2>
             </div>
             <div class="p-4 sm:p-6">
               <div class="space-y-4">
-                <div v-for="invoice in item.data.invoices" :key="invoice.id" class="invoice-card">
+                <div
+                  v-for="invoice in item.data.invoices"
+                  :key="invoice.id"
+                  class="invoice-card"
+                >
                   <div class="flex items-start justify-between mb-3">
                     <h3 class="text-base font-semibold text-gray-900">
                       Fatura {{ invoice.numeroFatura || invoice.id }}
@@ -207,17 +280,32 @@
                   </div>
 
                   <div class="detail-grid">
-                    <div v-if="invoice.numeroFatura" class="detail-item">
+                    <div
+                      v-if="invoice.numeroFatura"
+                      class="detail-item"
+                    >
                       <label class="detail-label">Número</label>
-                      <div class="detail-value">{{ invoice.numeroFatura }}</div>
+                      <div class="detail-value">
+                        {{ invoice.numeroFatura }}
+                      </div>
                     </div>
-                    <div v-if="invoice.dataFatura" class="detail-item">
+                    <div
+                      v-if="invoice.dataFatura"
+                      class="detail-item"
+                    >
                       <label class="detail-label">Data da Fatura</label>
-                      <div class="detail-value">{{ formatDate(invoice.dataFatura) }}</div>
+                      <div class="detail-value">
+                        {{ formatDate(invoice.dataFatura) }}
+                      </div>
                     </div>
-                    <div v-if="invoice.dataAviso" class="detail-item">
+                    <div
+                      v-if="invoice.dataAviso"
+                      class="detail-item"
+                    >
                       <label class="detail-label">Data do Aviso</label>
-                      <div class="detail-value">{{ formatDate(invoice.dataAviso) }}</div>
+                      <div class="detail-value">
+                        {{ formatDate(invoice.dataAviso) }}
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -17,16 +17,16 @@
     :get-item-subtitle="getRemoteAssistanceSubtitle"
     :get-item-meta1="getRemoteAssistanceMeta1"
     :get-item-meta2="getRemoteAssistanceMeta2"
-    @search="handleSearch"
-    @clear-search="handleClearSearch"
-    @item-click="handleRemoteAssistanceClick"
-    @create="handleCreate"
-    @edit="handleEdit"
     :current-page="api.pagination.value.page"
     :total-pages="api.pagination.value.totalPages"
     :total-count="api.pagination.value.total"
     :items-per-page="itemsPerPage"
     :show-pagination="api.pagination.value.total > 0"
+    @search="handleSearch"
+    @clear-search="handleClearSearch"
+    @item-click="handleRemoteAssistanceClick"
+    @create="handleCreate"
+    @edit="handleEdit"
     @page-change="handlePageChange"
     @items-per-page-change="handleItemsPerPageChange"
     @clear-error="clearError"
@@ -34,7 +34,10 @@
     <!-- Custom remote assistance icon -->
     <template #itemIcon="{ item }">
       <div class="remote-assistance-icon">
-        <div class="icon-circle" :class="getRemoteAssistanceIconClass(item)">
+        <div
+          class="icon-circle"
+          :class="getRemoteAssistanceIconClass(item)"
+        >
           {{ getRemoteAssistanceInitials(item) }}
         </div>
       </div>
@@ -45,7 +48,12 @@
       <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
         <!-- Assistance number -->
         <span class="assistance-number-badge">
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -57,14 +65,25 @@
         </span>
 
         <!-- Assistance type -->
-        <span class="assistance-type-badge" :class="getAssistanceTypeClass(item)">
+        <span
+          class="assistance-type-badge"
+          :class="getAssistanceTypeClass(item)"
+        >
           {{ getAssistanceTypeDisplay(item) }}
         </span>
 
         <!-- Status badges -->
         <div class="flex flex-wrap gap-1">
-          <span v-if="item.data.contrato" class="status-badge bg-blue-100 text-blue-800">
-            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <span
+            v-if="item.data.contrato"
+            class="status-badge bg-blue-100 text-blue-800"
+          >
+            <svg
+              class="w-3 h-3 mr-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -74,8 +93,16 @@
             </svg>
             Contrato
           </span>
-          <span v-if="item.data.garantia" class="status-badge bg-green-100 text-green-800">
-            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <span
+            v-if="item.data.garantia"
+            class="status-badge bg-green-100 text-green-800"
+          >
+            <svg
+              class="w-3 h-3 mr-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -85,8 +112,16 @@
             </svg>
             Garantia
           </span>
-          <span v-if="item.data.resolvido" class="status-badge bg-emerald-100 text-emerald-800">
-            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <span
+            v-if="item.data.resolvido"
+            class="status-badge bg-emerald-100 text-emerald-800"
+          >
+            <svg
+              class="w-3 h-3 mr-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -103,7 +138,12 @@
           v-if="item.data.dataAssistencia"
           class="flex items-center before:content-['•'] before:mx-1"
         >
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -119,7 +159,12 @@
           v-if="getAssistanceDuration(item)"
           class="flex items-center before:content-['•'] before:mx-1"
         >
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -136,7 +181,12 @@
           class="value-badge"
           :class="getValueBadgeClass(item)"
         >
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -152,7 +202,12 @@
           v-if="getTechnicianDisplayName(item.data.tecnicoResponsavel)"
           class="flex items-center before:content-['•'] before:mx-1"
         >
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"

@@ -33,23 +33,23 @@ vi.mock('@/composables/useApi', () => ({
 // --- Stubs ---
 const ClientSearchInputStub = defineComponent({
   name: 'ClientSearchInput',
-  template: '<div class="stub-client-search"></div>',
   props: ['modelValue', 'readonly', 'disabled'],
   emits: ['update:modelValue', 'clientSelected'],
+  template: '<div class="stub-client-search"></div>',
 });
 
 const WorkSheetSearchInputStub = defineComponent({
   name: 'WorkSheetSearchInput',
-  template: '<div class="stub-ws-search"></div>',
   props: ['modelValue', 'readonly', 'disabled', 'clientId'],
   emits: ['update:modelValue', 'workSheetSelected'],
+  template: '<div class="stub-ws-search"></div>',
 });
 
 const RemoteAssistanceSearchInputStub = defineComponent({
   name: 'RemoteAssistanceSearchInput',
-  template: '<div class="stub-ra-search"></div>',
   props: ['modelValue', 'readonly', 'disabled', 'clientId'],
   emits: ['update:modelValue', 'remoteAssistanceSelected'],
+  template: '<div class="stub-ra-search"></div>',
 });
 
 // --- Helpers ---

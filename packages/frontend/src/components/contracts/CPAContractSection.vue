@@ -6,12 +6,18 @@
         <label class="config-label required">TIPO DE CONTRATO CPA</label>
         <select
           :value="formData?.cpaContractType || ''"
-          @change="event => handleContractTypeChange((event.target as HTMLSelectElement).value)"
           class="config-select"
+          @change="event => handleContractTypeChange((event.target as HTMLSelectElement).value)"
         >
-          <option value="">Selecione o tipo...</option>
-          <option value="CPA">CPA - Cashlogy 2023</option>
-          <option value="CPA_1500">CPA - Cashlogy 1500 ou Outros</option>
+          <option value="">
+            Selecione o tipo...
+          </option>
+          <option value="CPA">
+            CPA - Cashlogy 2023
+          </option>
+          <option value="CPA_1500">
+            CPA - Cashlogy 1500 ou Outros
+          </option>
         </select>
       </div>
 
@@ -19,9 +25,9 @@
         <label class="config-label required">PLANO CPA</label>
         <select
           :value="formData?.planIdCPA || ''"
-          @change="event => handlePlanSelection((event.target as HTMLSelectElement).value)"
           class="config-select"
           :disabled="!formData?.cpaContractType"
+          @change="event => handlePlanSelection((event.target as HTMLSelectElement).value)"
         >
           <option value="">
             {{
@@ -44,14 +50,20 @@
         <label class="config-label required">DISTÂNCIA</label>
         <select
           :value="formData?.distanceCPA || ''"
+          class="config-select"
           @change="
             event => $emit('update-field', 'distanceCPA', (event.target as HTMLSelectElement).value)
           "
-          class="config-select"
         >
-          <option value="">Selecione a distância...</option>
-          <option value="under180km">Menos de 180 km</option>
-          <option value="over180km">Mais de 180 km</option>
+          <option value="">
+            Selecione a distância...
+          </option>
+          <option value="under180km">
+            Menos de 180 km
+          </option>
+          <option value="over180km">
+            Mais de 180 km
+          </option>
         </select>
       </div>
     </div>
@@ -63,17 +75,20 @@
     />
 
     <!-- POS Package Option (only for CPA_1500 PREMIUM) -->
-    <div v-if="showPOSPackageOption" class="pos-package-section">
+    <div
+      v-if="showPOSPackageOption"
+      class="pos-package-section"
+    >
       <div class="pos-package-option">
         <label class="pos-package-label">
           <input
             type="checkbox"
             :checked="formData?.hasPOSPackage || false"
+            class="pos-package-checkbox"
             @change="
               $emit('update-field', 'hasPOSPackage', ($event.target as HTMLInputElement).checked)
             "
-            class="pos-package-checkbox"
-          />
+          >
           <span class="pos-package-text">
             Pack de 10h de assistência para o seu POS (+100€/ano)
           </span>

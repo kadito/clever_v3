@@ -100,7 +100,7 @@ const initializeApp = async () => {
           email: user.primaryEmailAddress?.emailAddress || '',
           firstName: user.firstName || '',
           lastName: user.lastName || '',
-          userType: userType,
+          userType,
           sessionId: user.id,
           isAuthenticated: true,
         };

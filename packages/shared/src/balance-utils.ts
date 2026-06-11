@@ -61,7 +61,7 @@ export function calculateBalanceFromTransactions(
 
   // Initialize balance state
   let balance = 0;
-  let contracts: ContractUsage = {
+  const contracts: ContractUsage = {
     manutencoesPorAno: 0,
     deslocacoesPorAno: 0,
     horasAssistenciaAnuais: 0,

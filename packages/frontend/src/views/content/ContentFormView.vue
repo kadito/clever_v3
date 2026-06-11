@@ -17,7 +17,12 @@
                   </router-link>
                 </li>
                 <li>
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -35,7 +40,12 @@
                   </router-link>
                 </li>
                 <li v-if="isEditMode">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -65,27 +75,33 @@
       </header>
 
       <!-- Loading state -->
-      <div v-if="isLoading" class="animate-pulse">
+      <div
+        v-if="isLoading"
+        class="animate-pulse"
+      >
         <div class="bg-white rounded-lg border border-gray-200 p-6">
           <div class="space-y-6">
             <div class="space-y-2">
-              <div class="h-4 bg-gray-200 rounded w-1/4"></div>
-              <div class="h-10 bg-gray-200 rounded"></div>
+              <div class="h-4 bg-gray-200 rounded w-1/4" />
+              <div class="h-10 bg-gray-200 rounded" />
             </div>
             <div class="space-y-2">
-              <div class="h-4 bg-gray-200 rounded w-1/3"></div>
-              <div class="h-24 bg-gray-200 rounded"></div>
+              <div class="h-4 bg-gray-200 rounded w-1/3" />
+              <div class="h-24 bg-gray-200 rounded" />
             </div>
             <div class="flex justify-end space-x-3">
-              <div class="h-10 bg-gray-200 rounded w-20"></div>
-              <div class="h-10 bg-gray-200 rounded w-24"></div>
+              <div class="h-10 bg-gray-200 rounded w-20" />
+              <div class="h-10 bg-gray-200 rounded w-24" />
             </div>
           </div>
         </div>
       </div>
 
       <!-- Form -->
-      <div v-else class="bg-white rounded-lg border border-gray-200 p-6">
+      <div
+        v-else
+        class="bg-white rounded-lg border border-gray-200 p-6"
+      >
         <ContentForm
           :content-type="contentType"
           :initial-data="formData"
@@ -99,7 +115,10 @@
             <div class="space-y-6">
               <!-- Common fields for all content types -->
               <div class="form-group">
-                <label class="form-label" for="name"> Nome * </label>
+                <label
+                  class="form-label"
+                  for="name"
+                > Nome * </label>
                 <input
                   id="name"
                   v-model="formData.name"
@@ -108,14 +127,20 @@
                   :class="{ 'border-red-500': errors.name }"
                   placeholder="Digite o nome"
                   required
-                />
-                <p v-if="errors.name" class="form-error">
+                >
+                <p
+                  v-if="errors.name"
+                  class="form-error"
+                >
                   {{ errors.name }}
                 </p>
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="description"> Descrição </label>
+                <label
+                  class="form-label"
+                  for="description"
+                > Descrição </label>
                 <textarea
                   id="description"
                   v-model="formData.description"
@@ -123,16 +148,25 @@
                   :class="{ 'border-red-500': errors.description }"
                   rows="3"
                   placeholder="Digite uma descrição (opcional)"
-                ></textarea>
-                <p v-if="errors.description" class="form-error">
+                />
+                <p
+                  v-if="errors.description"
+                  class="form-error"
+                >
                   {{ errors.description }}
                 </p>
               </div>
 
               <!-- Content type specific fields -->
-              <div v-if="contentType === 'clientes'" class="space-y-6">
+              <div
+                v-if="contentType === 'clientes'"
+                class="space-y-6"
+              >
                 <div class="form-group">
-                  <label class="form-label" for="email"> Email </label>
+                  <label
+                    class="form-label"
+                    for="email"
+                  > Email </label>
                   <input
                     id="email"
                     v-model="formData.email"
@@ -140,27 +174,39 @@
                     class="form-input"
                     :class="{ 'border-red-500': errors.email }"
                     placeholder="cliente@exemplo.com"
-                  />
-                  <p v-if="errors.email" class="form-error">
+                  >
+                  <p
+                    v-if="errors.email"
+                    class="form-error"
+                  >
                     {{ errors.email }}
                   </p>
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" for="phone"> Telefone </label>
+                  <label
+                    class="form-label"
+                    for="phone"
+                  > Telefone </label>
                   <input
                     id="phone"
                     v-model="formData.phone"
                     type="tel"
                     class="form-input"
                     placeholder="+351 123 456 789"
-                  />
+                  >
                 </div>
               </div>
 
-              <div v-else-if="contentType === 'contratos'" class="space-y-6">
+              <div
+                v-else-if="contentType === 'contratos'"
+                class="space-y-6"
+              >
                 <div class="form-group">
-                  <label class="form-label" for="clientId"> Cliente * </label>
+                  <label
+                    class="form-label"
+                    for="clientId"
+                  > Cliente * </label>
                   <select
                     id="clientId"
                     v-model="formData.clientId"
@@ -168,17 +214,29 @@
                     :class="{ 'border-red-500': errors.clientId }"
                     required
                   >
-                    <option value="">Selecione um cliente</option>
-                    <option value="1">Cliente de Exemplo 1</option>
-                    <option value="2">Cliente de Exemplo 2</option>
+                    <option value="">
+                      Selecione um cliente
+                    </option>
+                    <option value="1">
+                      Cliente de Exemplo 1
+                    </option>
+                    <option value="2">
+                      Cliente de Exemplo 2
+                    </option>
                   </select>
-                  <p v-if="errors.clientId" class="form-error">
+                  <p
+                    v-if="errors.clientId"
+                    class="form-error"
+                  >
                     {{ errors.clientId }}
                   </p>
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" for="value"> Valor (€) </label>
+                  <label
+                    class="form-label"
+                    for="value"
+                  > Valor (€) </label>
                   <input
                     id="value"
                     v-model="formData.value"
@@ -187,17 +245,30 @@
                     min="0"
                     class="form-input"
                     placeholder="0.00"
-                  />
+                  >
                 </div>
               </div>
 
               <!-- Status field for all content types -->
               <div class="form-group">
-                <label class="form-label" for="status"> Estado </label>
-                <select id="status" v-model="formData.status" class="form-input">
-                  <option value="active">Ativo</option>
-                  <option value="inactive">Inativo</option>
-                  <option value="pending">Pendente</option>
+                <label
+                  class="form-label"
+                  for="status"
+                > Estado </label>
+                <select
+                  id="status"
+                  v-model="formData.status"
+                  class="form-input"
+                >
+                  <option value="active">
+                    Ativo
+                  </option>
+                  <option value="inactive">
+                    Inativo
+                  </option>
+                  <option value="pending">
+                    Pendente
+                  </option>
                 </select>
               </div>
             </div>

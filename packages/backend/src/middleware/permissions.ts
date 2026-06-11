@@ -22,7 +22,7 @@ export async function requireDeletePermission(c: Context, next: Next): Promise<R
   if (!canDelete(userType)) {
     console.warn('Delete permission denied:', JSON.stringify({
       userId: userContext.userId,
-      userType: userType,
+      userType,
       path: c.req.path,
     }, null, 2));
     

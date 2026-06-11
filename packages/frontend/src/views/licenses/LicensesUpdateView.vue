@@ -32,7 +32,10 @@
           <div class="form-grid">
             <!-- Software Selection (Multi-select Dropdown) -->
             <div class="form-group full-width">
-              <label for="software-names" class="form-label">Software *</label>
+              <label
+                for="software-names"
+                class="form-label"
+              >Software *</label>
               <div class="multiselect-wrapper">
                 <div
                   class="multiselect-trigger"
@@ -42,16 +45,29 @@
                   }"
                   @click="toggleSoftwareDropdown"
                 >
-                  <span v-if="!formData.software.name?.length" class="placeholder">
+                  <span
+                    v-if="!formData.software.name?.length"
+                    class="placeholder"
+                  >
                     Selecione o software...
                   </span>
-                  <span v-else class="selected-count">
+                  <span
+                    v-else
+                    class="selected-count"
+                  >
                     {{ formData.software.name.length }} selecionado(s)
                   </span>
-                  <span class="dropdown-arrow" :class="{ 'is-open': showSoftwareDropdown }">▼</span>
+                  <span
+                    class="dropdown-arrow"
+                    :class="{ 'is-open': showSoftwareDropdown }"
+                  >▼</span>
                 </div>
 
-                <div v-if="showSoftwareDropdown" class="multiselect-dropdown" @click.stop>
+                <div
+                  v-if="showSoftwareDropdown"
+                  class="multiselect-dropdown"
+                  @click.stop
+                >
                   <div class="multiselect-options">
                     <label
                       v-for="option in SOFTWARE_OPTIONS"
@@ -59,11 +75,11 @@
                       class="multiselect-option"
                     >
                       <input
+                        v-model="formData.software.name"
                         type="checkbox"
                         :value="option.value"
-                        v-model="formData.software.name"
                         @change="onSoftwareSelectionChange(formData)"
-                      />
+                      >
                       <span>{{ option.label }}</span>
                     </label>
                   </div>
@@ -71,7 +87,10 @@
               </div>
 
               <!-- Selected Software Tags -->
-              <div v-if="formData.software.name?.length > 0" class="selected-software">
+              <div
+                v-if="formData.software.name?.length > 0"
+                class="selected-software"
+              >
                 <span class="selected-label">Selecionado:</span>
                 <div class="selected-items">
                   <span
@@ -82,8 +101,8 @@
                     {{ item }}
                     <button
                       type="button"
-                      @click="removeSoftware(formData, item)"
                       class="tag-remove"
+                      @click="removeSoftware(formData, item)"
                     >
                       ×
                     </button>
@@ -94,48 +113,86 @@
           </div>
 
           <!-- Conditional Software-Specific Fields -->
-          <div v-if="formData.software.name?.length > 0" class="software-specific-fields">
+          <div
+            v-if="formData.software.name?.length > 0"
+            class="software-specific-fields"
+          >
             <!-- Vectron Group -->
-            <div v-if="formData.software.name?.includes('Vectron')" class="software-group">
-              <h3 class="software-group-title">Vectron</h3>
+            <div
+              v-if="formData.software.name?.includes('Vectron')"
+              class="software-group"
+            >
+              <h3 class="software-group-title">
+                Vectron
+              </h3>
               <div class="form-grid">
                 <div class="form-group">
-                  <label for="vectron-model" class="form-label">Modelo</label>
-                  <select id="vectron-model" v-model="formData.software.model" class="form-select">
-                    <option value="">Selecione o modelo...</option>
-                    <option v-for="model in VECTRON_MODELS" :key="model" :value="model">
+                  <label
+                    for="vectron-model"
+                    class="form-label"
+                  >Modelo</label>
+                  <select
+                    id="vectron-model"
+                    v-model="formData.software.model"
+                    class="form-select"
+                  >
+                    <option value="">
+                      Selecione o modelo...
+                    </option>
+                    <option
+                      v-for="model in VECTRON_MODELS"
+                      :key="model"
+                      :value="model"
+                    >
                       {{ model }}
                     </option>
                   </select>
                 </div>
 
                 <div class="form-group">
-                  <label for="n-equipamento" class="form-label">Nº Equipamento</label>
+                  <label
+                    for="n-equipamento"
+                    class="form-label"
+                  >Nº Equipamento</label>
                   <input
-                    type="text"
                     id="n-equipamento"
                     v-model="formData.software.nEquipamento"
+                    type="text"
                     class="form-input"
                     placeholder="Nº do equipamento"
-                  />
+                  >
                 </div>
               </div>
             </div>
 
             <!-- Pix Group -->
-            <div v-if="formData.software.name?.includes('Pix')" class="software-group">
-              <h3 class="software-group-title">Pix</h3>
+            <div
+              v-if="formData.software.name?.includes('Pix')"
+              class="software-group"
+            >
+              <h3 class="software-group-title">
+                Pix
+              </h3>
               <div class="form-grid">
                 <div class="form-group">
-                  <label for="pix-product" class="form-label">Produto</label>
+                  <label
+                    for="pix-product"
+                    class="form-label"
+                  >Produto</label>
                   <select
                     id="pix-product"
                     v-model="formData.software.product"
                     class="form-select"
                     @change="onPixProductChange(formData)"
                   >
-                    <option value="">Selecione o produto...</option>
-                    <option v-for="product in PIX_PRODUCTS" :key="product" :value="product">
+                    <option value="">
+                      Selecione o produto...
+                    </option>
+                    <option
+                      v-for="product in PIX_PRODUCTS"
+                      :key="product"
+                      :value="product"
+                    >
                       {{ product }}
                     </option>
                   </select>
@@ -149,8 +206,16 @@
               >
                 <label class="form-label">Módulos</label>
                 <div class="modules-checkboxes">
-                  <label v-for="module in PIX_MODULES" :key="module" class="module-checkbox">
-                    <input type="checkbox" :value="module" v-model="formData.software.modules" />
+                  <label
+                    v-for="module in PIX_MODULES"
+                    :key="module"
+                    class="module-checkbox"
+                  >
+                    <input
+                      v-model="formData.software.modules"
+                      type="checkbox"
+                      :value="module"
+                    >
                     {{ module }}
                   </label>
                 </div>
@@ -158,18 +223,32 @@
             </div>
 
             <!-- Zone Soft Group -->
-            <div v-if="formData.software.name?.includes('Zone Soft')" class="software-group">
-              <h3 class="software-group-title">Zone Soft</h3>
+            <div
+              v-if="formData.software.name?.includes('Zone Soft')"
+              class="software-group"
+            >
+              <h3 class="software-group-title">
+                Zone Soft
+              </h3>
               <div class="form-grid">
                 <div class="form-group">
-                  <label for="zonsoft-product" class="form-label">Produto</label>
+                  <label
+                    for="zonsoft-product"
+                    class="form-label"
+                  >Produto</label>
                   <select
                     id="zonsoft-product"
                     v-model="formData.software.product"
                     class="form-select"
                   >
-                    <option value="">Selecione o produto...</option>
-                    <option v-for="product in ZONSOFT_PRODUCTS" :key="product" :value="product">
+                    <option value="">
+                      Selecione o produto...
+                    </option>
+                    <option
+                      v-for="product in ZONSOFT_PRODUCTS"
+                      :key="product"
+                      :value="product"
+                    >
                       {{ product }}
                     </option>
                   </select>
@@ -179,14 +258,23 @@
                   v-if="formData.software.product && formData.software.product !== 'ZSFACT'"
                   class="form-group"
                 >
-                  <label for="zonsoft-version" class="form-label">Versão</label>
+                  <label
+                    for="zonsoft-version"
+                    class="form-label"
+                  >Versão</label>
                   <select
                     id="zonsoft-version"
                     v-model="formData.software.version"
                     class="form-select"
                   >
-                    <option value="">Selecione a versão...</option>
-                    <option v-for="version in ZONSOFT_VERSIONS" :key="version" :value="version">
+                    <option value="">
+                      Selecione a versão...
+                    </option>
+                    <option
+                      v-for="version in ZONSOFT_VERSIONS"
+                      :key="version"
+                      :value="version"
+                    >
                       {{ version }}
                     </option>
                   </select>
@@ -195,18 +283,32 @@
             </div>
 
             <!-- Pt CERT Group -->
-            <div v-if="formData.software.name?.includes('Pt CERT')" class="software-group">
-              <h3 class="software-group-title">Pt CERT</h3>
+            <div
+              v-if="formData.software.name?.includes('Pt CERT')"
+              class="software-group"
+            >
+              <h3 class="software-group-title">
+                Pt CERT
+              </h3>
               <div class="form-grid">
                 <div class="form-group">
-                  <label for="ptcert-license" class="form-label">Tipo de Licença</label>
+                  <label
+                    for="ptcert-license"
+                    class="form-label"
+                  >Tipo de Licença</label>
                   <select
                     id="ptcert-license"
                     v-model="formData.software.licenseType"
                     class="form-select"
                   >
-                    <option value="">Selecione o tipo...</option>
-                    <option v-for="type in PTCERT_LICENSE_TYPES" :key="type" :value="type">
+                    <option value="">
+                      Selecione o tipo...
+                    </option>
+                    <option
+                      v-for="type in PTCERT_LICENSE_TYPES"
+                      :key="type"
+                      :value="type"
+                    >
                       {{ type }}
                     </option>
                   </select>
@@ -215,38 +317,52 @@
             </div>
 
             <!-- Common Fields (for all software types) -->
-            <div v-if="formData.software.name?.length > 0" class="software-group">
-              <h3 class="software-group-title">Campos Comuns</h3>
+            <div
+              v-if="formData.software.name?.length > 0"
+              class="software-group"
+            >
+              <h3 class="software-group-title">
+                Campos Comuns
+              </h3>
               <div class="form-grid">
                 <div class="form-group">
-                  <label for="numero-serie" class="form-label">Número Série</label>
+                  <label
+                    for="numero-serie"
+                    class="form-label"
+                  >Número Série</label>
                   <input
-                    type="text"
                     id="numero-serie"
                     v-model="formData.software.numeroSerie"
+                    type="text"
                     class="form-input"
                     placeholder="Nº de série"
-                  />
+                  >
                 </div>
                 <div class="form-group">
-                  <label for="versao-software" class="form-label">Versão Software</label>
+                  <label
+                    for="versao-software"
+                    class="form-label"
+                  >Versão Software</label>
                   <input
-                    type="text"
                     id="versao-software"
                     v-model="formData.software.versaoSoftware"
+                    type="text"
                     class="form-input"
                     placeholder="Ex: 1.2.3"
-                  />
+                  >
                 </div>
                 <div class="form-group">
-                  <label for="versao-licenca" class="form-label">Versão Licença</label>
+                  <label
+                    for="versao-licenca"
+                    class="form-label"
+                  >Versão Licença</label>
                   <input
-                    type="text"
                     id="versao-licenca"
                     v-model="formData.software.versaoLicenca"
+                    type="text"
                     class="form-input"
                     placeholder="Versão da licença"
-                  />
+                  >
                 </div>
               </div>
             </div>
@@ -262,11 +378,16 @@
         <div class="mb-4">
           <button
             type="button"
-            @click="addInvoice(formData)"
             class="btn-secondary inline-flex items-center"
             :disabled="editingInvoiceId !== null"
+            @click="addInvoice(formData)"
           >
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -279,7 +400,10 @@
         </div>
 
         <!-- Invoice Items -->
-        <div v-if="formData.invoices && formData.invoices.length > 0" class="space-y-4">
+        <div
+          v-if="formData.invoices && formData.invoices.length > 0"
+          class="space-y-4"
+        >
           <div
             v-for="(invoice, index) in formData.invoices"
             :key="invoice.id"
@@ -295,17 +419,17 @@
                 <template v-if="isInvoiceEditing(invoice.id)">
                   <button
                     type="button"
-                    @click="saveInvoice(invoice.id)"
                     class="btn-icon-action btn-save"
                     title="Guardar"
+                    @click="saveInvoice(invoice.id)"
                   >
                     ✓
                   </button>
                   <button
                     type="button"
-                    @click="cancelEditInvoice(invoice.id)"
                     class="btn-icon-action btn-cancel"
                     title="Cancelar"
+                    @click="cancelEditInvoice(invoice.id)"
                   >
                     ✕
                   </button>
@@ -314,17 +438,17 @@
                 <template v-else>
                   <button
                     type="button"
-                    @click="editInvoice(invoice.id)"
                     class="btn-icon-action btn-edit"
                     title="Editar"
+                    @click="editInvoice(invoice.id)"
                   >
                     ✏️
                   </button>
                   <button
                     type="button"
-                    @click="removeInvoice(formData, Number(index))"
                     class="btn-icon-action btn-delete"
                     title="Eliminar"
+                    @click="removeInvoice(formData, Number(index))"
                   >
                     🗑️
                   </button>
@@ -336,50 +460,58 @@
             <div class="invoice-form">
               <div class="form-grid">
                 <div class="form-group">
-                  <label :for="`ano-${invoice.id}`" class="form-label">Ano</label>
+                  <label
+                    :for="`ano-${invoice.id}`"
+                    class="form-label"
+                  >Ano</label>
                   <input
-                    type="text"
                     :id="`ano-${invoice.id}`"
                     v-model="invoice.ano"
+                    type="text"
                     class="form-input"
                     :disabled="!isInvoiceEditing(invoice.id)"
                     placeholder="Ex: 2024"
-                  />
+                  >
                 </div>
                 <div class="form-group">
-                  <label :for="`numero-fatura-${invoice.id}`" class="form-label"
-                    >Número da Fatura</label
-                  >
+                  <label
+                    :for="`numero-fatura-${invoice.id}`"
+                    class="form-label"
+                  >Número da Fatura</label>
                   <input
-                    type="text"
                     :id="`numero-fatura-${invoice.id}`"
                     v-model="invoice.numeroFatura"
+                    type="text"
                     class="form-input"
                     :disabled="!isInvoiceEditing(invoice.id)"
                     placeholder="Número da fatura"
-                  />
+                  >
                 </div>
                 <div class="form-group">
-                  <label :for="`data-fatura-${invoice.id}`" class="form-label"
-                    >Data da Fatura</label
-                  >
+                  <label
+                    :for="`data-fatura-${invoice.id}`"
+                    class="form-label"
+                  >Data da Fatura</label>
                   <input
-                    type="date"
                     :id="`data-fatura-${invoice.id}`"
                     v-model="invoice.dataFatura"
+                    type="date"
                     class="form-input"
                     :disabled="!isInvoiceEditing(invoice.id)"
-                  />
+                  >
                 </div>
                 <div class="form-group">
-                  <label :for="`data-aviso-${invoice.id}`" class="form-label">Data do Aviso</label>
+                  <label
+                    :for="`data-aviso-${invoice.id}`"
+                    class="form-label"
+                  >Data do Aviso</label>
                   <input
-                    type="date"
                     :id="`data-aviso-${invoice.id}`"
                     v-model="invoice.dataAviso"
+                    type="date"
                     class="form-input"
                     :disabled="!isInvoiceEditing(invoice.id)"
-                  />
+                  >
                 </div>
               </div>
             </div>
@@ -396,7 +528,9 @@
           <div
             class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
           >
-            <h2 class="text-lg font-semibold text-gray-900">Informação de Auditoria</h2>
+            <h2 class="text-lg font-semibold text-gray-900">
+              Informação de Auditoria
+            </h2>
             <p class="text-sm text-gray-600 mt-1">
               Informações sobre criação e modificação (apenas leitura)
             </p>
@@ -405,23 +539,33 @@
             <div class="audit-info-grid">
               <div class="audit-item">
                 <label class="audit-label">Criado em</label>
-                <div class="audit-value">{{ formatDateTime(license?.createdAt) }}</div>
+                <div class="audit-value">
+                  {{ formatDateTime(license?.createdAt) }}
+                </div>
               </div>
               <div class="audit-item">
                 <label class="audit-label">Criado por</label>
-                <div class="audit-value">{{ license?.createdBy || 'Sistema' }}</div>
+                <div class="audit-value">
+                  {{ license?.createdBy || 'Sistema' }}
+                </div>
               </div>
               <div class="audit-item">
                 <label class="audit-label">Última atualização</label>
-                <div class="audit-value">{{ formatDateTime(license?.updatedAt) }}</div>
+                <div class="audit-value">
+                  {{ formatDateTime(license?.updatedAt) }}
+                </div>
               </div>
               <div class="audit-item">
                 <label class="audit-label">Atualizado por</label>
-                <div class="audit-value">{{ license?.updatedBy || 'Sistema' }}</div>
+                <div class="audit-value">
+                  {{ license?.updatedBy || 'Sistema' }}
+                </div>
               </div>
               <div class="audit-item">
                 <label class="audit-label">Versão</label>
-                <div class="audit-value">{{ license?.version || 1 }}</div>
+                <div class="audit-value">
+                  {{ license?.version || 1 }}
+                </div>
               </div>
             </div>
           </div>

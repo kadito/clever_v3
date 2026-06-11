@@ -3,8 +3,8 @@
     <!-- Search Input with Dropdown -->
     <div class="relative">
       <input
-        type="text"
         v-model="searchQuery"
+        type="text"
         :placeholder="placeholder"
         :disabled="disabled"
         :readonly="readonly"
@@ -17,7 +17,7 @@
         @focus="onFocus"
         @blur="onBlur"
         @keydown="onKeyDown"
-      />
+      >
 
       <!-- Search Icon -->
       <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -34,12 +34,12 @@
             r="10"
             stroke="currentColor"
             stroke-width="4"
-          ></circle>
+          />
           <path
             class="opacity-75"
             fill="currentColor"
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          ></path>
+          />
         </svg>
         <svg
           v-else
@@ -58,11 +58,21 @@
       </div>
 
       <!-- Dropdown Results - positioned relative to this input container -->
-      <div v-if="!readonly && !disabled && showDropdown" class="search-dropdown">
+      <div
+        v-if="!readonly && !disabled && showDropdown"
+        class="search-dropdown"
+      >
         <!-- Loading State -->
-        <div v-if="isLoading" class="search-option loading">
+        <div
+          v-if="isLoading"
+          class="search-option loading"
+        >
           <div class="flex items-center">
-            <svg class="animate-spin h-4 w-4 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24">
+            <svg
+              class="animate-spin h-4 w-4 text-gray-400 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
               <circle
                 class="opacity-25"
                 cx="12"
@@ -70,12 +80,12 @@
                 r="10"
                 stroke="currentColor"
                 stroke-width="4"
-              ></circle>
+              />
               <path
                 class="opacity-75"
                 fill="currentColor"
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
+              />
             </svg>
             <span class="text-gray-600">Pesquisando assistências remotas...</span>
           </div>
@@ -129,8 +139,8 @@
 
         <!-- Results -->
         <div
-          v-else
           v-for="assistance in searchResults"
+          v-else
           :key="assistance.uuid"
           class="search-option"
           @click="selectRemoteAssistance(assistance)"
@@ -138,26 +148,68 @@
           <div class="assistance-info">
             <div class="assistance-header">
               <span class="assistance-date">{{ formatDate(assistance.data.dataAssistencia) }}</span>
-              <span v-if="assistance.data.tipoAssistencia" class="assistance-type-badge">
+              <span
+                v-if="assistance.data.tipoAssistencia"
+                class="assistance-type-badge"
+              >
                 {{ assistance.data.tipoAssistencia }}
               </span>
             </div>
             <div class="assistance-details">
-              <span v-if="getClientName(assistance)" class="detail">
-                <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              <span
+                v-if="getClientName(assistance)"
+                class="detail"
+              >
+                <svg
+                  class="w-3 h-3 inline mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
                 </svg>
                 {{ getClientName(assistance) }}
               </span>
-              <span v-if="getTechnicianName(assistance)" class="detail">
-                <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              <span
+                v-if="getTechnicianName(assistance)"
+                class="detail"
+              >
+                <svg
+                  class="w-3 h-3 inline mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
                 </svg>
                 {{ getTechnicianName(assistance) }}
               </span>
-              <span v-if="assistance.data.horasTotais" class="detail">
-                <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <span
+                v-if="assistance.data.horasTotais"
+                class="detail"
+              >
+                <svg
+                  class="w-3 h-3 inline mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 {{ assistance.data.horasTotais }}
               </span>
@@ -168,30 +220,48 @@
     </div>
 
     <!-- Selected Remote Assistance Info (when readonly) -->
-    <div v-if="selectedRemoteAssistance && (readonly || disabled)" class="selected-assistance-info">
+    <div
+      v-if="selectedRemoteAssistance && (readonly || disabled)"
+      class="selected-assistance-info"
+    >
       <div class="assistance-card">
         <div class="assistance-card-header">
           <h3 class="assistance-title">
             Assistência Remota - {{ formatDate(selectedRemoteAssistance.data.dataAssistencia) }}
           </h3>
-          <span v-if="selectedRemoteAssistance.data.tipoAssistencia" class="assistance-type-badge">
+          <span
+            v-if="selectedRemoteAssistance.data.tipoAssistencia"
+            class="assistance-type-badge"
+          >
             {{ selectedRemoteAssistance.data.tipoAssistencia }}
           </span>
         </div>
         <div class="assistance-details-grid">
-          <div v-if="getClientName(selectedRemoteAssistance)" class="detail-item">
+          <div
+            v-if="getClientName(selectedRemoteAssistance)"
+            class="detail-item"
+          >
             <span class="detail-label">Cliente:</span>
             <span class="detail-value">{{ getClientName(selectedRemoteAssistance) }}</span>
           </div>
-          <div v-if="getTechnicianName(selectedRemoteAssistance)" class="detail-item">
+          <div
+            v-if="getTechnicianName(selectedRemoteAssistance)"
+            class="detail-item"
+          >
             <span class="detail-label">Técnico:</span>
             <span class="detail-value">{{ getTechnicianName(selectedRemoteAssistance) }}</span>
           </div>
-          <div v-if="selectedRemoteAssistance.data.horasTotais" class="detail-item">
+          <div
+            v-if="selectedRemoteAssistance.data.horasTotais"
+            class="detail-item"
+          >
             <span class="detail-label">Total Horas:</span>
             <span class="detail-value">{{ selectedRemoteAssistance.data.horasTotais }}</span>
           </div>
-          <div v-if="selectedRemoteAssistance.data.motivoPedido" class="detail-item">
+          <div
+            v-if="selectedRemoteAssistance.data.motivoPedido"
+            class="detail-item"
+          >
             <span class="detail-label">Motivo:</span>
             <span class="detail-value">{{ selectedRemoteAssistance.data.motivoPedido }}</span>
           </div>
@@ -200,36 +270,68 @@
     </div>
 
     <!-- Selected Remote Assistance Info (when not readonly/disabled - for forms) -->
-    <div v-if="selectedRemoteAssistance && !readonly && !disabled" class="selected-assistance-info">
+    <div
+      v-if="selectedRemoteAssistance && !readonly && !disabled"
+      class="selected-assistance-info"
+    >
       <div class="bg-white rounded-touch border border-gray-200 mt-4">
         <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-          <h3 class="text-lg font-semibold text-gray-900">Informação da Assistência Remota</h3>
+          <h3 class="text-lg font-semibold text-gray-900">
+            Informação da Assistência Remota
+          </h3>
         </div>
         <div class="p-4 sm:p-6">
           <div class="detail-grid">
             <div class="detail-item">
               <label class="detail-label">Data da Assistência</label>
-              <div class="detail-value">{{ formatDate(selectedRemoteAssistance.data.dataAssistencia) }}</div>
+              <div class="detail-value">
+                {{ formatDate(selectedRemoteAssistance.data.dataAssistencia) }}
+              </div>
             </div>
-            <div v-if="selectedRemoteAssistance.data.tipoAssistencia" class="detail-item">
+            <div
+              v-if="selectedRemoteAssistance.data.tipoAssistencia"
+              class="detail-item"
+            >
               <label class="detail-label">Tipo de Assistência</label>
-              <div class="detail-value">{{ selectedRemoteAssistance.data.tipoAssistencia }}</div>
+              <div class="detail-value">
+                {{ selectedRemoteAssistance.data.tipoAssistencia }}
+              </div>
             </div>
-            <div v-if="getClientName(selectedRemoteAssistance)" class="detail-item">
+            <div
+              v-if="getClientName(selectedRemoteAssistance)"
+              class="detail-item"
+            >
               <label class="detail-label">Cliente</label>
-              <div class="detail-value">{{ getClientName(selectedRemoteAssistance) }}</div>
+              <div class="detail-value">
+                {{ getClientName(selectedRemoteAssistance) }}
+              </div>
             </div>
-            <div v-if="getTechnicianName(selectedRemoteAssistance)" class="detail-item">
+            <div
+              v-if="getTechnicianName(selectedRemoteAssistance)"
+              class="detail-item"
+            >
               <label class="detail-label">Técnico</label>
-              <div class="detail-value">{{ getTechnicianName(selectedRemoteAssistance) }}</div>
+              <div class="detail-value">
+                {{ getTechnicianName(selectedRemoteAssistance) }}
+              </div>
             </div>
-            <div v-if="selectedRemoteAssistance.data.horasTotais" class="detail-item">
+            <div
+              v-if="selectedRemoteAssistance.data.horasTotais"
+              class="detail-item"
+            >
               <label class="detail-label">Total Horas</label>
-              <div class="detail-value">{{ selectedRemoteAssistance.data.horasTotais }}</div>
+              <div class="detail-value">
+                {{ selectedRemoteAssistance.data.horasTotais }}
+              </div>
             </div>
-            <div v-if="selectedRemoteAssistance.data.motivoPedido" class="detail-item">
+            <div
+              v-if="selectedRemoteAssistance.data.motivoPedido"
+              class="detail-item"
+            >
               <label class="detail-label">Motivo do Pedido</label>
-              <div class="detail-value">{{ selectedRemoteAssistance.data.motivoPedido }}</div>
+              <div class="detail-value">
+                {{ selectedRemoteAssistance.data.motivoPedido }}
+              </div>
             </div>
           </div>
         </div>

@@ -1,23 +1,41 @@
 <template>
   <div class="assistencia-form-container">
     <div class="form-header">
-      <BackButton :to="cancelRoute" variant="inline" />
+      <BackButton
+        :to="cancelRoute"
+        variant="inline"
+      />
       <h1>{{ isEditing ? 'Editar' : 'Nova' }} Assistência Remota</h1>
     </div>
 
     <!-- Loading state -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A processar...</p>
     </div>
 
     <!-- Error state -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Form -->
-    <form @submit.prevent="handleSubmit" class="assistencia-form" v-if="!loading">
+    <form
+      v-if="!loading"
+      class="assistencia-form"
+      @submit.prevent="handleSubmit"
+    >
       <!-- Basic Information Section -->
       <section class="form-section">
         <h2>INFORMAÇÃO BÁSICA</h2>
@@ -43,10 +61,18 @@
               class="form-control"
               required
             >
-              <option value="">Seleccionar tipo</option>
-              <option value="REMOTA">REMOTA</option>
-              <option value="TELEFÓNICA">TELEFÓNICA</option>
-              <option value="TELEMÓVEL">TELEMÓVEL</option>
+              <option value="">
+                Seleccionar tipo
+              </option>
+              <option value="REMOTA">
+                REMOTA
+              </option>
+              <option value="TELEFÓNICA">
+                TELEFÓNICA
+              </option>
+              <option value="TELEMÓVEL">
+                TELEMÓVEL
+              </option>
             </select>
           </div>
 
@@ -75,12 +101,12 @@
           <div class="form-group">
             <label for="quemAtendeu">QUEM ATENDEU</label>
             <input
-              type="text"
               id="quemAtendeu"
               v-model="form.quemAtendeu"
+              type="text"
               class="form-control"
               placeholder="Nome da pessoa que atendeu"
-            />
+            >
           </div>
         </div>
       </section>
@@ -92,38 +118,41 @@
           <div class="form-group">
             <label for="dataPedido">DATA DO PEDIDO</label>
             <input
-              type="datetime-local"
               id="dataPedido"
               v-model="form.dataPedido"
+              type="datetime-local"
               class="form-control"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="dataAssistencia">DATA DA ASSISTÊNCIA *</label>
             <input
-              type="datetime-local"
               id="dataAssistencia"
               v-model="form.dataAssistencia"
+              type="datetime-local"
               class="form-control"
               required
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="inicioAssistencia">INÍCIO DA ASSISTÊNCIA</label>
             <input
-              type="text"
               id="inicioAssistencia"
               v-model="form.inicioAssistencia"
+              type="text"
               class="form-control"
               :class="{ 'is-invalid': validationErrors.inicioAssistencia }"
               placeholder="HH:MM (ex: 09:30)"
               maxlength="5"
               @input="formatTimeInput('inicioAssistencia', $event)"
               @blur="validateTimeInput('inicioAssistencia')"
-            />
-            <div v-if="validationErrors.inicioAssistencia" class="invalid-feedback">
+            >
+            <div
+              v-if="validationErrors.inicioAssistencia"
+              class="invalid-feedback"
+            >
               {{ validationErrors.inicioAssistencia }}
             </div>
           </div>
@@ -131,17 +160,20 @@
           <div class="form-group">
             <label for="fimAssistencia">FIM DA ASSISTÊNCIA</label>
             <input
-              type="text"
               id="fimAssistencia"
               v-model="form.fimAssistencia"
+              type="text"
               class="form-control"
               :class="{ 'is-invalid': validationErrors.fimAssistencia }"
               placeholder="HH:MM (ex: 17:45)"
               maxlength="5"
               @input="formatTimeInput('fimAssistencia', $event)"
               @blur="validateTimeInput('fimAssistencia')"
-            />
-            <div v-if="validationErrors.fimAssistencia" class="invalid-feedback">
+            >
+            <div
+              v-if="validationErrors.fimAssistencia"
+              class="invalid-feedback"
+            >
               {{ validationErrors.fimAssistencia }}
             </div>
           </div>
@@ -149,12 +181,12 @@
           <div class="form-group">
             <label for="horasTotal">HORAS TOTAL</label>
             <input
-              type="text"
               id="horasTotal"
+              type="text"
               :value="calculatedTotalHours"
               class="form-control"
               readonly
-            />
+            >
           </div>
         </div>
       </section>
@@ -171,7 +203,7 @@
               class="form-control"
               rows="3"
               placeholder="Descreva o motivo do pedido de assistência"
-            ></textarea>
+            />
           </div>
 
           <div class="form-group full-width">
@@ -182,7 +214,7 @@
               class="form-control"
               rows="4"
               placeholder="Descreva o que foi feito durante a assistência"
-            ></textarea>
+            />
           </div>
         </div>
       </section>
@@ -197,12 +229,12 @@
           <div class="form-group">
             <label for="valorTotal">VALOR (SEM IVA)</label>
             <input
-              type="text"
               id="valorTotal"
+              type="text"
               :value="calculatedValue.toFixed(2) + ' €'"
               class="form-control value-display"
               readonly
-            />
+            >
           </div>
         </div>
       </section>
@@ -214,9 +246,17 @@
           <div class="form-group">
             <label>CONTRATO</label>
             <div class="toggle-switch">
-              <input type="checkbox" id="contrato" v-model="form.contrato" class="toggle-input" />
-              <label for="contrato" class="toggle-label">
-                <span class="toggle-slider"></span>
+              <input
+                id="contrato"
+                v-model="form.contrato"
+                type="checkbox"
+                class="toggle-input"
+              >
+              <label
+                for="contrato"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -224,9 +264,17 @@
           <div class="form-group">
             <label>GARANTIA</label>
             <div class="toggle-switch">
-              <input type="checkbox" id="garantia" v-model="form.garantia" class="toggle-input" />
-              <label for="garantia" class="toggle-label">
-                <span class="toggle-slider"></span>
+              <input
+                id="garantia"
+                v-model="form.garantia"
+                type="checkbox"
+                class="toggle-input"
+              >
+              <label
+                for="garantia"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -234,16 +282,27 @@
           <div class="form-group">
             <label>RESOLVIDO</label>
             <div class="toggle-switch">
-              <input type="checkbox" id="resolvido" v-model="form.resolvido" class="toggle-input" />
-              <label for="resolvido" class="toggle-label">
-                <span class="toggle-slider"></span>
+              <input
+                id="resolvido"
+                v-model="form.resolvido"
+                type="checkbox"
+                class="toggle-input"
+              >
+              <label
+                for="resolvido"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
         </div>
 
         <!-- Relatório textarea - shown when RESOLVIDO is true -->
-        <div v-if="form.resolvido" class="form-group form-group-full">
+        <div
+          v-if="form.resolvido"
+          class="form-group form-group-full"
+        >
           <label for="relatorio">RELATÓRIO</label>
           <textarea
             id="relatorio"
@@ -251,27 +310,36 @@
             class="form-control"
             rows="4"
             placeholder="Relatório da resolução"
-          ></textarea>
+          />
         </div>
 
         <div class="form-grid">
           <div class="form-group form-group-full">
             <label for="anexos">ANEXOS</label>
             <input
-              type="text"
               id="anexos"
               v-model="form.anexos"
+              type="text"
               class="form-control"
               placeholder="Referências a anexos"
-            />
+            >
           </div>
         </div>
       </section>
 
       <!-- Form Actions -->
       <div class="form-actions">
-        <button type="button" @click="navigateBack" class="btn btn-secondary">Cancelar</button>
-        <button type="submit" class="btn btn-primary">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          @click="navigateBack"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+        >
           {{ isEditing ? 'Actualizar' : 'Criar' }} Assistência
         </button>
       </div>
@@ -354,7 +422,7 @@ const formatTimeInput = (field, event) => {
 
   // Format as HH:MM
   if (value.length > 2) {
-    value = value.slice(0, 2) + ':' + value.slice(2, 4);
+    value = `${value.slice(0, 2)  }:${  value.slice(2, 4)}`;
   }
 
   // Update the form field
@@ -805,7 +873,7 @@ const handleSubmit = async () => {
     if (formData.dataAssistencia && formData.fimAssistencia) {
       const baseDate = new Date(formData.dataAssistencia);
       const [endHour, endMin] = formData.fimAssistencia.split(':').map(Number);
-      let endDateTime = new Date(
+      const endDateTime = new Date(
         baseDate.getFullYear(),
         baseDate.getMonth(),
         baseDate.getDate(),

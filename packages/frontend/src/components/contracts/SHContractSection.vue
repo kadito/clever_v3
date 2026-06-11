@@ -6,17 +6,31 @@
         <label class="config-label required">PLANO S&H</label>
         <select
           :value="formData?.planIdSH || ''"
-          @change="event => handlePlanSelection((event.target as HTMLSelectElement).value)"
           class="config-select"
           data-testid="plan-select"
+          @change="event => handlePlanSelection((event.target as HTMLSelectElement).value)"
         >
-          <option value="">Selecione o plano...</option>
-          <option value="sh_simple">SIMPLE</option>
-          <option value="sh_brass">BRASS</option>
-          <option value="sh_silver">SILVER</option>
-          <option value="sh_gold">GOLD</option>
-          <option value="sh_diamond">DIAMOND</option>
-          <option value="sh_platinum">PLATINUM</option>
+          <option value="">
+            Selecione o plano...
+          </option>
+          <option value="sh_simple">
+            SIMPLE
+          </option>
+          <option value="sh_brass">
+            BRASS
+          </option>
+          <option value="sh_silver">
+            SILVER
+          </option>
+          <option value="sh_gold">
+            GOLD
+          </option>
+          <option value="sh_diamond">
+            DIAMOND
+          </option>
+          <option value="sh_platinum">
+            PLATINUM
+          </option>
         </select>
       </div>
 
@@ -24,15 +38,21 @@
         <label class="config-label required">DISTÂNCIA</label>
         <select
           :value="formData?.distanceSH || ''"
+          class="config-select"
+          data-testid="distance-select"
           @change="
             event => $emit('update-field', 'distanceSH', (event.target as HTMLSelectElement).value)
           "
-          class="config-select"
-          data-testid="distance-select"
         >
-          <option value="">Selecione a distância...</option>
-          <option value="under180km">Menos de 180 km</option>
-          <option value="over180km">Mais de 180 km</option>
+          <option value="">
+            Selecione a distância...
+          </option>
+          <option value="under180km">
+            Menos de 180 km
+          </option>
+          <option value="over180km">
+            Mais de 180 km
+          </option>
         </select>
       </div>
     </div>
@@ -45,10 +65,8 @@
 
       <div class="equipment-info-callout">
         <span class="info-icon">ℹ️</span>
-        <span
-          >Pode adicionar múltiplos equipamentos para o contrato S&H. Cada equipamento pode ter
-          modelo, número de série e software específicos.</span
-        >
+        <span>Pode adicionar múltiplos equipamentos para o contrato S&H. Cada equipamento pode ter
+          modelo, número de série e software específicos.</span>
       </div>
 
       <div class="equipment-list">
@@ -62,7 +80,11 @@
         />
       </div>
 
-      <button type="button" class="add-equipment-btn" @click="addEquipment">
+      <button
+        type="button"
+        class="add-equipment-btn"
+        @click="addEquipment"
+      >
         + ADICIONAR EQUIPAMENTO
       </button>
     </div>
@@ -87,9 +109,12 @@
     />
 
     <!-- Dynamic Plan Details Display -->
-    <div v-if="props.isLoadingPlan" class="plan-loading-state">
+    <div
+      v-if="props.isLoadingPlan"
+      class="plan-loading-state"
+    >
       <div class="loading-spinner">
-        <div class="spinner"></div>
+        <div class="spinner" />
         <span class="loading-text">A carregar detalhes do plano...</span>
       </div>
     </div>

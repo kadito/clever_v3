@@ -1,23 +1,41 @@
 <template>
   <div class="conta-corrente-form-container">
     <div class="form-header">
-      <BackButton :to="cancelRoute" variant="inline" />
+      <BackButton
+        :to="cancelRoute"
+        variant="inline"
+      />
       <h1>{{ isEditing ? 'Editar' : 'Novo' }} Registo de Conta Corrente</h1>
     </div>
 
     <!-- Loading state -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A processar...</p>
     </div>
 
     <!-- Error state -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Form -->
-    <form @submit.prevent="handleSubmit" class="conta-corrente-form" v-if="!loading">
+    <form
+      v-if="!loading"
+      class="conta-corrente-form"
+      @submit.prevent="handleSubmit"
+    >
       <!-- Client Information Section -->
       <section class="form-section">
         <h2>INFORMAÇÃO DO CLIENTE</h2>
@@ -25,13 +43,13 @@
           <div class="form-group">
             <label for="nomeCliente">NOME DO CLIENTE</label>
             <input
-              type="text"
               id="nomeCliente"
               v-model="form.nomeCliente"
+              type="text"
               class="form-control"
               placeholder="Digite o nome do cliente"
               required
-            />
+            >
           </div>
         </div>
       </section>
@@ -42,48 +60,79 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="tipoFatura">TIPO DE FATURA</label>
-            <select id="tipoFatura" v-model="form.tipoFatura" class="form-control" required>
-              <option value="">--</option>
-              <option value="REMOTA">REMOTA</option>
-              <option value="PRESENCIAL">PRESENCIAL</option>
-              <option value="OUTROS">OUTROS</option>
+            <select
+              id="tipoFatura"
+              v-model="form.tipoFatura"
+              class="form-control"
+              required
+            >
+              <option value="">
+                --
+              </option>
+              <option value="REMOTA">
+                REMOTA
+              </option>
+              <option value="PRESENCIAL">
+                PRESENCIAL
+              </option>
+              <option value="OUTROS">
+                OUTROS
+              </option>
             </select>
           </div>
 
           <div class="form-group">
             <label for="numeroFatura">NÚMERO DA FATURA</label>
             <input
-              type="text"
               id="numeroFatura"
               v-model="form.numeroFatura"
+              type="text"
               class="form-control"
               placeholder="Número da fatura"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="valorFatura">VALOR DA FATURA (€)</label>
             <input
-              type="number"
               id="valorFatura"
               v-model="form.valorFatura"
+              type="number"
               class="form-control"
               step="0.01"
               min="0"
               placeholder="0.00"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="formaPagamento">FORMA DE PAGAMENTO</label>
-            <select id="formaPagamento" v-model="form.formaPagamento" class="form-control">
-              <option value="">--</option>
-              <option value="TRANSFERÊNCIA">TRANSFERÊNCIA</option>
-              <option value="MULTIBANCO">MULTIBANCO</option>
-              <option value="DINHEIRO">DINHEIRO</option>
-              <option value="CHEQUE">CHEQUE</option>
-              <option value="CARTÃO">CARTÃO</option>
-              <option value="OUTROS">OUTROS</option>
+            <select
+              id="formaPagamento"
+              v-model="form.formaPagamento"
+              class="form-control"
+            >
+              <option value="">
+                --
+              </option>
+              <option value="TRANSFERÊNCIA">
+                TRANSFERÊNCIA
+              </option>
+              <option value="MULTIBANCO">
+                MULTIBANCO
+              </option>
+              <option value="DINHEIRO">
+                DINHEIRO
+              </option>
+              <option value="CHEQUE">
+                CHEQUE
+              </option>
+              <option value="CARTÃO">
+                CARTÃO
+              </option>
+              <option value="OUTROS">
+                OUTROS
+              </option>
             </select>
           </div>
         </div>
@@ -96,21 +145,21 @@
           <div class="form-group">
             <label for="dataFaturaGerada">DATA DA FATURA GERADA</label>
             <input
-              type="datetime-local"
               id="dataFaturaGerada"
               v-model="form.dataFaturaGerada"
+              type="datetime-local"
               class="form-control"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="dataVencimentoFatura">DATA DE VENCIMENTO</label>
             <input
-              type="datetime-local"
               id="dataVencimentoFatura"
               v-model="form.dataVencimentoFatura"
+              type="datetime-local"
               class="form-control"
-            />
+            >
           </div>
         </div>
       </section>
@@ -122,36 +171,49 @@
           <div class="form-group">
             <label for="horasGastas">HORAS GASTAS</label>
             <input
-              type="text"
               id="horasGastas"
               v-model="form.horasGastas"
+              type="text"
               class="form-control"
               placeholder="Ex: 02:30"
               pattern="^([0-9]{1,2}):([0-5][0-9])$"
-            />
+            >
             <small class="field-help">Formato: HH:MM (ex: 02:30)</small>
           </div>
 
           <div class="form-group">
             <label for="pago">ESTADO DO PAGAMENTO</label>
-            <select id="pago" v-model="form.pago" class="form-control">
-              <option value="">--</option>
-              <option value="TRUE">PAGO</option>
-              <option value="FALSE">NÃO PAGO</option>
+            <select
+              id="pago"
+              v-model="form.pago"
+              class="form-control"
+            >
+              <option value="">
+                --
+              </option>
+              <option value="TRUE">
+                PAGO
+              </option>
+              <option value="FALSE">
+                NÃO PAGO
+              </option>
             </select>
           </div>
 
           <div class="form-group">
             <label for="numeroRemota">NÚMERO REMOTA</label>
             <input
-              type="text"
               id="numeroRemota"
               v-model="form.numeroRemota"
+              type="text"
               class="form-control"
               placeholder="Número da assistência remota"
               :disabled="form.tipoFatura !== 'REMOTA'"
-            />
-            <small v-if="form.tipoFatura !== 'REMOTA'" class="field-help">
+            >
+            <small
+              v-if="form.tipoFatura !== 'REMOTA'"
+              class="field-help"
+            >
               Disponível apenas para faturas do tipo "Remota"
             </small>
           </div>
@@ -159,14 +221,17 @@
           <div class="form-group">
             <label for="numeroPresencial">NÚMERO PRESENCIAL</label>
             <input
-              type="text"
               id="numeroPresencial"
               v-model="form.numeroPresencial"
+              type="text"
               class="form-control"
               placeholder="Número da assistência presencial"
               :disabled="form.tipoFatura !== 'PRESENCIAL'"
-            />
-            <small v-if="form.tipoFatura !== 'PRESENCIAL'" class="field-help">
+            >
+            <small
+              v-if="form.tipoFatura !== 'PRESENCIAL'"
+              class="field-help"
+            >
               Disponível apenas para faturas do tipo "Presencial"
             </small>
           </div>
@@ -179,18 +244,30 @@
               class="form-control"
               rows="3"
               placeholder="Descreva o motivo do serviço, observações ou detalhes relevantes..."
-            ></textarea>
+            />
           </div>
         </div>
       </section>
 
       <!-- Action buttons -->
       <div class="form-actions">
-        <button type="button" @click="handleCancel" class="btn btn-cancel" :disabled="loading">
+        <button
+          type="button"
+          class="btn btn-cancel"
+          :disabled="loading"
+          @click="handleCancel"
+        >
           Cancelar
         </button>
-        <button type="submit" class="btn btn-primary" :disabled="loading || !isFormValid">
-          <span v-if="loading" class="btn-spinner"></span>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          :disabled="loading || !isFormValid"
+        >
+          <span
+            v-if="loading"
+            class="btn-spinner"
+          />
           {{ isEditing ? 'Atualizar' : 'Criar' }} Registo
         </button>
       </div>

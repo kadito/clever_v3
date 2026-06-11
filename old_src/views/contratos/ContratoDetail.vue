@@ -1,19 +1,33 @@
 <template>
   <div class="contrato-detail-container">
     <div class="detail-header">
-      <BackButton to="/contratos/list" variant="inline" />
+      <BackButton
+        to="/contratos/list"
+        variant="inline"
+      />
       <h1>Detalhes do Contrato</h1>
     </div>
 
     <!-- Loading state -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A carregar contrato...</p>
     </div>
 
     <!-- Error state (non-not-found errors) -->
-    <div v-if="error && error.toLowerCase().includes('not found') === false" class="error-alert">
+    <div
+      v-if="error && error.toLowerCase().includes('not found') === false"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Not found state -->
@@ -24,22 +38,40 @@
       <h2>Contrato não encontrado</h2>
       <p>O contrato pode ainda não estar disponível no sistema. Tentar novamente?</p>
       <div class="retry-actions">
-        <button @click="retryLoad" class="retry-btn" :disabled="loading">
+        <button
+          class="retry-btn"
+          :disabled="loading"
+          @click="retryLoad"
+        >
           {{ loading ? 'A carregar...' : 'Tentar novamente' }}
         </button>
-        <BackButton to="/contratos/list" variant="full-width" />
+        <BackButton
+          to="/contratos/list"
+          variant="full-width"
+        />
       </div>
-      <p v-if="autoRetryCountdown > 0" class="auto-retry-info">
+      <p
+        v-if="autoRetryCountdown > 0"
+        class="auto-retry-info"
+      >
         Tentativa automática em {{ autoRetryCountdown }}s...
       </p>
     </div>
 
     <!-- Contract Details -->
-    <div v-if="contrato" class="contrato-detail">
+    <div
+      v-if="contrato"
+      class="contrato-detail"
+    >
       <!-- Header with actions -->
       <div class="detail-actions">
         <h2>{{ clienteData?.nomeComercial || 'Contrato' }}</h2>
-        <button @click="navigateToEdit" class="btn btn-edit">✏️ Editar</button>
+        <button
+          class="btn btn-edit"
+          @click="navigateToEdit"
+        >
+          ✏️ Editar
+        </button>
       </div>
 
       <!-- Basic Information Section -->
@@ -89,7 +121,10 @@
         <h3>PLANOS DE CONTRATO</h3>
 
         <!-- CPA Contract -->
-        <div v-if="contrato.hasCPAContract" class="contract-plan-subsection">
+        <div
+          v-if="contrato.hasCPAContract"
+          class="contract-plan-subsection"
+        >
           <h4 class="contract-subsection-title">
             {{
               contrato.cpaContractType === 'CPA_1500'
@@ -102,31 +137,42 @@
               <label>PLANO CPA:</label>
               <span class="plan-name">{{ getCPAPlanName(contrato.planIdCPA) }}</span>
             </div>
-            <div class="detail-item" v-if="contrato.modalidadePagamentoCPA">
+            <div
+              v-if="contrato.modalidadePagamentoCPA"
+              class="detail-item"
+            >
               <label>MODALIDADE DE PAGAMENTO:</label>
               <span class="payment-method">{{
                 formatPaymentMethod(contrato.modalidadePagamentoCPA)
               }}</span>
             </div>
-            <div class="detail-item" v-if="contrato.distanceCPA">
+            <div
+              v-if="contrato.distanceCPA"
+              class="detail-item"
+            >
               <label>DISTÂNCIA:</label>
               <span>{{
                 contrato.distanceCPA === 'under180km' ? 'Menos de 180 km' : 'Mais de 180 km'
               }}</span>
             </div>
-            <div class="detail-item full-width" v-if="contrato.planoCPA">
+            <div
+              v-if="contrato.planoCPA"
+              class="detail-item full-width"
+            >
               <label>DESCRIÇÃO:</label>
-              <div class="contract-plan">{{ contrato.planoCPA }}</div>
+              <div class="contract-plan">
+                {{ contrato.planoCPA }}
+              </div>
             </div>
 
             <!-- POS Package (only for CPA_1500 PREMIUM) -->
             <div
-              class="detail-item full-width"
               v-if="
                 contrato.hasPOSPackage &&
-                contrato.cpaContractType === 'CPA_1500' &&
-                contrato.planIdCPA === 'cpa_1500_premium'
+                  contrato.cpaContractType === 'CPA_1500' &&
+                  contrato.planIdCPA === 'cpa_1500_premium'
               "
+              class="detail-item full-width"
             >
               <label>PACK ADICIONAL:</label>
               <div class="pos-package-badge">
@@ -137,7 +183,10 @@
           </div>
 
           <!-- CPA Equipment Info -->
-          <div v-if="hasAnyCPAEquipment" class="equipment-subsection">
+          <div
+            v-if="hasAnyCPAEquipment"
+            class="equipment-subsection"
+          >
             <h5>Equipamentos CPA</h5>
 
             <!-- New format: Multiple equipments -->
@@ -147,22 +196,36 @@
                 :key="equipment.id || index"
                 class="equipment-detail-card"
               >
-                <h6 class="equipment-title">Equipamento {{ index + 1 }}</h6>
+                <h6 class="equipment-title">
+                  Equipamento {{ index + 1 }}
+                </h6>
                 <div class="detail-grid">
-                  <div class="detail-item" v-if="equipment.modelo">
+                  <div
+                    v-if="equipment.modelo"
+                    class="detail-item"
+                  >
                     <label>MODELO:</label>
                     <span>{{ equipment.modelo }}</span>
                   </div>
-                  <div class="detail-item" v-if="equipment.numeroSerie">
+                  <div
+                    v-if="equipment.numeroSerie"
+                    class="detail-item"
+                  >
                     <label>Nº SÉRIE:</label>
                     <span>{{ equipment.numeroSerie }}</span>
                   </div>
                   <!-- Discount only shown for 2nd equipment onwards (N+1) -->
-                  <div class="detail-item" v-if="index > 0 && equipment.desconto > 0">
+                  <div
+                    v-if="index > 0 && equipment.desconto > 0"
+                    class="detail-item"
+                  >
                     <label>DESCONTO:</label>
                     <span class="discount-badge">{{ equipment.desconto }}%</span>
                   </div>
-                  <div class="detail-item full-width" v-if="equipment.observacoes">
+                  <div
+                    v-if="equipment.observacoes"
+                    class="detail-item full-width"
+                  >
                     <label>OBSERVAÇÕES:</label>
                     <span>{{ equipment.observacoes }}</span>
                   </div>
@@ -175,13 +238,21 @@
               v-else-if="contrato.modeloCPA || contrato.numeroSerieCPA"
               class="equipment-detail-card"
             >
-              <h6 class="equipment-title">Equipamento</h6>
+              <h6 class="equipment-title">
+                Equipamento
+              </h6>
               <div class="detail-grid">
-                <div class="detail-item" v-if="contrato.modeloCPA">
+                <div
+                  v-if="contrato.modeloCPA"
+                  class="detail-item"
+                >
                   <label>MODELO:</label>
                   <span>{{ contrato.modeloCPA }}</span>
                 </div>
-                <div class="detail-item" v-if="contrato.numeroSerieCPA">
+                <div
+                  v-if="contrato.numeroSerieCPA"
+                  class="detail-item"
+                >
                   <label>Nº SÉRIE:</label>
                   <span>{{ contrato.numeroSerieCPA }}</span>
                 </div>
@@ -196,11 +267,17 @@
           >
             <h5>Datas do Contrato</h5>
             <div class="detail-grid">
-              <div class="detail-item" v-if="contrato.inicioContratoCPA">
+              <div
+                v-if="contrato.inicioContratoCPA"
+                class="detail-item"
+              >
                 <label>INÍCIO DE CONTRATO:</label>
                 <span>{{ formatDate(contrato.inicioContratoCPA) }}</span>
               </div>
-              <div class="detail-item" v-if="contrato.fimContratoCPA">
+              <div
+                v-if="contrato.fimContratoCPA"
+                class="detail-item"
+              >
                 <label>FIM DE CONTRATO:</label>
                 <span>{{ formatDate(contrato.fimContratoCPA) }}</span>
               </div>
@@ -209,22 +286,35 @@
         </div>
 
         <!-- S&H Contract -->
-        <div v-if="contrato.hasSHContract" class="contract-plan-subsection">
-          <h4 class="contract-subsection-title">S&H - Software e Hardware</h4>
+        <div
+          v-if="contrato.hasSHContract"
+          class="contract-plan-subsection"
+        >
+          <h4 class="contract-subsection-title">
+            S&H - Software e Hardware
+          </h4>
           <div class="detail-grid">
             <div class="detail-item">
               <label>PLANO S&H:</label>
               <span class="plan-name">{{ getSHPlanName(contrato.planIdSH) }}</span>
             </div>
-            <div class="detail-item" v-if="contrato.modalidadePagamentoSH">
+            <div
+              v-if="contrato.modalidadePagamentoSH"
+              class="detail-item"
+            >
               <label>MODALIDADE DE PAGAMENTO:</label>
               <span class="payment-method">{{
                 formatPaymentMethod(contrato.modalidadePagamentoSH)
               }}</span>
             </div>
-            <div class="detail-item full-width" v-if="contrato.planoSH">
+            <div
+              v-if="contrato.planoSH"
+              class="detail-item full-width"
+            >
               <label>DESCRIÇÃO:</label>
-              <div class="contract-plan">{{ contrato.planoSH }}</div>
+              <div class="contract-plan">
+                {{ contrato.planoSH }}
+              </div>
             </div>
           </div>
 
@@ -235,15 +325,24 @@
           >
             <h5>Informação do Equipamento</h5>
             <div class="detail-grid">
-              <div class="detail-item" v-if="contrato.modeloPSO">
+              <div
+                v-if="contrato.modeloPSO"
+                class="detail-item"
+              >
                 <label>MODELO:</label>
                 <span>{{ contrato.modeloPSO }}</span>
               </div>
-              <div class="detail-item" v-if="contrato.numeroSeriePSO">
+              <div
+                v-if="contrato.numeroSeriePSO"
+                class="detail-item"
+              >
                 <label>Nº SÉRIE:</label>
                 <span>{{ contrato.numeroSeriePSO }}</span>
               </div>
-              <div class="detail-item" v-if="contrato.softwarePSO">
+              <div
+                v-if="contrato.softwarePSO"
+                class="detail-item"
+              >
                 <label>SOFTWARE:</label>
                 <span>{{ contrato.softwarePSO }}</span>
               </div>
@@ -257,11 +356,17 @@
           >
             <h5>Datas do Contrato</h5>
             <div class="detail-grid">
-              <div class="detail-item" v-if="contrato.inicioContratoSH">
+              <div
+                v-if="contrato.inicioContratoSH"
+                class="detail-item"
+              >
                 <label>INÍCIO DE CONTRATO:</label>
                 <span>{{ formatDate(contrato.inicioContratoSH) }}</span>
               </div>
-              <div class="detail-item" v-if="contrato.fimContratoSH">
+              <div
+                v-if="contrato.fimContratoSH"
+                class="detail-item"
+              >
                 <label>FIM DE CONTRATO:</label>
                 <span>{{ formatDate(contrato.fimContratoSH) }}</span>
               </div>
@@ -276,7 +381,9 @@
         >
           <div class="detail-item full-width">
             <label>DESCRIÇÃO DO PLANO (LEGADO):</label>
-            <div class="contract-plan">{{ contrato.planoContrato }}</div>
+            <div class="contract-plan">
+              {{ contrato.planoContrato }}
+            </div>
           </div>
         </div>
 
@@ -309,7 +416,10 @@
       </section>
 
       <!-- Additional Information Section -->
-      <section class="detail-section" v-if="contrato.metodoPagamento">
+      <section
+        v-if="contrato.metodoPagamento"
+        class="detail-section"
+      >
         <h3>INFORMAÇÃO ADICIONAL</h3>
         <div class="detail-grid">
           <div class="detail-item">

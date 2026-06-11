@@ -9,77 +9,132 @@
     </div>
 
     <!-- Admin Check -->
-    <div v-if="!isAdmin" class="access-denied">
+    <div
+      v-if="!isAdmin"
+      class="access-denied"
+    >
       <div class="access-denied-card">
-        <div class="access-denied-icon">🚫</div>
+        <div class="access-denied-icon">
+          🚫
+        </div>
         <h2>Acesso Negado</h2>
         <p>Não tem permissões para aceder a esta página.</p>
-        <router-link to="/dashboard" class="btn btn-primary"> Voltar ao Dashboard </router-link>
+        <router-link
+          to="/dashboard"
+          class="btn btn-primary"
+        >
+          Voltar ao Dashboard
+        </router-link>
       </div>
     </div>
 
-    <div v-else class="admin-content">
+    <div
+      v-else
+      class="admin-content"
+    >
       <!-- Actions Bar -->
       <div class="actions-bar">
-        <button @click="showInviteModal = true" class="btn btn-primary">
+        <button
+          class="btn btn-primary"
+          @click="showInviteModal = true"
+        >
           ➕ Convidar Utilizador
         </button>
-        <button @click="refreshUsers" class="btn btn-secondary" :disabled="loading">
+        <button
+          class="btn btn-secondary"
+          :disabled="loading"
+          @click="refreshUsers"
+        >
           🔄 Actualizar Lista
         </button>
       </div>
 
       <!-- Loading State -->
-      <div v-if="loading" class="loading-state">
+      <div
+        v-if="loading"
+        class="loading-state"
+      >
         <p>A carregar utilizadores...</p>
       </div>
 
       <!-- Error State -->
-      <div v-if="error" class="error-alert">
+      <div
+        v-if="error"
+        class="error-alert"
+      >
         <p>{{ error }}</p>
-        <button @click="clearError" class="close-btn">×</button>
+        <button
+          class="close-btn"
+          @click="clearError"
+        >
+          ×
+        </button>
       </div>
 
       <!-- Users List -->
-      <div v-if="!loading" class="users-grid">
-        <div v-for="user in users" :key="user.id" class="user-card">
+      <div
+        v-if="!loading"
+        class="users-grid"
+      >
+        <div
+          v-for="user in users"
+          :key="user.id"
+          class="user-card"
+        >
           <div class="user-avatar">
-            <img v-if="user.imageUrl" :src="user.imageUrl" :alt="user.firstName" />
-            <div v-else class="avatar-placeholder">
+            <img
+              v-if="user.imageUrl"
+              :src="user.imageUrl"
+              :alt="user.firstName"
+            >
+            <div
+              v-else
+              class="avatar-placeholder"
+            >
               {{ (user.firstName?.[0] || '') + (user.lastName?.[0] || '') }}
             </div>
           </div>
 
           <div class="user-info">
             <h3>{{ user.firstName }} {{ user.lastName }}</h3>
-            <p class="user-email">{{ user.emailAddresses?.[0]?.emailAddress }}</p>
+            <p class="user-email">
+              {{ user.emailAddresses?.[0]?.emailAddress }}
+            </p>
             <div class="user-meta">
-              <span class="user-role" :class="getUserRole(user)">
+              <span
+                class="user-role"
+                :class="getUserRole(user)"
+              >
                 {{ getUserRole(user) === 'admin' ? '👑 Admin' : '👤 Utilizador' }}
               </span>
-              <span class="user-status" :class="user.banned ? 'banned' : 'active'">
+              <span
+                class="user-status"
+                :class="user.banned ? 'banned' : 'active'"
+              >
                 {{ user.banned ? '🚫 Banido' : '✅ Activo' }}
               </span>
             </div>
-            <p class="user-created">Registado: {{ formatDate(user.createdAt) }}</p>
+            <p class="user-created">
+              Registado: {{ formatDate(user.createdAt) }}
+            </p>
           </div>
 
           <div class="user-actions">
             <button
               v-if="user.id !== currentUser?.id"
-              @click="toggleUserRole(user)"
               class="btn btn-sm btn-outline"
               :disabled="updatingUser === user.id"
+              @click="toggleUserRole(user)"
             >
               {{ getUserRole(user) === 'admin' ? '👤 Remover Admin' : '👑 Tornar Admin' }}
             </button>
 
             <button
               v-if="user.id !== currentUser?.id"
-              @click="toggleUserBan(user)"
               class="btn btn-sm"
               :class="user.banned ? 'btn-success' : 'btn-danger'"
               :disabled="updatingUser === user.id"
+              @click="toggleUserBan(user)"
             >
               {{ user.banned ? '✅ Desbanir' : '🚫 Banir' }}
             </button>
@@ -88,45 +143,83 @@
       </div>
 
       <!-- Empty State -->
-      <div v-if="!loading && users.length === 0" class="empty-state">
-        <div class="empty-icon">👥</div>
+      <div
+        v-if="!loading && users.length === 0"
+        class="empty-state"
+      >
+        <div class="empty-icon">
+          👥
+        </div>
         <h3>Nenhum utilizador encontrado</h3>
         <p>Comece por convidar utilizadores para o sistema.</p>
       </div>
     </div>
 
     <!-- Invite User Modal -->
-    <div v-if="showInviteModal" class="modal-overlay" @click="closeInviteModal">
-      <div class="modal-card" @click.stop>
+    <div
+      v-if="showInviteModal"
+      class="modal-overlay"
+      @click="closeInviteModal"
+    >
+      <div
+        class="modal-card"
+        @click.stop
+      >
         <div class="modal-header">
           <h2>Convidar Utilizador</h2>
-          <button @click="closeInviteModal" class="close-btn">×</button>
+          <button
+            class="close-btn"
+            @click="closeInviteModal"
+          >
+            ×
+          </button>
         </div>
 
-        <form @submit.prevent="sendInvite" class="invite-form">
+        <form
+          class="invite-form"
+          @submit.prevent="sendInvite"
+        >
           <div class="form-group">
             <label for="inviteEmail">Email *</label>
             <input
-              type="email"
               id="inviteEmail"
               v-model="inviteForm.email"
+              type="email"
               class="form-control"
               placeholder="utilizador@exemplo.com"
               required
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="inviteRole">Papel</label>
-            <select id="inviteRole" v-model="inviteForm.role" class="form-control">
-              <option value="user">👤 Utilizador</option>
-              <option value="admin">👑 Administrador</option>
+            <select
+              id="inviteRole"
+              v-model="inviteForm.role"
+              class="form-control"
+            >
+              <option value="user">
+                👤 Utilizador
+              </option>
+              <option value="admin">
+                👑 Administrador
+              </option>
             </select>
           </div>
 
           <div class="modal-actions">
-            <button type="button" @click="closeInviteModal" class="btn btn-cancel">Cancelar</button>
-            <button type="submit" class="btn btn-primary" :disabled="sendingInvite">
+            <button
+              type="button"
+              class="btn btn-cancel"
+              @click="closeInviteModal"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              :disabled="sendingInvite"
+            >
               {{ sendingInvite ? 'A enviar...' : '📧 Enviar Convite' }}
             </button>
           </div>

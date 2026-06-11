@@ -9,11 +9,27 @@
     ]"
     @change="onChange"
   >
-    <option value="" disabled hidden>Data de Expiração</option>
-    <option v-for="option in options" :key="option.value" :value="option.value" class="text-gray-700">
+    <option
+      value=""
+      disabled
+      hidden
+    >
+      Data de Expiração
+    </option>
+    <option
+      v-for="option in options"
+      :key="option.value"
+      :value="option.value"
+      class="text-gray-700"
+    >
       {{ option.label }}
     </option>
-    <option v-if="modelValue" value="">Limpar filtro</option>
+    <option
+      v-if="modelValue"
+      value=""
+    >
+      Limpar filtro
+    </option>
   </select>
 </template>
 

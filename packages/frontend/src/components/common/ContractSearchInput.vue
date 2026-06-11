@@ -3,8 +3,8 @@
     <!-- Search Input with Dropdown -->
     <div class="relative">
       <input
-        type="text"
         v-model="searchQuery"
+        type="text"
         :placeholder="placeholder"
         :disabled="disabled"
         :readonly="readonly"
@@ -17,7 +17,7 @@
         @focus="onFocus"
         @blur="onBlur"
         @keydown="onKeyDown"
-      />
+      >
 
       <!-- Search Icon -->
       <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -34,12 +34,12 @@
             r="10"
             stroke="currentColor"
             stroke-width="4"
-          ></circle>
+          />
           <path
             class="opacity-75"
             fill="currentColor"
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          ></path>
+          />
         </svg>
         <svg
           v-else
@@ -58,11 +58,21 @@
       </div>
 
       <!-- Dropdown Results -->
-      <div v-if="!readonly && !disabled && showDropdown" class="search-dropdown">
+      <div
+        v-if="!readonly && !disabled && showDropdown"
+        class="search-dropdown"
+      >
         <!-- Loading State -->
-        <div v-if="isLoading" class="search-option loading">
+        <div
+          v-if="isLoading"
+          class="search-option loading"
+        >
           <div class="flex items-center">
-            <svg class="animate-spin h-4 w-4 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24">
+            <svg
+              class="animate-spin h-4 w-4 text-gray-400 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
               <circle
                 class="opacity-25"
                 cx="12"
@@ -70,19 +80,22 @@
                 r="10"
                 stroke="currentColor"
                 stroke-width="4"
-              ></circle>
+              />
               <path
                 class="opacity-75"
                 fill="currentColor"
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
+              />
             </svg>
             <span class="text-gray-600">Pesquisando contratos...</span>
           </div>
         </div>
 
         <!-- No Client Selected -->
-        <div v-else-if="!clientId" class="search-option instruction">
+        <div
+          v-else-if="!clientId"
+          class="search-option instruction"
+        >
           <div class="flex items-center justify-center py-2">
             <svg
               class="h-5 w-5 text-gray-400 mr-3"
@@ -149,16 +162,21 @@
 
         <!-- Results -->
         <div
-          v-else
           v-for="contract in searchResults"
+          v-else
           :key="contract.uuid"
           class="search-option"
           @click="selectContract(contract)"
         >
           <div class="contract-info">
-            <div class="contract-name">{{ getContractDisplayName(contract) }}</div>
+            <div class="contract-name">
+              {{ getContractDisplayName(contract) }}
+            </div>
             <div class="contract-details">
-              <span v-if="contract.relations?.client && !isRelationError(contract.relations.client)" class="detail">
+              <span
+                v-if="contract.relations?.client && !isRelationError(contract.relations.client)"
+                class="detail"
+              >
                 {{ contract.relations.client.nomeEmpresa }}
               </span>
               <span class="detail">{{ getContractDates(contract) }}</span>
@@ -169,10 +187,15 @@
     </div>
 
     <!-- Selected Contract Info (when readonly) -->
-    <div v-if="selectedContract && (readonly || disabled)" class="selected-contract-info">
+    <div
+      v-if="selectedContract && (readonly || disabled)"
+      class="selected-contract-info"
+    >
       <div class="contract-card">
         <div class="contract-header">
-          <h3 class="contract-title">{{ getContractDisplayName(selectedContract) }}</h3>
+          <h3 class="contract-title">
+            {{ getContractDisplayName(selectedContract) }}
+          </h3>
         </div>
         <div class="contract-details-grid">
           <div class="detail-item">
@@ -184,20 +207,29 @@
     </div>
 
     <!-- Selected Contract Info (when not readonly/disabled - for forms) -->
-    <div v-if="selectedContract && !readonly && !disabled" class="selected-contract-info">
+    <div
+      v-if="selectedContract && !readonly && !disabled"
+      class="selected-contract-info"
+    >
       <div class="bg-white rounded-touch border border-gray-200 mt-4">
         <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-          <h3 class="text-lg font-semibold text-gray-900">Informação do Contrato</h3>
+          <h3 class="text-lg font-semibold text-gray-900">
+            Informação do Contrato
+          </h3>
         </div>
         <div class="p-4 sm:p-6">
           <div class="detail-grid">
             <div class="detail-item">
               <label class="detail-label">Tipo</label>
-              <div class="detail-value">{{ getContractDisplayName(selectedContract) }}</div>
+              <div class="detail-value">
+                {{ getContractDisplayName(selectedContract) }}
+              </div>
             </div>
             <div class="detail-item">
               <label class="detail-label">Período</label>
-              <div class="detail-value">{{ getContractDates(selectedContract) }}</div>
+              <div class="detail-value">
+                {{ getContractDates(selectedContract) }}
+              </div>
             </div>
           </div>
         </div>

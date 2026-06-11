@@ -1,5 +1,8 @@
 <template>
-  <form @submit.prevent="handleSubmit" class="content-form">
+  <form
+    class="content-form"
+    @submit.prevent="handleSubmit"
+  >
     <!-- Form header -->
     <div class="content-form__header">
       <h2 class="text-xl font-semibold text-gray-900 mb-2">
@@ -15,7 +18,10 @@
       <slot name="fields">
         <!-- Default fields for demonstration -->
         <div class="form-group">
-          <label class="form-label" for="name"> Nome * </label>
+          <label
+            class="form-label"
+            for="name"
+          > Nome * </label>
           <input
             id="name"
             v-model="formData.name"
@@ -24,14 +30,20 @@
             :class="{ 'border-red-500': errors.name }"
             placeholder="Digite o nome"
             required
-          />
-          <p v-if="errors.name" class="form-error">
+          >
+          <p
+            v-if="errors.name"
+            class="form-error"
+          >
             {{ errors.name }}
           </p>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="description"> Descrição </label>
+          <label
+            class="form-label"
+            for="description"
+          > Descrição </label>
           <textarea
             id="description"
             v-model="formData.description"
@@ -39,8 +51,11 @@
             :class="{ 'border-red-500': errors.description }"
             rows="3"
             placeholder="Digite uma descrição (opcional)"
-          ></textarea>
-          <p v-if="errors.description" class="form-error">
+          />
+          <p
+            v-if="errors.description"
+            class="form-error"
+          >
             {{ errors.description }}
           </p>
         </div>
@@ -52,9 +67,9 @@
       <div class="flex flex-col sm:flex-row gap-3 sm:justify-end">
         <button
           type="button"
-          @click="handleCancel"
           class="btn-outline w-full sm:w-auto order-2 sm:order-1"
           :disabled="isSubmitting"
+          @click="handleCancel"
         >
           Cancelar
         </button>
@@ -77,12 +92,12 @@
               r="10"
               stroke="currentColor"
               stroke-width="4"
-            ></circle>
+            />
             <path
               class="opacity-75"
               fill="currentColor"
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
+            />
           </svg>
           {{ isSubmitting ? 'Guardando...' : isEditMode ? 'Guardar Alterações' : 'Criar' }}
         </button>
@@ -90,7 +105,10 @@
     </div>
 
     <!-- Form validation summary -->
-    <div v-if="hasErrors" class="content-form__errors">
+    <div
+      v-if="hasErrors"
+      class="content-form__errors"
+    >
       <div class="bg-red-50 border border-red-200 rounded-lg p-4">
         <div class="flex">
           <svg
@@ -107,9 +125,14 @@
             />
           </svg>
           <div>
-            <h3 class="text-sm font-medium text-red-800 mb-1">Existem erros no formulário</h3>
+            <h3 class="text-sm font-medium text-red-800 mb-1">
+              Existem erros no formulário
+            </h3>
             <ul class="text-sm text-red-700 list-disc list-inside">
-              <li v-for="(error, field) in errors" :key="field">
+              <li
+                v-for="(error, field) in errors"
+                :key="field"
+              >
                 {{ error }}
               </li>
             </ul>

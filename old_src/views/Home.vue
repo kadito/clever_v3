@@ -10,7 +10,9 @@
         ]"
         @click="navigateToModule(module)"
       >
-        <div class="module-icon">{{ module.icon }}</div>
+        <div class="module-icon">
+          {{ module.icon }}
+        </div>
         <h3>{{ module.name }}</h3>
         <div
           v-if="module.status === 'incomplete' || module.status === 'disabled'"

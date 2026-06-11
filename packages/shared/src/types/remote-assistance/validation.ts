@@ -3,13 +3,334 @@ import type {
   RemoteAssistanceCreationData,
   RemoteAssistanceUpdateData,
   TimeValidationResult,
-  ValueCalculationResult,
   ValidMinute,
 } from './types.js';
 import { REMOTE_ASSISTANCE_CONSTANTS } from './types.js';
 
 // Re-export constants for convenience
 export { REMOTE_ASSISTANCE_CONSTANTS };
+
+// ─── Split Billing Interfaces ────────────────────────────────────────────────
+
+/**
+ * Input for the unified remote assistance pricing calculation.
+ */
+export interface RemoteAssistancePricingInput {
+  startTime: string;         // HH:MM format
+  endTime: string;           // HH:MM format
+  isWeekendOrHoliday: boolean;
+  paymentMethod?: 'Contrato' | 'Faturação' | 'Garantia' | '';
+}
+
+/**
+ * Result of the unified remote assistance pricing calculation with split billing.
+ */
+export interface RemoteAssistancePricingResult {
+  totalValue: number;
+  businessHoursValue: number;
+  offHoursValue: number;
+  totalMinutes: number;          // raw duration
+  billingMinutes: number;        // rounded up to 15-min increments
+  businessMinutes: number;       // minutes in business hours windows
+  offHoursMinutes: number;       // minutes outside business hours
+  isZeroCost: boolean;           // true when Contrato or Garantia
+  breakdown: TimeSegment[];
+}
+
+/**
+ * A time segment within a remote assistance session, classified by rate.
+ */
+export interface TimeSegment {
+  startMinute: number;   // minutes from midnight
+  endMinute: number;     // minutes from midnight
+  isBusinessHours: boolean;
+  rate: number;
+  minutes: number;
+  value: number;
+}
+
+// ─── Split Billing Implementation ───────────────────────────────────────────
+
+/**
+ * Boundary points for business hours windows (minutes from midnight).
+ * 09:00, 12:30, 14:30, 18:00
+ */
+const BOUNDARIES = [540, 750, 870, 1080] as const;
+
+/**
+ * Determines if a minute from midnight falls within business hours.
+ * Business hours: 09:00-12:30 (540-750) or 14:30-18:00 (870-1080).
+ */
+function isMinuteBusinessHours(m: number): boolean {
+  return (
+    (m >= REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_MORNING_START &&
+      m < REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_MORNING_END) ||
+    (m >= REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_AFTERNOON_START &&
+      m < REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_AFTERNOON_END)
+  );
+}
+
+/**
+ * Parses a time string in HH:MM format to minutes from midnight.
+ * Returns null if the format is invalid or the string is empty.
+ */
+function parseTimeToMinutesRA(time: string): number | null {
+  if (!time || typeof time !== 'string') return null;
+  const match = time.match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) return null;
+  const hours = parseInt(match[1], 10);
+  const minutes = parseInt(match[2], 10);
+  if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return null;
+  return hours * 60 + minutes;
+}
+
+/**
+ * Returns a zeroed pricing result.
+ */
+function zeroPricingResult(isZeroCost: boolean = false): RemoteAssistancePricingResult {
+  return {
+    totalValue: 0,
+    businessHoursValue: 0,
+    offHoursValue: 0,
+    totalMinutes: 0,
+    billingMinutes: 0,
+    businessMinutes: 0,
+    offHoursMinutes: 0,
+    isZeroCost,
+    breakdown: [],
+  };
+}
+
+/**
+ * Calculates remote assistance pricing with minute-level split billing.
+ *
+ * Algorithm:
+ * 1. If paymentMethod is Contrato or Garantia → zero-cost result
+ * 2. If isWeekendOrHoliday → entire duration at off-hours rate €60/h
+ * 3. Otherwise: split session into segments by boundary crossings (09:00, 12:30, 14:30, 18:00)
+ * 4. Round TOTAL duration up to 15-min ceiling, distribute proportionally across segments
+ * 5. Calculate value per segment: minutes/60 × rate
+ *
+ * Covers: PRICE-AC-006, PRICE-AC-007, PRICE-AC-008, PRICE-AC-009, PRICE-AC-011,
+ *         PRICE-BR-006, PRICE-BR-007, PRICE-BR-008, PRICE-BR-009, PRICE-BR-010, PRICE-BR-012
+ */
+export function calculateRemoteAssistancePricing(
+  input: RemoteAssistancePricingInput
+): RemoteAssistancePricingResult {
+  const { startTime, endTime, isWeekendOrHoliday, paymentMethod } = input;
+
+  // 1. Contract/Warranty → zero-cost
+  if (paymentMethod === 'Contrato' || paymentMethod === 'Garantia') {
+    return zeroPricingResult(true);
+  }
+
+  // Validate inputs
+  const startMinutes = parseTimeToMinutesRA(startTime);
+  const endMinutes = parseTimeToMinutesRA(endTime);
+
+  if (startMinutes === null || endMinutes === null) {
+    return zeroPricingResult();
+  }
+
+  // Calculate raw duration handling overnight wrap-around
+  let totalMinutes: number;
+  if (endMinutes > startMinutes) {
+    totalMinutes = endMinutes - startMinutes;
+  } else if (endMinutes < startMinutes) {
+    // Overnight: add 24h to end
+    totalMinutes = (endMinutes + 24 * 60) - startMinutes;
+  } else {
+    // Duration exactly 0
+    return zeroPricingResult();
+  }
+
+  // Round total up to 15-min ceiling
+  const billingMinutes = Math.ceil(totalMinutes / REMOTE_ASSISTANCE_CONSTANTS.BILLING_INCREMENT_MINUTES)
+    * REMOTE_ASSISTANCE_CONSTANTS.BILLING_INCREMENT_MINUTES;
+
+  // 2. Weekend/Holiday → entire duration at off-hours rate
+  if (isWeekendOrHoliday) {
+    const rate = REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS;
+    const value = Math.round((billingMinutes / 60) * rate * 100) / 100;
+    return {
+      totalValue: value,
+      businessHoursValue: 0,
+      offHoursValue: value,
+      totalMinutes,
+      billingMinutes,
+      businessMinutes: 0,
+      offHoursMinutes: billingMinutes,
+      isZeroCost: false,
+      breakdown: [{
+        startMinute: startMinutes,
+        endMinute: endMinutes <= startMinutes ? endMinutes + 24 * 60 : endMinutes,
+        isBusinessHours: false,
+        rate,
+        minutes: billingMinutes,
+        value,
+      }],
+    };
+  }
+
+  // 3. Weekday: split session into segments by boundary crossings
+  const effectiveEnd = endMinutes <= startMinutes ? endMinutes + 24 * 60 : endMinutes;
+
+  // Collect boundaries between start and end (including next-day boundaries for overnight)
+  const splitPoints: number[] = [];
+  // First pass: boundaries as-is
+  for (const b of BOUNDARIES) {
+    if (b > startMinutes && b < effectiveEnd) {
+      splitPoints.push(b);
+    }
+  }
+  // Second pass: boundaries + 24h for overnight sessions
+  if (effectiveEnd > 24 * 60) {
+    for (const b of BOUNDARIES) {
+      const shifted = b + 24 * 60;
+      if (shifted > startMinutes && shifted < effectiveEnd) {
+        splitPoints.push(shifted);
+      }
+    }
+  }
+
+  // Sort and deduplicate
+  splitPoints.sort((a, b) => a - b);
+
+  // Create segment boundaries
+  const segmentBounds: Array<[number, number]> = [];
+  let prev = startMinutes;
+  for (const sp of splitPoints) {
+    segmentBounds.push([prev, sp]);
+    prev = sp;
+  }
+  segmentBounds.push([prev, effectiveEnd]);
+
+  // Calculate raw minutes per classification (business vs off-hours)
+  let rawBusinessMinutes = 0;
+  let rawOffHoursMinutes = 0;
+
+  interface RawSegment {
+    startMinute: number;
+    endMinute: number;
+    isBusinessHours: boolean;
+    rawMinutes: number;
+  }
+
+  const rawSegments: RawSegment[] = [];
+
+  for (const [segStart, segEnd] of segmentBounds) {
+    const segMinutes = segEnd - segStart;
+    // Classify using the start minute of the segment (mod 1440 for overnight)
+    const classificationMinute = segStart % (24 * 60);
+    const isBusiness = isMinuteBusinessHours(classificationMinute);
+
+    rawSegments.push({
+      startMinute: segStart,
+      endMinute: segEnd,
+      isBusinessHours: isBusiness,
+      rawMinutes: segMinutes,
+    });
+
+    if (isBusiness) {
+      rawBusinessMinutes += segMinutes;
+    } else {
+      rawOffHoursMinutes += segMinutes;
+    }
+  }
+
+  // 4. Distribute billing minutes proportionally across segments
+  const rawTotal = rawBusinessMinutes + rawOffHoursMinutes; // should equal totalMinutes
+
+  // Proportional distribution: each segment gets (rawMinutes / rawTotal) * billingMinutes
+  // Use integer distribution to avoid floating point drift
+  let distributedBusinessMinutes = 0;
+  let distributedOffHoursMinutes = 0;
+
+  if (rawTotal > 0) {
+    distributedBusinessMinutes = Math.round((rawBusinessMinutes / rawTotal) * billingMinutes);
+    distributedOffHoursMinutes = billingMinutes - distributedBusinessMinutes;
+  }
+
+  // Build breakdown segments with proportional billing minutes
+  const breakdown: TimeSegment[] = [];
+  let remainingBusinessBilling = distributedBusinessMinutes;
+  let remainingOffHoursBilling = distributedOffHoursMinutes;
+
+  for (const seg of rawSegments) {
+    let segBillingMinutes: number;
+
+    if (seg.isBusinessHours) {
+      if (rawBusinessMinutes > 0) {
+        segBillingMinutes = Math.round((seg.rawMinutes / rawBusinessMinutes) * distributedBusinessMinutes);
+        // Clamp to remaining to handle rounding
+        segBillingMinutes = Math.min(segBillingMinutes, remainingBusinessBilling);
+        remainingBusinessBilling -= segBillingMinutes;
+      } else {
+        segBillingMinutes = 0;
+      }
+    } else {
+      if (rawOffHoursMinutes > 0) {
+        segBillingMinutes = Math.round((seg.rawMinutes / rawOffHoursMinutes) * distributedOffHoursMinutes);
+        segBillingMinutes = Math.min(segBillingMinutes, remainingOffHoursBilling);
+        remainingOffHoursBilling -= segBillingMinutes;
+      } else {
+        segBillingMinutes = 0;
+      }
+    }
+
+    const rate = seg.isBusinessHours
+      ? REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS
+      : REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS;
+
+    const value = Math.round((segBillingMinutes / 60) * rate * 100) / 100;
+
+    breakdown.push({
+      startMinute: seg.startMinute % (24 * 60),
+      endMinute: seg.endMinute % (24 * 60),
+      isBusinessHours: seg.isBusinessHours,
+      rate,
+      minutes: segBillingMinutes,
+      value,
+    });
+  }
+
+  // Distribute any remaining rounding leftovers to the last segment of that type
+  if (remainingBusinessBilling > 0) {
+    const lastBiz = breakdown.filter(s => s.isBusinessHours).pop();
+    if (lastBiz) {
+      lastBiz.minutes += remainingBusinessBilling;
+      lastBiz.value = Math.round((lastBiz.minutes / 60) * lastBiz.rate * 100) / 100;
+    }
+  }
+  if (remainingOffHoursBilling > 0) {
+    const lastOff = breakdown.filter(s => !s.isBusinessHours).pop();
+    if (lastOff) {
+      lastOff.minutes += remainingOffHoursBilling;
+      lastOff.value = Math.round((lastOff.minutes / 60) * lastOff.rate * 100) / 100;
+    }
+  }
+
+  // 5. Sum values
+  const businessHoursValue = breakdown
+    .filter(s => s.isBusinessHours)
+    .reduce((sum, s) => sum + s.value, 0);
+  const offHoursValue = breakdown
+    .filter(s => !s.isBusinessHours)
+    .reduce((sum, s) => sum + s.value, 0);
+  const totalValue = Math.round((businessHoursValue + offHoursValue) * 100) / 100;
+
+  return {
+    totalValue,
+    businessHoursValue: Math.round(businessHoursValue * 100) / 100,
+    offHoursValue: Math.round(offHoursValue * 100) / 100,
+    totalMinutes,
+    billingMinutes,
+    businessMinutes: distributedBusinessMinutes,
+    offHoursMinutes: distributedOffHoursMinutes,
+    isZeroCost: false,
+    breakdown,
+  };
+}
 
 /**
  * Validation functions for remote assistance data
@@ -210,191 +531,6 @@ export function calculateRoundedTotalHours(startTime: string, endTime: string): 
     console.warn('Error calculating rounded total hours:', error);
     return '';
   }
-}
-
-/**
- * Determine if a time is within business hours (09:00-18:00)
- */
-export function isBusinessHours(hour: number): boolean {
-  return (
-    hour >= REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_START &&
-    hour < REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_END
-  );
-}
-
-/**
- * Calculate assistance value with proper business hours logic
- * If either start time OR end time is outside business hours (09:00-18:00), 
- * charge the after-hours rate for the entire duration
- */
-export function calculateAssistanceValueWithBusinessHours(
-  startTime: string,
-  endTime: string,
-  paymentMethod?: 'Contrato' | 'Faturação' | 'Garantia' | ''
-): ValueCalculationResult {
-  const result: ValueCalculationResult = {
-    totalValue: 0,
-    businessHoursValue: 0,
-    afterHoursValue: 0,
-    totalHours: 0,
-    businessHours: 0,
-    afterHours: 0,
-    breakdown: [],
-  };
-
-  // If payment method is Contrato or Garantia, value should be 0
-  if (paymentMethod === 'Contrato' || paymentMethod === 'Garantia') {
-    return result;
-  }
-
-  if (!startTime || !endTime) {
-    return result;
-  }
-
-  try {
-    // Calculate the actual duration and round up to next 15-minute interval
-    const actualDuration = calculateTotalHours(startTime, endTime);
-    if (!actualDuration) return result;
-
-    const [hours, minutes] = actualDuration.split(':').map(Number);
-    const totalMinutes = hours * 60 + minutes;
-    
-    // Round up to next 15-minute interval for billing
-    const billingMinutes = Math.ceil(totalMinutes / 15) * 15;
-    const billingHours = billingMinutes / 60;
-    
-    result.totalHours = billingHours;
-
-    // Parse start and end times
-    const [startHour, startMin] = startTime.split(':').map(Number);
-    const [endHour, endMin] = endTime.split(':').map(Number);
-
-    // Check if either start time OR end time is outside business hours (09:00-18:00)
-    const isStartOutsideBusinessHours = startHour < 9 || startHour >= 18;
-    const isEndOutsideBusinessHours = endHour < 9 || endHour >= 18;
-    
-    // If either time is outside business hours, charge after-hours rate for entire duration
-    if (isStartOutsideBusinessHours || isEndOutsideBusinessHours) {
-      // Charge after-hours rate for entire duration
-      result.afterHours = billingHours;
-      result.afterHoursValue = billingHours * REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS;
-      result.totalValue = result.afterHoursValue;
-      
-      result.breakdown.push({
-        hour: startHour,
-        rate: REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS,
-        value: result.afterHoursValue,
-        isBusinessHours: false,
-      });
-    } else {
-      // Both times are within business hours, charge business rate
-      result.businessHours = billingHours;
-      result.businessHoursValue = billingHours * REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS;
-      result.totalValue = result.businessHoursValue;
-      
-      result.breakdown.push({
-        hour: startHour,
-        rate: REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS,
-        value: result.businessHoursValue,
-        isBusinessHours: true,
-      });
-    }
-  } catch (error) {
-    console.warn('Error calculating assistance value with business hours:', error);
-  }
-
-  return result;
-}
-
-/**
- * Calculate assistance value based on time difference and business rules
- */
-export function calculateAssistanceValue(
-  startTime: string,
-  endTime: string,
-  paymentMethod?: 'Contrato' | 'Faturação' | 'Garantia' | ''
-): ValueCalculationResult {
-  const result: ValueCalculationResult = {
-    totalValue: 0,
-    businessHoursValue: 0,
-    afterHoursValue: 0,
-    totalHours: 0,
-    businessHours: 0,
-    afterHours: 0,
-    breakdown: [],
-  };
-
-  // If payment method is Contrato or Garantia, value should be 0
-  if (paymentMethod === 'Contrato' || paymentMethod === 'Garantia') {
-    return result;
-  }
-
-  if (!startTime || !endTime) {
-    return result;
-  }
-
-  try {
-    const [startHour, startMin] = startTime.split(':').map(Number);
-    const [endHour, endMin] = endTime.split(':').map(Number);
-
-    // Convert to minutes since midnight
-    const startMinutes = startHour * 60 + startMin;
-    let endMinutes = endHour * 60 + endMin;
-
-    // Handle case where end time is next day
-    if (endMinutes <= startMinutes) {
-      endMinutes += 24 * 60; // Add 24 hours
-    }
-
-    // Calculate duration in minutes
-    const durationMinutes = endMinutes - startMinutes;
-    result.totalHours = durationMinutes / 60;
-
-    // Calculate value hour by hour to apply correct pricing
-    let currentMinutes = startMinutes;
-    let businessHoursMinutes = 0;
-    let afterHoursMinutes = 0;
-
-    while (currentMinutes < endMinutes) {
-      const currentHour = Math.floor(currentMinutes / 60) % 24;
-      const minutesUntilNextHour = 60 - (currentMinutes % 60);
-      const minutesInThisHour = Math.min(minutesUntilNextHour, endMinutes - currentMinutes);
-
-      // Apply appropriate rate based on hour
-      const pricePerHour = isBusinessHours(currentHour)
-        ? REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS
-        : REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS;
-
-      const hourValue = (minutesInThisHour / 60) * pricePerHour;
-      result.totalValue += hourValue;
-
-      // Track business vs after hours
-      if (isBusinessHours(currentHour)) {
-        result.businessHoursValue += hourValue;
-        businessHoursMinutes += minutesInThisHour;
-      } else {
-        result.afterHoursValue += hourValue;
-        afterHoursMinutes += minutesInThisHour;
-      }
-
-      // Add to breakdown
-      result.breakdown.push({
-        hour: currentHour,
-        rate: pricePerHour,
-        value: hourValue,
-        isBusinessHours: isBusinessHours(currentHour),
-      });
-
-      currentMinutes += minutesInThisHour;
-    }
-
-    result.businessHours = businessHoursMinutes / 60;
-    result.afterHours = afterHoursMinutes / 60;
-  } catch (error) {
-    console.warn('Error calculating assistance value:', error);
-  }
-
-  return result;
 }
 
 /**

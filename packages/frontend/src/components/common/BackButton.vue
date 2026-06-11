@@ -1,9 +1,9 @@
 <template>
   <button
-    @click="handleBack"
     class="back-button inline-flex items-center justify-center text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-touch transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 touch-target"
     :class="variantClasses"
     :aria-label="ariaLabel"
+    @click="handleBack"
   >
     <!-- Back arrow icon -->
     <svg
@@ -13,11 +13,19 @@
       stroke="currentColor"
       viewBox="0 0 24 24"
     >
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M15 19l-7-7 7-7"
+      />
     </svg>
 
     <!-- Optional text for inline variant -->
-    <span v-if="variant === 'inline' && showText" class="text-sm font-medium">
+    <span
+      v-if="variant === 'inline' && showText"
+      class="text-sm font-medium"
+    >
       {{ text || 'Voltar' }}
     </span>
   </button>

@@ -1,23 +1,41 @@
 <template>
   <div class="licencas-form-container">
     <div class="form-header">
-      <BackButton :to="cancelRoute" variant="inline" />
+      <BackButton
+        :to="cancelRoute"
+        variant="inline"
+      />
       <h1>{{ isEditing ? 'Editar' : 'Nova' }} Licença</h1>
     </div>
 
     <!-- Loading state -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A processar...</p>
     </div>
 
     <!-- Error state -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Form -->
-    <form @submit.prevent="handleSubmit" class="licencas-form" v-if="!loading">
+    <form
+      v-if="!loading"
+      class="licencas-form"
+      @submit.prevent="handleSubmit"
+    >
       <!-- Basic Information Section -->
       <section class="form-section">
         <h2>INFORMAÇÕES BÁSICAS</h2>
@@ -25,14 +43,17 @@
           <div class="form-group">
             <label for="cliente">CLIENTE</label>
             <!-- Show read-only cliente name when editing -->
-            <div v-if="isEditing" class="readonly-cliente-display">
+            <div
+              v-if="isEditing"
+              class="readonly-cliente-display"
+            >
               <input
                 type="text"
                 :value="formData.cliente"
                 readonly
                 class="form-control readonly-input"
                 placeholder="Nome do cliente"
-              />
+              >
             </div>
             <!-- Show searchable select when creating new -->
             <ClienteSearchSelect
@@ -45,7 +66,10 @@
               :required="true"
               store-name
             />
-            <div v-if="clientesStore.error" class="error-message">
+            <div
+              v-if="clientesStore.error"
+              class="error-message"
+            >
               Erro ao carregar clientes: {{ clientesStore.error }}
             </div>
           </div>
@@ -68,16 +92,29 @@
                 }"
                 @click="toggleSoftwareDropdown"
               >
-                <span v-if="formData.software.name.length === 0" class="placeholder">
+                <span
+                  v-if="formData.software.name.length === 0"
+                  class="placeholder"
+                >
                   Selecione o software...
                 </span>
-                <span v-else class="selected-count">
+                <span
+                  v-else
+                  class="selected-count"
+                >
                   {{ formData.software.name.length }} selecionado(s)
                 </span>
-                <span class="dropdown-arrow" :class="{ 'is-open': showSoftwareDropdown }">▼</span>
+                <span
+                  class="dropdown-arrow"
+                  :class="{ 'is-open': showSoftwareDropdown }"
+                >▼</span>
               </div>
 
-              <div v-if="showSoftwareDropdown" class="multiselect-dropdown" @click.stop>
+              <div
+                v-if="showSoftwareDropdown"
+                class="multiselect-dropdown"
+                @click.stop
+              >
                 <div class="multiselect-options">
                   <label
                     v-for="option in softwareOptions"
@@ -85,18 +122,21 @@
                     class="multiselect-option"
                   >
                     <input
+                      v-model="formData.software.name"
                       type="checkbox"
                       :value="option.value"
-                      v-model="formData.software.name"
                       @change="onSoftwareChange"
-                    />
+                    >
                     <span>{{ option.label }}</span>
                   </label>
                 </div>
               </div>
             </div>
 
-            <div v-if="formData.software.name.length > 0" class="selected-software">
+            <div
+              v-if="formData.software.name.length > 0"
+              class="selected-software"
+            >
               <span class="selected-label">Selecionado:</span>
               <span class="selected-items">
                 <span
@@ -105,7 +145,11 @@
                   class="software-tag"
                 >
                   {{ item }}
-                  <button type="button" @click="removeSoftware(item)" class="tag-remove">×</button>
+                  <button
+                    type="button"
+                    class="tag-remove"
+                    @click="removeSoftware(item)"
+                  >×</button>
                 </span>
               </span>
             </div>
@@ -113,53 +157,88 @@
         </div>
 
         <!-- Grouped Software-Specific Fields -->
-        <div v-if="formData.software.name.length > 0" class="software-specific-fields">
+        <div
+          v-if="formData.software.name.length > 0"
+          class="software-specific-fields"
+        >
           <!-- Vectron Group -->
-          <div v-if="formData.software.name.includes('Vectron')" class="software-group">
-            <h3 class="software-group-title">Vectron</h3>
+          <div
+            v-if="formData.software.name.includes('Vectron')"
+            class="software-group"
+          >
+            <h3 class="software-group-title">
+              Vectron
+            </h3>
             <div class="form-grid">
               <div class="form-group">
                 <label for="vectron-model">MODELO</label>
-                <select id="vectron-model" v-model="formData.software.model" class="form-control">
-                  <option value="">Selecione o modelo...</option>
-                  <option value="Vectron Wide 14">Vectron Wide 14"</option>
-                  <option value="Vectron Pos 7">Vectron Pos 7</option>
-                  <option value="Vectron Pos PC">Vectron Pos PC</option>
-                  <option value="Vectron Pos Touch K6">Vectron Pos Touch K6</option>
-                  <option value="Vectron Pos Touch K5 15">Vectron Pos Touch K5 15"</option>
-                  <option value="Vectron Pos Touch K5 12">Vectron Pos Touch K5 12"</option>
-                  <option value="Vectron Mobil Pro III">Vectron Mobil Pro III</option>
-                  <option value="Vectron Mobil Pro IV">Vectron Mobil Pro IV</option>
+                <select
+                  id="vectron-model"
+                  v-model="formData.software.model"
+                  class="form-control"
+                >
+                  <option value="">
+                    Selecione o modelo...
+                  </option>
+                  <option value="Vectron Wide 14">
+                    Vectron Wide 14"
+                  </option>
+                  <option value="Vectron Pos 7">
+                    Vectron Pos 7
+                  </option>
+                  <option value="Vectron Pos PC">
+                    Vectron Pos PC
+                  </option>
+                  <option value="Vectron Pos Touch K6">
+                    Vectron Pos Touch K6
+                  </option>
+                  <option value="Vectron Pos Touch K5 15">
+                    Vectron Pos Touch K5 15"
+                  </option>
+                  <option value="Vectron Pos Touch K5 12">
+                    Vectron Pos Touch K5 12"
+                  </option>
+                  <option value="Vectron Mobil Pro III">
+                    Vectron Mobil Pro III
+                  </option>
+                  <option value="Vectron Mobil Pro IV">
+                    Vectron Mobil Pro IV
+                  </option>
                 </select>
               </div>
 
               <div class="form-group">
                 <label for="n-equipamento">Nº EQUIPAMENTO</label>
                 <input
-                  type="text"
                   id="n-equipamento"
                   v-model="formData.software.nEquipamento"
+                  type="text"
                   class="form-control"
                   placeholder="Nº do equipamento"
-                />
+                >
               </div>
 
               <div class="form-group">
                 <label for="versao-vectron">VERSÃO DO SOFTWARE</label>
                 <input
-                  type="text"
                   id="versao-vectron"
                   v-model="formData.versao"
+                  type="text"
                   class="form-control"
                   placeholder="Ex: 1.2.3"
-                />
+                >
               </div>
             </div>
           </div>
 
           <!-- Pix Group -->
-          <div v-if="formData.software.name.includes('Pix')" class="software-group">
-            <h3 class="software-group-title">Pix</h3>
+          <div
+            v-if="formData.software.name.includes('Pix')"
+            class="software-group"
+          >
+            <h3 class="software-group-title">
+              Pix
+            </h3>
             <div class="form-grid">
               <div class="form-group">
                 <label for="pix-product">PRODUTO</label>
@@ -169,40 +248,73 @@
                   class="form-control"
                   @change="onPixProductChange"
                 >
-                  <option value="">Selecione o produto...</option>
-                  <option value="Pix rest">Pix rest</option>
-                  <option value="Pix Gest">Pix Gest</option>
-                  <option value="Pix POS">Pix POS</option>
-                  <option value="Pix AutoVenda">Pix AutoVenda</option>
-                  <option value="Pix Orders">Pix Orders</option>
-                  <option value="Pix Order Posto adicional">Pix Order Posto adicional</option>
-                  <option value="Pix Monitor Pedidos">Pix Monitor Pedidos</option>
-                  <option value="Pix RestFest">Pix RestFest</option>
+                  <option value="">
+                    Selecione o produto...
+                  </option>
+                  <option value="Pix rest">
+                    Pix rest
+                  </option>
+                  <option value="Pix Gest">
+                    Pix Gest
+                  </option>
+                  <option value="Pix POS">
+                    Pix POS
+                  </option>
+                  <option value="Pix AutoVenda">
+                    Pix AutoVenda
+                  </option>
+                  <option value="Pix Orders">
+                    Pix Orders
+                  </option>
+                  <option value="Pix Order Posto adicional">
+                    Pix Order Posto adicional
+                  </option>
+                  <option value="Pix Monitor Pedidos">
+                    Pix Monitor Pedidos
+                  </option>
+                  <option value="Pix RestFest">
+                    Pix RestFest
+                  </option>
                 </select>
               </div>
 
               <!-- Pix Modules (for products that have modules) -->
-              <div class="form-group full-width" v-if="pixHasModules(formData.software.product)">
+              <div
+                v-if="pixHasModules(formData.software.product)"
+                class="form-group full-width"
+              >
                 <label>MÓDULOS</label>
                 <div class="modules-checkboxes">
                   <label class="module-checkbox">
-                    <input type="checkbox" value="Modulo 1" v-model="formData.software.modules" />
+                    <input
+                      v-model="formData.software.modules"
+                      type="checkbox"
+                      value="Modulo 1"
+                    >
                     Módulo 1
                   </label>
                   <label class="module-checkbox">
-                    <input type="checkbox" value="Modulo 2" v-model="formData.software.modules" />
+                    <input
+                      v-model="formData.software.modules"
+                      type="checkbox"
+                      value="Modulo 2"
+                    >
                     Módulo 2
                   </label>
                   <label class="module-checkbox">
-                    <input type="checkbox" value="Modulo 3" v-model="formData.software.modules" />
+                    <input
+                      v-model="formData.software.modules"
+                      type="checkbox"
+                      value="Modulo 3"
+                    >
                     Módulo 3
                   </label>
                   <label class="module-checkbox">
                     <input
+                      v-model="formData.software.modules"
                       type="checkbox"
                       value="Posto adicional"
-                      v-model="formData.software.modules"
-                    />
+                    >
                     Posto adicional
                   </label>
                 </div>
@@ -211,8 +323,13 @@
           </div>
 
           <!-- Zon Soft Group -->
-          <div v-if="formData.software.name.includes('Zon Soft')" class="software-group">
-            <h3 class="software-group-title">Zon Soft</h3>
+          <div
+            v-if="formData.software.name.includes('Zon Soft')"
+            class="software-group"
+          >
+            <h3 class="software-group-title">
+              Zon Soft
+            </h3>
             <div class="form-grid">
               <div class="form-group">
                 <label for="zonsoft-product">PRODUTO</label>
@@ -221,18 +338,30 @@
                   v-model="formData.software.product"
                   class="form-control"
                 >
-                  <option value="">Selecione o produto...</option>
-                  <option value="ZSFACT">ZSFACT</option>
-                  <option value="ZSGO">ZSGO</option>
-                  <option value="ZSPOS">ZSPOS</option>
-                  <option value="ZSPOS MOBILE (ANDRIOD)">ZSPOS MOBILE (ANDRIOD)</option>
-                  <option value="ZSREST">ZSREST</option>
+                  <option value="">
+                    Selecione o produto...
+                  </option>
+                  <option value="ZSFACT">
+                    ZSFACT
+                  </option>
+                  <option value="ZSGO">
+                    ZSGO
+                  </option>
+                  <option value="ZSPOS">
+                    ZSPOS
+                  </option>
+                  <option value="ZSPOS MOBILE (ANDRIOD)">
+                    ZSPOS MOBILE (ANDRIOD)
+                  </option>
+                  <option value="ZSREST">
+                    ZSREST
+                  </option>
                 </select>
               </div>
 
               <div
-                class="form-group"
                 v-if="formData.software.product && formData.software.product !== 'ZSFACT'"
+                class="form-group"
               >
                 <label for="zonsoft-version">VERSÃO</label>
                 <select
@@ -240,18 +369,31 @@
                   v-model="formData.software.version"
                   class="form-control"
                 >
-                  <option value="">Selecione a versão...</option>
-                  <option value="Pro">Pro</option>
-                  <option value="Lite">Lite</option>
-                  <option value="Basic">Basic</option>
+                  <option value="">
+                    Selecione a versão...
+                  </option>
+                  <option value="Pro">
+                    Pro
+                  </option>
+                  <option value="Lite">
+                    Lite
+                  </option>
+                  <option value="Basic">
+                    Basic
+                  </option>
                 </select>
               </div>
             </div>
           </div>
 
           <!-- Pt CERT Group -->
-          <div v-if="formData.software.name.includes('Pt CERT')" class="software-group">
-            <h3 class="software-group-title">Pt CERT</h3>
+          <div
+            v-if="formData.software.name.includes('Pt CERT')"
+            class="software-group"
+          >
+            <h3 class="software-group-title">
+              Pt CERT
+            </h3>
             <div class="form-grid">
               <div class="form-group">
                 <label for="ptcert-license">TIPO DE LICENÇA</label>
@@ -260,49 +402,60 @@
                   v-model="formData.software.licenseType"
                   class="form-control"
                 >
-                  <option value="">Selecione o tipo...</option>
-                  <option value="Licença Definitiva">Licença Definitiva</option>
-                  <option value="Licença Anual">Licença Anual</option>
+                  <option value="">
+                    Selecione o tipo...
+                  </option>
+                  <option value="Licença Definitiva">
+                    Licença Definitiva
+                  </option>
+                  <option value="Licença Anual">
+                    Licença Anual
+                  </option>
                 </select>
               </div>
             </div>
           </div>
 
           <!-- Common Fields (for other software types) -->
-          <div v-if="hasOtherSoftware" class="software-group">
-            <h3 class="software-group-title">Outros</h3>
+          <div
+            v-if="hasOtherSoftware"
+            class="software-group"
+          >
+            <h3 class="software-group-title">
+              Outros
+            </h3>
             <div class="form-grid">
               <div class="form-group">
                 <label for="numero-serie">NÚMERO SÉRIE</label>
                 <input
-                  type="text"
                   id="numero-serie"
                   v-model="formData.numeroSerie"
+                  type="text"
                   class="form-control"
                   placeholder="Nº de série"
-                />
+                >
               </div>
 
               <div class="form-group">
                 <label for="versao-software">VERSÃO SOFTWARE</label>
                 <input
-                  type="text"
                   id="versao-software"
                   v-model="formData.versao"
+                  type="text"
                   class="form-control"
                   placeholder="Ex: 1.2.3"
-                />
+                >
               </div>
 
               <div class="form-group">
                 <label for="versao-licenca">VERSÃO LICENÇA</label>
                 <input
-                  type="text"
                   id="versao-licenca"
                   v-model="formData.software.versaoLicenca"
+                  type="text"
                   class="form-control"
                   placeholder="Versão da licença"
-                />
+                >
               </div>
             </div>
           </div>
@@ -315,39 +468,58 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="dataInicio">DATA DE INÍCIO</label>
-            <input type="date" id="dataInicio" v-model="formData.dataInicio" class="form-control" />
+            <input
+              id="dataInicio"
+              v-model="formData.dataInicio"
+              type="date"
+              class="form-control"
+            >
           </div>
 
           <div class="form-group">
             <label for="dataVencimento">DATA DE VENCIMENTO</label>
             <input
-              type="date"
               id="dataVencimento"
               v-model="formData.dataVencimento"
+              type="date"
               class="form-control"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="modalidade">MODALIDADE</label>
-            <select id="modalidade" v-model="formData.modalidade" class="form-control">
-              <option value="">--</option>
-              <option value="ANUAL">ANUAL</option>
-              <option value="SEMESTRAL">SEMESTRAL</option>
-              <option value="TRIMESTRAL">TRIMESTRAL</option>
-              <option value="MENSAL">MENSAL</option>
+            <select
+              id="modalidade"
+              v-model="formData.modalidade"
+              class="form-control"
+            >
+              <option value="">
+                --
+              </option>
+              <option value="ANUAL">
+                ANUAL
+              </option>
+              <option value="SEMESTRAL">
+                SEMESTRAL
+              </option>
+              <option value="TRIMESTRAL">
+                TRIMESTRAL
+              </option>
+              <option value="MENSAL">
+                MENSAL
+              </option>
             </select>
           </div>
 
           <div class="form-group">
             <label for="duracaoContrato">DURAÇÃO DO CONTRATO</label>
             <input
-              type="text"
               id="duracaoContrato"
               v-model="formData.duracaoContrato"
+              type="text"
               class="form-control"
               placeholder="Ex: 12 meses"
-            />
+            >
           </div>
         </div>
       </section>
@@ -357,10 +529,18 @@
         <h2>INFORMAÇÕES DE FATURA</h2>
 
         <!-- Dynamic invoice items -->
-        <div v-for="(invoice, index) in formData.invoices" :key="invoice.id" class="activity-card">
+        <div
+          v-for="(invoice, index) in formData.invoices"
+          :key="invoice.id"
+          class="activity-card"
+        >
           <div class="activity-header">
             <h3>Fatura {{ index + 1 }}</h3>
-            <button type="button" @click="removeInvoice(index)" class="btn btn-remove-activity">
+            <button
+              type="button"
+              class="btn btn-remove-activity"
+              @click="removeInvoice(index)"
+            >
               ❌
             </button>
           </div>
@@ -369,43 +549,43 @@
             <div class="form-group">
               <label :for="`ano-${invoice.id}`">ANO</label>
               <input
-                type="text"
                 :id="`ano-${invoice.id}`"
                 v-model="invoice.ano"
+                type="text"
                 class="form-control"
                 placeholder="Ex: 2024"
-              />
+              >
             </div>
 
             <div class="form-group">
               <label :for="`numeroFatura-${invoice.id}`">NÚMERO DA FATURA</label>
               <input
-                type="text"
                 :id="`numeroFatura-${invoice.id}`"
                 v-model="invoice.numeroFatura"
+                type="text"
                 class="form-control"
                 placeholder="Número da fatura"
-              />
+              >
             </div>
 
             <div class="form-group">
               <label :for="`dataFatura-${invoice.id}`">DATA DA FATURA</label>
               <input
-                type="date"
                 :id="`dataFatura-${invoice.id}`"
                 v-model="invoice.dataFatura"
+                type="date"
                 class="form-control"
-              />
+              >
             </div>
 
             <div class="form-group">
               <label :for="`dataAviso-${invoice.id}`">DATA DE AVISO</label>
               <input
-                type="date"
                 :id="`dataAviso-${invoice.id}`"
                 v-model="invoice.dataAviso"
+                type="date"
                 class="form-control"
-              />
+              >
             </div>
           </div>
         </div>
@@ -413,8 +593,8 @@
         <!-- Clickable empty state / add button -->
         <div
           v-if="formData.invoices.length === 0"
-          @click="addInvoice"
           class="clickable-add-message"
+          @click="addInvoice"
         >
           ➕ Adicionar Fatura
         </div>
@@ -422,11 +602,23 @@
 
       <!-- Action buttons -->
       <div class="form-actions">
-        <button type="button" @click="handleCancel" class="btn btn-cancel" :disabled="loading">
+        <button
+          type="button"
+          class="btn btn-cancel"
+          :disabled="loading"
+          @click="handleCancel"
+        >
           Cancelar
         </button>
-        <button type="submit" class="btn btn-primary" :disabled="loading || !isFormValid">
-          <span v-if="loading" class="btn-spinner"></span>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          :disabled="loading || !isFormValid"
+        >
+          <span
+            v-if="loading"
+            class="btn-spinner"
+          />
           {{ isEditing ? 'Atualizar' : 'Criar' }} Licença
         </button>
       </div>

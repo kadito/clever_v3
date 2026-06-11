@@ -1,7 +1,10 @@
 <template>
   <div class="clientes-container">
     <div class="clientes-header">
-      <BackButton to="/clientes" variant="inline" />
+      <BackButton
+        to="/clientes"
+        variant="inline"
+      />
     </div>
 
     <!-- Controls -->
@@ -10,34 +13,54 @@
         <h2>Clientes ({{ displayedClientes.length }})</h2>
       </div>
 
-      <button @click="refreshData" :disabled="loading" class="btn btn-refresh">🔄 Atualizar</button>
+      <button
+        :disabled="loading"
+        class="btn btn-refresh"
+        @click="refreshData"
+      >
+        🔄 Atualizar
+      </button>
     </div>
 
     <!-- Search -->
     <div class="search-container">
       <input
-        type="text"
         v-model="searchQuery"
-        @input="handleSearch"
+        type="text"
         placeholder="Pesquisar por nome, empresa, contribuinte..."
         class="search-input"
-      />
+        @input="handleSearch"
+      >
       <span class="search-icon">🔍</span>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A carregar clientes...</p>
     </div>
 
     <!-- Error State -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Clientes List -->
-    <div v-if="!loading && displayedClientes.length > 0" class="clientes-list">
+    <div
+      v-if="!loading && displayedClientes.length > 0"
+      class="clientes-list"
+    >
       <div
         v-for="cliente in displayedClientes"
         :key="cliente.id"
@@ -50,43 +73,85 @@
             <span class="cliente-contribuinte">{{ cliente.contribuinte || 'Sem NIF' }}</span>
             <span class="cliente-localidade">{{ cliente.localidade || 'Sem localidade' }}</span>
           </div>
-          <div class="cliente-contact" v-if="cliente.responsavel || cliente.telefoneContato">
-            <span v-if="cliente.responsavel" class="cliente-responsavel">{{
+          <div
+            v-if="cliente.responsavel || cliente.telefoneContato"
+            class="cliente-contact"
+          >
+            <span
+              v-if="cliente.responsavel"
+              class="cliente-responsavel"
+            >{{
               cliente.responsavel
             }}</span>
-            <span v-if="cliente.telefoneContato" class="cliente-telefone"
-              >📞 {{ cliente.telefoneContato }}</span
-            >
+            <span
+              v-if="cliente.telefoneContato"
+              class="cliente-telefone"
+            >📞 {{ cliente.telefoneContato }}</span>
           </div>
         </div>
         <div class="cliente-actions">
-          <button class="action-btn" @click.stop="showActions(cliente)">⋮</button>
+          <button
+            class="action-btn"
+            @click.stop="showActions(cliente)"
+          >
+            ⋮
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Empty State -->
-    <div v-if="!loading && displayedClientes.length === 0" class="empty-state">
+    <div
+      v-if="!loading && displayedClientes.length === 0"
+      class="empty-state"
+    >
       <h3>Nenhum cliente encontrado</h3>
-      <p v-if="searchQuery">Não foram encontrados clientes com o termo "{{ searchQuery }}".</p>
-      <p v-else>Não há clientes cadastrados no sistema.</p>
+      <p v-if="searchQuery">
+        Não foram encontrados clientes com o termo "{{ searchQuery }}".
+      </p>
+      <p v-else>
+        Não há clientes cadastrados no sistema.
+      </p>
     </div>
 
     <!-- Search Results Info -->
-    <div v-if="searchResults && searchQuery" class="search-info">
+    <div
+      v-if="searchResults && searchQuery"
+      class="search-info"
+    >
       <p>{{ searchResults.count }} resultado(s) encontrado(s) para "{{ searchQuery }}"</p>
     </div>
 
     <!-- Actions Modal -->
-    <div v-if="showActionsModal" class="actions-modal-overlay" @click="closeActions">
-      <div class="actions-modal" @click.stop>
+    <div
+      v-if="showActionsModal"
+      class="actions-modal-overlay"
+      @click="closeActions"
+    >
+      <div
+        class="actions-modal"
+        @click.stop
+      >
         <h3>
           {{ selectedClienteForActions?.nomeComercial || selectedClienteForActions?.nomeEmpresa }}
         </h3>
         <div class="modal-actions">
-          <button @click="viewCliente" class="modal-btn view-btn">📋 Ver Detalhes</button>
-          <button @click="editCliente" class="modal-btn edit-btn">✏️ Editar</button>
-          <button @click="confirmDelete(selectedClienteForActions)" class="modal-btn delete-btn">
+          <button
+            class="modal-btn view-btn"
+            @click="viewCliente"
+          >
+            📋 Ver Detalhes
+          </button>
+          <button
+            class="modal-btn edit-btn"
+            @click="editCliente"
+          >
+            ✏️ Editar
+          </button>
+          <button
+            class="modal-btn delete-btn"
+            @click="confirmDelete(selectedClienteForActions)"
+          >
             🗑️ Eliminar
           </button>
         </div>
@@ -94,18 +159,35 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div v-if="showDeleteModal" class="modal-overlay" @click="cancelDelete">
-      <div class="modal-content" @click.stop>
+    <div
+      v-if="showDeleteModal"
+      class="modal-overlay"
+      @click="cancelDelete"
+    >
+      <div
+        class="modal-content"
+        @click.stop
+      >
         <h3>Confirmar Eliminação</h3>
         <p>
           Tem a certeza que pretende eliminar o cliente
-          <strong>{{ clienteToDelete?.nomeComercial || clienteToDelete?.nomeEmpresa }}</strong
-          >?
+          <strong>{{ clienteToDelete?.nomeComercial || clienteToDelete?.nomeEmpresa }}</strong>?
         </p>
-        <p class="warning-text">Esta ação não pode ser desfeita.</p>
+        <p class="warning-text">
+          Esta ação não pode ser desfeita.
+        </p>
         <div class="modal-actions">
-          <button @click="cancelDelete" class="btn btn-secondary">Cancelar</button>
-          <button @click="deleteClienteAction" class="btn btn-danger" :disabled="loading">
+          <button
+            class="btn btn-secondary"
+            @click="cancelDelete"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn btn-danger"
+            :disabled="loading"
+            @click="deleteClienteAction"
+          >
             {{ loading ? 'A eliminar...' : 'Eliminar' }}
           </button>
         </div>
@@ -113,7 +195,12 @@
     </div>
 
     <!-- Floating Action Button -->
-    <button @click="navigateToCreate" class="fab">➕</button>
+    <button
+      class="fab"
+      @click="navigateToCreate"
+    >
+      ➕
+    </button>
   </div>
 </template>
 

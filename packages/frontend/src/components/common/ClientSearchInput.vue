@@ -3,8 +3,8 @@
     <!-- Search Input with Dropdown -->
     <div class="relative">
       <input
-        type="text"
         v-model="searchQuery"
+        type="text"
         :placeholder="placeholder"
         :disabled="disabled"
         :readonly="readonly"
@@ -17,7 +17,7 @@
         @focus="onFocus"
         @blur="onBlur"
         @keydown="onKeyDown"
-      />
+      >
 
       <!-- Search Icon -->
       <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -34,12 +34,12 @@
             r="10"
             stroke="currentColor"
             stroke-width="4"
-          ></circle>
+          />
           <path
             class="opacity-75"
             fill="currentColor"
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          ></path>
+          />
         </svg>
         <svg
           v-else
@@ -58,11 +58,21 @@
       </div>
 
       <!-- Dropdown Results - positioned relative to this input container -->
-      <div v-if="!readonly && !disabled && showDropdown" class="search-dropdown">
+      <div
+        v-if="!readonly && !disabled && showDropdown"
+        class="search-dropdown"
+      >
         <!-- Loading State -->
-        <div v-if="isLoading" class="search-option loading">
+        <div
+          v-if="isLoading"
+          class="search-option loading"
+        >
           <div class="flex items-center">
-            <svg class="animate-spin h-4 w-4 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24">
+            <svg
+              class="animate-spin h-4 w-4 text-gray-400 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
               <circle
                 class="opacity-25"
                 cx="12"
@@ -70,12 +80,12 @@
                 r="10"
                 stroke="currentColor"
                 stroke-width="4"
-              ></circle>
+              />
               <path
                 class="opacity-75"
                 fill="currentColor"
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
+              />
             </svg>
             <span class="text-gray-600">Pesquisando clientes...</span>
           </div>
@@ -129,22 +139,31 @@
 
         <!-- Results -->
         <div
-          v-else
           v-for="client in searchResults"
+          v-else
           :key="client.uuid"
           class="search-option"
           @click="selectClient(client)"
         >
           <div class="client-info">
-            <div class="client-name">{{ client.data.nomeEmpresa }}</div>
+            <div class="client-name">
+              {{ client.data.nomeEmpresa }}
+            </div>
             <div class="client-details">
-              <span v-if="client.data.nomeComercial" class="detail">{{
+              <span
+                v-if="client.data.nomeComercial"
+                class="detail"
+              >{{
                 client.data.nomeComercial
               }}</span>
-              <span v-if="client.data.contribuinte" class="detail"
-                >NIF: {{ client.data.contribuinte }}</span
-              >
-              <span v-if="client.data.localidade" class="detail">{{ client.data.localidade }}</span>
+              <span
+                v-if="client.data.contribuinte"
+                class="detail"
+              >NIF: {{ client.data.contribuinte }}</span>
+              <span
+                v-if="client.data.localidade"
+                class="detail"
+              >{{ client.data.localidade }}</span>
             </div>
           </div>
         </div>
@@ -152,28 +171,46 @@
     </div>
 
     <!-- Selected Client Info (when readonly) -->
-    <div v-if="selectedClient && (readonly || disabled)" class="selected-client-info">
+    <div
+      v-if="selectedClient && (readonly || disabled)"
+      class="selected-client-info"
+    >
       <div class="client-card">
         <div class="client-header">
-          <h3 class="client-title">{{ selectedClient.data.nomeEmpresa }}</h3>
-          <span v-if="selectedClient.data.contribuinte" class="client-nif"
-            >NIF: {{ selectedClient.data.contribuinte }}</span
-          >
+          <h3 class="client-title">
+            {{ selectedClient.data.nomeEmpresa }}
+          </h3>
+          <span
+            v-if="selectedClient.data.contribuinte"
+            class="client-nif"
+          >NIF: {{ selectedClient.data.contribuinte }}</span>
         </div>
         <div class="client-details-grid">
-          <div v-if="selectedClient.data.nomeComercial" class="detail-item">
+          <div
+            v-if="selectedClient.data.nomeComercial"
+            class="detail-item"
+          >
             <span class="detail-label">Nome Comercial:</span>
             <span class="detail-value">{{ selectedClient.data.nomeComercial }}</span>
           </div>
-          <div v-if="selectedClient.data.localidade" class="detail-item">
+          <div
+            v-if="selectedClient.data.localidade"
+            class="detail-item"
+          >
             <span class="detail-label">Localidade:</span>
             <span class="detail-value">{{ selectedClient.data.localidade }}</span>
           </div>
-          <div v-if="selectedClient.data.telefoneContato" class="detail-item">
+          <div
+            v-if="selectedClient.data.telefoneContato"
+            class="detail-item"
+          >
             <span class="detail-label">Telefone:</span>
             <span class="detail-value">{{ selectedClient.data.telefoneContato }}</span>
           </div>
-          <div v-if="selectedClient.data.emailContato" class="detail-item">
+          <div
+            v-if="selectedClient.data.emailContato"
+            class="detail-item"
+          >
             <span class="detail-label">Email:</span>
             <span class="detail-value">{{ selectedClient.data.emailContato }}</span>
           </div>
@@ -182,36 +219,68 @@
     </div>
 
     <!-- Selected Client Info (when not readonly/disabled - for forms) -->
-    <div v-if="selectedClient && !readonly && !disabled" class="selected-client-info">
+    <div
+      v-if="selectedClient && !readonly && !disabled"
+      class="selected-client-info"
+    >
       <div class="bg-white rounded-touch border border-gray-200 mt-4">
         <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-          <h3 class="text-lg font-semibold text-gray-900">Informação do Cliente</h3>
+          <h3 class="text-lg font-semibold text-gray-900">
+            Informação do Cliente
+          </h3>
         </div>
         <div class="p-4 sm:p-6">
           <div class="detail-grid">
             <div class="detail-item">
               <label class="detail-label">Nome da Empresa</label>
-              <div class="detail-value">{{ selectedClient.data.nomeEmpresa || '-' }}</div>
+              <div class="detail-value">
+                {{ selectedClient.data.nomeEmpresa || '-' }}
+              </div>
             </div>
-            <div v-if="selectedClient.data.nomeComercial" class="detail-item">
+            <div
+              v-if="selectedClient.data.nomeComercial"
+              class="detail-item"
+            >
               <label class="detail-label">Nome Comercial</label>
-              <div class="detail-value">{{ selectedClient.data.nomeComercial }}</div>
+              <div class="detail-value">
+                {{ selectedClient.data.nomeComercial }}
+              </div>
             </div>
-            <div v-if="selectedClient.data.contribuinte" class="detail-item">
+            <div
+              v-if="selectedClient.data.contribuinte"
+              class="detail-item"
+            >
               <label class="detail-label">NIF</label>
-              <div class="detail-value font-mono">{{ selectedClient.data.contribuinte }}</div>
+              <div class="detail-value font-mono">
+                {{ selectedClient.data.contribuinte }}
+              </div>
             </div>
-            <div v-if="selectedClient.data.localidade" class="detail-item">
+            <div
+              v-if="selectedClient.data.localidade"
+              class="detail-item"
+            >
               <label class="detail-label">Localidade</label>
-              <div class="detail-value">{{ selectedClient.data.localidade }}</div>
+              <div class="detail-value">
+                {{ selectedClient.data.localidade }}
+              </div>
             </div>
-            <div v-if="selectedClient.data.telefoneContato" class="detail-item">
+            <div
+              v-if="selectedClient.data.telefoneContato"
+              class="detail-item"
+            >
               <label class="detail-label">Telefone</label>
-              <div class="detail-value">{{ selectedClient.data.telefoneContato }}</div>
+              <div class="detail-value">
+                {{ selectedClient.data.telefoneContato }}
+              </div>
             </div>
-            <div v-if="selectedClient.data.emailContato" class="detail-item">
+            <div
+              v-if="selectedClient.data.emailContato"
+              class="detail-item"
+            >
               <label class="detail-label">Email</label>
-              <div class="detail-value">{{ selectedClient.data.emailContato }}</div>
+              <div class="detail-value">
+                {{ selectedClient.data.emailContato }}
+              </div>
             </div>
           </div>
         </div>

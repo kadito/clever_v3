@@ -1,23 +1,40 @@
 <template>
   <div class="folha-detail">
     <div class="detail-header">
-      <BackButton to="/folhas-obra/list" variant="inline" />
+      <BackButton
+        to="/folhas-obra/list"
+        variant="inline"
+      />
       <h1>FOLHA DE OBRA</h1>
     </div>
 
     <!-- Loading state -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A carregar folha de obra...</p>
     </div>
 
     <!-- Error state -->
-    <div v-else-if="error" class="error-state">
+    <div
+      v-else-if="error"
+      class="error-state"
+    >
       <p>{{ error }}</p>
-      <button @click="loadFolhaData" class="retry-btn">Tentar novamente</button>
+      <button
+        class="retry-btn"
+        @click="loadFolhaData"
+      >
+        Tentar novamente
+      </button>
     </div>
 
     <!-- Content -->
-    <div v-else-if="folhaData.id" class="detail-content">
+    <div
+      v-else-if="folhaData.id"
+      class="detail-content"
+    >
       <!-- Dados do Cliente Section -->
       <section class="info-section">
         <h2>DADOS DO CLIENTE</h2>
@@ -99,7 +116,10 @@
             <label>TÉCNICO RESPONSÁVEL</label>
             <p>{{ folhaData.otherData.technician }}</p>
           </div>
-          <div class="info-item full-width" v-if="folhaData.otherData.serviceObservations">
+          <div
+            v-if="folhaData.otherData.serviceObservations"
+            class="info-item full-width"
+          >
             <label>OBSERVAÇÕES DO SERVIÇO</label>
             <p>{{ folhaData.otherData.serviceObservations }}</p>
           </div>
@@ -118,49 +138,48 @@
             <label>FINAL SEMANA - FERIADO</label>
             <p>{{ folhaData.displacement.weekendHoliday ? 'SIM' : 'NÃO' }}</p>
           </div>
-          <div class="info-item" v-if="folhaData.displacement.hasDisplacement">
+          <div
+            v-if="folhaData.displacement.hasDisplacement"
+            class="info-item"
+          >
             <label>KMS (IDA)</label>
             <p>{{ folhaData.displacement.oneWayKms }} km</p>
           </div>
-          <div class="info-item" v-if="folhaData.displacement.hasDisplacement">
+          <div
+            v-if="folhaData.displacement.hasDisplacement"
+            class="info-item"
+          >
             <label>TOTAL KMS (IDA E VOLTA)</label>
             <p>{{ folhaData.displacement.totalKms }} km</p>
           </div>
         </div>
 
         <!-- Calculated Pricing - only shown when displacement is true -->
-        <div v-if="folhaData.displacement.hasDisplacement" class="pricing-section">
+        <div
+          v-if="folhaData.displacement.hasDisplacement"
+          class="pricing-section"
+        >
           <h3>CÁLCULO DE PREÇOS <span class="vat-note">(sem IVA)</span></h3>
           <div class="pricing-table">
             <div class="pricing-row">
               <span class="pricing-label">Taxa Deslocação:</span>
-              <span class="pricing-value"
-                >{{ getDisplacementRate() }}€ <span class="vat-indicator">sem IVA</span></span
-              >
+              <span class="pricing-value">{{ getDisplacementRate() }}€ <span class="vat-indicator">sem IVA</span></span>
             </div>
             <div class="pricing-row">
               <span class="pricing-label">Preço KMs:</span>
-              <span class="pricing-value"
-                >{{ getKmsPrice() }}€ <span class="vat-indicator">sem IVA</span></span
-              >
+              <span class="pricing-value">{{ getKmsPrice() }}€ <span class="vat-indicator">sem IVA</span></span>
             </div>
             <div class="pricing-row">
               <span class="pricing-label">Valor Hora:</span>
-              <span class="pricing-value"
-                >{{ getHourlyRate() }}€ <span class="vat-indicator">sem IVA</span></span
-              >
+              <span class="pricing-value">{{ getHourlyRate() }}€ <span class="vat-indicator">sem IVA</span></span>
             </div>
             <div class="pricing-row">
               <span class="pricing-label">Preço Mão Obra:</span>
-              <span class="pricing-value"
-                >{{ getLaborPrice() }}€ <span class="vat-indicator">sem IVA</span></span
-              >
+              <span class="pricing-value">{{ getLaborPrice() }}€ <span class="vat-indicator">sem IVA</span></span>
             </div>
             <div class="pricing-row total">
               <span class="pricing-label">PREÇO TOTAL:</span>
-              <span class="pricing-value"
-                >{{ getTotalPrice() }}€ <span class="vat-indicator">sem IVA</span></span
-              >
+              <span class="pricing-value">{{ getTotalPrice() }}€ <span class="vat-indicator">sem IVA</span></span>
             </div>
           </div>
         </div>
@@ -178,7 +197,10 @@
       </section>
 
       <!-- Garantia e Contrato Section - only shown when payment method is CONTRATO -->
-      <section class="info-section" v-if="folhaData.displacement.paymentMethod === 'CONTRATO'">
+      <section
+        v-if="folhaData.displacement.paymentMethod === 'CONTRATO'"
+        class="info-section"
+      >
         <h2>GARANTIA E CONTRATO</h2>
         <div class="info-grid">
           <div class="info-item">
@@ -189,7 +211,10 @@
             <label>CONTRATO</label>
             <p>{{ folhaData.otherData.contract ? 'SIM' : 'NÃO' }}</p>
           </div>
-          <div class="info-item" v-if="folhaData.otherData.contract">
+          <div
+            v-if="folhaData.otherData.contract"
+            class="info-item"
+          >
             <label>ANO DE CONTRATO</label>
             <p>{{ folhaData.otherData.contractYear }}</p>
           </div>
@@ -209,15 +234,15 @@
             <p>{{ folhaData.otherData.equipment ? 'SIM' : 'NÃO' }}</p>
           </div>
           <div
-            class="info-item full-width"
             v-if="folhaData.otherData.materialUsed && folhaData.otherData.materialDetails"
+            class="info-item full-width"
           >
             <label>DESCRIÇÃO DO MATERIAL UTILIZADO</label>
             <p>{{ folhaData.otherData.materialDetails }}</p>
           </div>
           <div
-            class="info-item full-width"
             v-if="folhaData.otherData.equipment && folhaData.otherData.equipmentDetails"
+            class="info-item full-width"
           >
             <label>DESCRIÇÃO DOS EQUIPAMENTOS</label>
             <p>{{ folhaData.otherData.equipmentDetails }}</p>
@@ -250,8 +275,8 @@
             <p>{{ folhaData.otherData.anydesk ? 'SIM' : 'NÃO' }}</p>
           </div>
           <div
-            class="info-item full-width"
             v-if="!folhaData.otherData.totallyResolved && folhaData.otherData.resolutionIssues"
+            class="info-item full-width"
           >
             <label>OBSERVAÇÕES SOBRE PROBLEMAS NÃO RESOLVIDOS</label>
             <p>{{ folhaData.otherData.resolutionIssues }}</p>
@@ -271,7 +296,10 @@
       </section>
 
       <!-- Assinatura Cliente Section -->
-      <section class="info-section" v-if="folhaData.otherData.clientSignature">
+      <section
+        v-if="folhaData.otherData.clientSignature"
+        class="info-section"
+      >
         <h2>ASSINATURA CLIENTE</h2>
         <div class="info-grid">
           <div class="info-item full-width">
@@ -281,7 +309,7 @@
                 :src="folhaData.otherData.clientSignature"
                 alt="Assinatura do Cliente"
                 class="signature-image"
-              />
+              >
             </div>
           </div>
         </div>
@@ -295,23 +323,43 @@
 
         <!-- Action Buttons -->
         <div class="action-buttons">
-          <button class="action-btn primary">📋 FOLHA</button>
-          <button @click="editFolha" class="action-btn secondary">✏️ Editar</button>
+          <button class="action-btn primary">
+            📋 FOLHA
+          </button>
+          <button
+            class="action-btn secondary"
+            @click="editFolha"
+          >
+            ✏️ Editar
+          </button>
         </div>
       </section>
     </div>
 
     <!-- No data state -->
-    <div v-else class="no-data-state">
+    <div
+      v-else
+      class="no-data-state"
+    >
       <h2>Folha de obra não encontrada</h2>
       <p>O registo pode ainda não estar disponível no sistema. Tentar novamente?</p>
       <div class="retry-actions">
-        <button @click="retryLoad" class="retry-btn" :disabled="loading">
+        <button
+          class="retry-btn"
+          :disabled="loading"
+          @click="retryLoad"
+        >
           {{ loading ? 'A carregar...' : 'Tentar novamente' }}
         </button>
-        <BackButton to="/folhas-obra/list" variant="full-width" />
+        <BackButton
+          to="/folhas-obra/list"
+          variant="full-width"
+        />
       </div>
-      <p v-if="autoRetryCountdown > 0" class="auto-retry-info">
+      <p
+        v-if="autoRetryCountdown > 0"
+        class="auto-retry-info"
+      >
         Tentativa automática em {{ autoRetryCountdown }}s...
       </p>
     </div>
@@ -428,11 +476,11 @@ watch(
 const formatDate = dateString => {
   const date = new Date(dateString);
   return (
-    date.toLocaleDateString('pt-PT', {
+    `${date.toLocaleDateString('pt-PT', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
-    }) + ' at 12:00'
+    })  } at 12:00`
   );
 };
 
@@ -465,7 +513,7 @@ const getWorkDuration = () => {
   const [endHour, endMinute] = endTime.split(':').map(Number);
 
   const startDate = new Date(0, 0, 0, startHour, startMinute);
-  let endDate = new Date(0, 0, 0, endHour, endMinute);
+  const endDate = new Date(0, 0, 0, endHour, endMinute);
 
   if (endDate < startDate) {
     endDate.setDate(endDate.getDate() + 1); // Assume next day if end time is earlier

@@ -6,20 +6,20 @@
         <label class="form-label">DATA DE INÍCIO</label>
         <input
           :value="startDate"
-          @input="$emit('update:start-date', $event.target.value)"
           type="date"
           class="form-input"
-        />
+          @input="$emit('update:start-date', $event.target.value)"
+        >
       </div>
 
       <div class="form-field">
         <label class="form-label">DATA DE FIM</label>
         <input
           :value="endDate"
-          @input="$emit('update:end-date', $event.target.value)"
           type="date"
           class="form-input"
-        />
+          @input="$emit('update:end-date', $event.target.value)"
+        >
       </div>
     </div>
   </div>

@@ -1,7 +1,10 @@
 <template>
   <div class="registo-container">
     <div class="registo-header">
-      <BackButton to="/registo-diario-atividade" variant="inline" />
+      <BackButton
+        to="/registo-diario-atividade"
+        variant="inline"
+      />
     </div>
 
     <!-- Controls -->
@@ -11,37 +14,61 @@
       </div>
 
       <div class="controls-right">
-        <YearSelector v-model="selectedYear" :years="availableYears" @change="handleYearChange" />
+        <YearSelector
+          v-model="selectedYear"
+          :years="availableYears"
+          @change="handleYearChange"
+        />
 
-        <button @click="fetchData" :disabled="loading" class="btn btn-refresh">🔄 Atualizar</button>
+        <button
+          :disabled="loading"
+          class="btn btn-refresh"
+          @click="fetchData"
+        >
+          🔄 Atualizar
+        </button>
       </div>
     </div>
 
     <!-- Search -->
     <div class="search-container">
       <input
-        type="text"
         v-model="searchQuery"
-        @input="handleSearch"
+        type="text"
         placeholder="Pesquisar registos..."
         class="search-input"
-      />
+        @input="handleSearch"
+      >
       <span class="search-icon">🔍</span>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A carregar registos...</p>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="error-alert">
+    <div
+      v-else-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Registos List -->
-    <div v-else-if="displayedRegistros.length > 0" class="registos-list">
+    <div
+      v-else-if="displayedRegistros.length > 0"
+      class="registos-list"
+    >
       <div
         v-for="registro in displayedRegistros"
         :key="`${registro.year || selectedYear}-${registro.id}`"
@@ -69,7 +96,10 @@
               <span class="info-value">{{ formatDateTime(registro.dataRegistro) }}</span>
             </div>
 
-            <div v-if="registro.assunto" class="registro-info-item">
+            <div
+              v-if="registro.assunto"
+              class="registro-info-item"
+            >
               <span class="info-icon">📋</span>
               <span class="info-label">Assunto:</span>
               <span class="info-value">{{ registro.assunto }}</span>
@@ -86,26 +116,39 @@
               }}</span>
             </div>
 
-            <div v-if="registro.respRegisto" class="registro-info-item">
+            <div
+              v-if="registro.respRegisto"
+              class="registro-info-item"
+            >
               <span class="info-icon">👤</span>
               <span class="info-label">Responsável:</span>
               <span class="info-value">{{ registro.respRegisto }}</span>
             </div>
           </div>
 
-          <div v-if="getTotalClientsForRegistro(registro) > 1" class="registro-additional-info">
+          <div
+            v-if="getTotalClientsForRegistro(registro) > 1"
+            class="registro-additional-info"
+          >
             <span class="additional-badge">
               +{{ getTotalClientsForRegistro(registro) - 1 }} cliente(s) adicional(is)
             </span>
           </div>
 
-          <div v-if="searchResults && registro.year" class="registro-year-badge">
+          <div
+            v-if="searchResults && registro.year"
+            class="registro-year-badge"
+          >
             Ano: {{ registro.year }}
           </div>
         </div>
 
         <div class="registro-actions">
-          <button class="action-btn" @click.stop="showActions(registro)" aria-label="Mais ações">
+          <button
+            class="action-btn"
+            aria-label="Mais ações"
+            @click.stop="showActions(registro)"
+          >
             <span>⋮</span>
           </button>
         </div>
@@ -113,14 +156,24 @@
     </div>
 
     <!-- Empty State -->
-    <div v-else class="empty-state">
+    <div
+      v-else
+      class="empty-state"
+    >
       <h3>Nenhum registo encontrado</h3>
-      <p v-if="searchQuery">Não foram encontrados registos com o termo "{{ searchQuery }}".</p>
-      <p v-else>Não há registos para o ano {{ selectedYear }}.</p>
+      <p v-if="searchQuery">
+        Não foram encontrados registos com o termo "{{ searchQuery }}".
+      </p>
+      <p v-else>
+        Não há registos para o ano {{ selectedYear }}.
+      </p>
     </div>
 
     <!-- Search Results Info -->
-    <div v-if="searchResults && searchQuery" class="search-info">
+    <div
+      v-if="searchResults && searchQuery"
+      class="search-info"
+    >
       <p>
         {{ searchResults.count || 0 }} resultado(s) encontrado(s) para "{{ searchQuery }}"
         {{ selectedYear ? `no ano ${selectedYear}` : 'em todos os anos' }}
@@ -128,11 +181,14 @@
     </div>
 
     <!-- Pagination -->
-    <div v-if="totalPages > 1" class="pagination">
+    <div
+      v-if="totalPages > 1"
+      class="pagination"
+    >
       <button
-        @click="goToPage(currentPage - 1)"
         :disabled="currentPage === 1"
         class="pagination-btn"
+        @click="goToPage(currentPage - 1)"
       >
         ← Anterior
       </button>
@@ -142,31 +198,44 @@
       </div>
 
       <button
-        @click="goToPage(currentPage + 1)"
         :disabled="currentPage === totalPages"
         class="pagination-btn"
+        @click="goToPage(currentPage + 1)"
       >
         Próxima →
       </button>
     </div>
 
     <!-- Actions Modal -->
-    <div v-if="showActionsModal" class="actions-modal-overlay" @click="closeActions">
-      <div class="actions-modal" @click.stop>
+    <div
+      v-if="showActionsModal"
+      class="actions-modal-overlay"
+      @click="closeActions"
+    >
+      <div
+        class="actions-modal"
+        @click.stop
+      >
         <h3>{{ selectedRegistroForActions?.cliente }}</h3>
         <div class="modal-actions">
-          <button @click="viewRegistro(selectedRegistroForActions)" class="modal-btn view-btn">
+          <button
+            class="modal-btn view-btn"
+            @click="viewRegistro(selectedRegistroForActions)"
+          >
             📋 Ver Detalhes
           </button>
-          <button @click="editRegistro(selectedRegistroForActions)" class="modal-btn edit-btn">
+          <button
+            class="modal-btn edit-btn"
+            @click="editRegistro(selectedRegistroForActions)"
+          >
             ✏️ Editar
           </button>
           <button
+            class="modal-btn delete-btn"
             @click="
               confirmDelete(selectedRegistroForActions);
               closeActions();
             "
-            class="modal-btn delete-btn"
           >
             🗑️ Eliminar
           </button>
@@ -175,18 +244,35 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div v-if="showDeleteModal" class="modal-overlay" @click="cancelDelete">
-      <div class="modal-content" @click.stop>
+    <div
+      v-if="showDeleteModal"
+      class="modal-overlay"
+      @click="cancelDelete"
+    >
+      <div
+        class="modal-content"
+        @click.stop
+      >
         <h3>Confirmar Eliminação</h3>
         <p>
           Tem a certeza que pretende eliminar o registo de
-          <strong>{{ registroToDelete?.cliente }}</strong
-          >?
+          <strong>{{ registroToDelete?.cliente }}</strong>?
         </p>
-        <p class="warning-text">Esta ação não pode ser desfeita.</p>
+        <p class="warning-text">
+          Esta ação não pode ser desfeita.
+        </p>
         <div class="modal-actions">
-          <button @click="cancelDelete" class="btn btn-secondary">Cancelar</button>
-          <button @click="deleteRegistroAction" class="btn btn-danger" :disabled="loading">
+          <button
+            class="btn btn-secondary"
+            @click="cancelDelete"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn btn-danger"
+            :disabled="loading"
+            @click="deleteRegistroAction"
+          >
             {{ loading ? 'A eliminar...' : 'Eliminar' }}
           </button>
         </div>
@@ -444,7 +530,7 @@ const deleteRegistroAction = async () => {
 
 const truncateText = (text, maxLength) => {
   if (!text || text.length <= maxLength) return text;
-  return text.substring(0, maxLength) + '...';
+  return `${text.substring(0, maxLength)  }...`;
 };
 
 const fetchData = async () => {

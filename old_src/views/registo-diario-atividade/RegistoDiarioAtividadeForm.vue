@@ -1,23 +1,41 @@
 <template>
   <div class="registo-form-container">
     <div class="form-header">
-      <BackButton :to="cancelRoute" variant="inline" />
+      <BackButton
+        :to="cancelRoute"
+        variant="inline"
+      />
       <h1>{{ isEditing ? 'Editar' : 'Novo' }} Registo Diário de Atividade</h1>
     </div>
 
     <!-- Loading state -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A processar...</p>
     </div>
 
     <!-- Error state -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Form -->
-    <form @submit.prevent="handleSubmit" class="registo-form" v-if="!loading">
+    <form
+      v-if="!loading"
+      class="registo-form"
+      @submit.prevent="handleSubmit"
+    >
       <!-- General Information Section -->
       <section class="form-section">
         <h2>INFORMAÇÕES GERAIS</h2>
@@ -25,12 +43,12 @@
           <div class="form-group">
             <label for="dataRegistro">DATA DO REGISTO</label>
             <input
-              type="datetime-local"
               id="dataRegistro"
               v-model="formData.dataRegistro"
+              type="datetime-local"
               class="form-control"
               required
-            />
+            >
           </div>
         </div>
       </section>
@@ -54,38 +72,51 @@
 
           <div class="form-group">
             <label for="internoOuExterno">TIPO DE ATIVIDADE</label>
-            <select id="internoOuExterno" v-model="formData.internoOuExterno" class="form-control">
-              <option value="">--</option>
-              <option value="INTERNO">INTERNO</option>
-              <option value="EXTERNO">EXTERNO</option>
+            <select
+              id="internoOuExterno"
+              v-model="formData.internoOuExterno"
+              class="form-control"
+            >
+              <option value="">
+                --
+              </option>
+              <option value="INTERNO">
+                INTERNO
+              </option>
+              <option value="EXTERNO">
+                EXTERNO
+              </option>
             </select>
           </div>
 
           <div class="form-group">
             <label for="assunto">ASSUNTO</label>
             <input
-              type="text"
               id="assunto"
               v-model="formData.assunto"
+              type="text"
               class="form-control"
               placeholder="Assunto da atividade"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="horaInicio">HORA INÍCIO</label>
             <input
-              type="text"
               id="horaInicio"
               v-model="formData.horaInicio"
+              type="text"
               class="form-control time-input"
               :class="{ 'is-invalid': validationErrors.horaInicio }"
               placeholder="HH:MM (ex: 09:30)"
               maxlength="5"
               @input="formatTimeInput($event, 'horaInicio')"
               @blur="validateTimeInput('horaInicio')"
-            />
-            <div v-if="validationErrors.horaInicio" class="invalid-feedback">
+            >
+            <div
+              v-if="validationErrors.horaInicio"
+              class="invalid-feedback"
+            >
               {{ validationErrors.horaInicio }}
             </div>
           </div>
@@ -93,17 +124,20 @@
           <div class="form-group">
             <label for="horaFim">HORA FIM</label>
             <input
-              type="text"
               id="horaFim"
               v-model="formData.horaFim"
+              type="text"
               class="form-control time-input"
               :class="{ 'is-invalid': validationErrors.horaFim }"
               placeholder="HH:MM (ex: 17:45)"
               maxlength="5"
               @input="formatTimeInput($event, 'horaFim')"
               @blur="validateTimeInput('horaFim')"
-            />
-            <div v-if="validationErrors.horaFim" class="invalid-feedback">
+            >
+            <div
+              v-if="validationErrors.horaFim"
+              class="invalid-feedback"
+            >
               {{ validationErrors.horaFim }}
             </div>
           </div>
@@ -111,26 +145,26 @@
           <div class="form-group">
             <label for="tempoPausa">TEMPO PAUSA (MINUTOS)</label>
             <input
-              type="number"
               id="tempoPausa"
               v-model.number="formData.tempoPausa"
+              type="number"
               class="form-control"
               placeholder="0"
               min="0"
               step="1"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="totalHorasCalculado">TOTAL HORAS</label>
             <input
-              type="text"
               id="totalHorasCalculado"
               v-model="formData.totalHorasCalculado"
+              type="text"
               class="form-control"
               placeholder="00:00:00"
               readonly
-            />
+            >
           </div>
 
           <div class="form-group">
@@ -164,54 +198,67 @@
             class="form-control"
             rows="3"
             placeholder="Descrição detalhada da atividade"
-          ></textarea>
+          />
         </div>
       </section>
 
       <!-- Secondary Activity Section -->
-      <section class="form-section" v-if="showSecondaryActivity">
+      <section
+        v-if="showSecondaryActivity"
+        class="form-section"
+      >
         <h2>ATIVIDADE SECUNDÁRIA</h2>
         <div class="form-grid">
           <div class="form-group">
             <label for="cliente2">CLIENTE 2</label>
             <input
-              type="text"
               id="cliente2"
               v-model="formData.cliente2"
+              type="text"
               class="form-control"
               placeholder="Nome do segundo cliente"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="interOuExter2">TIPO DE ATIVIDADE</label>
-            <select id="interOuExter2" v-model="formData.interOuExter2" class="form-control">
-              <option value="">--</option>
-              <option value="INTERNO">INTERNO</option>
-              <option value="EXTERNO">EXTERNO</option>
+            <select
+              id="interOuExter2"
+              v-model="formData.interOuExter2"
+              class="form-control"
+            >
+              <option value="">
+                --
+              </option>
+              <option value="INTERNO">
+                INTERNO
+              </option>
+              <option value="EXTERNO">
+                EXTERNO
+              </option>
             </select>
           </div>
 
           <div class="form-group">
             <label for="assunto2">ASSUNTO</label>
             <input
-              type="text"
               id="assunto2"
               v-model="formData.assunto2"
+              type="text"
               class="form-control"
               placeholder="Assunto da atividade"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="totalHoras2">TOTAL DE HORAS</label>
             <input
-              type="text"
               id="totalHoras2"
               v-model="formData.totalHoras2"
+              type="text"
               class="form-control"
               placeholder="00:00:00"
-            />
+            >
           </div>
 
           <div class="form-group">
@@ -243,20 +290,23 @@
               class="form-control"
               rows="3"
               placeholder="Descrição detalhada da atividade"
-            ></textarea>
+            />
           </div>
 
           <div class="form-group">
             <label>TEVE CLIENTE 2</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="teveCliente2"
                 v-model="formData.teveCliente2"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="teveCliente2" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="teveCliente2"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -265,13 +315,16 @@
             <label>FOLHA DE OBRA</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="folhaObra2"
                 v-model="formData.folhaObra2"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="folhaObra2" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="folhaObra2"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -280,13 +333,16 @@
             <label>ASSISTÊNCIA REMOTA</label>
             <div class="toggle-switch">
               <input
-                type="checkbox"
                 id="assistRemota2"
                 v-model="formData.assistRemota2"
+                type="checkbox"
                 class="toggle-input"
-              />
-              <label for="assistRemota2" class="toggle-label">
-                <span class="toggle-slider"></span>
+              >
+              <label
+                for="assistRemota2"
+                class="toggle-label"
+              >
+                <span class="toggle-slider" />
               </label>
             </div>
           </div>
@@ -294,72 +350,75 @@
       </section>
 
       <!-- Distances Section - Only shown for EXTERNO activities -->
-      <section class="form-section" v-if="formData.internoOuExterno === 'EXTERNO'">
+      <section
+        v-if="formData.internoOuExterno === 'EXTERNO'"
+        class="form-section"
+      >
         <h2>DISTÂNCIAS E DESLOCAÇÕES</h2>
         <div class="form-grid">
           <div class="form-group">
             <label for="kmsSaidaSede">KMS SAÍDA SEDE</label>
             <input
-              type="number"
               id="kmsSaidaSede"
               v-model.number="formData.kmsSaidaSede"
+              type="number"
               class="form-control"
               min="0"
               step="0.1"
               placeholder="0.0"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="kmsChegadaSede">KMS CHEGADA SEDE</label>
             <input
-              type="number"
               id="kmsChegadaSede"
               v-model.number="formData.kmsChegadaSede"
+              type="number"
               class="form-control"
               min="0"
               step="0.1"
               placeholder="0.0"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="horaSaida">HORA SAÍDA</label>
             <input
-              type="text"
               id="horaSaida"
               v-model="formData.horaSaida"
+              type="text"
               class="form-control time-input"
               placeholder="HH:MM"
               maxlength="5"
               @input="formatTimeInput($event, 'horaSaida')"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="horaChegada">HORA CHEGADA</label>
             <input
-              type="text"
               id="horaChegada"
               v-model="formData.horaChegada"
+              type="text"
               class="form-control time-input"
               placeholder="HH:MM"
               maxlength="5"
               @input="formatTimeInput($event, 'horaChegada')"
-            />
+            >
           </div>
 
           <div class="form-group">
             <label for="kmsAbastecimento">KMS ABASTECIMENTO</label>
             <input
-              type="number"
               id="kmsAbastecimento"
               v-model.number="formData.kmsAbastecimento"
+              type="number"
               class="form-control"
               min="0"
               step="0.1"
               placeholder="0.0"
-            />
+            >
           </div>
         </div>
       </section>
@@ -371,22 +430,27 @@
         <div class="add-activity-buttons">
           <button
             type="button"
-            @click="addAtividadeAdicional('FOLHA DE OBRA')"
             class="btn btn-add-activity btn-folha-obra"
+            @click="addAtividadeAdicional('FOLHA DE OBRA')"
           >
             Folha de Obra
           </button>
-          <div class="button-divider">+</div>
+          <div class="button-divider">
+            +
+          </div>
           <button
             type="button"
-            @click="addAtividadeAdicional('ASSISTENCIA REMOTA')"
             class="btn btn-add-activity btn-assistencia-remota"
+            @click="addAtividadeAdicional('ASSISTENCIA REMOTA')"
           >
             Assistencia remota
           </button>
         </div>
 
-        <div v-if="formData.atividadesAdicionais.length === 0" class="no-activities-message">
+        <div
+          v-if="formData.atividadesAdicionais.length === 0"
+          class="no-activities-message"
+        >
           <p>Nenhuma atividade adicional adicionada</p>
         </div>
 
@@ -399,9 +463,9 @@
             <h3>{{ atividade.tipo }} {{ index + 1 }}</h3>
             <button
               type="button"
-              @click="removeAtividadeAdicional(index)"
               class="btn btn-remove-activity"
               title="Remover atividade"
+              @click="removeAtividadeAdicional(index)"
             >
               ❌
             </button>
@@ -419,14 +483,14 @@
               </label>
               <input
                 :id="`referencia-${atividade.id}`"
-                type="text"
                 v-model="atividade.referencia"
+                type="text"
                 class="form-control"
                 :placeholder="
                   atividade.tipo === 'FOLHA DE OBRA' ? 'Ex: FO-2024-001' : 'Ex: AR-2024-001'
                 "
                 required
-              />
+              >
             </div>
 
             <!-- Cliente -->
@@ -438,7 +502,9 @@
                 class="form-control"
                 required
               >
-                <option value="">--</option>
+                <option value="">
+                  --
+                </option>
                 <option
                   v-for="cliente in clientes"
                   :key="cliente.id"
@@ -457,9 +523,15 @@
                 v-model="atividade.tipoAtividade"
                 class="form-control"
               >
-                <option value="">--</option>
-                <option value="INTERNO">INTERNO</option>
-                <option value="EXTERNO">EXTERNO</option>
+                <option value="">
+                  --
+                </option>
+                <option value="INTERNO">
+                  INTERNO
+                </option>
+                <option value="EXTERNO">
+                  EXTERNO
+                </option>
               </select>
             </div>
 
@@ -468,11 +540,11 @@
               <label :for="`assunto-${atividade.id}`">ASSUNTO</label>
               <input
                 :id="`assunto-${atividade.id}`"
-                type="text"
                 v-model="atividade.assunto"
+                type="text"
                 class="form-control"
                 placeholder="Assunto da atividade"
-              />
+              >
             </div>
 
             <!-- Hora Início -->
@@ -480,13 +552,13 @@
               <label :for="`horaInicio-${atividade.id}`">HORA INÍCIO</label>
               <input
                 :id="`horaInicio-${atividade.id}`"
-                type="text"
                 v-model="atividade.horaInicio"
+                type="text"
                 class="form-control time-input"
                 placeholder="HH:MM"
                 maxlength="5"
                 @input="formatTimeInputForActivity($event, atividade, 'horaInicio')"
-              />
+              >
             </div>
 
             <!-- Hora Fim -->
@@ -494,13 +566,13 @@
               <label :for="`horaFim-${atividade.id}`">HORA FIM</label>
               <input
                 :id="`horaFim-${atividade.id}`"
-                type="text"
                 v-model="atividade.horaFim"
+                type="text"
                 class="form-control time-input"
                 placeholder="HH:MM"
                 maxlength="5"
                 @input="formatTimeInputForActivity($event, atividade, 'horaFim')"
-              />
+              >
             </div>
 
             <!-- Tempo Pausa -->
@@ -508,13 +580,13 @@
               <label :for="`tempoPausa-${atividade.id}`">TEMPO PAUSA (MINUTOS)</label>
               <input
                 :id="`tempoPausa-${atividade.id}`"
-                type="number"
                 v-model.number="atividade.tempoPausa"
+                type="number"
                 class="form-control"
                 placeholder="0"
                 min="0"
                 step="1"
-              />
+              >
             </div>
 
             <!-- Total Horas -->
@@ -522,12 +594,12 @@
               <label :for="`totalHoras-${atividade.id}`">TOTAL HORAS</label>
               <input
                 :id="`totalHoras-${atividade.id}`"
-                type="text"
                 v-model="atividade.totalHoras"
+                type="text"
                 class="form-control"
                 placeholder="00:00:00"
                 readonly
-              />
+              >
             </div>
 
             <!-- Responsável pelo Registo -->
@@ -561,7 +633,7 @@
                 class="form-control"
                 rows="3"
                 placeholder="Descrição detalhada da atividade"
-              ></textarea>
+              />
             </div>
           </div>
         </div>
@@ -569,11 +641,23 @@
 
       <!-- Action buttons -->
       <div class="form-actions">
-        <button type="button" @click="handleCancel" class="btn btn-cancel" :disabled="loading">
+        <button
+          type="button"
+          class="btn btn-cancel"
+          :disabled="loading"
+          @click="handleCancel"
+        >
           Cancelar
         </button>
-        <button type="submit" class="btn btn-primary" :disabled="loading || !isFormValid">
-          <span v-if="loading" class="btn-spinner"></span>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          :disabled="loading || !isFormValid"
+        >
+          <span
+            v-if="loading"
+            class="btn-spinner"
+          />
           {{ isEditing ? 'Atualizar' : 'Criar' }} Registo
         </button>
       </div>
@@ -807,7 +891,7 @@ const formatTimeInput = (event, field) => {
 
   // Format as HH:MM
   if (value.length > 2) {
-    value = value.slice(0, 2) + ':' + value.slice(2, 4);
+    value = `${value.slice(0, 2)  }:${  value.slice(2, 4)}`;
   }
 
   // Update the form field
@@ -828,7 +912,7 @@ const formatTimeInput = (event, field) => {
 const addAtividadeAdicional = tipo => {
   formData.value.atividadesAdicionais.push({
     id: Date.now(), // Simple ID for tracking
-    tipo: tipo, // FOLHA DE OBRA or ASSISTENCIA REMOTA
+    tipo, // FOLHA DE OBRA or ASSISTENCIA REMOTA
     referencia: '',
     cliente: '',
     tipoAtividade: '',
@@ -852,7 +936,7 @@ const formatTimeInputForActivity = (event, atividade, field) => {
 
   // Format as HH:MM
   if (value.length > 2) {
-    value = value.slice(0, 2) + ':' + value.slice(2, 4);
+    value = `${value.slice(0, 2)  }:${  value.slice(2, 4)}`;
   }
 
   // Update the activity field

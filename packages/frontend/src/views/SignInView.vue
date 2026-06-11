@@ -3,9 +3,15 @@
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <!-- Logo and title -->
       <div class="text-center">
-        <h1 class="text-3xl font-bold text-primary-600 mb-2">CLEVER</h1>
-        <h2 class="text-xl text-gray-900 font-medium">Entrar na sua conta</h2>
-        <p class="mt-2 text-sm text-gray-600">Aceda ao seu dashboard CLEVER</p>
+        <h1 class="text-3xl font-bold text-primary-600 mb-2">
+          CLEVER
+        </h1>
+        <h2 class="text-xl text-gray-900 font-medium">
+          Entrar na sua conta
+        </h2>
+        <p class="mt-2 text-sm text-gray-600">
+          Aceda ao seu dashboard CLEVER
+        </p>
       </div>
     </div>
 
@@ -13,14 +19,24 @@
       <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
         <!-- Clerk SignIn component -->
         <div class="clerk-signin-container">
-          <div ref="signInRef" class="w-full"></div>
+          <div
+            ref="signInRef"
+            class="w-full"
+          />
         </div>
 
         <!-- Error handling -->
-        <div v-if="authError" class="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+        <div
+          v-if="authError"
+          class="mt-4 p-3 bg-red-50 border border-red-200 rounded-md"
+        >
           <div class="flex">
             <div class="flex-shrink-0">
-              <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+              <svg
+                class="h-5 w-5 text-red-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
                 <path
                   fill-rule="evenodd"
                   d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -29,7 +45,9 @@
               </svg>
             </div>
             <div class="ml-3">
-              <h3 class="text-sm font-medium text-red-800">Erro de autenticação</h3>
+              <h3 class="text-sm font-medium text-red-800">
+                Erro de autenticação
+              </h3>
               <div class="mt-1 text-sm text-red-700">
                 {{ authError }}
               </div>
@@ -38,7 +56,10 @@
         </div>
 
         <!-- Loading state -->
-        <div v-if="isLoading" class="mt-4 text-center">
+        <div
+          v-if="isLoading"
+          class="mt-4 text-center"
+        >
           <div class="inline-flex items-center px-4 py-2 text-sm text-gray-600">
             <svg
               class="animate-spin -ml-1 mr-3 h-5 w-5 text-primary-600"
@@ -53,12 +74,12 @@
                 r="10"
                 stroke="currentColor"
                 stroke-width="4"
-              ></circle>
+              />
               <path
                 class="opacity-75"
                 fill="currentColor"
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
+              />
             </svg>
             A carregar...
           </div>
@@ -67,7 +88,9 @@
 
       <!-- Footer -->
       <div class="mt-6 text-center">
-        <p class="text-xs text-gray-500">CLEVER Dashboard v3.0</p>
+        <p class="text-xs text-gray-500">
+          CLEVER Dashboard v3.0
+        </p>
       </div>
     </div>
   </div>

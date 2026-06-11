@@ -17,16 +17,16 @@
     :get-item-subtitle="getItemSubtitle"
     :get-item-meta1="getItemMeta1"
     :get-item-meta2="getItemMeta2"
-    @search="handleSearch"
-    @clear-search="handleClearSearch"
-    @item-click="handleItemClick"
-    @create="handleCreate"
-    @edit="handleEdit"
     :current-page="api.pagination.value.page"
     :total-pages="api.pagination.value.totalPages"
     :total-count="api.pagination.value.total"
     :items-per-page="itemsPerPage"
     :show-pagination="api.pagination.value.total > 0"
+    @search="handleSearch"
+    @clear-search="handleClearSearch"
+    @item-click="handleItemClick"
+    @create="handleCreate"
+    @edit="handleEdit"
     @page-change="handlePageChange"
     @items-per-page-change="handleItemsPerPageChange"
     @clear-error="clearError"
@@ -47,8 +47,16 @@
     <template #itemMeta="{ item }">
       <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
         <!-- Progress indicator -->
-        <span class="progress-badge" :class="getProgressClass(item)">
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <span
+          class="progress-badge"
+          :class="getProgressClass(item)"
+        >
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -64,7 +72,12 @@
           v-if="getIsCompleted(item)"
           class="px-2 py-1 rounded text-xs font-medium bg-emerald-100 text-emerald-800 flex items-center"
         >
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -80,7 +93,12 @@
           v-if="getTechnicianName(item)"
           class="flex items-center before:content-['•'] before:mx-1"
         >
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -93,7 +111,12 @@
 
         <!-- Created date -->
         <span class="flex items-center before:content-['•'] before:mx-1">
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"

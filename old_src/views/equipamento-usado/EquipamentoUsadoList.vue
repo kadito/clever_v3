@@ -15,72 +15,100 @@
 
       <div class="search-box">
         <input
-          type="text"
           v-model="searchQuery"
-          @input="handleSearch"
+          type="text"
           placeholder="Pesquisar por tipo, marca, modelo, série..."
           class="search-input"
-        />
-        <div class="search-icon">🔍</div>
+          @input="handleSearch"
+        >
+        <div class="search-icon">
+          🔍
+        </div>
       </div>
     </div>
 
     <!-- Filter Tabs -->
     <div class="filter-tabs">
       <button
-        @click="activeFilter = 'todos'"
         :class="{ active: activeFilter === 'todos' }"
         class="filter-tab"
+        @click="activeFilter = 'todos'"
       >
         Todos ({{ filteredEquipamentos.length }})
       </button>
       <button
-        @click="activeFilter = 'disponivel'"
         :class="{ active: activeFilter === 'disponivel' }"
         class="filter-tab disponivel"
+        @click="activeFilter = 'disponivel'"
       >
         Disponíveis ({{ getEquipamentosByStatus.disponivel.length }})
       </button>
       <button
-        @click="activeFilter = 'emprestado'"
         :class="{ active: activeFilter === 'emprestado' }"
         class="filter-tab emprestado"
+        @click="activeFilter = 'emprestado'"
       >
         Emprestados ({{ getEquipamentosByStatus.emprestado.length }})
       </button>
       <button
-        @click="activeFilter = 'manutencao'"
         :class="{ active: activeFilter === 'manutencao' }"
         class="filter-tab manutencao"
+        @click="activeFilter = 'manutencao'"
       >
         Manutenção ({{ getEquipamentosByStatus.manutencao.length }})
       </button>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A carregar equipamentos...</p>
     </div>
 
     <!-- Error State -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Empty State -->
-    <div v-if="!loading && displayedEquipamentos.length === 0" class="empty-state">
-      <div class="empty-icon">📦</div>
+    <div
+      v-if="!loading && displayedEquipamentos.length === 0"
+      class="empty-state"
+    >
+      <div class="empty-icon">
+        📦
+      </div>
       <h3>{{ searchQuery ? 'Nenhum equipamento encontrado' : 'Nenhum equipamento registado' }}</h3>
-      <p v-if="searchQuery">Tente ajustar os termos de pesquisa ou selecionar um ano diferente.</p>
-      <p v-else>Comece por adicionar o primeiro equipamento ao sistema.</p>
-      <router-link to="/equipamento-usado/new" class="btn btn-primary">
+      <p v-if="searchQuery">
+        Tente ajustar os termos de pesquisa ou selecionar um ano diferente.
+      </p>
+      <p v-else>
+        Comece por adicionar o primeiro equipamento ao sistema.
+      </p>
+      <router-link
+        to="/equipamento-usado/new"
+        class="btn btn-primary"
+      >
         ➕ Adicionar Equipamento
       </router-link>
     </div>
 
     <!-- Equipment Cards -->
-    <div v-else class="equipment-grid">
+    <div
+      v-else
+      class="equipment-grid"
+    >
       <div
         v-for="equipamento in displayedEquipamentos"
         :key="equipamento.id"
@@ -90,22 +118,34 @@
         <div class="card-header">
           <div class="equipment-title">
             <h3>{{ getEquipamentoSummary(equipamento) }}</h3>
-            <div class="equipment-serial" v-if="equipamento.numeroSerie">
+            <div
+              v-if="equipamento.numeroSerie"
+              class="equipment-serial"
+            >
               Série: {{ equipamento.numeroSerie }}
             </div>
           </div>
-          <div class="status-badge" :class="getEquipamentoStatus(equipamento).status">
+          <div
+            class="status-badge"
+            :class="getEquipamentoStatus(equipamento).status"
+          >
             {{ getEquipamentoStatus(equipamento).label }}
           </div>
         </div>
 
         <div class="card-content">
           <div class="equipment-info">
-            <div class="info-row" v-if="equipamento.marca">
+            <div
+              v-if="equipamento.marca"
+              class="info-row"
+            >
               <span class="label">Marca:</span>
               <span class="value">{{ equipamento.marca }}</span>
             </div>
-            <div class="info-row" v-if="equipamento.modelo">
+            <div
+              v-if="equipamento.modelo"
+              class="info-row"
+            >
               <span class="label">Modelo:</span>
               <span class="value">{{ equipamento.modelo }}</span>
             </div>
@@ -116,8 +156,13 @@
           </div>
 
           <!-- Loan Information -->
-          <div v-if="isEquipamentoEmprestado(equipamento)" class="loan-info">
-            <div class="loan-header">📤 Emprestado</div>
+          <div
+            v-if="isEquipamentoEmprestado(equipamento)"
+            class="loan-info"
+          >
+            <div class="loan-header">
+              📤 Emprestado
+            </div>
             <div class="info-row">
               <span class="label">Cliente:</span>
               <span class="value">{{ equipamento.clienteEmprestimo }}</span>
@@ -138,7 +183,10 @@
               <span class="label">Última Revisão:</span>
               <span class="value">{{ formatDate(equipamento.dataRevisao) }}</span>
             </div>
-            <div class="info-row" v-if="equipamento.tecnico">
+            <div
+              v-if="equipamento.tecnico"
+              class="info-row"
+            >
               <span class="label">Técnico:</span>
               <span class="value">{{ equipamento.tecnico }}</span>
             </div>
@@ -146,8 +194,16 @@
         </div>
 
         <div class="card-actions">
-          <button @click.stop="goToEdit(equipamento)" class="btn btn-edit">✏️ Editar</button>
-          <button @click.stop="goToDetail(equipamento)" class="btn btn-detail">
+          <button
+            class="btn btn-edit"
+            @click.stop="goToEdit(equipamento)"
+          >
+            ✏️ Editar
+          </button>
+          <button
+            class="btn btn-detail"
+            @click.stop="goToDetail(equipamento)"
+          >
             👁️ Ver Detalhes
           </button>
         </div>
@@ -155,7 +211,11 @@
     </div>
 
     <!-- Add Button (Floating) -->
-    <router-link to="/equipamento-usado/new" class="fab" title="Adicionar Equipamento">
+    <router-link
+      to="/equipamento-usado/new"
+      class="fab"
+      title="Adicionar Equipamento"
+    >
       ➕
     </router-link>
   </div>

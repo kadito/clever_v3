@@ -1,15 +1,25 @@
 <template>
   <div class="work-sheet-update-container">
     <!-- Loading state -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A carregar folha de obra...</p>
     </div>
 
     <!-- Error state -->
-    <ErrorComponent v-if="error" :error="error" @close="clearError" />
+    <ErrorComponent
+      v-if="error"
+      :error="error"
+      @close="clearError"
+    />
 
     <!-- Content -->
-    <div v-if="!loading && workSheet" class="update-content">
+    <div
+      v-if="!loading && workSheet"
+      class="update-content"
+    >
       <!-- Form -->
       <ContentUpdateTemplate
         :item="workSheet"
@@ -36,8 +46,11 @@
             :class="{ 'border-red-500': !!error }"
             @input="e => handleTimeInput(e, 'arrivalTime', updateFieldValue)"
             @blur="e => handleTimeBlur(e, 'arrivalTime', updateFieldValue)"
-          />
-          <p v-if="error" class="form-error text-red-600 text-sm mt-1">
+          >
+          <p
+            v-if="error"
+            class="form-error text-red-600 text-sm mt-1"
+          >
             {{ error }}
           </p>
         </template>
@@ -52,8 +65,11 @@
             :class="{ 'border-red-500': !!error }"
             @input="e => handleTimeInput(e, 'departureTime', updateFieldValue)"
             @blur="e => handleTimeBlur(e, 'departureTime', updateFieldValue)"
-          />
-          <p v-if="error" class="form-error text-red-600 text-sm mt-1">
+          >
+          <p
+            v-if="error"
+            class="form-error text-red-600 text-sm mt-1"
+          >
             {{ error }}
           </p>
         </template>
@@ -67,7 +83,10 @@
             @update:model-value="value => updateFieldValue('clientId', value)"
             @client-selected="handleClientSelected"
           />
-          <p v-if="error" class="form-error text-red-600 text-sm mt-1">
+          <p
+            v-if="error"
+            class="form-error text-red-600 text-sm mt-1"
+          >
             {{ error }}
           </p>
         </template>
@@ -82,7 +101,7 @@
                   :checked="formData?.hasDisplacement === true"
                   name="displacement"
                   @change="updateFieldValue('hasDisplacement', true)"
-                />
+                >
                 <span>SIM</span>
               </label>
               <label
@@ -93,7 +112,7 @@
                   :checked="formData?.hasDisplacement === false"
                   name="displacement"
                   @change="updateFieldValue('hasDisplacement', false)"
-                />
+                >
                 <span>NÃO</span>
               </label>
             </div>
@@ -118,11 +137,14 @@
                   :checked="formData?.paymentMethod === method.value"
                   name="paymentMethod"
                   @change="updateFieldValue('paymentMethod', method.value)"
-                />
+                >
                 <span>{{ method.label }}</span>
               </label>
             </div>
-            <p v-if="error" class="form-error text-red-600 text-sm mt-1">
+            <p
+              v-if="error"
+              class="form-error text-red-600 text-sm mt-1"
+            >
               {{ error }}
             </p>
           </div>
@@ -130,10 +152,16 @@
 
         <!-- Contract auto-fetch display (conditional on paymentMethod === 'CONTRATO') -->
         <template #field-contractId="{ formData, error, updateFieldValue }">
-          <div v-if="isLoadingContracts" class="text-sm text-gray-500 py-2">
+          <div
+            v-if="isLoadingContracts"
+            class="text-sm text-gray-500 py-2"
+          >
             A carregar contratos...
           </div>
-          <div v-else-if="clientContracts.length === 0" class="text-sm text-red-600 py-2">
+          <div
+            v-else-if="clientContracts.length === 0"
+            class="text-sm text-red-600 py-2"
+          >
             Nenhum contrato encontrado para este cliente.
           </div>
           <div v-else>
@@ -144,7 +172,9 @@
               :class="{ 'border-red-500': !!error }"
               @change="(e: Event) => updateFieldValue('contractId', (e.target as HTMLSelectElement).value)"
             >
-              <option value="">Selecionar contrato...</option>
+              <option value="">
+                Selecionar contrato...
+              </option>
               <option
                 v-for="contract in clientContracts"
                 :key="contract.uuid"
@@ -153,56 +183,66 @@
                 {{ getContractDisplayName(contract) }}
               </option>
             </select>
-            <div v-if="selectedContract" class="bg-green-50 border border-green-200 rounded-lg p-3">
-              <div class="text-sm font-medium text-green-800">{{ getContractDisplayName(selectedContract) }}</div>
-              <div v-if="getContractDates(selectedContract)" class="text-xs text-green-600 mt-1">
+            <div
+              v-if="selectedContract"
+              class="bg-green-50 border border-green-200 rounded-lg p-3"
+            >
+              <div class="text-sm font-medium text-green-800">
+                {{ getContractDisplayName(selectedContract) }}
+              </div>
+              <div
+                v-if="getContractDates(selectedContract)"
+                class="text-xs text-green-600 mt-1"
+              >
                 Período: {{ getContractDates(selectedContract) }}
               </div>
             </div>
           </div>
-          <p v-if="error" class="form-error text-red-600 text-sm mt-1">
+          <p
+            v-if="error"
+            class="form-error text-red-600 text-sm mt-1"
+          >
             {{ error }}
           </p>
         </template>
 
-        <!-- Pricing display section (only shown when hasDisplacement is true) -->
+        <!-- Pricing display section (always visible) -->
         <template #after-section-displacement="{ formData: slotFormData }">
-          <div v-if="formData?.hasDisplacement === true" class="pricing-section">
+          <div class="pricing-section">
             <h3>Cálculo de Preços <span class="vat-note">(sem IVA)</span></h3>
             <div class="pricing-table">
-              <div class="pricing-row">
-                <span class="pricing-label">Taxa Deslocação:</span>
-                <span class="pricing-value"
-                  >{{ getDisplacementRate() }}€ <span class="vat-indicator">sem IVA</span></span
-                >
-              </div>
-              <div class="pricing-row">
-                <span class="pricing-label">Preço KMs:
-                  <span class="pricing-detail">{{ formData?.totalKms || 0 }} km × 0,45€</span>
-                </span>
-                <span class="pricing-value"
-                  >{{ getKmsPrice() }}€ <span class="vat-indicator">sem IVA</span></span
-                >
-              </div>
+              <!-- Always shown -->
               <div class="pricing-row">
                 <span class="pricing-label">Valor Hora:
-                  <span class="pricing-detail">{{ formData?.weekendHoliday ? 'Fim de semana / Feriado' : 'Semana' }}</span>
+                  <span class="pricing-detail">{{ currentFormData?.weekendHoliday ? 'Fim de semana / Feriado' : 'Semana' }}</span>
                 </span>
-                <span class="pricing-value"
-                  >{{ getHourlyRate() }}€ <span class="vat-indicator">sem IVA</span></span
-                >
+                <span class="pricing-value">{{ pricing.hourlyRate }}€</span>
               </div>
               <div class="pricing-row">
-                <span class="pricing-label">Preço Mão Obra:</span>
-                <span class="pricing-value"
-                  >{{ getLaborPrice() }}€ <span class="vat-indicator">sem IVA</span></span
-                >
+                <span class="pricing-label">Preço Mão Obra:
+                  <span class="pricing-detail">{{ pricing.laborHours }}h × {{ pricing.hourlyRate }}€</span>
+                </span>
+                <span class="pricing-value">{{ pricing.laborPrice }}€</span>
               </div>
+
+              <!-- Conditional: displacement costs -->
+              <template v-if="pricing.hasDisplacement">
+                <div class="pricing-row">
+                  <span class="pricing-label">Taxa Deslocação:</span>
+                  <span class="pricing-value">{{ pricing.travelFee }}€</span>
+                </div>
+                <div class="pricing-row">
+                  <span class="pricing-label">Preço KMs:
+                    <span class="pricing-detail">{{ pricing.totalKms }} km × {{ WORK_SHEET_CONSTANTS.MILEAGE_RATE_PER_KM }}€</span>
+                  </span>
+                  <span class="pricing-value">{{ pricing.mileagePrice }}€</span>
+                </div>
+              </template>
+
+              <!-- Always shown -->
               <div class="pricing-row total">
                 <span class="pricing-label">PREÇO TOTAL:</span>
-                <span class="pricing-value"
-                  >{{ getTotalPrice() }}€ <span class="vat-indicator">sem IVA</span></span
-                >
+                <span class="pricing-value">{{ pricing.totalPrice }}€ <span class="vat-indicator">sem IVA</span></span>
               </div>
             </div>
           </div>
@@ -215,7 +255,10 @@
             :has-error="!!error"
             @update:model-value="value => handleSignatureUpdate(value, updateFieldValue)"
           />
-          <p v-if="error" class="form-error text-red-600 text-sm mt-1">
+          <p
+            v-if="error"
+            class="form-error text-red-600 text-sm mt-1"
+          >
             {{ error }}
           </p>
         </template>
@@ -228,7 +271,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { WorkSheet, WorkSheetUpdateData, Client, Contract } from '@clever/shared';
-import { validateWorkSheetUpdate } from '@clever/shared';
+import { validateWorkSheetUpdate, calculateWorkSheetPricing, WORK_SHEET_CONSTANTS } from '@clever/shared';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
 import SignaturePad from '@/components/forms/SignaturePad.vue';
 import ErrorComponent from '@/components/common/ErrorComponent.vue';
@@ -651,67 +694,16 @@ const handleUpdate = async (formData: Record<string, any>) => {
   }
 };
 
-// Pricing calculation methods (based on legacy logic)
-const getDisplacementRate = (): number => {
-  const formDataValue = currentFormData.value;
-  if (!formDataValue?.hasDisplacement) return 0;
-  const totalKms = formDataValue?.totalKms || 0;
-  return totalKms > 180 ? 55 : 40;
-};
-
-const getHourlyRate = (): number => {
-  const formDataValue = currentFormData.value;
-  // Always show hourly rate, even without displacement
-  return formDataValue?.weekendHoliday ? 60 : 45;
-};
-
-const getKmsPrice = (): number => {
-  const formDataValue = currentFormData.value;
-  if (!formDataValue?.hasDisplacement) return 0;
-  const pricePerKm = 0.45;
-  const totalKms = formDataValue?.totalKms || 0;
-  return Math.round(pricePerKm * totalKms * 100) / 100;
-};
-
-const getLaborPrice = (): number => {
-  const formDataValue = currentFormData.value;
-  // Calculate labor price even without displacement
-  const arrivalTime = formDataValue?.arrivalTime;
-  const departureTime = formDataValue?.departureTime;
-
-  if (!arrivalTime || !departureTime) return 0;
-
-  try {
-    const [arrivalHours, arrivalMinutes] = arrivalTime.split(':').map(Number);
-    const [departureHours, departureMinutes] = departureTime.split(':').map(Number);
-
-    const arrivalTotalMinutes = arrivalHours * 60 + arrivalMinutes;
-    const departureTotalMinutes = departureHours * 60 + departureMinutes;
-
-    let diffMinutes = departureTotalMinutes - arrivalTotalMinutes;
-    if (diffMinutes < 0) {
-      diffMinutes += 24 * 60; // Handle next day
-    }
-
-    const totalHours = diffMinutes / 60;
-    const chargeableHours = totalHours < 1 ? 1 : totalHours; // Minimum 1 hour
-    const hourlyRate = getHourlyRate();
-
-    return Math.round(chargeableHours * hourlyRate * 100) / 100;
-  } catch {
-    return 0;
-  }
-};
-
-const getTotalPrice = (): number => {
-  const formDataValue = currentFormData.value;
-  // Calculate total price always, including displacement costs only when applicable
-  const displacementRate = formDataValue?.hasDisplacement ? getDisplacementRate() : 0;
-  const kmsPrice = formDataValue?.hasDisplacement ? getKmsPrice() : 0;
-  const laborPrice = getLaborPrice();
-
-  return Math.round((displacementRate + kmsPrice + laborPrice) * 100) / 100;
-};
+// Pricing computed property using shared calculation
+const pricing = computed(() => {
+  return calculateWorkSheetPricing({
+    weekendHoliday: currentFormData.value?.weekendHoliday ?? false,
+    hasDisplacement: currentFormData.value?.hasDisplacement ?? false,
+    totalKms: currentFormData.value?.totalKms ?? 0,
+    arrivalTime: currentFormData.value?.arrivalTime ?? '',
+    departureTime: currentFormData.value?.departureTime ?? '',
+  });
+});
 
 // Watchers for automatic calculations
 watch(

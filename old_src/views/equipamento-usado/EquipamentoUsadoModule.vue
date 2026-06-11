@@ -1,24 +1,37 @@
 <template>
   <div class="equipamento-usado-module">
     <div class="module-header">
-      <BackButton to="/" variant="inline" />
+      <BackButton
+        to="/"
+        variant="inline"
+      />
       <div class="module-info">
-        <div class="module-icon">📦</div>
+        <div class="module-icon">
+          📦
+        </div>
         <div class="module-content">
           <h1>Empréstimo de Equipamentos</h1>
-          <p class="module-description">Gestão de equipamentos em empréstimo e controlo de stock</p>
+          <p class="module-description">
+            Gestão de equipamentos em empréstimo e controlo de stock
+          </p>
         </div>
       </div>
     </div>
 
     <div class="module-actions">
-      <button @click="navigateToList" class="action-btn primary">
+      <button
+        class="action-btn primary"
+        @click="navigateToList"
+      >
         <span class="action-icon">📋</span>
         <span class="action-label">CONSULTAR EQUIPAMENTOS</span>
         <span class="action-description">Ver lista de equipamentos</span>
       </button>
 
-      <button @click="navigateToCreate" class="action-btn secondary">
+      <button
+        class="action-btn secondary"
+        @click="navigateToCreate"
+      >
         <span class="action-icon">➕</span>
         <span class="action-label">NOVO EQUIPAMENTO</span>
         <span class="action-description">Registar um novo equipamento</span>
@@ -26,14 +39,25 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A carregar informações...</p>
     </div>
 
     <!-- Error State -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
   </div>
 </template>

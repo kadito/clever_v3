@@ -14,9 +14,13 @@
           data-testid="horas-assistencia-input"
           @input="handleInput('horasAssistencia', $event)"
           @blur="handleBlur('horasAssistencia', $event)"
-        />
+        >
         <span class="field-hint">-1 = Ilimitado</span>
-        <p v-if="errors.horasAssistencia" class="form-error" data-testid="horas-assistencia-error">
+        <p
+          v-if="errors.horasAssistencia"
+          class="form-error"
+          data-testid="horas-assistencia-error"
+        >
           {{ errors.horasAssistencia }}
         </p>
       </div>
@@ -33,9 +37,13 @@
           data-testid="deslocacoes-input"
           @input="handleInput('deslocacoesPorAno', $event)"
           @blur="handleBlur('deslocacoesPorAno', $event)"
-        />
+        >
         <span class="field-hint">-1 = Ilimitado</span>
-        <p v-if="errors.deslocacoesPorAno" class="form-error" data-testid="deslocacoes-error">
+        <p
+          v-if="errors.deslocacoesPorAno"
+          class="form-error"
+          data-testid="deslocacoes-error"
+        >
           {{ errors.deslocacoesPorAno }}
         </p>
       </div>
@@ -52,9 +60,13 @@
           data-testid="manutencoes-input"
           @input="handleInput('manutencoesPorAno', $event)"
           @blur="handleBlur('manutencoesPorAno', $event)"
-        />
+        >
         <span class="field-hint">-1 = Ilimitado</span>
-        <p v-if="errors.manutencoesPorAno" class="form-error" data-testid="manutencoes-error">
+        <p
+          v-if="errors.manutencoesPorAno"
+          class="form-error"
+          data-testid="manutencoes-error"
+        >
           {{ errors.manutencoesPorAno }}
         </p>
       </div>

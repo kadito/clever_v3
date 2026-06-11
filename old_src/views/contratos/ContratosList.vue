@@ -1,7 +1,10 @@
 <template>
   <div class="contratos-container">
     <div class="contratos-header">
-      <BackButton to="/gestor-contratos" variant="inline" />
+      <BackButton
+        to="/gestor-contratos"
+        variant="inline"
+      />
     </div>
 
     <!-- Controls -->
@@ -12,9 +15,17 @@
 
       <div class="controls-right">
         <!-- Year selector -->
-        <YearSelector v-model="selectedYear" :years="availableYears" @change="handleYearChange" />
+        <YearSelector
+          v-model="selectedYear"
+          :years="availableYears"
+          @change="handleYearChange"
+        />
 
-        <button @click="refreshData" :disabled="loading" class="btn btn-refresh">
+        <button
+          :disabled="loading"
+          class="btn btn-refresh"
+          @click="refreshData"
+        >
           🔄 Atualizar
         </button>
       </div>
@@ -24,25 +35,34 @@
     <div class="search-section">
       <div class="search-container">
         <input
-          type="text"
           v-model="searchQuery"
-          @input="handleSearch"
+          type="text"
           placeholder="Pesquisar por nome do cliente..."
           class="search-input"
-        />
+          @input="handleSearch"
+        >
         <span class="search-icon">🔍</span>
       </div>
 
       <div class="month-filter-container">
-        <label for="month-filter" class="month-filter-label">Filtrar por mês de expiração:</label>
+        <label
+          for="month-filter"
+          class="month-filter-label"
+        >Filtrar por mês de expiração:</label>
         <select
           id="month-filter"
           v-model="selectedMonth"
-          @change="handleMonthChange"
           class="month-filter-select"
+          @change="handleMonthChange"
         >
-          <option value="">Todos os meses</option>
-          <option v-for="month in months" :key="month.value" :value="month.value">
+          <option value="">
+            Todos os meses
+          </option>
+          <option
+            v-for="month in months"
+            :key="month.value"
+            :value="month.value"
+          >
             {{ month.label }}
           </option>
         </select>
@@ -50,18 +70,32 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A carregar contratos...</p>
     </div>
 
     <!-- Error State -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Contratos List -->
-    <div v-if="!loading && displayedContratos.length > 0" class="contratos-list">
+    <div
+      v-if="!loading && displayedContratos.length > 0"
+      class="contratos-list"
+    >
       <div
         v-for="contrato in displayedContratos"
         :key="contrato.id"
@@ -73,9 +107,9 @@
             <h3>
               {{
                 contrato.clienteName ||
-                contrato.nomeComercial ||
-                contrato.nome ||
-                'Cliente não especificado'
+                  contrato.nomeComercial ||
+                  contrato.nome ||
+                  'Cliente não especificado'
               }}
             </h3>
             <span class="contrato-id">{{ `CT${String(contrato.id).slice(0, 8)}` }}</span>
@@ -84,7 +118,10 @@
           <div class="contrato-info">
             <div class="info-row">
               <span class="info-label">Tipo:</span>
-              <span class="info-value tipo-badge" :class="getTipoClass(contrato)">
+              <span
+                class="info-value tipo-badge"
+                :class="getTipoClass(contrato)"
+              >
                 {{ getTipoContrato(contrato) }}
               </span>
             </div>
@@ -92,7 +129,10 @@
             <div class="info-row">
               <span class="info-label">Validade:</span>
               <div class="info-value expiration-dates">
-                <div v-if="hasCPAContract(contrato)" class="expiration-date-item">
+                <div
+                  v-if="hasCPAContract(contrato)"
+                  class="expiration-date-item"
+                >
                   <span class="expiration-label">CPA:</span>
                   <span :class="getExpirationClassForDate(getCPAExpirationDate(contrato))">
                     {{ formatExpirationDate(getCPAExpirationDate(contrato)) }}
@@ -113,7 +153,10 @@
                     </span>
                   </span>
                 </div>
-                <div v-if="hasSHContract(contrato)" class="expiration-date-item">
+                <div
+                  v-if="hasSHContract(contrato)"
+                  class="expiration-date-item"
+                >
                   <span class="expiration-label">S&H:</span>
                   <span :class="getExpirationClassForDate(getSHExpirationDate(contrato))">
                     {{ formatExpirationDate(getSHExpirationDate(contrato)) }}
@@ -141,27 +184,45 @@
               </div>
             </div>
 
-            <div class="info-row" v-if="getFrequenciaPagamento(contrato)">
+            <div
+              v-if="getFrequenciaPagamento(contrato)"
+              class="info-row"
+            >
               <span class="info-label">Pagamento:</span>
               <span class="info-value">{{ getFrequenciaPagamento(contrato) }}</span>
             </div>
           </div>
         </div>
         <div class="contrato-actions">
-          <button class="action-btn" @click.stop="showActions(contrato)">⋮</button>
+          <button
+            class="action-btn"
+            @click.stop="showActions(contrato)"
+          >
+            ⋮
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Empty State -->
-    <div v-if="!loading && displayedContratos.length === 0" class="empty-state">
+    <div
+      v-if="!loading && displayedContratos.length === 0"
+      class="empty-state"
+    >
       <h3>Nenhum contrato encontrado</h3>
-      <p v-if="searchQuery">Não foram encontrados contratos com o termo "{{ searchQuery }}".</p>
-      <p v-else>Não há contratos para o ano {{ selectedYear }}.</p>
+      <p v-if="searchQuery">
+        Não foram encontrados contratos com o termo "{{ searchQuery }}".
+      </p>
+      <p v-else>
+        Não há contratos para o ano {{ selectedYear }}.
+      </p>
     </div>
 
     <!-- Search Results Info -->
-    <div v-if="searchResults && (searchQuery || selectedMonth)" class="search-info">
+    <div
+      v-if="searchResults && (searchQuery || selectedMonth)"
+      class="search-info"
+    >
       <p>
         {{ searchResults.count }} resultado(s) encontrado(s)
         <span v-if="searchQuery">para "{{ searchQuery }}"</span>
@@ -172,19 +233,46 @@
     </div>
 
     <!-- Actions Modal (like in folhas obra) -->
-    <div v-if="showActionsModal" class="actions-modal-overlay" @click="closeActions">
-      <div class="actions-modal" @click.stop>
+    <div
+      v-if="showActionsModal"
+      class="actions-modal-overlay"
+      @click="closeActions"
+    >
+      <div
+        class="actions-modal"
+        @click.stop
+      >
         <h3>{{ selectedContratoForActions?.clienteName || 'Cliente não especificado' }}</h3>
         <div class="modal-actions">
-          <button @click="viewContrato" class="modal-btn view-btn">📋 Ver Detalhes</button>
-          <button @click="editContrato" class="modal-btn edit-btn">✏️ Editar</button>
-          <button @click="deleteContrato" class="modal-btn delete-btn">🗑️ Eliminar</button>
+          <button
+            class="modal-btn view-btn"
+            @click="viewContrato"
+          >
+            📋 Ver Detalhes
+          </button>
+          <button
+            class="modal-btn edit-btn"
+            @click="editContrato"
+          >
+            ✏️ Editar
+          </button>
+          <button
+            class="modal-btn delete-btn"
+            @click="deleteContrato"
+          >
+            🗑️ Eliminar
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Floating Action Button -->
-    <button @click="navigateToCreate" class="fab">➕</button>
+    <button
+      class="fab"
+      @click="navigateToCreate"
+    >
+      ➕
+    </button>
   </div>
 </template>
 

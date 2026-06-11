@@ -11,205 +11,238 @@
     @create="handleCreateSuccess"
     @clear-error="clearError"
   >
-      <!-- Custom field templates -->
-      <template #field-clientId="{ formData, error, updateFieldValue }">
-        <ClientSearchInput
-          :model-value="formData?.clientId || ''"
-          :has-error="!!error"
-          @update:model-value="value => updateFieldValue('clientId', value)"
-          @client-selected="handleClientSelected"
-        />
-        <p v-if="error" class="form-error text-red-600 text-sm mt-1">
-          {{ error }}
-        </p>
-      </template>
+    <!-- Custom field templates -->
+    <template #field-clientId="{ formData, error, updateFieldValue }">
+      <ClientSearchInput
+        :model-value="formData?.clientId || ''"
+        :has-error="!!error"
+        @update:model-value="value => updateFieldValue('clientId', value)"
+        @client-selected="handleClientSelected"
+      />
+      <p
+        v-if="error"
+        class="form-error text-red-600 text-sm mt-1"
+      >
+        {{ error }}
+      </p>
+    </template>
 
-      <!-- Time input fields with automatic colon formatting -->
-      <template #field-arrivalTime="{ formData, error, updateFieldValue }">
-        <input
-          type="text"
-          :value="formData?.arrivalTime || ''"
-          placeholder="10:00"
-          maxlength="5"
-          class="form-input"
-          :class="{ 'border-red-500': !!error }"
-          @input="e => handleTimeInput(e, 'arrivalTime', updateFieldValue)"
-          @blur="e => handleTimeBlur(e, 'arrivalTime', updateFieldValue)"
-        />
-        <p v-if="error" class="form-error text-red-600 text-sm mt-1">
-          {{ error }}
-        </p>
-      </template>
+    <!-- Time input fields with automatic colon formatting -->
+    <template #field-arrivalTime="{ formData, error, updateFieldValue }">
+      <input
+        type="text"
+        :value="formData?.arrivalTime || ''"
+        placeholder="10:00"
+        maxlength="5"
+        class="form-input"
+        :class="{ 'border-red-500': !!error }"
+        @input="e => handleTimeInput(e, 'arrivalTime', updateFieldValue)"
+        @blur="e => handleTimeBlur(e, 'arrivalTime', updateFieldValue)"
+      >
+      <p
+        v-if="error"
+        class="form-error text-red-600 text-sm mt-1"
+      >
+        {{ error }}
+      </p>
+    </template>
 
-      <template #field-departureTime="{ formData, error, updateFieldValue }">
-        <input
-          type="text"
-          :value="formData?.departureTime || ''"
-          placeholder="18:00"
-          maxlength="5"
-          class="form-input"
-          :class="{ 'border-red-500': !!error }"
-          @input="e => handleTimeInput(e, 'departureTime', updateFieldValue)"
-          @blur="e => handleTimeBlur(e, 'departureTime', updateFieldValue)"
-        />
-        <p v-if="error" class="form-error text-red-600 text-sm mt-1">
-          {{ error }}
-        </p>
-      </template>
+    <template #field-departureTime="{ formData, error, updateFieldValue }">
+      <input
+        type="text"
+        :value="formData?.departureTime || ''"
+        placeholder="18:00"
+        maxlength="5"
+        class="form-input"
+        :class="{ 'border-red-500': !!error }"
+        @input="e => handleTimeInput(e, 'departureTime', updateFieldValue)"
+        @blur="e => handleTimeBlur(e, 'departureTime', updateFieldValue)"
+      >
+      <p
+        v-if="error"
+        class="form-error text-red-600 text-sm mt-1"
+      >
+        {{ error }}
+      </p>
+    </template>
 
-      <template #field-hasDisplacement="{ formData, updateFieldValue }">
-        <div class="displacement-toggle">
-          <label class="displacement-label">Deslocação</label>
-          <div class="radio-group">
-            <label :class="['radio-label', formData?.hasDisplacement === true ? 'selected' : '']">
-              <input
-                type="radio"
-                :checked="formData?.hasDisplacement === true"
-                name="displacement"
-                @change="updateFieldValue('hasDisplacement', true)"
-              />
-              <span>SIM</span>
-            </label>
-            <label :class="['radio-label', formData?.hasDisplacement === false ? 'selected' : '']">
-              <input
-                type="radio"
-                :checked="formData?.hasDisplacement === false"
-                name="displacement"
-                @change="updateFieldValue('hasDisplacement', false)"
-              />
-              <span>NÃO</span>
-            </label>
-          </div>
-        </div>
-      </template>
-
-      <template #field-paymentMethod="{ formData, error, updateFieldValue }">
-        <div class="payment-method-selector">
-          <label class="payment-label">Método de Pagamento</label>
-          <div class="payment-options">
-            <label
-              v-for="method in paymentMethods"
-              :key="method.value"
-              :class="[
-                'payment-option',
-                formData?.paymentMethod === method.value ? 'selected' : '',
-              ]"
+    <template #field-hasDisplacement="{ formData, updateFieldValue }">
+      <div class="displacement-toggle">
+        <label class="displacement-label">Deslocação</label>
+        <div class="radio-group">
+          <label :class="['radio-label', formData?.hasDisplacement === true ? 'selected' : '']">
+            <input
+              type="radio"
+              :checked="formData?.hasDisplacement === true"
+              name="displacement"
+              @change="updateFieldValue('hasDisplacement', true)"
             >
-              <input
-                type="radio"
-                :value="method.value"
-                :checked="formData?.paymentMethod === method.value"
-                name="paymentMethod"
-                @change="updateFieldValue('paymentMethod', method.value)"
-              />
-              <span>{{ method.label }}</span>
-            </label>
-          </div>
-          <p v-if="error" class="form-error text-red-600 text-sm mt-1">
-            {{ error }}
-          </p>
+            <span>SIM</span>
+          </label>
+          <label :class="['radio-label', formData?.hasDisplacement === false ? 'selected' : '']">
+            <input
+              type="radio"
+              :checked="formData?.hasDisplacement === false"
+              name="displacement"
+              @change="updateFieldValue('hasDisplacement', false)"
+            >
+            <span>NÃO</span>
+          </label>
         </div>
-      </template>
+      </div>
+    </template>
 
-      <!-- Contract auto-fetch display (conditional on paymentMethod === 'CONTRATO') -->
-      <template #field-contractId="{ formData, error, updateFieldValue }">
-        <div v-if="isLoadingContracts" class="text-sm text-gray-500 py-2">
-          A carregar contratos...
-        </div>
-        <div v-else-if="clientContracts.length === 0" class="text-sm text-red-600 py-2">
-          Nenhum contrato encontrado para este cliente.
-        </div>
-        <div v-else>
-          <select
-            v-if="clientContracts.length > 1"
-            :value="formData?.contractId || ''"
-            class="form-input mb-2"
-            :class="{ 'border-red-500': !!error }"
-            @change="(e: Event) => updateFieldValue('contractId', (e.target as HTMLSelectElement).value)"
+    <template #field-paymentMethod="{ formData, error, updateFieldValue }">
+      <div class="payment-method-selector">
+        <label class="payment-label">Método de Pagamento</label>
+        <div class="payment-options">
+          <label
+            v-for="method in paymentMethods"
+            :key="method.value"
+            :class="[
+              'payment-option',
+              formData?.paymentMethod === method.value ? 'selected' : '',
+            ]"
           >
-            <option value="">Selecionar contrato...</option>
-            <option
-              v-for="contract in clientContracts"
-              :key="contract.uuid"
-              :value="contract.uuid"
+            <input
+              type="radio"
+              :value="method.value"
+              :checked="formData?.paymentMethod === method.value"
+              name="paymentMethod"
+              @change="updateFieldValue('paymentMethod', method.value)"
             >
-              {{ getContractDisplayName(contract) }}
-            </option>
-          </select>
-          <div v-if="selectedContract" class="bg-green-50 border border-green-200 rounded-lg p-3">
-            <div class="text-sm font-medium text-green-800">{{ getContractDisplayName(selectedContract) }}</div>
-            <div v-if="getContractDates(selectedContract)" class="text-xs text-green-600 mt-1">
-              Período: {{ getContractDates(selectedContract) }}
-            </div>
-          </div>
+            <span>{{ method.label }}</span>
+          </label>
         </div>
-        <p v-if="error" class="form-error text-red-600 text-sm mt-1">
+        <p
+          v-if="error"
+          class="form-error text-red-600 text-sm mt-1"
+        >
           {{ error }}
         </p>
-      </template>
+      </div>
+    </template>
 
-      <!-- Pricing display section (only shown when hasDisplacement is true) -->
-      <template #after-section-displacement="{ formData: slotFormData }">
-        <div v-if="formData?.hasDisplacement === true" class="pricing-section">
-          <h3>Cálculo de Preços <span class="vat-note">(sem IVA)</span></h3>
-          <div class="pricing-table">
+    <!-- Contract auto-fetch display (conditional on paymentMethod === 'CONTRATO') -->
+    <template #field-contractId="{ formData, error, updateFieldValue }">
+      <div
+        v-if="isLoadingContracts"
+        class="text-sm text-gray-500 py-2"
+      >
+        A carregar contratos...
+      </div>
+      <div
+        v-else-if="clientContracts.length === 0"
+        class="text-sm text-red-600 py-2"
+      >
+        Nenhum contrato encontrado para este cliente.
+      </div>
+      <div v-else>
+        <select
+          v-if="clientContracts.length > 1"
+          :value="formData?.contractId || ''"
+          class="form-input mb-2"
+          :class="{ 'border-red-500': !!error }"
+          @change="(e: Event) => updateFieldValue('contractId', (e.target as HTMLSelectElement).value)"
+        >
+          <option value="">
+            Selecionar contrato...
+          </option>
+          <option
+            v-for="contract in clientContracts"
+            :key="contract.uuid"
+            :value="contract.uuid"
+          >
+            {{ getContractDisplayName(contract) }}
+          </option>
+        </select>
+        <div
+          v-if="selectedContract"
+          class="bg-green-50 border border-green-200 rounded-lg p-3"
+        >
+          <div class="text-sm font-medium text-green-800">
+            {{ getContractDisplayName(selectedContract) }}
+          </div>
+          <div
+            v-if="getContractDates(selectedContract)"
+            class="text-xs text-green-600 mt-1"
+          >
+            Período: {{ getContractDates(selectedContract) }}
+          </div>
+        </div>
+      </div>
+      <p
+        v-if="error"
+        class="form-error text-red-600 text-sm mt-1"
+      >
+        {{ error }}
+      </p>
+    </template>
+
+    <!-- Pricing display section (always visible) -->
+    <template #after-section-displacement="{ formData: slotFormData }">
+      <div class="pricing-section">
+        <h3>Cálculo de Preços <span class="vat-note">(sem IVA)</span></h3>
+        <div class="pricing-table">
+          <!-- Always shown -->
+          <div class="pricing-row">
+            <span class="pricing-label">Valor Hora:
+              <span class="pricing-detail">{{ formData?.weekendHoliday ? 'Fim de semana / Feriado' : 'Semana' }}</span>
+            </span>
+            <span class="pricing-value">{{ pricing.hourlyRate }}€</span>
+          </div>
+          <div class="pricing-row">
+            <span class="pricing-label">Preço Mão Obra:
+              <span class="pricing-detail">{{ pricing.laborHours }}h × {{ pricing.hourlyRate }}€</span>
+            </span>
+            <span class="pricing-value">{{ pricing.laborPrice }}€</span>
+          </div>
+
+          <!-- Conditional: displacement costs -->
+          <template v-if="pricing.hasDisplacement">
             <div class="pricing-row">
               <span class="pricing-label">Taxa Deslocação:</span>
-              <span class="pricing-value"
-                >{{ getDisplacementRate() }}€ <span class="vat-indicator">sem IVA</span></span
-              >
+              <span class="pricing-value">{{ pricing.travelFee }}€</span>
             </div>
             <div class="pricing-row">
               <span class="pricing-label">Preço KMs:
-                <span class="pricing-detail">{{ formData?.totalKms || 0 }} km × 0,45€</span>
+                <span class="pricing-detail">{{ pricing.totalKms }} km × {{ WORK_SHEET_CONSTANTS.MILEAGE_RATE_PER_KM }}€</span>
               </span>
-              <span class="pricing-value"
-                >{{ getKmsPrice() }}€ <span class="vat-indicator">sem IVA</span></span
-              >
+              <span class="pricing-value">{{ pricing.mileagePrice }}€</span>
             </div>
-            <div class="pricing-row">
-              <span class="pricing-label">Valor Hora:
-                <span class="pricing-detail">{{ formData?.weekendHoliday ? 'Fim de semana / Feriado' : 'Semana' }}</span>
-              </span>
-              <span class="pricing-value"
-                >{{ getHourlyRate() }}€ <span class="vat-indicator">sem IVA</span></span
-              >
-            </div>
-            <div class="pricing-row">
-              <span class="pricing-label">Preço Mão Obra:</span>
-              <span class="pricing-value"
-                >{{ getLaborPrice() }}€ <span class="vat-indicator">sem IVA</span></span
-              >
-            </div>
-            <div class="pricing-row total">
-              <span class="pricing-label">PREÇO TOTAL:</span>
-              <span class="pricing-value"
-                >{{ getTotalPrice() }}€ <span class="vat-indicator">sem IVA</span></span
-              >
-            </div>
+          </template>
+
+          <!-- Always shown -->
+          <div class="pricing-row total">
+            <span class="pricing-label">PREÇO TOTAL:</span>
+            <span class="pricing-value">{{ pricing.totalPrice }}€ <span class="vat-indicator">sem IVA</span></span>
           </div>
         </div>
-      </template>
+      </div>
+    </template>
 
-      <!-- Signature field template -->
-      <template #field-clientSignature="{ formData, error, updateFieldValue }">
-        <SignaturePad
-          :model-value="formData?.clientSignature || ''"
-          :has-error="!!error"
-          @update:model-value="value => handleSignatureUpdate(value, updateFieldValue)"
-        />
-        <p v-if="error" class="form-error text-red-600 text-sm mt-1">
-          {{ error }}
-        </p>
-      </template>
-    </ContentCreateTemplate>
+    <!-- Signature field template -->
+    <template #field-clientSignature="{ formData, error, updateFieldValue }">
+      <SignaturePad
+        :model-value="formData?.clientSignature || ''"
+        :has-error="!!error"
+        @update:model-value="value => handleSignatureUpdate(value, updateFieldValue)"
+      />
+      <p
+        v-if="error"
+        class="form-error text-red-600 text-sm mt-1"
+      >
+        {{ error }}
+      </p>
+    </template>
+  </ContentCreateTemplate>
 </template>
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import type { WorkSheetCreationData, Client, Contract } from '@clever/shared';
-import { validateWorkSheetCreation } from '@clever/shared';
+import { validateWorkSheetCreation, calculateWorkSheetPricing, WORK_SHEET_CONSTANTS } from '@clever/shared';
 import ClientSearchInput from '@/components/common/ClientSearchInput.vue';
 import SignaturePad from '@/components/forms/SignaturePad.vue';
 import ContentCreateTemplate from '@/components/common/ContentCreateTemplate.vue';
@@ -292,6 +325,17 @@ const getContractDates = (contract: Contract): string => {
   }
   return '';
 };
+
+// Pricing computed property using shared calculation
+const pricing = computed(() => {
+  return calculateWorkSheetPricing({
+    weekendHoliday: formData.value?.weekendHoliday ?? false,
+    hasDisplacement: formData.value?.hasDisplacement ?? false,
+    totalKms: formData.value?.totalKms ?? 0,
+    arrivalTime: formData.value?.arrivalTime ?? '',
+    departureTime: formData.value?.departureTime ?? '',
+  });
+});
 
 const fetchClientContracts = async (clientId: string) => {
   if (!clientId) {
@@ -564,68 +608,6 @@ const handleCreateSuccess = async (formData: Record<string, any>) => {
   } finally {
     isSaving.value = false;
   }
-};
-
-// Pricing calculation methods (based on legacy logic)
-const getDisplacementRate = (): number => {
-  const currentFormData = formData.value;
-  if (!currentFormData?.hasDisplacement) return 0;
-  const totalKms = currentFormData?.totalKms || 0;
-  return totalKms > 180 ? 55 : 40;
-};
-
-const getHourlyRate = (): number => {
-  const currentFormData = formData.value;
-  // Always show hourly rate, even without displacement
-  return currentFormData?.weekendHoliday ? 60 : 45;
-};
-
-const getKmsPrice = (): number => {
-  const currentFormData = formData.value;
-  if (!currentFormData?.hasDisplacement) return 0;
-  const pricePerKm = 0.45;
-  const totalKms = currentFormData?.totalKms || 0;
-  return Math.round(pricePerKm * totalKms * 100) / 100;
-};
-
-const getLaborPrice = (): number => {
-  const currentFormData = formData.value;
-  // Calculate labor price even without displacement
-  const arrivalTime = currentFormData?.arrivalTime;
-  const departureTime = currentFormData?.departureTime;
-
-  if (!arrivalTime || !departureTime) return 0;
-
-  try {
-    const [arrivalHours, arrivalMinutes] = arrivalTime.split(':').map(Number);
-    const [departureHours, departureMinutes] = departureTime.split(':').map(Number);
-
-    const arrivalTotalMinutes = arrivalHours * 60 + arrivalMinutes;
-    const departureTotalMinutes = departureHours * 60 + departureMinutes;
-
-    let diffMinutes = departureTotalMinutes - arrivalTotalMinutes;
-    if (diffMinutes < 0) {
-      diffMinutes += 24 * 60; // Handle next day
-    }
-
-    const totalHours = diffMinutes / 60;
-    const chargeableHours = totalHours < 1 ? 1 : totalHours; // Minimum 1 hour
-    const hourlyRate = getHourlyRate();
-
-    return Math.round(chargeableHours * hourlyRate * 100) / 100;
-  } catch {
-    return 0;
-  }
-};
-
-const getTotalPrice = (): number => {
-  const currentFormData = formData.value;
-  // Calculate total price always, including displacement costs only when applicable
-  const displacementRate = currentFormData?.hasDisplacement ? getDisplacementRate() : 0;
-  const kmsPrice = currentFormData?.hasDisplacement ? getKmsPrice() : 0;
-  const laborPrice = getLaborPrice();
-
-  return Math.round((displacementRate + kmsPrice + laborPrice) * 100) / 100;
 };
 
 // Watchers for automatic calculations

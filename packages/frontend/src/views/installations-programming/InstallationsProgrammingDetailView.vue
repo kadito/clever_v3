@@ -21,7 +21,10 @@
     @clear-error="clearError"
   >
     <template #content="{ item }">
-      <div v-if="item && item.data" class="space-y-6">
+      <div
+        v-if="item && item.data"
+        class="space-y-6"
+      >
         <!-- Phase Navigation -->
         <PhaseNavigation
           v-model:current-phase="currentPhase"
@@ -29,19 +32,37 @@
         />
 
         <!-- Phase 1: Programação / Preparação -->
-        <div v-if="currentPhase === 1" class="space-y-6">
+        <div
+          v-if="currentPhase === 1"
+          class="space-y-6"
+        >
           <div class="detail-section">
             <div class="bg-white rounded-touch border border-gray-200">
               <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-                <h2 class="text-lg font-semibold text-gray-900">Programação / Preparação</h2>
+                <h2 class="text-lg font-semibold text-gray-900">
+                  Programação / Preparação
+                </h2>
               </div>
               <div class="p-4 sm:p-6">
                 <div class="detail-grid">
-                  <div class="detail-item"><span class="detail-label">Tipo de Programação</span><span class="detail-value">{{ item.data.phase1?.tipoProgramacao || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Número de Série</span><span class="detail-value">{{ item.data.phase1?.numeroSerie || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Nº Equipamento</span><span class="detail-value">{{ item.data.phase1?.numeroEquipamento || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Leituras Guardadas</span><span class="detail-value">{{ item.data.phase1?.leiturasGuardadas || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Teste Final</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase1?.testeFinal ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase1?.testeFinal ? 'Sim' : 'Não' }}</span></div>
+                  <div class="detail-item">
+                    <span class="detail-label">Tipo de Programação</span><span class="detail-value">{{ item.data.phase1?.tipoProgramacao || '—' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Número de Série</span><span class="detail-value">{{ item.data.phase1?.numeroSerie || '—' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Nº Equipamento</span><span class="detail-value">{{ item.data.phase1?.numeroEquipamento || '—' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Leituras Guardadas</span><span class="detail-value">{{ item.data.phase1?.leiturasGuardadas || '—' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Teste Final</span><span class="detail-value"><span
+                      class="bool-dot"
+                      :class="item.data.phase1?.testeFinal ? 'bool-dot--on' : 'bool-dot--off'"
+                    />{{ item.data.phase1?.testeFinal ? 'Sim' : 'Não' }}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -49,11 +70,16 @@
         </div>
 
         <!-- Phase 2: Preparação -->
-        <div v-if="currentPhase === 2" class="space-y-6">
+        <div
+          v-if="currentPhase === 2"
+          class="space-y-6"
+        >
           <div class="detail-section">
             <div class="bg-white rounded-touch border border-gray-200">
               <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-                <h2 class="text-lg font-semibold text-gray-900">Checklist de Preparação</h2>
+                <h2 class="text-lg font-semibold text-gray-900">
+                  Checklist de Preparação
+                </h2>
               </div>
               <div class="p-4 sm:p-6">
                 <PhaseChecklist
@@ -66,20 +92,31 @@
         </div>
 
         <!-- Phase 3: Instalação no Cliente -->
-        <div v-if="currentPhase === 3" class="space-y-6">
+        <div
+          v-if="currentPhase === 3"
+          class="space-y-6"
+        >
           <!-- Dados Gerais -->
           <ClientInfoSection :client-relation="installation?.relations?.client" />
 
           <div class="detail-section">
             <div class="bg-white rounded-touch border border-gray-200">
               <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-                <h2 class="text-lg font-semibold text-gray-900">Dados Gerais</h2>
+                <h2 class="text-lg font-semibold text-gray-900">
+                  Dados Gerais
+                </h2>
               </div>
               <div class="p-4 sm:p-6">
                 <div class="detail-grid">
-                  <div class="detail-item"><span class="detail-label">Nº Fatura</span><span class="detail-value">{{ item.data.phase3?.nrFatura || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Nº Guia de Transportes</span><span class="detail-value">{{ item.data.phase3?.nrGuiaTransportes || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Técnico</span><span class="detail-value">{{ getTechnicianDisplayName(item.data.technician) }}</span></div>
+                  <div class="detail-item">
+                    <span class="detail-label">Nº Fatura</span><span class="detail-value">{{ item.data.phase3?.nrFatura || '—' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Nº Guia de Transportes</span><span class="detail-value">{{ item.data.phase3?.nrGuiaTransportes || '—' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Técnico</span><span class="detail-value">{{ getTechnicianDisplayName(item.data.technician) }}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -89,13 +126,21 @@
           <div class="detail-section">
             <div class="bg-white rounded-touch border border-gray-200">
               <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-                <h2 class="text-lg font-semibold text-gray-900">Detalhes da Instalação</h2>
+                <h2 class="text-lg font-semibold text-gray-900">
+                  Detalhes da Instalação
+                </h2>
               </div>
               <div class="p-4 sm:p-6">
                 <div class="detail-grid">
-                  <div class="detail-item"><span class="detail-label">Data de Instalação</span><span class="detail-value">{{ formatDate(item.data.phase3?.dataInstalacao) || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Hora Inicial Instalação</span><span class="detail-value">{{ item.data.phase3?.horaInicialInstalacao || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Hora Final Instalação</span><span class="detail-value">{{ item.data.phase3?.horaFinalInstalacao || '—' }}</span></div>
+                  <div class="detail-item">
+                    <span class="detail-label">Data de Instalação</span><span class="detail-value">{{ formatDate(item.data.phase3?.dataInstalacao) || '—' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Hora Inicial Instalação</span><span class="detail-value">{{ item.data.phase3?.horaInicialInstalacao || '—' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Hora Final Instalação</span><span class="detail-value">{{ item.data.phase3?.horaFinalInstalacao || '—' }}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -105,15 +150,27 @@
           <div class="detail-section">
             <div class="bg-white rounded-touch border border-gray-200">
               <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-                <h2 class="text-lg font-semibold text-gray-900">Formação</h2>
+                <h2 class="text-lg font-semibold text-gray-900">
+                  Formação
+                </h2>
               </div>
               <div class="p-4 sm:p-6">
                 <div class="detail-grid">
-                  <div class="detail-item"><span class="detail-label">Data de Formação</span><span class="detail-value">{{ formatDate(item.data.phase3?.dataFormacao) || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Hora Inicial Formação</span><span class="detail-value">{{ item.data.phase3?.horaInicialFormacao || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Hora Final Formação</span><span class="detail-value">{{ item.data.phase3?.horaFinalFormacao || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Quem Recebeu Formação</span><span class="detail-value">{{ item.data.phase3?.quemRecebeuFormacao || '—' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Técnico Responsável pela Formação</span><span class="detail-value">{{ item.data.phase3?.tecnicoFormacao || '—' }}</span></div>
+                  <div class="detail-item">
+                    <span class="detail-label">Data de Formação</span><span class="detail-value">{{ formatDate(item.data.phase3?.dataFormacao) || '—' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Hora Inicial Formação</span><span class="detail-value">{{ item.data.phase3?.horaInicialFormacao || '—' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Hora Final Formação</span><span class="detail-value">{{ item.data.phase3?.horaFinalFormacao || '—' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Quem Recebeu Formação</span><span class="detail-value">{{ item.data.phase3?.quemRecebeuFormacao || '—' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Técnico Responsável pela Formação</span><span class="detail-value">{{ item.data.phase3?.tecnicoFormacao || '—' }}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -123,21 +180,78 @@
           <div class="detail-section">
             <div class="bg-white rounded-touch border border-gray-200">
               <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-                <h2 class="text-lg font-semibold text-gray-900">Material Instalado</h2>
+                <h2 class="text-lg font-semibold text-gray-900">
+                  Material Instalado
+                </h2>
               </div>
               <div class="p-4 sm:p-6">
                 <div class="detail-grid">
-                  <div class="detail-item"><span class="detail-label">POS</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase3?.materialInstalado?.pos ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase3?.materialInstalado?.pos ? 'Sim' : 'Não' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">CPA</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase3?.materialInstalado?.cpa ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase3?.materialInstalado?.cpa ? 'Sim' : 'Não' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Balança</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase3?.materialInstalado?.balanca ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase3?.materialInstalado?.balanca ? 'Sim' : 'Não' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">CCTV</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase3?.materialInstalado?.cctv ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase3?.materialInstalado?.cctv ? 'Sim' : 'Não' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Alarme</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase3?.materialInstalado?.alarme ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase3?.materialInstalado?.alarme ? 'Sim' : 'Não' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Impressora</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase3?.materialInstalado?.impressora ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase3?.materialInstalado?.impressora ? 'Sim' : 'Não' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">UPS</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase3?.materialInstalado?.ups ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase3?.materialInstalado?.ups ? 'Sim' : 'Não' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Router</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase3?.materialInstalado?.router ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase3?.materialInstalado?.router ? 'Sim' : 'Não' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Switch</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase3?.materialInstalado?.switchEquip ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase3?.materialInstalado?.switchEquip ? 'Sim' : 'Não' }}</span></div>
-                  <div class="detail-item"><span class="detail-label">Rolos</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase3?.materialInstalado?.rolos ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase3?.materialInstalado?.rolos ? 'Sim' : 'Não' }}</span></div>
-                  <div v-if="item.data.phase3?.materialInstalado?.rolos" class="detail-item"><span class="detail-label">Quantidade de Rolos</span><span class="detail-value">{{ item.data.phase3?.materialInstalado?.rolosQuantidade ?? 0 }}</span></div>
+                  <div class="detail-item">
+                    <span class="detail-label">POS</span><span class="detail-value"><span
+                      class="bool-dot"
+                      :class="item.data.phase3?.materialInstalado?.pos ? 'bool-dot--on' : 'bool-dot--off'"
+                    />{{ item.data.phase3?.materialInstalado?.pos ? 'Sim' : 'Não' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">CPA</span><span class="detail-value"><span
+                      class="bool-dot"
+                      :class="item.data.phase3?.materialInstalado?.cpa ? 'bool-dot--on' : 'bool-dot--off'"
+                    />{{ item.data.phase3?.materialInstalado?.cpa ? 'Sim' : 'Não' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Balança</span><span class="detail-value"><span
+                      class="bool-dot"
+                      :class="item.data.phase3?.materialInstalado?.balanca ? 'bool-dot--on' : 'bool-dot--off'"
+                    />{{ item.data.phase3?.materialInstalado?.balanca ? 'Sim' : 'Não' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">CCTV</span><span class="detail-value"><span
+                      class="bool-dot"
+                      :class="item.data.phase3?.materialInstalado?.cctv ? 'bool-dot--on' : 'bool-dot--off'"
+                    />{{ item.data.phase3?.materialInstalado?.cctv ? 'Sim' : 'Não' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Alarme</span><span class="detail-value"><span
+                      class="bool-dot"
+                      :class="item.data.phase3?.materialInstalado?.alarme ? 'bool-dot--on' : 'bool-dot--off'"
+                    />{{ item.data.phase3?.materialInstalado?.alarme ? 'Sim' : 'Não' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Impressora</span><span class="detail-value"><span
+                      class="bool-dot"
+                      :class="item.data.phase3?.materialInstalado?.impressora ? 'bool-dot--on' : 'bool-dot--off'"
+                    />{{ item.data.phase3?.materialInstalado?.impressora ? 'Sim' : 'Não' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">UPS</span><span class="detail-value"><span
+                      class="bool-dot"
+                      :class="item.data.phase3?.materialInstalado?.ups ? 'bool-dot--on' : 'bool-dot--off'"
+                    />{{ item.data.phase3?.materialInstalado?.ups ? 'Sim' : 'Não' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Router</span><span class="detail-value"><span
+                      class="bool-dot"
+                      :class="item.data.phase3?.materialInstalado?.router ? 'bool-dot--on' : 'bool-dot--off'"
+                    />{{ item.data.phase3?.materialInstalado?.router ? 'Sim' : 'Não' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Switch</span><span class="detail-value"><span
+                      class="bool-dot"
+                      :class="item.data.phase3?.materialInstalado?.switchEquip ? 'bool-dot--on' : 'bool-dot--off'"
+                    />{{ item.data.phase3?.materialInstalado?.switchEquip ? 'Sim' : 'Não' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Rolos</span><span class="detail-value"><span
+                      class="bool-dot"
+                      :class="item.data.phase3?.materialInstalado?.rolos ? 'bool-dot--on' : 'bool-dot--off'"
+                    />{{ item.data.phase3?.materialInstalado?.rolos ? 'Sim' : 'Não' }}</span>
+                  </div>
+                  <div
+                    v-if="item.data.phase3?.materialInstalado?.rolos"
+                    class="detail-item"
+                  >
+                    <span class="detail-label">Quantidade de Rolos</span><span class="detail-value">{{ item.data.phase3?.materialInstalado?.rolosQuantidade ?? 0 }}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -145,18 +259,38 @@
         </div>
 
         <!-- Phase 4: Testes -->
-        <div v-if="currentPhase === 4" class="space-y-6">
+        <div
+          v-if="currentPhase === 4"
+          class="space-y-6"
+        >
           <!-- Anydesk -->
           <div class="detail-section">
             <div class="bg-white rounded-touch border border-gray-200">
               <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-                <h2 class="text-lg font-semibold text-gray-900">Teste Anydesk</h2>
+                <h2 class="text-lg font-semibold text-gray-900">
+                  Teste Anydesk
+                </h2>
               </div>
               <div class="p-4 sm:p-6">
-                <div class="detail-item"><span class="detail-label">Anydesk Testado</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase4?.anydeskTestado ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase4?.anydeskTestado ? 'Sim' : 'Não' }}</span></div>
+                <div class="detail-item">
+                  <span class="detail-label">Anydesk Testado</span><span class="detail-value"><span
+                    class="bool-dot"
+                    :class="item.data.phase4?.anydeskTestado ? 'bool-dot--on' : 'bool-dot--off'"
+                  />{{ item.data.phase4?.anydeskTestado ? 'Sim' : 'Não' }}</span>
+                </div>
                 <div class="mt-4">
-                  <div v-if="item.data.phase4?.anydeskTestado" class="detail-item"><span class="detail-label">Código Anydesk</span><span class="detail-value">{{ item.data.phase4?.anydeskCodigo || '—' }}</span></div>
-                  <div v-if="item.data.phase4?.anydeskTestado === false" class="detail-item"><span class="detail-label">Motivo da Falha</span><span class="detail-value">{{ item.data.phase4?.anydeskMotivo || '—' }}</span></div>
+                  <div
+                    v-if="item.data.phase4?.anydeskTestado"
+                    class="detail-item"
+                  >
+                    <span class="detail-label">Código Anydesk</span><span class="detail-value">{{ item.data.phase4?.anydeskCodigo || '—' }}</span>
+                  </div>
+                  <div
+                    v-if="item.data.phase4?.anydeskTestado === false"
+                    class="detail-item"
+                  >
+                    <span class="detail-label">Motivo da Falha</span><span class="detail-value">{{ item.data.phase4?.anydeskMotivo || '—' }}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -166,13 +300,30 @@
           <div class="detail-section">
             <div class="bg-white rounded-touch border border-gray-200">
               <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-                <h2 class="text-lg font-semibold text-gray-900">Teste Vectron Connect</h2>
+                <h2 class="text-lg font-semibold text-gray-900">
+                  Teste Vectron Connect
+                </h2>
               </div>
               <div class="p-4 sm:p-6">
-                <div class="detail-item"><span class="detail-label">Vectron Connect Testado</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase4?.vectronConnectTestado ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase4?.vectronConnectTestado ? 'Sim' : 'Não' }}</span></div>
+                <div class="detail-item">
+                  <span class="detail-label">Vectron Connect Testado</span><span class="detail-value"><span
+                    class="bool-dot"
+                    :class="item.data.phase4?.vectronConnectTestado ? 'bool-dot--on' : 'bool-dot--off'"
+                  />{{ item.data.phase4?.vectronConnectTestado ? 'Sim' : 'Não' }}</span>
+                </div>
                 <div class="mt-4">
-                  <div v-if="item.data.phase4?.vectronConnectTestado" class="detail-item"><span class="detail-label">Código Vectron Connect</span><span class="detail-value">{{ item.data.phase4?.vectronConnectCodigo || '—' }}</span></div>
-                  <div v-if="item.data.phase4?.vectronConnectTestado === false" class="detail-item"><span class="detail-label">Motivo da Falha</span><span class="detail-value">{{ item.data.phase4?.vectronConnectMotivo || '—' }}</span></div>
+                  <div
+                    v-if="item.data.phase4?.vectronConnectTestado"
+                    class="detail-item"
+                  >
+                    <span class="detail-label">Código Vectron Connect</span><span class="detail-value">{{ item.data.phase4?.vectronConnectCodigo || '—' }}</span>
+                  </div>
+                  <div
+                    v-if="item.data.phase4?.vectronConnectTestado === false"
+                    class="detail-item"
+                  >
+                    <span class="detail-label">Motivo da Falha</span><span class="detail-value">{{ item.data.phase4?.vectronConnectMotivo || '—' }}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -180,25 +331,50 @@
         </div>
 
         <!-- Phase 5: Finalização -->
-        <div v-if="currentPhase === 5" class="space-y-6">
+        <div
+          v-if="currentPhase === 5"
+          class="space-y-6"
+        >
           <div class="detail-section">
             <div class="bg-white rounded-touch border border-gray-200">
               <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-                <h2 class="text-lg font-semibold text-gray-900">Finalização</h2>
+                <h2 class="text-lg font-semibold text-gray-900">
+                  Finalização
+                </h2>
               </div>
               <div class="p-4 sm:p-6 space-y-4">
-                <div class="detail-item"><span class="detail-label">DUMP Lido</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase5?.dumpLido ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase5?.dumpLido ? 'Sim' : 'Não' }}</span></div>
-                <div class="detail-item"><span class="detail-label">Cópia de Segurança</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase5?.copiaSeguranca ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase5?.copiaSeguranca ? 'Sim' : 'Não' }}</span></div>
-                <div class="detail-item"><span class="detail-label">Foto da Instalação</span><span class="detail-value"><span class="bool-dot" :class="item.data.phase5?.fotoInstalacao ? 'bool-dot--on' : 'bool-dot--off'"></span>{{ item.data.phase5?.fotoInstalacao ? 'Sim' : 'Não' }}</span></div>
+                <div class="detail-item">
+                  <span class="detail-label">DUMP Lido</span><span class="detail-value"><span
+                    class="bool-dot"
+                    :class="item.data.phase5?.dumpLido ? 'bool-dot--on' : 'bool-dot--off'"
+                  />{{ item.data.phase5?.dumpLido ? 'Sim' : 'Não' }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Cópia de Segurança</span><span class="detail-value"><span
+                    class="bool-dot"
+                    :class="item.data.phase5?.copiaSeguranca ? 'bool-dot--on' : 'bool-dot--off'"
+                  />{{ item.data.phase5?.copiaSeguranca ? 'Sim' : 'Não' }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Foto da Instalação</span><span class="detail-value"><span
+                    class="bool-dot"
+                    :class="item.data.phase5?.fotoInstalacao ? 'bool-dot--on' : 'bool-dot--off'"
+                  />{{ item.data.phase5?.fotoInstalacao ? 'Sim' : 'Não' }}</span>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Photo display -->
-          <div v-if="item.data.phase5?.fotoInstalacao && item.data.phase5?.fotoURL && typeof item.data.phase5.fotoURL === 'object' && item.data.phase5.fotoURL.key" class="detail-section">
+          <div
+            v-if="item.data.phase5?.fotoInstalacao && item.data.phase5?.fotoURL && typeof item.data.phase5.fotoURL === 'object' && item.data.phase5.fotoURL.key"
+            class="detail-section"
+          >
             <div class="bg-white rounded-touch border border-gray-200">
               <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch">
-                <h2 class="text-lg font-semibold text-gray-900">Foto</h2>
+                <h2 class="text-lg font-semibold text-gray-900">
+                  Foto
+                </h2>
               </div>
               <div class="p-4 sm:p-6">
                 <FileDisplay

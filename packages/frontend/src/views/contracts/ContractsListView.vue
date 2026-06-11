@@ -17,16 +17,16 @@
     :get-item-subtitle="getContractSubtitle"
     :get-item-meta1="getContractMeta1"
     :get-item-meta2="getContractMeta2"
-    @search="handleSearch"
-    @clear-search="handleClearSearch"
-    @item-click="handleContractClick"
-    @create="handleCreate"
-    @edit="handleEdit"
     :current-page="api.pagination.value.page"
     :total-pages="api.pagination.value.totalPages"
     :total-count="api.pagination.value.total"
     :items-per-page="itemsPerPage"
     :show-pagination="api.pagination.value.total > 0"
+    @search="handleSearch"
+    @clear-search="handleClearSearch"
+    @item-click="handleContractClick"
+    @create="handleCreate"
+    @edit="handleEdit"
     @page-change="handlePageChange"
     @items-per-page-change="handleItemsPerPageChange"
     @clear-error="clearError"
@@ -42,7 +42,10 @@
     <!-- Custom contract icon -->
     <template #itemIcon="{ item }">
       <div class="contract-icon">
-        <div class="icon-circle" :class="getContractIconClass(item)">
+        <div
+          class="icon-circle"
+          :class="getContractIconClass(item)"
+        >
           {{ getContractInitials(item) }}
         </div>
       </div>
@@ -68,7 +71,10 @@
         </div>
 
         <!-- Contract status -->
-        <span class="contract-status-badge" :class="getContractStatusClass(item)">
+        <span
+          class="contract-status-badge"
+          :class="getContractStatusClass(item)"
+        >
           {{ getContractStatusText(item) }}
         </span>
 
@@ -77,7 +83,12 @@
           v-if="getContractDateRange(item)"
           class="flex items-center before:content-['•'] before:mx-1"
         >
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -93,7 +104,12 @@
           v-if="getEquipmentCount(item) > 0"
           class="flex items-center before:content-['•'] before:mx-1"
         >
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -105,15 +121,29 @@
         </span>
 
         <!-- Payment methods -->
-        <div v-if="getPaymentMethods(item).length > 0" class="flex flex-wrap gap-1 mt-1">
-          <span v-for="method in getPaymentMethods(item)" :key="method" class="payment-badge">
+        <div
+          v-if="getPaymentMethods(item).length > 0"
+          class="flex flex-wrap gap-1 mt-1"
+        >
+          <span
+            v-for="method in getPaymentMethods(item)"
+            :key="method"
+            class="payment-badge"
+          >
             {{ formatPaymentMethod(method) }}
           </span>
         </div>
 
         <!-- Plan names -->
-        <div v-if="getPlanNames(item).length > 0" class="flex flex-wrap gap-1 mt-1">
-          <span v-for="plan in getPlanNames(item)" :key="plan" class="plan-badge">
+        <div
+          v-if="getPlanNames(item).length > 0"
+          class="flex flex-wrap gap-1 mt-1"
+        >
+          <span
+            v-for="plan in getPlanNames(item)"
+            :key="plan"
+            class="plan-badge"
+          >
             {{ plan }}
           </span>
         </div>

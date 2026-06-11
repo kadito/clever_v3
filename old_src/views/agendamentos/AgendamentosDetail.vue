@@ -3,23 +3,37 @@
     <BackButton />
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-container">
-      <div class="loading-spinner"></div>
+    <div
+      v-if="loading"
+      class="loading-container"
+    >
+      <div class="loading-spinner" />
       <p>Carregando agendamento...</p>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="error-container">
+    <div
+      v-else-if="error"
+      class="error-container"
+    >
       <h2>Erro ao Carregar Agendamento</h2>
       <p>{{ error }}</p>
       <div class="error-actions">
         <BackButton variant="inline" />
-        <button @click="retryLoad" class="btn secondary">Tentar Novamente</button>
+        <button
+          class="btn secondary"
+          @click="retryLoad"
+        >
+          Tentar Novamente
+        </button>
       </div>
     </div>
 
     <!-- Agendamento Details -->
-    <div v-else-if="agendamento" class="agendamento-content">
+    <div
+      v-else-if="agendamento"
+      class="agendamento-content"
+    >
       <div class="agendamento-header">
         <div class="header-info">
           <h1>📅 {{ agendamento.nomeCliente }}</h1>
@@ -54,7 +68,12 @@
           >
             ✏️ Editar
           </router-link>
-          <button @click="confirmDelete" class="btn danger">🗑️ Eliminar</button>
+          <button
+            class="btn danger"
+            @click="confirmDelete"
+          >
+            🗑️ Eliminar
+          </button>
         </div>
       </div>
 
@@ -109,8 +128,8 @@
                 <span>{{ agendamento.assunto || 'N/A' }}</span>
               </div>
               <div
-                class="info-item"
                 v-if="agendamento.dataPrevistaAssistencia && !agendamento.tarefaConcluida"
+                class="info-item"
               >
                 <label>TEMPO RESTANTE</label>
                 <span
@@ -169,7 +188,10 @@
         </div>
 
         <!-- Postponement Information -->
-        <div class="section" v-if="agendamento.houveAdiamento">
+        <div
+          v-if="agendamento.houveAdiamento"
+          class="section"
+        >
           <h3>📅 INFORMAÇÕES DO ADIAMENTO</h3>
           <div class="section-content">
             <div class="info-grid">
@@ -192,24 +214,42 @@
             <div class="info-grid">
               <div class="info-item">
                 <label>FOLHA DE OBRA</label>
-                <span v-if="agendamento.folhaObra" class="document-link">
+                <span
+                  v-if="agendamento.folhaObra"
+                  class="document-link"
+                >
                   {{ agendamento.folhaObra }}
                 </span>
-                <span v-else class="text-muted">N/A</span>
+                <span
+                  v-else
+                  class="text-muted"
+                >N/A</span>
               </div>
               <div class="info-item">
                 <label>ASSISTÊNCIA REMOTA</label>
-                <span v-if="agendamento.assistenciaRemota" class="document-link">
+                <span
+                  v-if="agendamento.assistenciaRemota"
+                  class="document-link"
+                >
                   {{ agendamento.assistenciaRemota }}
                 </span>
-                <span v-else class="text-muted">N/A</span>
+                <span
+                  v-else
+                  class="text-muted"
+                >N/A</span>
               </div>
               <div class="info-item">
                 <label>CONTRATO</label>
-                <span v-if="agendamento.contrato" class="document-link">
+                <span
+                  v-if="agendamento.contrato"
+                  class="document-link"
+                >
                   {{ agendamento.contrato }}
                 </span>
-                <span v-else class="text-muted">N/A</span>
+                <span
+                  v-else
+                  class="text-muted"
+                >N/A</span>
               </div>
             </div>
           </div>
@@ -235,33 +275,60 @@
     </div>
 
     <!-- Not Found State -->
-    <div v-else-if="!loading && !error && !agendamento" class="not-found-state">
+    <div
+      v-else-if="!loading && !error && !agendamento"
+      class="not-found-state"
+    >
       <h2>Agendamento não encontrado</h2>
       <p>O agendamento pode ainda não estar disponível no sistema. Tentar novamente?</p>
       <div class="retry-actions">
-        <button @click="retryLoad" class="btn primary" :disabled="loading">
+        <button
+          class="btn primary"
+          :disabled="loading"
+          @click="retryLoad"
+        >
           {{ loading ? 'A carregar...' : 'Tentar novamente' }}
         </button>
         <BackButton variant="inline" />
       </div>
-      <p v-if="autoRetryCountdown > 0" class="auto-retry-info">
+      <p
+        v-if="autoRetryCountdown > 0"
+        class="auto-retry-info"
+      >
         Tentativa automática em {{ autoRetryCountdown }}s...
       </p>
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div v-if="showDeleteModal" class="modal-overlay" @click="cancelDelete">
-      <div class="modal" @click.stop>
+    <div
+      v-if="showDeleteModal"
+      class="modal-overlay"
+      @click="cancelDelete"
+    >
+      <div
+        class="modal"
+        @click.stop
+      >
         <h3>Confirmar Eliminação</h3>
         <p>
           Tem a certeza que pretende eliminar o agendamento de
-          <strong>{{ agendamento?.nomeCliente }}</strong
-          >?
+          <strong>{{ agendamento?.nomeCliente }}</strong>?
         </p>
-        <p class="warning">Esta ação não pode ser desfeita.</p>
+        <p class="warning">
+          Esta ação não pode ser desfeita.
+        </p>
         <div class="modal-actions">
-          <button @click="cancelDelete" class="btn secondary">Cancelar</button>
-          <button @click="deleteAgendamento" class="btn danger" :disabled="deleting">
+          <button
+            class="btn secondary"
+            @click="cancelDelete"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn danger"
+            :disabled="deleting"
+            @click="deleteAgendamento"
+          >
             {{ deleting ? 'Eliminando...' : 'Eliminar' }}
           </button>
         </div>

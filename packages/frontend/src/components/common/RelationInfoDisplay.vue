@@ -1,5 +1,8 @@
 <template>
-  <div v-if="shouldShowRelation" class="relation-info-section">
+  <div
+    v-if="shouldShowRelation"
+    class="relation-info-section"
+  >
     <div
       class="relation-info-card"
       :class="{
@@ -10,13 +13,24 @@
       <!-- Header -->
       <div class="relation-info-header">
         <div class="relation-info-icon">
-          <component :is="relationIcon" class="w-5 h-5" />
+          <component
+            :is="relationIcon"
+            class="w-5 h-5"
+          />
         </div>
         <h3 class="relation-info-title">
           {{ relationDisplayName }}
         </h3>
-        <div v-if="isError" class="relation-info-status">
-          <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div
+          v-if="isError"
+          class="relation-info-status"
+        >
+          <svg
+            class="w-4 h-4 text-red-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -28,11 +42,16 @@
         <!-- Navigate to relation detail icon (top-right) -->
         <button
           v-if="!isError && !isMissing && navigationRoute"
-          @click="navigateToRelation"
           class="relation-info-navigate"
           :title="`Ver detalhes de ${relationDisplayName.toLowerCase()}`"
+          @click="navigateToRelation"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -46,24 +65,42 @@
       <!-- Content -->
       <div class="relation-info-content">
         <!-- Error state -->
-        <div v-if="isError" class="relation-error-content">
+        <div
+          v-if="isError"
+          class="relation-error-content"
+        >
           <p class="relation-error-message">
             {{ errorMessage }}
           </p>
-          <p v-if="relationData.code" class="relation-error-code">
+          <p
+            v-if="relationData.code"
+            class="relation-error-code"
+          >
             Código: {{ relationData.code }}
           </p>
         </div>
 
         <!-- Missing state -->
-        <div v-else-if="isMissing" class="relation-missing-content">
-          <p class="relation-missing-message">{{ relationDisplayName }} não encontrado</p>
+        <div
+          v-else-if="isMissing"
+          class="relation-missing-content"
+        >
+          <p class="relation-missing-message">
+            {{ relationDisplayName }} não encontrado
+          </p>
         </div>
 
         <!-- Success state with relation data -->
-        <div v-else class="relation-data-content">
+        <div
+          v-else
+          class="relation-data-content"
+        >
           <div class="relation-data-grid">
-            <div v-for="field in displayFields" :key="field.key" class="relation-data-item">
+            <div
+              v-for="field in displayFields"
+              :key="field.key"
+              class="relation-data-item"
+            >
               <label class="relation-data-label">
                 {{ field.label }}
               </label>
@@ -76,8 +113,13 @@
       </div>
 
       <!-- Footer with relation ID for debugging (only in development) -->
-      <div v-if="showDebugInfo && relationId" class="relation-info-footer">
-        <p class="relation-debug-info">ID: {{ relationId }}</p>
+      <div
+        v-if="showDebugInfo && relationId"
+        class="relation-info-footer"
+      >
+        <p class="relation-debug-info">
+          ID: {{ relationId }}
+        </p>
       </div>
     </div>
   </div>

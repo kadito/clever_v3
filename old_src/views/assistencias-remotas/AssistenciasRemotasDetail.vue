@@ -1,37 +1,64 @@
 <template>
   <div class="assistencia-detail-container">
     <div class="detail-header">
-      <BackButton :to="backRoute" variant="inline" />
+      <BackButton
+        :to="backRoute"
+        variant="inline"
+      />
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>A carregar assistência...</p>
     </div>
 
     <!-- Error State -->
-    <div v-if="error" class="error-alert">
+    <div
+      v-if="error"
+      class="error-alert"
+    >
       <p>{{ error }}</p>
-      <button @click="clearError" class="close-btn">×</button>
+      <button
+        class="close-btn"
+        @click="clearError"
+      >
+        ×
+      </button>
     </div>
 
     <!-- Assistencia Details -->
-    <div v-if="!loading && assistencia" class="assistencia-detail">
+    <div
+      v-if="!loading && assistencia"
+      class="assistencia-detail"
+    >
       <!-- Header Info -->
       <div class="detail-section header-section">
         <div class="assistencia-title">
           <h1>{{ assistencia.assistNumero }}</h1>
-          <span class="assistencia-tipo" :class="getTipoClass(assistencia.tipoAssistencia)">
+          <span
+            class="assistencia-tipo"
+            :class="getTipoClass(assistencia.tipoAssistencia)"
+          >
             {{ assistencia.tipoAssistencia }}
           </span>
         </div>
 
         <div class="assistencia-status">
-          <span v-if="assistencia.contrato" class="status-badge contract">Contrato</span>
-          <span v-if="assistencia.garantia" class="status-badge warranty">Garantia</span>
-          <span v-if="assistencia.valorAssist > 0" class="value-badge"
-            >€{{ assistencia.valorAssist.toFixed(2) }}</span
-          >
+          <span
+            v-if="assistencia.contrato"
+            class="status-badge contract"
+          >Contrato</span>
+          <span
+            v-if="assistencia.garantia"
+            class="status-badge warranty"
+          >Garantia</span>
+          <span
+            v-if="assistencia.valorAssist > 0"
+            class="value-badge"
+          >€{{ assistencia.valorAssist.toFixed(2) }}</span>
         </div>
       </div>
 
@@ -94,19 +121,29 @@
 
       <!-- Description -->
       <div
-        class="detail-section"
         v-if="assistencia.motivoPedido || assistencia.relatorioAssistencia"
+        class="detail-section"
       >
         <h2>DESCRIÇÃO</h2>
         <div class="detail-grid">
-          <div class="detail-item full-width" v-if="assistencia.motivoPedido">
+          <div
+            v-if="assistencia.motivoPedido"
+            class="detail-item full-width"
+          >
             <label>MOTIVO DO PEDIDO</label>
-            <div class="text-content">{{ assistencia.motivoPedido }}</div>
+            <div class="text-content">
+              {{ assistencia.motivoPedido }}
+            </div>
           </div>
 
-          <div class="detail-item full-width" v-if="assistencia.relatorioAssistencia">
+          <div
+            v-if="assistencia.relatorioAssistencia"
+            class="detail-item full-width"
+          >
             <label>RELATÓRIO DA ASSISTÊNCIA</label>
-            <div class="text-content">{{ assistencia.relatorioAssistencia }}</div>
+            <div class="text-content">
+              {{ assistencia.relatorioAssistencia }}
+            </div>
           </div>
         </div>
       </div>
@@ -144,7 +181,10 @@
             <span>{{ assistencia.resolvido ? 'SIM' : 'NÃO' }}</span>
           </div>
 
-          <div class="detail-item" v-if="assistencia.anexos">
+          <div
+            v-if="assistencia.anexos"
+            class="detail-item"
+          >
             <label>ANEXOS</label>
             <span>{{ assistencia.anexos }}</span>
           </div>
@@ -169,22 +209,47 @@
 
       <!-- Action Buttons -->
       <div class="detail-actions">
-        <button @click="editAssistencia" class="btn btn-primary">✏️ Editar</button>
-        <button @click="deleteAssistencia" class="btn btn-danger">🗑️ Eliminar</button>
+        <button
+          class="btn btn-primary"
+          @click="editAssistencia"
+        >
+          ✏️ Editar
+        </button>
+        <button
+          class="btn btn-danger"
+          @click="deleteAssistencia"
+        >
+          🗑️ Eliminar
+        </button>
       </div>
     </div>
 
     <!-- Not Found State -->
-    <div v-if="!loading && !assistencia && !error" class="not-found-state">
+    <div
+      v-if="!loading && !assistencia && !error"
+      class="not-found-state"
+    >
       <h2>Assistência não encontrada</h2>
       <p>A assistência pode ainda não estar disponível no sistema. Tentar novamente?</p>
       <div class="retry-actions">
-        <button @click="retryLoad" class="btn btn-primary" :disabled="loading">
+        <button
+          class="btn btn-primary"
+          :disabled="loading"
+          @click="retryLoad"
+        >
           {{ loading ? 'A carregar...' : 'Tentar novamente' }}
         </button>
-        <button @click="navigateToList" class="btn btn-secondary">← Voltar à Lista</button>
+        <button
+          class="btn btn-secondary"
+          @click="navigateToList"
+        >
+          ← Voltar à Lista
+        </button>
       </div>
-      <p v-if="autoRetryCountdown > 0" class="auto-retry-info">
+      <p
+        v-if="autoRetryCountdown > 0"
+        class="auto-retry-info"
+      >
         Tentativa automática em {{ autoRetryCountdown }}s...
       </p>
     </div>

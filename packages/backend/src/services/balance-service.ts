@@ -1046,7 +1046,7 @@ export class BalanceService {
       console.log('Starting balance recalculation:', JSON.stringify({ clientId }, null, 2));
 
       // Step 1: Read all existing transactions for the client
-      let transactions = await this.getTransactionHistory(clientId);
+      const transactions = await this.getTransactionHistory(clientId);
 
       console.log('Existing transactions found:', JSON.stringify({
         clientId,
@@ -1221,7 +1221,7 @@ export class BalanceService {
 
       // Calculate balance from transactions
       let balance = 0;
-      let contracts = {
+      const contracts = {
         manutencoesPorAno: 0,
         deslocacoesPorAno: 0,
         horasAssistenciaAnuais: 0,
