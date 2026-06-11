@@ -64,14 +64,6 @@
           {{ getAssistanceNumber(item) }}
         </span>
 
-        <!-- Assistance type -->
-        <span
-          class="assistance-type-badge"
-          :class="getAssistanceTypeClass(item)"
-        >
-          {{ getAssistanceTypeDisplay(item) }}
-        </span>
-
         <!-- Status badges -->
         <div class="flex flex-wrap gap-1">
           <span
@@ -284,7 +276,6 @@ const displayedRemoteAssistance = computed(() => {
 
     // Search in assistance data
     return (
-      data.tipoAssistencia?.toLowerCase().includes(query) ||
       getTechnicianDisplayName(data.tecnicoResponsavel)?.toLowerCase().includes(query) ||
       data.quemAtendeu?.toLowerCase().includes(query) ||
       data.motivoPedido?.toLowerCase().includes(query) ||
@@ -331,11 +322,6 @@ const getRemoteAssistanceTitle = (item: BaseContent): string => {
 const getRemoteAssistanceSubtitle = (item: BaseContent): string => {
   const assistance = item as ContentWithRelations<RemoteAssistance['data']>;
   const parts = [];
-
-  // Assistance type
-  if (assistance.data.tipoAssistencia) {
-    parts.push(getAssistanceTypeDisplay(assistance));
-  }
 
   // Main reason/description
   if (assistance.data.motivoPedido) {
@@ -457,30 +443,6 @@ const getAssistanceNumber = (item: BaseContent): string => {
   }
 
   return `RA-${new Date().getFullYear()}-0001`;
-};
-
-const getAssistanceTypeDisplay = (item: BaseContent): string => {
-  const assistance = item as ContentWithRelations<RemoteAssistance['data']>;
-
-  const typeMap: Record<string, string> = {
-    REMOTA: 'Remota',
-    TELEFÓNICA: 'Telefónica',
-    TELEMÓVEL: 'Telemóvel',
-  };
-
-  return typeMap[assistance.data.tipoAssistencia] || assistance.data.tipoAssistencia || 'N/A';
-};
-
-const getAssistanceTypeClass = (item: BaseContent): string => {
-  const assistance = item as ContentWithRelations<RemoteAssistance['data']>;
-
-  const typeClassMap: Record<string, string> = {
-    REMOTA: 'bg-purple-100 text-purple-800',
-    TELEFÓNICA: 'bg-indigo-100 text-indigo-800',
-    TELEMÓVEL: 'bg-cyan-100 text-cyan-800',
-  };
-
-  return typeClassMap[assistance.data.tipoAssistencia] || 'bg-gray-100 text-gray-800';
 };
 
 const getAssistanceDuration = (item: BaseContent): string => {
@@ -685,10 +647,6 @@ onMounted(() => {
   @apply px-2 py-1 bg-slate-100 text-slate-700 rounded text-xs font-medium flex items-center;
 }
 
-.assistance-type-badge {
-  @apply px-2 py-1 rounded text-xs font-medium;
-}
-
 .status-badge {
   @apply px-2 py-1 rounded text-xs font-medium flex items-center;
 }
@@ -704,7 +662,6 @@ onMounted(() => {
   }
 
   .assistance-number-badge,
-  .assistance-type-badge,
   .status-badge,
   .value-badge {
     @apply px-1.5 py-0.5 text-xs;
@@ -714,7 +671,6 @@ onMounted(() => {
 /* Portuguese text optimization */
 .remote-assistance-icon,
 .assistance-number-badge,
-.assistance-type-badge,
 .status-badge,
 .value-badge {
   @apply text-portuguese;
@@ -723,7 +679,6 @@ onMounted(() => {
 /* Touch-friendly interactions */
 @media (hover: none) {
   .assistance-number-badge:active,
-  .assistance-type-badge:active,
   .status-badge:active,
   .value-badge:active {
     @apply bg-opacity-80;

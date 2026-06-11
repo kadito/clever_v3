@@ -42,17 +42,6 @@
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
                 <div class="detail-item">
-                  <label class="detail-label">Tipo de Assistência</label>
-                  <div class="detail-value">
-                    <span
-                      class="assistance-type-badge"
-                      :class="getAssistanceTypeClass(item.data.tipoAssistencia)"
-                    >
-                      {{ item.data.tipoAssistencia || '-' }}
-                    </span>
-                  </div>
-                </div>
-                <div class="detail-item">
                   <label class="detail-label">Técnico Responsável</label>
                   <div class="detail-value">
                     {{ getTechnicianDisplayName(item.data.tecnicoResponsavel) }}
@@ -617,10 +606,6 @@ const getRemoteAssistanceSubtitle = (item: BaseContent | null): string => {
   const assistance = item as ContentWithRelations<any>;
   const parts = [];
 
-  if (assistance.data.tipoAssistencia) {
-    parts.push(assistance.data.tipoAssistencia);
-  }
-
   if (assistance.data.dataAssistencia) {
     parts.push(formatDateForDisplay(assistance.data.dataAssistencia));
   }
@@ -687,16 +672,6 @@ const anexosFiles = computed((): FileReference[] => {
 });
 
 // Helper functions
-const getAssistanceTypeClass = (type: string): string => {
-  const typeClasses: Record<string, string> = {
-    REMOTA: 'assistance-type-badge--remote',
-    TELEFÓNICA: 'assistance-type-badge--phone',
-    TELEMÓVEL: 'assistance-type-badge--mobile',
-  };
-
-  return typeClasses[type] || 'assistance-type-badge--default';
-};
-
 const getPaymentMethodClass = (method: string): string => {
   const methodClasses: Record<string, string> = {
     Contrato: 'payment-method-badge--contract',

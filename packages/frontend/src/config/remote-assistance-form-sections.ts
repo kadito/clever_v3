@@ -16,25 +16,6 @@ export const remoteAssistanceFormSections: FormSection[] = [
     ],
   },
   {
-    key: 'assistanceInfo',
-    title: 'Informação da Assistência',
-    description: 'Detalhes sobre o tipo de assistência',
-    fields: [
-      {
-        key: 'tipoAssistencia',
-        label: 'Tipo de Assistência',
-        type: 'select',
-        required: true,
-        fullWidth: false,
-        options: [
-          { value: '', label: 'Selecionar tipo...' },
-          { value: 'REMOTA', label: 'REMOTA' },
-          { value: 'TELEFÓNICA', label: 'TELEFÓNICA' },
-        ],
-      },
-    ],
-  },
-  {
     key: 'dateTime',
     title: 'Data e Horário',
     description: 'Datas e horários da assistência remota',

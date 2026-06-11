@@ -582,7 +582,6 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
     // Transform form data to RemoteAssistanceCreationData format
     const remoteAssistanceData: RemoteAssistanceCreationData = {
       clientId: data.clientId || '',
-      tipoAssistencia: data.tipoAssistencia || '',
       tecnicoResponsavel: data.tecnicoResponsavel || '',
       dataPedido: data.dataPedido || '',
       dataAssistencia: data.dataAssistencia || '',
@@ -604,16 +603,6 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
     // Basic validation
     if (!remoteAssistanceData.clientId?.trim()) {
       errors.push('Por favor, selecione um cliente');
-    }
-
-    if (!remoteAssistanceData.tipoAssistencia) {
-      errors.push('Por favor, selecione o tipo de assistência');
-    } else if (
-      !REMOTE_ASSISTANCE_CONSTANTS.ASSISTANCE_TYPES.includes(
-        remoteAssistanceData.tipoAssistencia as any
-      )
-    ) {
-      errors.push('Tipo de assistência inválido');
     }
 
     // Note: tecnicoResponsavel is automatically assigned by the backend based on authenticated user
@@ -707,10 +696,6 @@ const validateCreateForm = (data: Record<string, any>): Record<string, string> =
     errors.forEach((errorMessage: string) => {
       if (errorMessage.includes('selecione um cliente')) {
         fieldErrors.clientId = errorMessage;
-      } else if (errorMessage.includes('selecione o tipo de assistência')) {
-        fieldErrors.tipoAssistencia = errorMessage;
-      } else if (errorMessage.includes('Tipo de assistência inválido')) {
-        fieldErrors.tipoAssistencia = errorMessage;
       } else if (errorMessage.includes('selecione a data do pedido')) {
         fieldErrors.dataPedido = errorMessage;
       } else if (errorMessage.includes('selecione a data da assistência')) {
@@ -754,7 +739,6 @@ const handleCreateSuccess = async (formData: Record<string, any>) => {
   const remoteAssistanceData: RemoteAssistanceCreationData = {
     clientId: formData.clientId || '',
     contractId: formData.paymentMethod === 'Contrato' ? formData.contractId || '' : undefined,
-    tipoAssistencia: formData.tipoAssistencia || '',
     // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
     tecnicoResponsavel: {} as any, // Will be populated by backend auto-assignment
     dataPedido: formData.dataPedido || '',

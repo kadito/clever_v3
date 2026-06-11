@@ -544,12 +544,6 @@ export function validateRemoteAssistanceCreation(data: RemoteAssistanceCreationD
     errors.push('Por favor, selecione um cliente');
   }
 
-  if (!data.tipoAssistencia) {
-    errors.push('Por favor, selecione o tipo de assistência');
-  } else if (!REMOTE_ASSISTANCE_CONSTANTS.ASSISTANCE_TYPES.includes(data.tipoAssistencia as any)) {
-    errors.push('Tipo de assistência inválido');
-  }
-
   // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
   // No need to validate this field during creation as it will be populated by auto-assignment
 
@@ -639,16 +633,6 @@ export function validateRemoteAssistanceUpdate(data: RemoteAssistanceUpdateData)
   // Basic validation (only if fields are being updated)
   if (data.clientId !== undefined && !data.clientId?.trim()) {
     errors.push('Cliente não pode estar vazio');
-  }
-
-  if (data.tipoAssistencia !== undefined) {
-    if (!data.tipoAssistencia) {
-      errors.push('Tipo de assistência não pode estar vazio');
-    } else if (
-      !REMOTE_ASSISTANCE_CONSTANTS.ASSISTANCE_TYPES.includes(data.tipoAssistencia as any)
-    ) {
-      errors.push('Tipo de assistência inválido');
-    }
   }
 
   // Note: tecnicoResponsavel is automatically assigned by backend based on authenticated user
@@ -779,7 +763,6 @@ export function getYearFromAssistanceDate(dateString: string): string {
  * Get remote assistance display summary
  */
 export function getRemoteAssistanceSummary(data: RemoteAssistanceData): {
-  assistanceType: string;
   technician: string;
   date: string;
   value: number;
@@ -798,7 +781,6 @@ export function getRemoteAssistanceSummary(data: RemoteAssistanceData): {
   const duration = calculateTotalHours(data.inicioAssistencia, data.fimAssistencia);
 
   return {
-    assistanceType: data.tipoAssistencia || 'N/A',
     technician: data.tecnicoResponsavel ? `${data.tecnicoResponsavel.firstName} ${data.tecnicoResponsavel.lastName}` : 'N/A',
     date: data.dataAssistencia || 'N/A',
     value: data.valorAssist || 0,

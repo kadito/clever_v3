@@ -181,9 +181,6 @@ function createRemoteAssistanceSearchText(data: RemoteAssistanceData): string {
   if (data.clientId) searchTerms.push(data.clientId.toLowerCase());
   if (data.clienteName) searchTerms.push(data.clienteName.toLowerCase());
 
-  // Assistance type and technician information
-  if (data.tipoAssistencia) searchTerms.push(data.tipoAssistencia.toLowerCase());
-  
   // Handle TechnicianUser object for technician
   if (data.tecnicoResponsavel) {
     const technician = data.tecnicoResponsavel;
@@ -278,7 +275,6 @@ remoteAssistanceConfig.extractIndexFields = (content: RemoteAssistance) => {
     assistanceNumber, // Generated assistance number for display
 
     // Assistance details
-    tipoAssistencia: data.tipoAssistencia || '',
     tecnicoResponsavel: data.tecnicoResponsavel || '',
 
     // Date and time information
@@ -296,7 +292,6 @@ remoteAssistanceConfig.extractIndexFields = (content: RemoteAssistance) => {
     resolvido: data.resolvido || false,
 
     // Summary information
-    assistanceType: summary.assistanceType,
     technician: summary.technician,
     date: summary.date,
     value: summary.value,
