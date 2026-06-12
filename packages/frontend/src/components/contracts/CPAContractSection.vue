@@ -1,40 +1,16 @@
 <template>
   <div class="cpa-contract-section">
-    <!-- Three-column layout for CPA fields -->
-    <div class="contract-config-grid">
-      <div class="config-field">
-        <label class="config-label required">TIPO DE CONTRATO CPA</label>
-        <select
-          :value="formData?.cpaContractType || ''"
-          class="config-select"
-          @change="event => handleContractTypeChange((event.target as HTMLSelectElement).value)"
-        >
-          <option value="">
-            Selecione o tipo...
-          </option>
-          <option value="CPA">
-            CPA - Cashlogy 2023
-          </option>
-          <option value="CPA_1500">
-            CPA - Cashlogy 1500 ou Outros
-          </option>
-        </select>
-      </div>
-
+    <!-- 1. PLANO — Plan selector -->
+    <div class="plan-selector-section">
       <div class="config-field">
         <label class="config-label required">PLANO CPA</label>
         <select
           :value="formData?.planIdCPA || ''"
           class="config-select"
-          :disabled="!formData?.cpaContractType"
           @change="event => handlePlanSelection((event.target as HTMLSelectElement).value)"
         >
           <option value="">
-            {{
-              formData.cpaContractType
-                ? 'Selecione o plano...'
-                : 'Primeiro selecione o tipo de contrato'
-            }}
+            Selecione o plano...
           </option>
           <option
             v-for="planOption in availablePlanOptions"
@@ -45,36 +21,21 @@
           </option>
         </select>
       </div>
-
-      <div class="config-field">
-        <label class="config-label required">DISTÂNCIA</label>
-        <select
-          :value="formData?.distanceCPA || ''"
-          class="config-select"
-          @change="
-            event => $emit('update-field', 'distanceCPA', (event.target as HTMLSelectElement).value)
-          "
-        >
-          <option value="">
-            Selecione a distância...
-          </option>
-          <option value="under180km">
-            Menos de 180 km
-          </option>
-          <option value="over180km">
-            Mais de 180 km
-          </option>
-        </select>
-      </div>
     </div>
 
-    <!-- Equipment Management -->
-    <CPAEquipmentManager
-      :equipments="cpaEquipments"
-      @equipment-updated="$emit('equipment-updated', $event)"
+    <!-- 2. PLANO INFORMATION — Plan details, pricing, POS package -->
+    <DynamicPlanDetails
+      v-if="shouldShowPlanDetails || props.isLoadingPlan"
+      data-testid="dynamic-plan-details"
+      :plan-details="selectedPlanDetails"
+      :selected-payment="formData?.modalidadePagamentoCPA || ''"
+      :is-loading="props.isLoadingPlan"
+      :has-p-o-s-package="formData?.hasPOSPackage || false"
+      contract-type="CPA"
+      @payment-selected="$emit('update-field', 'modalidadePagamentoCPA', $event)"
     />
 
-    <!-- POS Package Option (only for CPA_1500 PREMIUM) -->
+    <!-- POS Package Option (only for cpa_premium plan) -->
     <div
       v-if="showPOSPackageOption"
       class="pos-package-section"
@@ -90,55 +51,63 @@
             "
           >
           <span class="pos-package-text">
-            Pack de 10h de assistência para o seu POS (+100€/ano)
+            Pack de 10h de assistência para o seu POS (+200€/ano)
           </span>
         </label>
       </div>
     </div>
 
-    <!-- Contract Dates -->
+    <!-- 3. EQUIPMENTS -->
+    <CPAEquipmentManager
+      :equipments="cpaEquipments"
+      @equipment-updated="$emit('equipment-updated', $event)"
+    />
+
+    <!-- 4. MANUAL INPUTS (visible only when 2+ equipments) -->
+    <BenefitFieldsGroup
+      :deslocacoes-por-ano="formData?.deslocacoesPorAnoCPA ?? 0"
+      :manutencoes-por-ano="formData?.manutencoesPorAnoCPA ?? 0"
+      :mode="mode"
+      contract-type="CPA"
+      @update:deslocacoes-por-ano="$emit('update-field', 'deslocacoesPorAnoCPA', $event)"
+      @update:manutencoes-por-ano="$emit('update-field', 'manutencoesPorAnoCPA', $event)"
+    />
+
+    <div
+      v-if="mode === 'manual'"
+      class="config-field manual-price-field"
+    >
+      <label class="config-label required">PREÇO DO CONTRATO (€)</label>
+      <input
+        type="number"
+        min="0"
+        step="0.01"
+        :value="formData?.precoCPA || ''"
+        class="config-input"
+        placeholder="0.00"
+        data-testid="manual-price-input"
+        @input="$emit('update-field', 'precoCPA', Number(($event.target as HTMLInputElement).value))"
+      >
+    </div>
+
+    <!-- 5. DATES -->
     <ContractDatesSection
       :start-date="formData?.inicioContratoCPA || ''"
       :end-date="formData?.fimContratoCPA || ''"
       @update:start-date="$emit('update-field', 'inicioContratoCPA', $event)"
       @update:end-date="$emit('update-field', 'fimContratoCPA', $event)"
     />
-
-    <!-- Benefit Fields (editable overrides) -->
-    <BenefitFieldsGroup
-      :horas-assistencia="formData?.horasAssistenciaAnualCPA ?? 0"
-      :deslocacoes-por-ano="formData?.deslocacoesPorAnoCPA ?? 0"
-      :manutencoes-por-ano="formData?.manutencoesPorAnoCPA ?? 0"
-      :disabled="!formData?.planIdCPA"
-      @update:horas-assistencia="$emit('update-field', 'horasAssistenciaAnualCPA', $event)"
-      @update:deslocacoes-por-ano="$emit('update-field', 'deslocacoesPorAnoCPA', $event)"
-      @update:manutencoes-por-ano="$emit('update-field', 'manutencoesPorAnoCPA', $event)"
-    />
-
-    <!-- Dynamic Plan Details Display -->
-    <DynamicPlanDetails
-      v-if="shouldShowPlanDetails || props.isLoadingPlan"
-      data-testid="dynamic-plan-details"
-      :plan-details="selectedPlanDetails"
-      :selected-payment="formData?.modalidadePagamentoCPA || ''"
-      :distance="formData?.distanceCPA || ''"
-      :is-loading="props.isLoadingPlan"
-      :has-p-o-s-package="formData?.hasPOSPackage || false"
-      :equipments="cpaEquipments"
-      :contract-type="formData?.cpaContractType || ''"
-      @payment-selected="$emit('update-field', 'modalidadePagamentoCPA', $event)"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { ContractEquipment } from '@clever/shared';
+import type { ContractEquipment, CPAPlan } from '@clever/shared';
 import BenefitFieldsGroup from './BenefitFieldsGroup.vue';
 import CPAEquipmentManager from './CPAEquipmentManager.vue';
 import ContractDatesSection from './ContractDatesSection.vue';
 import DynamicPlanDetails from './DynamicPlanDetails.vue';
-import { computed, toRefs } from 'vue';
-import { getPlanOptions, type ContractType } from '../../services/planSelection';
+import { computed, toRefs, watch } from 'vue';
+import { getPlanOptions, getPlanDetails } from '../../services/planSelection';
 
 interface Props {
   formData: Record<string, any>;
@@ -157,54 +126,70 @@ const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
 // Use toRefs for better performance with reactive props
-const { formData, selectedPlanDetails, isLoadingPlan } = toRefs(props);
+const { selectedPlanDetails, isLoadingPlan } = toRefs(props);
 
-// Get available plan options based on selected contract type
-const availablePlanOptions = computed(() => {
-  const contractType = props.formData?.cpaContractType as ContractType | '';
-
-  try {
-    const options = getPlanOptions(contractType);
-    return options;
-  } catch (error) {
-    console.error('Error getting plan options:', JSON.stringify(error, null, 2));
-    return [];
-  }
+// 9.1 — Mode computed: 'auto' (1 equip) or 'manual' (2+ equip)
+const mode = computed<'auto' | 'manual'>(() => {
+  return props.cpaEquipments.length >= 2 ? 'manual' : 'auto';
 });
 
-const handleContractTypeChange = (contractType: string) => {
-  // Clear the selected plan when contract type changes
-  if (props.formData?.planIdCPA) {
-    emit('update-field', 'planIdCPA', '');
+// 9.2 & 9.3 — Equipment count watcher for mode transitions
+watch(
+  () => props.cpaEquipments.length,
+  (newLen, oldLen) => {
+    if (oldLen === 1 && newLen >= 2) {
+      // Auto → Manual: clear auto-populated parameter values and price
+      emit('update-field', 'deslocacoesPorAnoCPA', '');
+      emit('update-field', 'manutencoesPorAnoCPA', '');
+      emit('update-field', 'precoCPA', undefined);
+    } else if (oldLen >= 2 && newLen === 1) {
+      // Manual → Auto: restore plan base values
+      const planId = props.formData?.planIdCPA;
+      if (planId) {
+        const plan = getPlanDetails('CPA', planId) as CPAPlan | null;
+        if (plan) {
+          emit('update-field', 'deslocacoesPorAnoCPA', plan.parameters.deslocacoesPorAno);
+          emit('update-field', 'manutencoesPorAnoCPA', plan.parameters.manutencoesPorAno);
+        }
+      }
+      // Clear manual price since auto mode derives price from plan
+      emit('update-field', 'precoCPA', undefined);
+    }
   }
+);
 
-  // Update the contract type
-  emit('update-field', 'cpaContractType', contractType);
-};
+// Get unified CPA plan options directly — no contract type dependency
+const availablePlanOptions = computed(() => {
+  return getPlanOptions('CPA');
+});
 
-const handlePlanSelection = (planId: string) => {
+// 9.4 & 9.5 — Plan change handler with mode awareness
+const handlePlanSelection = (planId: string): void => {
+  if (mode.value === 'auto' && planId) {
+    // In auto mode: re-populate parameters from new plan
+    const plan = getPlanDetails('CPA', planId) as CPAPlan | null;
+    if (plan) {
+      emit('update-field', 'deslocacoesPorAnoCPA', plan.parameters.deslocacoesPorAno);
+      emit('update-field', 'manutencoesPorAnoCPA', plan.parameters.manutencoesPorAno);
+    }
+  }
+  // In manual mode: do NOT clear manual values (schedule info updates via selectedPlanDetails prop)
+  // Always emit plan-selected event
   emit('plan-selected', planId);
 };
 
-// Show POS package option only for CPA_1500 PREMIUM plan - memoized for performance
+// Show POS package option only for cpa_premium plan
 const showPOSPackageOption = computed(() => {
-  return (
-    props.formData?.cpaContractType === 'CPA_1500' &&
-    props.formData?.planIdCPA === 'cpa_1500_premium'
-  );
+  return props.formData?.planIdCPA === 'cpa_premium';
 });
 
-// Determine if plan details should be shown - show immediately after plan selection for all contract types
+// Determine if plan details should be shown
 const shouldShowPlanDetails = computed(() => {
-  // Show plan details if we have selected plan details and a plan is selected
-  // OR if we're in test mode (selectedPlanDetails provided without planIdCPA)
   const hasPlanSelected = props.formData?.planIdCPA && props.formData.planIdCPA !== '';
   const isTestMode =
     !!selectedPlanDetails.value && (!props.formData?.planIdCPA || props.formData.planIdCPA === '');
 
-  const shouldShow = !!selectedPlanDetails.value && (hasPlanSelected || isTestMode);
-
-  return shouldShow;
+  return !!selectedPlanDetails.value && (hasPlanSelected || isTestMode);
 });
 </script>
 
@@ -213,14 +198,8 @@ const shouldShowPlanDetails = computed(() => {
   @apply space-y-6;
 }
 
-.contract-config-grid {
-  @apply form-grid-consistent;
-}
-
-@media (min-width: 768px) {
-  .contract-config-grid {
-    @apply grid-cols-3;
-  }
+.plan-selector-section {
+  @apply grid grid-cols-1 gap-4;
 }
 
 .config-field {
@@ -241,6 +220,18 @@ const shouldShowPlanDetails = computed(() => {
 
 .config-select:disabled {
   @apply bg-gray-100 text-gray-500 cursor-not-allowed;
+}
+
+.config-input {
+  @apply px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm transition-colors duration-200;
+}
+
+.config-input:focus {
+  @apply outline-none border-green-500 ring-2 ring-green-200;
+}
+
+.manual-price-field {
+  @apply mt-4;
 }
 
 .pos-package-section {

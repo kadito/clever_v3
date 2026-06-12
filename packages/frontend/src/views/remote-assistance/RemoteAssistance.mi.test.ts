@@ -102,6 +102,7 @@ const mockFormData = ref<Record<string, any>>({});
 vi.mock('@/composables/useSharedFormData', () => ({
   useSharedFormData: vi.fn(() => ({
     formData: mockFormData,
+    validationErrors: {},
     updateFieldValue: vi.fn((key: string, value: any) => {
       mockFormData.value[key] = value;
     }),
@@ -601,9 +602,9 @@ describe('MI-16: Detail view — legacy record, Notas Anexas shown', () => {
     const fileDisplay = wrapper.find('.file-display');
     expect(fileDisplay.exists()).toBe(false);
 
-    // "Notas Anexas" section should be shown with the text
+    // "Notas Anexos" section should be shown with the text
     const text = wrapper.text();
-    expect(text).toContain('Notas Anexas');
+    expect(text).toContain('Notas Anexos');
     expect(text).toContain('some old text notes');
   });
 });

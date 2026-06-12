@@ -232,8 +232,13 @@ describe('Relation Validation', () => {
       expect(fieldNames).toEqual(['clientId']);
     });
 
-    it('should return empty array for content type without relations', () => {
+    it('should return relation field names for content type with relations (clients)', () => {
       const fieldNames = getRelationFieldNames('clients');
+      expect(fieldNames).toEqual(['contractId']);
+    });
+
+    it('should return empty array for content type without relations', () => {
+      const fieldNames = getRelationFieldNames('reminders');
       expect(fieldNames).toEqual([]);
     });
   });
@@ -293,7 +298,7 @@ describe('Relation Validation', () => {
     });
 
     it('should have empty configurations for content types without relations', () => {
-      const contentTypesWithoutRelations = ['clients', 'reminders', 'pending'];
+      const contentTypesWithoutRelations = ['reminders', 'pending'];
 
       for (const contentType of contentTypesWithoutRelations) {
         expect(CONTENT_RELATION_CONFIGS[contentType]).toEqual([]);

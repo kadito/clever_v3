@@ -52,10 +52,6 @@ function validateContractCreationDirect(data: ContractCreationData): string[] {
 
   // CPA Contract validation
   if (data.hasCPAContract) {
-    if (!data.cpaContractType) {
-      errors.push('Por favor, selecione o tipo de contrato CPA');
-    }
-
     if (!data.planIdCPA) {
       errors.push('Por favor, selecione um plano CPA');
     }
@@ -64,14 +60,20 @@ function validateContractCreationDirect(data: ContractCreationData): string[] {
       errors.push('Por favor, selecione a modalidade de pagamento CPA');
     }
 
-    // Distance is only required for CPA (2023), not CPA_1500
-    if (data.cpaContractType === 'CPA' && !data.distanceCPA) {
-      errors.push('Por favor, selecione a distância para contratos CPA (2023)');
-    }
-
     // Validate CPA equipment
     if (!data.cpaEquipments || data.cpaEquipments.length === 0) {
       errors.push('Por favor, adicione pelo menos um equipamento CPA');
+    } else if (data.cpaEquipments.length >= 2) {
+      // Multi-equipment: price and parameters required
+      if (!data.precoCPA || data.precoCPA <= 0) {
+        errors.push('Por favor, introduza o preço do contrato CPA');
+      }
+      if (typeof data.deslocacoesPorAnoCPA !== 'number' || (data.deslocacoesPorAnoCPA !== -1 && data.deslocacoesPorAnoCPA <= 0)) {
+        errors.push('Por favor, especifique as deslocações por ano CPA');
+      }
+      if (typeof data.manutencoesPorAnoCPA !== 'number' || data.manutencoesPorAnoCPA < 0) {
+        errors.push('Por favor, especifique as manutenções por ano CPA');
+      }
     }
   }
 
@@ -108,11 +110,10 @@ function validateContractCreate(requestData: any): void {
     clienteName: contractData.clienteName || '',
     hasCPAContract: contractData.hasCPAContract || false,
     hasSHContract: contractData.hasSHContract || false,
-    cpaContractType: contractData.cpaContractType || '',
     planIdCPA: contractData.planIdCPA || '',
-    distanceCPA: contractData.distanceCPA || '',
     modalidadePagamentoCPA: contractData.modalidadePagamentoCPA || '',
     hasPOSPackage: contractData.hasPOSPackage || false,
+    precoCPA: contractData.precoCPA || undefined,
     inicioContratoCPA: contractData.inicioContratoCPA || '',
     fimContratoCPA: contractData.fimContratoCPA || '',
     horasAssistenciaAnualCPA: contractData.horasAssistenciaAnualCPA || 0,
@@ -121,6 +122,7 @@ function validateContractCreate(requestData: any): void {
     planIdSH: contractData.planIdSH || '',
     distanceSH: contractData.distanceSH || '',
     modalidadePagamentoSH: contractData.modalidadePagamentoSH || '',
+    precoSH: contractData.precoSH || undefined,
     inicioContratoSH: contractData.inicioContratoSH || '',
     fimContratoSH: contractData.fimContratoSH || '',
     horasAssistenciaAnualSH: contractData.horasAssistenciaAnualSH || 0,
@@ -164,11 +166,10 @@ function validateContractUpdateData(requestData: any, existingContent?: Contract
     clienteName: contractData.clienteName || '',
     hasCPAContract: contractData.hasCPAContract || false,
     hasSHContract: contractData.hasSHContract || false,
-    cpaContractType: contractData.cpaContractType || '',
     planIdCPA: contractData.planIdCPA || '',
-    distanceCPA: contractData.distanceCPA || '',
     modalidadePagamentoCPA: contractData.modalidadePagamentoCPA || '',
     hasPOSPackage: contractData.hasPOSPackage || false,
+    precoCPA: contractData.precoCPA || undefined,
     inicioContratoCPA: contractData.inicioContratoCPA || '',
     fimContratoCPA: contractData.fimContratoCPA || '',
     horasAssistenciaAnualCPA: contractData.horasAssistenciaAnualCPA || 0,
@@ -177,6 +178,7 @@ function validateContractUpdateData(requestData: any, existingContent?: Contract
     planIdSH: contractData.planIdSH || '',
     distanceSH: contractData.distanceSH || '',
     modalidadePagamentoSH: contractData.modalidadePagamentoSH || '',
+    precoSH: contractData.precoSH || undefined,
     inicioContratoSH: contractData.inicioContratoSH || '',
     fimContratoSH: contractData.fimContratoSH || '',
     horasAssistenciaAnualSH: contractData.horasAssistenciaAnualSH || 0,
@@ -209,10 +211,8 @@ function createContractSearchText(data: ContractData): string {
   // Contract types and plans
   if (data.hasCPAContract) {
     searchTerms.push('cpa');
-    if (data.cpaContractType) searchTerms.push(data.cpaContractType.toLowerCase());
     if (data.planIdCPA) searchTerms.push(data.planIdCPA.toLowerCase());
     if (data.modalidadePagamentoCPA) searchTerms.push(data.modalidadePagamentoCPA.toLowerCase());
-    if (data.distanceCPA) searchTerms.push(data.distanceCPA.toLowerCase());
   }
 
   if (data.hasSHContract) {
@@ -323,10 +323,8 @@ contractConfig.extractIndexFields = (content: Contract) => {
     hasActiveContract: hasActiveContract(data),
 
     // CPA Contract information
-    cpaContractType: data.cpaContractType || '',
     planIdCPA: data.planIdCPA || '',
     modalidadePagamentoCPA: data.modalidadePagamentoCPA || '',
-    distanceCPA: data.distanceCPA || '',
     inicioContratoCPA: data.inicioContratoCPA || '',
     fimContratoCPA: data.fimContratoCPA || '',
 

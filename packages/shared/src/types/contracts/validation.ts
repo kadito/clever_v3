@@ -29,15 +29,6 @@ export function validateContractEquipment(equipment: ContractEquipment): string[
     errors.push('Número de série deve ser um texto');
   }
 
-  // Discount validation
-  if (
-    typeof equipment.desconto !== 'number' ||
-    equipment.desconto < 0 ||
-    equipment.desconto > 100
-  ) {
-    errors.push('Desconto deve ser um número entre 0 e 100');
-  }
-
   if (equipment.observacoes && typeof equipment.observacoes !== 'string') {
     errors.push('Observações devem ser um texto');
   }
@@ -63,21 +54,8 @@ export function validateContractCreation(data: ContractCreationData): string[] {
 
   // CPA Contract validation
   if (data.hasCPAContract) {
-    if (!data.cpaContractType) {
-      errors.push('Por favor, selecione o tipo de contrato CPA');
-    }
-
-    if (!data.planIdCPA) {
-      errors.push('Por favor, selecione um plano CPA');
-    }
-
     if (!data.modalidadePagamentoCPA) {
       errors.push('Por favor, selecione a modalidade de pagamento CPA');
-    }
-
-    // Distance is only required for CPA (2023), not CPA_1500
-    if (data.cpaContractType === 'CPA' && !data.distanceCPA) {
-      errors.push('Por favor, selecione a distância para contratos CPA (2023)');
     }
 
     // Validate CPA equipment
@@ -94,12 +72,28 @@ export function validateContractCreation(data: ContractCreationData): string[] {
         if (!equipment.modelo?.trim()) {
           errors.push(`Por favor, introduza o modelo do equipamento CPA ${index + 1}`);
         }
-
-        // First equipment should have 0% discount
-        if (index === 0 && equipment.desconto !== 0) {
-          errors.push('O primeiro equipamento não deve ter desconto aplicado');
-        }
       });
+
+      // Single-equipment: plan required (parameters come from plan)
+      if (data.cpaEquipments.length === 1 && !data.planIdCPA) {
+        errors.push('Por favor, selecione um plano CPA para preencher os parâmetros');
+      }
+
+      // Multi-equipment: price and parameters required (manual mode)
+      if (data.cpaEquipments.length >= 2) {
+        if (!data.precoCPA || data.precoCPA <= 0) {
+          errors.push('Por favor, introduza o preço do contrato CPA');
+        }
+        if (
+          typeof data.deslocacoesPorAnoCPA !== 'number' ||
+          (data.deslocacoesPorAnoCPA !== -1 && data.deslocacoesPorAnoCPA <= 0)
+        ) {
+          errors.push('Por favor, especifique as deslocações por ano CPA');
+        }
+        if (typeof data.manutencoesPorAnoCPA !== 'number' || data.manutencoesPorAnoCPA < 0) {
+          errors.push('Por favor, especifique as manutenções por ano CPA');
+        }
+      }
     }
 
     // Date validation
@@ -114,10 +108,6 @@ export function validateContractCreation(data: ContractCreationData): string[] {
 
   // S&H Contract validation
   if (data.hasSHContract) {
-    if (!data.planIdSH) {
-      errors.push('Por favor, selecione um plano S&H');
-    }
-
     if (!data.distanceSH) {
       errors.push('Por favor, selecione a distância para o contrato S&H');
     }
@@ -135,6 +125,27 @@ export function validateContractCreation(data: ContractCreationData): string[] {
           errors.push(`Por favor, introduza o modelo do equipamento S&H ${index + 1}`);
         }
       });
+
+      // Single-equipment: plan required (parameters come from plan)
+      if (data.shEquipments.length === 1 && !data.planIdSH) {
+        errors.push('Por favor, selecione um plano S&H para preencher os parâmetros');
+      }
+
+      // Multi-equipment: price and parameters required (manual mode)
+      if (data.shEquipments.length >= 2) {
+        if (!data.precoSH || data.precoSH <= 0) {
+          errors.push('Por favor, introduza o preço do contrato S&H');
+        }
+        if (
+          typeof data.deslocacoesPorAnoSH !== 'number' ||
+          (data.deslocacoesPorAnoSH !== -1 && data.deslocacoesPorAnoSH <= 0)
+        ) {
+          errors.push('Por favor, especifique as deslocações por ano S&H');
+        }
+        if (typeof data.horasAssistenciaAnualSH !== 'number' || data.horasAssistenciaAnualSH <= 0) {
+          errors.push('Por favor, especifique as horas de assistência anual S&H');
+        }
+      }
     }
 
     // Date validation
@@ -144,41 +155,6 @@ export function validateContractCreation(data: ContractCreationData): string[] {
       if (startDate >= endDate) {
         errors.push('A data de fim do contrato S&H deve ser posterior à data de início');
       }
-    }
-  }
-
-  // Service details validation
-  if (data.hasCPAContract) {
-    if (typeof data.horasAssistenciaAnualCPA !== 'number' || data.horasAssistenciaAnualCPA < 0) {
-      errors.push('As horas de assistência anual CPA devem ser um número positivo');
-    }
-
-    if (
-      typeof data.deslocacoesPorAnoCPA !== 'number' ||
-      (data.deslocacoesPorAnoCPA !== -1 && data.deslocacoesPorAnoCPA <= 0)
-    ) {
-      errors.push('As deslocações por ano CPA devem ser um número positivo ou -1 para ilimitado');
-    }
-
-    if (typeof data.manutencoesPorAnoCPA !== 'number' || data.manutencoesPorAnoCPA < 0) {
-      errors.push('As manutenções por ano CPA devem ser um número positivo');
-    }
-  }
-
-  if (data.hasSHContract) {
-    if (typeof data.horasAssistenciaAnualSH !== 'number' || data.horasAssistenciaAnualSH < 0) {
-      errors.push('As horas de assistência anual S&H devem ser um número positivo');
-    }
-
-    if (
-      typeof data.deslocacoesPorAnoSH !== 'number' ||
-      (data.deslocacoesPorAnoSH !== -1 && data.deslocacoesPorAnoSH <= 0)
-    ) {
-      errors.push('As deslocações por ano S&H devem ser um número positivo ou -1 para ilimitado');
-    }
-
-    if (typeof data.manutencoesPorAnoSH !== 'number' || data.manutencoesPorAnoSH < 0) {
-      errors.push('As manutenções por ano S&H devem ser um número positivo');
     }
   }
 
@@ -208,21 +184,12 @@ export function validateContractUpdate(data: ContractUpdateData): string[] {
 
   // CPA Contract validation (if being updated)
   if (data.hasCPAContract) {
-    if (data.cpaContractType !== undefined && !data.cpaContractType) {
-      errors.push('Tipo de contrato CPA é obrigatório');
-    }
-
     if (data.planIdCPA !== undefined && !data.planIdCPA) {
       errors.push('Plano CPA é obrigatório');
     }
 
     if (data.modalidadePagamentoCPA !== undefined && !data.modalidadePagamentoCPA) {
       errors.push('Modalidade de pagamento CPA é obrigatória');
-    }
-
-    // Distance validation for CPA (2023)
-    if (data.cpaContractType === 'CPA' && data.distanceCPA !== undefined && !data.distanceCPA) {
-      errors.push('Distância é obrigatória para contratos CPA (2023)');
     }
 
     // Validate CPA equipment if provided
@@ -240,12 +207,28 @@ export function validateContractUpdate(data: ContractUpdateData): string[] {
           if (!equipment.modelo?.trim()) {
             errors.push(`Modelo do equipamento CPA ${index + 1} é obrigatório`);
           }
-
-          // First equipment should have 0% discount
-          if (index === 0 && equipment.desconto !== 0) {
-            errors.push('O primeiro equipamento não deve ter desconto');
-          }
         });
+
+        // Single-equipment: plan required (parameters come from plan)
+        if (data.cpaEquipments.length === 1 && data.planIdCPA !== undefined && !data.planIdCPA) {
+          errors.push('Por favor, selecione um plano CPA para preencher os parâmetros');
+        }
+
+        // Multi-equipment: price and parameters required (manual mode)
+        if (data.cpaEquipments.length >= 2) {
+          if (!data.precoCPA || data.precoCPA <= 0) {
+            errors.push('Por favor, introduza o preço do contrato CPA');
+          }
+          if (
+            typeof data.deslocacoesPorAnoCPA !== 'number' ||
+            (data.deslocacoesPorAnoCPA !== -1 && data.deslocacoesPorAnoCPA <= 0)
+          ) {
+            errors.push('Por favor, especifique as deslocações por ano CPA');
+          }
+          if (typeof data.manutencoesPorAnoCPA !== 'number' || data.manutencoesPorAnoCPA < 0) {
+            errors.push('Por favor, especifique as manutenções por ano CPA');
+          }
+        }
       }
     }
 
@@ -283,6 +266,27 @@ export function validateContractUpdate(data: ContractUpdateData): string[] {
             errors.push(`Modelo do equipamento S&H ${index + 1} é obrigatório`);
           }
         });
+
+        // Single-equipment: plan required (parameters come from plan)
+        if (data.shEquipments.length === 1 && data.planIdSH !== undefined && !data.planIdSH) {
+          errors.push('Por favor, selecione um plano S&H para preencher os parâmetros');
+        }
+
+        // Multi-equipment: price and parameters required (manual mode)
+        if (data.shEquipments.length >= 2) {
+          if (!data.precoSH || data.precoSH <= 0) {
+            errors.push('Por favor, introduza o preço do contrato S&H');
+          }
+          if (
+            typeof data.deslocacoesPorAnoSH !== 'number' ||
+            (data.deslocacoesPorAnoSH !== -1 && data.deslocacoesPorAnoSH <= 0)
+          ) {
+            errors.push('Por favor, especifique as deslocações por ano S&H');
+          }
+          if (typeof data.horasAssistenciaAnualSH !== 'number' || data.horasAssistenciaAnualSH <= 0) {
+            errors.push('Por favor, especifique as horas de assistência anual S&H');
+          }
+        }
       }
     }
 
@@ -292,53 +296,6 @@ export function validateContractUpdate(data: ContractUpdateData): string[] {
       const endDate = new Date(data.fimContratoSH);
       if (startDate >= endDate) {
         errors.push('Data de fim do contrato S&H deve ser posterior à data de início');
-      }
-    }
-  }
-
-  // Service details validation (if provided)
-  if (data.hasCPAContract) {
-    if (data.horasAssistenciaAnualCPA !== undefined) {
-      if (typeof data.horasAssistenciaAnualCPA !== 'number' || data.horasAssistenciaAnualCPA < 0) {
-        errors.push('Horas de assistência anual CPA deve ser um número positivo');
-      }
-    }
-
-    if (data.deslocacoesPorAnoCPA !== undefined) {
-      if (
-        typeof data.deslocacoesPorAnoCPA !== 'number' ||
-        (data.deslocacoesPorAnoCPA !== -1 && data.deslocacoesPorAnoCPA <= 0)
-      ) {
-        errors.push('Deslocações por ano CPA deve ser um número positivo ou -1 para ilimitado');
-      }
-    }
-
-    if (data.manutencoesPorAnoCPA !== undefined) {
-      if (typeof data.manutencoesPorAnoCPA !== 'number' || data.manutencoesPorAnoCPA < 0) {
-        errors.push('Manutenções por ano CPA deve ser um número positivo');
-      }
-    }
-  }
-
-  if (data.hasSHContract) {
-    if (data.horasAssistenciaAnualSH !== undefined) {
-      if (typeof data.horasAssistenciaAnualSH !== 'number' || data.horasAssistenciaAnualSH < 0) {
-        errors.push('Horas de assistência anual S&H deve ser um número positivo');
-      }
-    }
-
-    if (data.deslocacoesPorAnoSH !== undefined) {
-      if (
-        typeof data.deslocacoesPorAnoSH !== 'number' ||
-        (data.deslocacoesPorAnoSH !== -1 && data.deslocacoesPorAnoSH <= 0)
-      ) {
-        errors.push('Deslocações por ano S&H deve ser um número positivo ou -1 para ilimitado');
-      }
-    }
-
-    if (data.manutencoesPorAnoSH !== undefined) {
-      if (typeof data.manutencoesPorAnoSH !== 'number' || data.manutencoesPorAnoSH < 0) {
-        errors.push('Manutenções por ano S&H deve ser um número positivo');
       }
     }
   }

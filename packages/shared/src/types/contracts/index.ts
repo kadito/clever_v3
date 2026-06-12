@@ -9,6 +9,13 @@
 
 // Export all types
 export type {
+  PlanBaseParameters,
+  PlanScheduleInfo,
+  CPAPlanParameters,
+  SHPlanParameters,
+  CPAPlan,
+  SHPlan,
+  ContractPlanConfig,
   ContractEquipment,
   ContractData,
   Contract,
@@ -16,8 +23,6 @@ export type {
   ContractUpdateData,
   ContractDisplayData,
   ContractSearchFilters,
-  ContractPlan,
-  ContractPlanConfig,
 } from './types';
 
 // Export all validation functions

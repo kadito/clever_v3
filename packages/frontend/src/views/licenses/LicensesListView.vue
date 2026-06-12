@@ -166,7 +166,7 @@ const router = useRouter();
 // Composables
 const api = useApi<License>('licenses');
 const errorHandler = useErrorHandler();
-const { filterOptions, selectedMonth, clearFilter, filterParams } = useExpirationFilter();
+const { filterOptions, selectedMonth, clearFilter, filterParams, filterItems } = useExpirationFilter();
 
 // State
 const licenses = ref<ContentWithRelations<License['data']>[]>([]);
@@ -183,7 +183,24 @@ const clearError = () => {
 
 // Computed properties
 const displayedLicenses = computed(() => {
-  return licenses.value;
+  let items = licenses.value as unknown as import('@clever/shared').BaseContent[];
+
+  // Client-side search filtering
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    items = items.filter((item) => {
+      const data = item.data as Record<string, unknown>;
+      const clientName = (data.clientName as string) || '';
+      const softwareNames = ((data.software as Record<string, unknown>)?.name as string[]) || [];
+      return (
+        clientName.toLowerCase().includes(query) ||
+        softwareNames.some((s) => s.toLowerCase().includes(query))
+      );
+    });
+  }
+
+  // Client-side expiration date filtering
+  return filterItems(items) as typeof licenses.value;
 });
 
 // Display functions for ContentListTemplate

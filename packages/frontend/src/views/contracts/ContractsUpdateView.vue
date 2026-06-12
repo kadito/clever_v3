@@ -198,7 +198,7 @@ import DisplayToggleSwitch from '@/components/contracts/DisplayToggleSwitch.vue'
 import CPAContractSection from '@/components/contracts/CPAContractSection.vue';
 import SHContractSection from '@/components/contracts/SHContractSection.vue';
 import { contractsFormSections } from '@/config/contracts-form-sections';
-import { getPlanDetails, type ContractType } from '../../services/planSelection';
+import { getPlanDetails } from '../../services/planSelection';
 
 // Create modified form sections with readonly clientId field
 const modifiedFormSections = computed(() => {
@@ -266,13 +266,12 @@ const cleanupFunctions: (() => void)[] = [];
 
 // Plan details computed properties with memoization
 const selectedCPAPlanDetails = computed(() => {
-  if (!formData.value?.planIdCPA || !formData.value?.cpaContractType) {
+  if (!formData.value?.planIdCPA) {
     return null;
   }
 
   try {
-    const contractType = formData.value.cpaContractType as ContractType;
-    const planDetails = getPlanDetails(contractType, formData.value.planIdCPA);
+    const planDetails = getPlanDetails('CPA', formData.value.planIdCPA);
 
     return planDetails;
   } catch (error) {
@@ -302,10 +301,10 @@ const debouncedUpdateField = createDebounced((field: string, value: any) => {
 }, 300);
 
 // Optimized plan loading functions with proper error handling and caching
-const loadCPAPlanDetails = async (planId: string, contractType: string) => {
-  if (!planId || !contractType) return null;
+const loadCPAPlanDetails = async (planId: string) => {
+  if (!planId) return null;
 
-  const cacheKey = `${contractType}-${planId}`;
+  const cacheKey = `CPA-${planId}`;
 
   // Return cached result if available
   if (planDetailsCache.has(cacheKey)) {
@@ -318,7 +317,7 @@ const loadCPAPlanDetails = async (planId: string, contractType: string) => {
     // Simulate async loading with shorter delay for better UX
     await new Promise(resolve => setTimeout(resolve, 200));
 
-    const planDetails = getPlanDetails(contractType as ContractType, planId);
+    const planDetails = getPlanDetails('CPA', planId);
 
     if (planDetails) {
       planDetailsCache.set(cacheKey, markRaw(planDetails));
@@ -418,13 +417,12 @@ const handleSHDisplayToggle = (active: boolean) => {
 const clearCPAValidationErrors = () => {
   // Clear CPA-specific errors from the error state if they exist
   const fieldsToClean = [
-    'cpaContractType',
     'planIdCPA',
-    'distanceCPA',
     'modalidadePagamentoCPA',
     'inicioContratoCPA',
     'fimContratoCPA',
     'cpaEquipments',
+    'precoCPA',
   ];
 
   fieldsToClean.forEach(field => {
@@ -443,6 +441,7 @@ const clearSHValidationErrors = () => {
     'inicioContratoSH',
     'fimContratoSH',
     'shEquipments',
+    'precoSH',
   ];
 
   fieldsToClean.forEach(field => {
@@ -458,14 +457,8 @@ const initializeCPAData = () => {
   if (!formData.value) return;
 
   // Initialize CPA-specific fields with default values if they don't exist
-  if (!formData.value.cpaContractType) {
-    updateFieldValue('cpaContractType', '');
-  }
   if (!formData.value.planIdCPA) {
     updateFieldValue('planIdCPA', '');
-  }
-  if (!formData.value.distanceCPA) {
-    updateFieldValue('distanceCPA', '');
   }
   if (!formData.value.modalidadePagamentoCPA) {
     updateFieldValue('modalidadePagamentoCPA', '');
@@ -479,6 +472,10 @@ const initializeCPAData = () => {
   if (formData.value.hasPOSPackage === undefined) {
     updateFieldValue('hasPOSPackage', false);
   }
+  // precoCPA is undefined by default (only set in manual mode with 2+ equipments)
+  if (formData.value.precoCPA === undefined) {
+    updateFieldValue('precoCPA', undefined);
+  }
 
   // Initialize equipment array if empty
   if (cpaEquipments.value.length === 0) {
@@ -486,7 +483,6 @@ const initializeCPAData = () => {
       id: crypto.randomUUID(),
       modelo: '',
       numeroSerie: '',
-      desconto: 0, // First equipment has 0% discount
       observacoes: '',
     };
     cpaEquipments.value.push(newEquipment);
@@ -512,6 +508,10 @@ const initializeSHData = () => {
   }
   if (!formData.value.fimContratoSH) {
     updateFieldValue('fimContratoSH', '');
+  }
+  // precoSH is undefined by default (only set in manual mode with 2+ equipments)
+  if (formData.value.precoSH === undefined) {
+    updateFieldValue('precoSH', undefined);
   }
 
   // Initialize S&H equipment array if empty
@@ -554,43 +554,19 @@ const getClientErrorMessage = (clientRelation: any): string => {
 const handleCPAPlanSelection = async (planId: string) => {
   updateFieldValue('planIdCPA', planId);
 
-  if (planId && formData.value?.cpaContractType) {
-    await loadCPAPlanDetails(planId, formData.value.cpaContractType);
+  if (planId) {
+    await loadCPAPlanDetails(planId);
 
-    // Auto-populate service details from plan data
-    const planDetails = getPlanDetails(formData.value.cpaContractType as ContractType, planId);
+    // Auto-populate service details from new plan data structure
+    const planDetails = getPlanDetails('CPA', planId);
 
-    if (planDetails) {
-      // Set maintenance per year (CPA plans have this field)
-      if (planDetails.maintenancePerYear !== undefined) {
-        updateFieldValue('manutencoesPorAnoCPA', planDetails.maintenancePerYear);
-      }
-
-      // Set displacements per year (try to extract number from callouts if it's a number)
-      if (planDetails.callouts !== undefined) {
-        if (typeof planDetails.callouts === 'number') {
-          updateFieldValue('deslocacoesPorAnoCPA', planDetails.callouts);
-        } else if (typeof planDetails.callouts === 'string') {
-          // Try to extract number from string like "1 deslocação" or "2 deslocações"
-          const match = planDetails.callouts.match(/(\d+)/);
-          if (match) {
-            const value = parseInt(match[1]);
-            updateFieldValue('deslocacoesPorAnoCPA', value);
-          } else {
-            // If no number found, check if it's unlimited (contains "sem limite" or "unlimited")
-            if (
-              planDetails.callouts.toLowerCase().includes('sem limite') ||
-              planDetails.callouts.toLowerCase().includes('unlimited')
-            ) {
-              updateFieldValue('deslocacoesPorAnoCPA', -1); // -1 represents unlimited
-            } else {
-              updateFieldValue('deslocacoesPorAnoCPA', 0);
-            }
-          }
-        }
-      }
-
-      // CPA plans don't typically have hours, so set to 0
+    if (planDetails && 'parameters' in planDetails) {
+      const cpaPlan = planDetails as import('@clever/shared').CPAPlan;
+      // Set maintenance per year from plan parameters
+      updateFieldValue('manutencoesPorAnoCPA', cpaPlan.parameters.manutencoesPorAno);
+      // Set displacements per year from plan parameters
+      updateFieldValue('deslocacoesPorAnoCPA', cpaPlan.parameters.deslocacoesPorAno);
+      // CPA plans don't have hours
       updateFieldValue('horasAssistenciaAnualCPA', 0);
     }
   }
@@ -602,40 +578,16 @@ const handleSHPlanSelection = async (planId: string) => {
   if (planId) {
     await loadSHPlanDetails(planId);
 
-    // Auto-populate service details from plan data
+    // Auto-populate service details from new plan data structure
     const planDetails = getPlanDetails('S&H', planId);
 
-    if (planDetails) {
-      // Set hours per year (S&H plans have this field)
-      if (planDetails.hoursPerYear !== undefined) {
-        updateFieldValue('horasAssistenciaAnualSH', planDetails.hoursPerYear);
-      }
-
-      // Set displacements per year (S&H plans have displacementsIncluded)
-      if (planDetails.displacementsIncluded !== undefined) {
-        if (typeof planDetails.displacementsIncluded === 'number') {
-          updateFieldValue('deslocacoesPorAnoSH', planDetails.displacementsIncluded);
-        } else if (typeof planDetails.displacementsIncluded === 'string') {
-          // Try to extract number from string
-          const match = planDetails.displacementsIncluded.match(/(\d+)/);
-          if (match) {
-            const value = parseInt(match[1]);
-            updateFieldValue('deslocacoesPorAnoSH', value);
-          } else {
-            // If no number found, check if it's unlimited (contains "sem limite" or "unlimited")
-            if (
-              planDetails.displacementsIncluded.toLowerCase().includes('sem limite') ||
-              planDetails.displacementsIncluded.toLowerCase().includes('unlimited')
-            ) {
-              updateFieldValue('deslocacoesPorAnoSH', -1); // -1 represents unlimited
-            } else {
-              updateFieldValue('deslocacoesPorAnoSH', 0);
-            }
-          }
-        }
-      }
-
-      // S&H plans don't typically have maintenance, so set to 0
+    if (planDetails && 'parameters' in planDetails) {
+      const shPlan = planDetails as import('@clever/shared').SHPlan;
+      // Set hours per year from plan parameters
+      updateFieldValue('horasAssistenciaAnualSH', shPlan.parameters.horasPorAno);
+      // Set displacements per year from plan parameters
+      updateFieldValue('deslocacoesPorAnoSH', shPlan.parameters.deslocacoesPorAno);
+      // S&H plans don't have maintenance
       updateFieldValue('manutencoesPorAnoSH', 0);
     }
   }
@@ -691,23 +643,12 @@ const handleSHEquipmentUpdate = (data: {
   }
 };
 
-// Watch for CPA contract type changes to reload plan details with debouncing
-const stopCPAContractTypeWatcher = watch(
-  () => formData.value?.cpaContractType,
-  async newContractType => {
-    if (newContractType && formData.value?.planIdCPA) {
-      await loadCPAPlanDetails(formData.value.planIdCPA, newContractType);
-    }
-  }
-);
-cleanupFunctions.push(stopCPAContractTypeWatcher);
-
 // Watch for CPA plan changes to clear POS package if not applicable
 const stopCPAPlanWatcher = watch(
-  [() => formData.value?.cpaContractType, () => formData.value?.planIdCPA],
-  ([contractType, planId]) => {
-    // Clear POS package if not CPA_1500 PREMIUM
-    if (contractType !== 'CPA_1500' || planId !== 'cpa_1500_premium') {
+  () => formData.value?.planIdCPA,
+  (planId) => {
+    // Clear POS package if not cpa_premium plan
+    if (planId !== 'cpa_premium') {
       if (formData.value?.hasPOSPackage) {
         updateFieldValue('hasPOSPackage', false);
       }
@@ -752,7 +693,6 @@ const stopCPAInitWatcher = watch(
         id: crypto.randomUUID(),
         modelo: '',
         numeroSerie: '',
-        desconto: 0, // First equipment has 0% discount
         observacoes: '',
       };
       cpaEquipments.value.push(newEquipment);
@@ -882,17 +822,8 @@ const validateContractUpdate = (data: Record<string, any>): Record<string, strin
 
     // CPA-specific validation (if CPA is configured)
     if (hasCPA) {
-      if (!data.cpaContractType) {
-        errors.cpaContractType = 'Por favor, selecione o tipo de contrato CPA';
-      }
-
       if (!data.planIdCPA) {
         errors.planIdCPA = 'Por favor, selecione um plano CPA';
-      }
-
-      // Distance is only required for CPA (2023), not CPA_1500
-      if (data.cpaContractType === 'CPA' && !data.distanceCPA) {
-        errors.distanceCPA = 'Por favor, selecione a distância para contratos CPA (2023)';
       }
 
       if (!data.modalidadePagamentoCPA) {
@@ -910,24 +841,14 @@ const validateContractUpdate = (data: Record<string, any>): Record<string, strin
             errors[`cpaEquipment${index}Model`] =
               `Por favor, introduza o modelo do equipamento ${index + 1}`;
           }
-
-          // First equipment should have 0% discount
-          if (index === 0 && equipment.desconto !== 0) {
-            errors[`cpaEquipment${index}Discount`] =
-              'O primeiro equipamento não deve ter desconto aplicado';
-          }
-
-          // Discount validation for additional equipment
-          if (
-            index > 0 &&
-            (typeof equipment.desconto !== 'number' ||
-              equipment.desconto < 0 ||
-              equipment.desconto > 100)
-          ) {
-            errors[`cpaEquipment${index}Discount`] =
-              `O desconto do equipamento ${index + 1} deve estar entre 0 e 100%`;
-          }
         });
+
+        // Multi-equipment: manual price required
+        if (cpaEquipmentsData.length >= 2) {
+          if (!data.precoCPA || data.precoCPA <= 0) {
+            errors.precoCPA = 'Por favor, introduza o preço do contrato CPA';
+          }
+        }
       }
 
       // Validate contract dates
@@ -984,6 +905,13 @@ const validateContractUpdate = (data: Record<string, any>): Record<string, strin
               `Por favor, introduza o modelo do equipamento S&H ${index + 1}`;
           }
         });
+
+        // Multi-equipment: manual price required
+        if (shEquipmentsData.length >= 2) {
+          if (!data.precoSH || data.precoSH <= 0) {
+            errors.precoSH = 'Por favor, introduza o preço do contrato S&H';
+          }
+        }
       }
 
       // Validate contract dates
@@ -1043,12 +971,11 @@ const handleUpdate = async (data: Record<string, any>) => {
       clientId: contract.value?.data?.clientId || currentFormData.clientId || data.clientId,
       hasCPAContract: currentFormData.hasCPAContract || data.hasCPAContract || false,
       hasSHContract: currentFormData.hasSHContract || data.hasSHContract || false,
-      cpaContractType: currentFormData.cpaContractType || data.cpaContractType || '',
       planIdCPA: currentFormData.planIdCPA || data.planIdCPA || '',
-      distanceCPA: currentFormData.distanceCPA || data.distanceCPA || '',
       modalidadePagamentoCPA:
         currentFormData.modalidadePagamentoCPA || data.modalidadePagamentoCPA || '',
       hasPOSPackage: currentFormData.hasPOSPackage || data.hasPOSPackage || false,
+      precoCPA: currentFormData.precoCPA ?? data.precoCPA ?? undefined,
       inicioContratoCPA: currentFormData.inicioContratoCPA || data.inicioContratoCPA || '',
       fimContratoCPA: currentFormData.fimContratoCPA || data.fimContratoCPA || '',
       // Use the values from formData which should have been set by plan selection handlers
@@ -1060,6 +987,7 @@ const handleUpdate = async (data: Record<string, any>) => {
       distanceSH: currentFormData.distanceSH || data.distanceSH || '',
       modalidadePagamentoSH:
         currentFormData.modalidadePagamentoSH || data.modalidadePagamentoSH || '',
+      precoSH: currentFormData.precoSH ?? data.precoSH ?? undefined,
       inicioContratoSH: currentFormData.inicioContratoSH || data.inicioContratoSH || '',
       fimContratoSH: currentFormData.fimContratoSH || data.fimContratoSH || '',
       // Use the values from formData which should have been set by plan selection handlers
@@ -1126,26 +1054,14 @@ const loadContract = async () => {
       // Set up initial data for the form
       const data = contract.value.data;
 
-      // Infer cpaContractType from planIdCPA if missing (handles migration data)
-      let inferredCpaContractType = data.cpaContractType || '';
-      if (!inferredCpaContractType && data.planIdCPA) {
-        if (data.planIdCPA.startsWith('cpa_1500_')) {
-          inferredCpaContractType = 'CPA_1500';
-        } else if (data.planIdCPA.startsWith('cpa_')) {
-          inferredCpaContractType = 'CPA';
-        }
-        console.log('Inferred cpaContractType from planIdCPA:', JSON.stringify({ planIdCPA: data.planIdCPA, inferred: inferredCpaContractType }, null, 2));
-      }
-
       const contractData = {
         clientId: data.clientId || '',
         hasCPAContract: data.hasCPAContract || false,
         hasSHContract: data.hasSHContract || false,
-        cpaContractType: inferredCpaContractType,
         planIdCPA: data.planIdCPA || '',
-        distanceCPA: data.distanceCPA || '',
         modalidadePagamentoCPA: data.modalidadePagamentoCPA || '',
         hasPOSPackage: data.hasPOSPackage || false,
+        precoCPA: data.precoCPA ?? undefined,
         inicioContratoCPA: data.inicioContratoCPA || '',
         fimContratoCPA: data.fimContratoCPA || '',
         horasAssistenciaAnualCPA: data.horasAssistenciaAnualCPA || 0,
@@ -1154,6 +1070,7 @@ const loadContract = async () => {
         planIdSH: data.planIdSH || '',
         distanceSH: data.distanceSH || '',
         modalidadePagamentoSH: data.modalidadePagamentoSH || '',
+        precoSH: data.precoSH ?? undefined,
         inicioContratoSH: data.inicioContratoSH || '',
         fimContratoSH: data.fimContratoSH || '',
         horasAssistenciaAnualSH: data.horasAssistenciaAnualSH || 0,

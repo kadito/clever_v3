@@ -4,19 +4,12 @@
       <h4>EQUIPAMENTOS CPA</h4>
     </div>
 
-    <div class="equipment-info-callout">
-      <span class="info-icon">ℹ️</span>
-      <span>O desconto aplica-se apenas aos equipamentos adicionais (2º, 3º, etc.). O primeiro
-        equipamento não tem desconto.</span>
-    </div>
-
     <div class="equipment-list">
       <EquipmentCard
         v-for="(equipment, index) in equipments"
         :key="equipment.id"
         :equipment="equipment"
         :equipment-number="index + 1"
-        :show-discount="index > 0"
         @update="updateEquipment(index, $event)"
         @remove="removeEquipment(index)"
       />
@@ -33,7 +26,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import type { ContractEquipment } from '@clever/shared';
 import EquipmentCard from './EquipmentCard.vue';
 
@@ -56,7 +48,6 @@ const addEquipment = () => {
     id: crypto.randomUUID(),
     modelo: '',
     numeroSerie: '',
-    desconto: props.equipments.length === 0 ? 0 : 10, // First equipment has 0% discount
     observacoes: '',
   };
 
@@ -93,18 +84,6 @@ const removeEquipment = (index: number) => {
   @apply bg-green-600;
 }
 
-.equipment-info-callout {
-  @apply flex items-start gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg mb-4;
-}
-
-.info-icon {
-  @apply text-blue-600 text-base;
-}
-
-.equipment-info-callout span:last-child {
-  @apply text-sm text-blue-700 leading-relaxed;
-}
-
 .equipment-list {
   @apply space-y-4;
 }
@@ -113,13 +92,6 @@ const removeEquipment = (index: number) => {
 @media (hover: none) {
   .add-equipment-btn:active {
     @apply bg-green-700;
-  }
-}
-
-/* Mobile responsiveness improvements */
-@media (max-width: 640px) {
-  .equipment-info-callout {
-    @apply p-2;
   }
 }
 </style>

@@ -1,40 +1,142 @@
 import type { BaseContent } from '../base';
 
+// ─── Plan Data Model ───────────────────────────────────────────────────────────
+
+/**
+ * Base plan parameter fields — shared between CPA and S&H.
+ * These are the values that auto-populate the contract form for 1 equipment,
+ * and that the user must manually specify for 2+ equipments.
+ */
+export interface PlanBaseParameters {
+  manutencoesPorAno: number;
+  deslocacoesPorAno: number; // -1 = unlimited
+}
+
+/**
+ * Work schedule info — READ-ONLY display, never overridable by user.
+ * Derived from plan definition, shown as informational text.
+ */
+export interface PlanScheduleInfo {
+  deslocacao: string;
+  remoteSupport: string;
+}
+
+/**
+ * CPA-specific plan parameters.
+ * CPA doesn't have "horas por ano".
+ */
+export interface CPAPlanParameters extends PlanBaseParameters {
+  // No additional fields
+}
+
+/**
+ * S&H-specific plan parameters.
+ */
+export interface SHPlanParameters extends PlanBaseParameters {
+  horasPorAno: number;
+}
+
+/**
+ * CPA Plan definition — flat pricing (no distance zones).
+ */
+export interface CPAPlan {
+  id: string;
+  name: string;
+  description: string;
+  parameters: CPAPlanParameters;
+  schedule: PlanScheduleInfo;
+  weekendSupport: boolean;
+  posPackage?: {
+    description: string;
+    pricePerYear: number;
+  };
+  prices: {
+    mensal: number;
+    semestral: number;
+    anual: number;
+  };
+}
+
+/**
+ * S&H Plan definition — distance-based pricing.
+ */
+export interface SHPlan {
+  id: string;
+  name: string;
+  description: string;
+  parameters: SHPlanParameters;
+  schedule: PlanScheduleInfo;
+  weekendSupport: boolean;
+  prices: {
+    under180km: {
+      mensal: number;
+      anual: number;
+    };
+    over180km: {
+      mensal: number;
+      anual: number;
+    };
+  };
+}
+
+/**
+ * Top-level plan config — replaces old ContractPlanConfig.
+ * CPA_1500 key is REMOVED (unified into CPA).
+ */
+export interface ContractPlanConfig {
+  CPA: {
+    name: string;
+    description: string;
+    plans: CPAPlan[];
+  };
+  'S&H': {
+    name: string;
+    description: string;
+    plans: SHPlan[];
+  };
+}
+
+// ─── Contract Equipment ────────────────────────────────────────────────────────
+
 /**
  * Contract Equipment Interface
- * Represents individual equipment items for CPA contracts
+ * Represents individual equipment items for CPA contracts.
+ * Note: `desconto` field has been removed — pricing is now plan-based or manual.
  */
 export interface ContractEquipment {
   id: string;
   modelo: string;
   numeroSerie: string;
-  desconto: number; // Discount percentage (0 for first equipment, can be > 0 for additional)
   observacoes: string;
 }
 
+// ─── Contract Data ─────────────────────────────────────────────────────────────
+
 /**
  * Contract Data Interface
- * Based on analysis of old_src/views/contratos/ContratoDetail.vue and ContratoForm.vue
+ * Fields removed: cpaContractType, distanceCPA (CPA is now unified with flat pricing).
+ * Fields added: precoCPA, precoSH (manual price for 2+ equipments).
  */
 export interface ContractData {
   // Client relationship
   clientId: string;
-  clienteName?: string; // Optional - client data should be resolved through relations
+  clienteName?: string;
 
   // CPA Contract Information
   hasCPAContract: boolean;
-  cpaContractType: 'CPA' | 'CPA_1500' | ''; // CPA (2023) or CPA_1500
   planIdCPA: string;
-  distanceCPA: 'under180km' | 'over180km' | ''; // Required for CPA (2023), not for CPA_1500
-  modalidadePagamentoCPA: 'MENSAL' | 'TRIMESTRAL' | 'SEMESTRAL' | 'ANUAL' | '';
-  hasPOSPackage: boolean; // Optional POS assistance package for CPA_1500 PREMIUM
+  modalidadePagamentoCPA: '' | 'MENSAL' | 'SEMESTRAL' | 'ANUAL';
+  hasPOSPackage: boolean;
+
+  // CPA Price (manual — set when 2+ equipments, undefined in auto mode)
+  precoCPA?: number;
 
   // CPA Equipment (array of equipments)
   cpaEquipments: ContractEquipment[];
 
   // CPA Contract Dates
-  inicioContratoCPA: string; // ISO date string
-  fimContratoCPA: string; // ISO date string
+  inicioContratoCPA: string;
+  fimContratoCPA: string;
 
   // CPA Service Details
   horasAssistenciaAnualCPA: number;
@@ -45,7 +147,10 @@ export interface ContractData {
   hasSHContract: boolean;
   planIdSH: string;
   distanceSH: 'under180km' | 'over180km' | '';
-  modalidadePagamentoSH: 'MENSAL' | 'TRIMESTRAL' | 'SEMESTRAL' | 'ANUAL' | '';
+  modalidadePagamentoSH: '' | 'MENSAL' | 'ANUAL';
+
+  // S&H Price (manual — set when 2+ equipments, undefined in auto mode)
+  precoSH?: number;
 
   // S&H Equipment (array of equipments)
   shEquipments: Array<{
@@ -57,8 +162,8 @@ export interface ContractData {
   }>;
 
   // S&H Contract Dates
-  inicioContratoSH: string; // ISO date string
-  fimContratoSH: string; // ISO date string
+  inicioContratoSH: string;
+  fimContratoSH: string;
 
   // S&H Service Details
   horasAssistenciaAnualSH: number;
@@ -76,6 +181,8 @@ export interface ContractData {
     | '';
 }
 
+// ─── Contract Entity ───────────────────────────────────────────────────────────
+
 /**
  * Contract Interface
  * Extends BaseContent with contract-specific data
@@ -85,12 +192,13 @@ export interface Contract extends BaseContent {
   data: ContractData;
 }
 
+// ─── Contract Creation / Update ────────────────────────────────────────────────
+
 /**
  * Contract Creation Data
  * Data required to create a new contract
  */
 export interface ContractCreationData extends Omit<ContractData, 'clienteName'> {
-  // clienteName is optional for creation as it can be derived from clientId
   clienteName?: string;
 }
 
@@ -99,9 +207,10 @@ export interface ContractCreationData extends Omit<ContractData, 'clienteName'> 
  * Data that can be updated in an existing contract
  */
 export interface ContractUpdateData extends Partial<ContractData> {
-  // clientId cannot be changed after creation
   clientId?: never;
 }
+
+// ─── Display & Search ──────────────────────────────────────────────────────────
 
 /**
  * Contract Display Data
@@ -109,12 +218,12 @@ export interface ContractUpdateData extends Partial<ContractData> {
  */
 export interface ContractDisplayData {
   uuid: string;
-  clienteName?: string; // Optional - should be resolved through relations
-  contractTypes: string[]; // ['CPA', 'S&H'] based on active contracts
-  planNames: string[]; // Plan names for display
-  paymentMethods: string[]; // Payment methods for both contract types
-  startDate: string; // Earliest start date
-  endDate: string; // Latest end date
+  clienteName?: string;
+  contractTypes: string[];
+  planNames: string[];
+  paymentMethods: string[];
+  startDate: string;
+  endDate: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -133,68 +242,4 @@ export interface ContractSearchFilters {
   endDateFrom?: string;
   endDateTo?: string;
   hasActiveContract?: boolean;
-}
-
-/**
- * Contract Plan Configuration
- * Configuration for contract plans (from contract-plans.json)
- */
-export interface ContractPlan {
-  id: string;
-  name: string;
-  description: string;
-  maintenancePerYear?: number;
-  hoursPerYear?: number;
-  callouts?: string | number; // Can be either string or number based on plan type
-  displacementsIncluded?: string | number;
-  remoteSupport?: string;
-  weekendSupport?: boolean;
-  softwareUpdates?: boolean;
-  prioritySupport?: boolean;
-  dedicatedManager?: boolean;
-  additionalPackage?: {
-    description: string;
-    price: number;
-  };
-  prices: {
-    under180km?: {
-      monthly: number;
-      quarterly?: number;
-      semiannual?: number;
-      annual: number;
-    };
-    over180km?: {
-      monthly: number;
-      quarterly?: number;
-      semiannual?: number;
-      annual: number;
-    };
-    // For CPA_1500 (no distance-based pricing)
-    monthly?: number;
-    quarterly?: number;
-    semiannual?: number;
-    annual?: number;
-  };
-}
-
-/**
- * Contract Plan Configuration Structure
- * Structure of the contract-plans.json configuration
- */
-export interface ContractPlanConfig {
-  CPA: {
-    name: string;
-    description: string;
-    plans: ContractPlan[];
-  };
-  CPA_1500: {
-    name: string;
-    description: string;
-    plans: ContractPlan[];
-  };
-  'S&H': {
-    name: string;
-    description: string;
-    plans: ContractPlan[];
-  };
 }

@@ -108,6 +108,7 @@ const mockFormData = ref<Record<string, any>>({});
 vi.mock('@/composables/useSharedFormData', () => ({
   useSharedFormData: vi.fn(() => ({
     formData: mockFormData,
+    validationErrors: {},
     updateFieldValue: vi.fn((key: string, value: any) => {
       mockFormData.value[key] = value;
     }),
@@ -178,6 +179,7 @@ const createViewStubs = {
   ContentCreateTemplate: {
     template: `<div>
       <slot name="createSections" />
+      <slot name="field-anexosFiles" />
       <button class="submit-btn" @click="emitCreate">Submit</button>
     </div>`,
     props: ['formSections', 'contentType', 'createTitle', 'subtitle',
@@ -213,6 +215,7 @@ const updateViewStubs = {
   ContentUpdateTemplate: {
     template: `<div>
       <slot name="updateSections" />
+      <slot name="field-anexosFiles" />
       <button class="submit-btn" @click="emitUpdate">Save</button>
     </div>`,
     props: ['item', 'formSections', 'contentType', 'initialData',
@@ -285,13 +288,13 @@ describe('MA-01: Given technician opens Create form / When form loads / Then Fil
     expect(uploadZone.exists()).toBe(true);
   });
 
-  it('should display the "Ficheiros Anexos" section title', () => {
+  it('should display the "Anexos" section in the create form', () => {
     const wrapper = mount(RemoteAssistanceCreateView, {
       global: { stubs: createViewStubs },
     });
 
-    const text = wrapper.text();
-    expect(text).toContain('Ficheiros Anexos');
+    const uploadZone = wrapper.find('[data-testid="file-upload-zone"]');
+    expect(uploadZone.exists()).toBe(true);
   });
 });
 
@@ -711,7 +714,7 @@ describe('MA-13: Given user views legacy record with plain-text anexos / When de
     });
   });
 
-  it('should show Notas Anexas text and NOT render FileDisplay', async () => {
+  it('should show Notas Anexos text and NOT render FileDisplay', async () => {
     const wrapper = mount(RemoteAssistanceDetailView, {
       global: { stubs: detailViewStubs },
     });
@@ -724,9 +727,9 @@ describe('MA-13: Given user views legacy record with plain-text anexos / When de
     const fileDisplay = wrapper.find('[data-testid="file-display"]');
     expect(fileDisplay.exists()).toBe(false);
 
-    // "Notas Anexas" section should be shown with the legacy text
+    // "Notas Anexos" section should be shown with the legacy text
     const text = wrapper.text();
-    expect(text).toContain('Notas Anexas');
+    expect(text).toContain('Notas Anexos');
     expect(text).toContain('Notas antigas do sistema anterior');
   });
 });

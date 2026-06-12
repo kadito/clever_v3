@@ -34,22 +34,6 @@
           @input="updateEquipment"
         >
       </div>
-
-      <div
-        v-if="showDiscount"
-        class="form-field"
-      >
-        <label class="form-label">DESCONTO (%)</label>
-        <input
-          v-model.number="localEquipment.desconto"
-          type="number"
-          class="form-input"
-          min="0"
-          max="100"
-          placeholder="0"
-          @input="updateEquipment"
-        >
-      </div>
     </div>
 
     <div class="form-field">
@@ -72,7 +56,6 @@ import type { ContractEquipment } from '@clever/shared';
 interface Props {
   equipment: ContractEquipment;
   equipmentNumber: number;
-  showDiscount: boolean;
 }
 
 interface Emits {

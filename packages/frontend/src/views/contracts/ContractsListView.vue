@@ -169,7 +169,7 @@ const router = useRouter();
 // Composables
 const api = useApi<Contract>('contracts');
 const errorHandler = useErrorHandler();
-const { filterOptions, selectedMonth, clearFilter, filterParams } = useExpirationFilter();
+const { filterOptions, selectedMonth, clearFilter, filterParams, filterItems } = useExpirationFilter();
 
 // State
 const contracts = ref<ContentWithRelations<Contract['data']>[]>([]);
@@ -186,7 +186,20 @@ const clearError = () => {
 
 // Computed properties
 const displayedContracts = computed(() => {
-  return contracts.value;
+  let items = contracts.value as unknown as import('@clever/shared').BaseContent[];
+
+  // Client-side search filtering
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    items = items.filter((item) => {
+      const data = item.data as Record<string, unknown>;
+      const clientName = (data.clienteName as string) || '';
+      return clientName.toLowerCase().includes(query);
+    });
+  }
+
+  // Client-side expiration date filtering
+  return filterItems(items) as typeof contracts.value;
 });
 
 // Display functions for ContentListTemplate

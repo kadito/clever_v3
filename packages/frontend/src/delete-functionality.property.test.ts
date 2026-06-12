@@ -173,15 +173,18 @@ describe('Delete Functionality Property-Based Tests', () => {
           const hasPortugueseTitle =
             textConfig.title.includes('Confirmar') || textConfig.title.includes('Eliminar');
           const hasPortugueseMessage =
-            textConfig.message.includes('certeza') || textConfig.message.includes('eliminar');
+            textConfig.message.includes('certeza') ||
+            textConfig.message.includes('eliminar') ||
+            textConfig.message.includes('eliminação') ||
+            textConfig.message.includes('apagar');
 
-          // Ensure no English terms are present
+          // Ensure no English terms are present (check exact English words, not substrings)
           const hasNoEnglishTerms =
-            !textConfig.deleteButton.includes('Delete') &&
-            !textConfig.confirmButton.includes('Confirm') &&
-            !textConfig.cancelButton.includes('Cancel') &&
-            !textConfig.title.includes('Delete') &&
-            !textConfig.message.includes('delete');
+            !/\bDelete\b/.test(textConfig.deleteButton) &&
+            !/\bConfirm\b/.test(textConfig.confirmButton) &&
+            !/\bCancel\b/.test(textConfig.cancelButton) &&
+            !/\bDelete\b/.test(textConfig.title) &&
+            !/\bdelete\b/.test(textConfig.message);
 
           expect(hasPortugueseDeleteButton).toBeTruthy();
           expect(hasPortugueseConfirmButton).toBeTruthy();
@@ -288,37 +291,31 @@ describe('Delete Functionality Property-Based Tests', () => {
    * **Validates: Requirements 2.5, 3.1, 3.2**
    */
   describe('Property 6: Delete operation execution', () => {
-    it('should execute delete operations with proper API calls and loading states', () => {
-      fc.assert(
-        fc.property(baseContentArb, content => {
+    it('should execute delete operations with proper API calls and loading states', async () => {
+      await fc.assert(
+        fc.asyncProperty(baseContentArb, async content => {
           const mockRemove = vi.fn().mockResolvedValue(true);
 
           // Simulate confirm operation
-          const confirmOperation = async () => {
-            const isLoading = true;
-            const result = await mockRemove(content.uuid);
-            return {
-              confirmed: true,
-              apiCalled: mockRemove.mock.calls.length > 0,
-              loadingState: isLoading,
-              result,
-            };
+          const isLoading = true;
+          const result = await mockRemove(content.uuid);
+          const confirmResult = {
+            confirmed: true,
+            apiCalled: mockRemove.mock.calls.length > 0,
+            loadingState: isLoading,
+            result,
           };
 
           // Property assertion: Confirm should execute properly
-          return confirmOperation().then(result => {
-            const wasConfirmed = result.confirmed === true;
-            const apiWasCalled = result.apiCalled === true;
-            const hadLoadingState = result.loadingState === true;
-            const succeeded = result.result === true;
+          const wasConfirmed = confirmResult.confirmed === true;
+          const apiWasCalled = confirmResult.apiCalled === true;
+          const hadLoadingState = confirmResult.loadingState === true;
+          const succeeded = confirmResult.result === true;
 
-            expect(wasConfirmed).toBe(true);
-            expect(apiWasCalled).toBe(true);
-            expect(hadLoadingState).toBe(true);
-            expect(succeeded).toBe(true);
-
-            return wasConfirmed && apiWasCalled && hadLoadingState && succeeded;
-          });
+          expect(wasConfirmed).toBe(true);
+          expect(apiWasCalled).toBe(true);
+          expect(hadLoadingState).toBe(true);
+          expect(succeeded).toBe(true);
         }),
         { numRuns: 100, verbose: false }
       );
@@ -465,9 +462,9 @@ describe('Delete Functionality Property-Based Tests', () => {
    * **Validates: Requirements 8.3**
    */
   describe('Property 10: Double-deletion prevention', () => {
-    it('should prevent double-deletion through loading states and disabled buttons', () => {
-      fc.assert(
-        fc.property(baseContentArb, content => {
+    it('should prevent double-deletion through loading states and disabled buttons', async () => {
+      await fc.assert(
+        fc.asyncProperty(baseContentArb, async content => {
           // Simulate loading state management
           let isLoading = false;
           const mockRemove = vi.fn().mockImplementation(async () => {
@@ -484,26 +481,23 @@ describe('Delete Functionality Property-Based Tests', () => {
           const firstCall = mockRemove(content.uuid);
           const secondCall = mockRemove(content.uuid); // Should be prevented
 
-          return Promise.all([firstCall, secondCall]).then(([first, second]) => {
-            const firstSucceeded = first === true;
-            const secondPrevented = second === false;
-            const onlyOneCallSucceeded = firstSucceeded && secondPrevented;
+          const [first, second] = await Promise.all([firstCall, secondCall]);
+          const firstSucceeded = first === true;
+          const secondPrevented = second === false;
+          const onlyOneCallSucceeded = firstSucceeded && secondPrevented;
 
-            // Button state simulation
-            const buttonState = {
-              initiallyEnabled: !isLoading,
-              disabledDuringLoading: isLoading,
-              hasLoadingIndicator: isLoading,
-            };
+          // Button state simulation
+          const buttonState = {
+            initiallyEnabled: !isLoading,
+            disabledDuringLoading: isLoading,
+            hasLoadingIndicator: isLoading,
+          };
 
-            const preventsDoubleClick =
-              !buttonState.disabledDuringLoading || buttonState.hasLoadingIndicator;
+          const preventsDoubleClick =
+            !buttonState.disabledDuringLoading || buttonState.hasLoadingIndicator;
 
-            expect(onlyOneCallSucceeded).toBe(true);
-            expect(preventsDoubleClick).toBe(true);
-
-            return onlyOneCallSucceeded && preventsDoubleClick;
-          });
+          expect(onlyOneCallSucceeded).toBe(true);
+          expect(preventsDoubleClick).toBe(true);
         }),
         { numRuns: 100, verbose: false }
       );

@@ -1,6 +1,6 @@
 <template>
   <div class="sh-contract-section">
-    <!-- Two-column layout for S&H fields -->
+    <!-- 1. PLANO — Plan selector + distance -->
     <div class="contract-config-grid-sh">
       <div class="config-field">
         <label class="config-label required">PLANO S&H</label>
@@ -13,23 +13,12 @@
           <option value="">
             Selecione o plano...
           </option>
-          <option value="sh_simple">
-            SIMPLE
-          </option>
-          <option value="sh_brass">
-            BRASS
-          </option>
-          <option value="sh_silver">
-            SILVER
-          </option>
-          <option value="sh_gold">
-            GOLD
-          </option>
-          <option value="sh_diamond">
-            DIAMOND
-          </option>
-          <option value="sh_platinum">
-            PLATINUM
+          <option
+            v-for="planOption in availablePlanOptions"
+            :key="planOption.value"
+            :value="planOption.value"
+          >
+            {{ planOption.label }}
           </option>
         </select>
       </div>
@@ -57,7 +46,28 @@
       </div>
     </div>
 
-    <!-- Equipment Management -->
+    <!-- 2. PLANO INFORMATION — Plan details and pricing -->
+    <div
+      v-if="props.isLoadingPlan"
+      class="plan-loading-state"
+    >
+      <div class="loading-spinner">
+        <div class="spinner" />
+        <span class="loading-text">A carregar detalhes do plano...</span>
+      </div>
+    </div>
+
+    <DynamicPlanDetails
+      v-if="shouldShowPlanDetails"
+      data-testid="dynamic-plan-details"
+      :plan-details="selectedPlanDetails"
+      :selected-payment="formData?.modalidadePagamentoSH || ''"
+      :distance="formData?.distanceSH || ''"
+      :contract-type="'S&H'"
+      @payment-selected="$emit('update-field', 'modalidadePagamentoSH', $event)"
+    />
+
+    <!-- 3. EQUIPMENTS -->
     <div class="equipment-section">
       <div class="equipment-header">
         <h4>EQUIPAMENTOS S&H</h4>
@@ -89,55 +99,51 @@
       </button>
     </div>
 
-    <!-- Contract Dates -->
+    <!-- 4. MANUAL INPUTS (visible only when 2+ equipments) -->
+    <BenefitFieldsGroup
+      :horas-assistencia="formData?.horasAssistenciaAnualSH ?? 0"
+      :deslocacoes-por-ano="formData?.deslocacoesPorAnoSH ?? 0"
+      :mode="mode"
+      contract-type="S&H"
+      @update:horas-assistencia="$emit('update-field', 'horasAssistenciaAnualSH', $event)"
+      @update:deslocacoes-por-ano="$emit('update-field', 'deslocacoesPorAnoSH', $event)"
+    />
+
+    <div
+      v-if="mode === 'manual'"
+      class="config-field manual-price-field"
+    >
+      <label class="config-label required">PREÇO DO CONTRATO (€)</label>
+      <input
+        type="number"
+        min="0"
+        step="0.01"
+        :value="formData?.precoSH || ''"
+        class="config-input"
+        placeholder="0.00"
+        data-testid="manual-price-input"
+        @input="$emit('update-field', 'precoSH', Number(($event.target as HTMLInputElement).value))"
+      >
+    </div>
+
+    <!-- 5. DATES -->
     <ContractDatesSection
       :start-date="formData?.inicioContratoSH || ''"
       :end-date="formData?.fimContratoSH || ''"
       @update:start-date="$emit('update-field', 'inicioContratoSH', $event)"
       @update:end-date="$emit('update-field', 'fimContratoSH', $event)"
     />
-
-    <!-- Benefit Fields (editable overrides) -->
-    <BenefitFieldsGroup
-      :horas-assistencia="formData?.horasAssistenciaAnualSH ?? 0"
-      :deslocacoes-por-ano="formData?.deslocacoesPorAnoSH ?? 0"
-      :manutencoes-por-ano="formData?.manutencoesPorAnoSH ?? 0"
-      :disabled="!formData?.planIdSH"
-      @update:horas-assistencia="$emit('update-field', 'horasAssistenciaAnualSH', $event)"
-      @update:deslocacoes-por-ano="$emit('update-field', 'deslocacoesPorAnoSH', $event)"
-      @update:manutencoes-por-ano="$emit('update-field', 'manutencoesPorAnoSH', $event)"
-    />
-
-    <!-- Dynamic Plan Details Display -->
-    <div
-      v-if="props.isLoadingPlan"
-      class="plan-loading-state"
-    >
-      <div class="loading-spinner">
-        <div class="spinner" />
-        <span class="loading-text">A carregar detalhes do plano...</span>
-      </div>
-    </div>
-
-    <DynamicPlanDetails
-      v-if="shouldShowPlanDetails"
-      data-testid="dynamic-plan-details"
-      :plan-details="selectedPlanDetails"
-      :selected-payment="formData?.modalidadePagamentoSH || ''"
-      :distance="formData?.distanceSH || ''"
-      :equipments="shEquipmentsForPricing"
-      :contract-type="'S&H'"
-      @payment-selected="$emit('update-field', 'modalidadePagamentoSH', $event)"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed, watch } from 'vue';
+import type { SHPlan } from '@clever/shared';
 import BenefitFieldsGroup from './BenefitFieldsGroup.vue';
 import ContractDatesSection from './ContractDatesSection.vue';
 import DynamicPlanDetails from './DynamicPlanDetails.vue';
 import SHEquipmentCard from './SHEquipmentCard.vue';
+import { getPlanOptions, getPlanDetails } from '../../services/planSelection';
 
 interface SHEquipment {
   id: string;
@@ -163,7 +169,53 @@ interface Emits {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
+// 9.8 — Mode computed: 'auto' (1 equip) or 'manual' (2+ equip)
+const mode = computed<'auto' | 'manual'>(() => {
+  return props.shEquipments.length >= 2 ? 'manual' : 'auto';
+});
+
+// 9.9 — Get S&H plan options from service (replacing hardcoded options)
+const availablePlanOptions = computed(() => {
+  return getPlanOptions('S&H');
+});
+
+// Equipment count watcher for mode transitions
+watch(
+  () => props.shEquipments.length,
+  (newLen, oldLen) => {
+    if (oldLen === 1 && newLen >= 2) {
+      // Auto → Manual: clear auto-populated parameter values and price
+      emit('update-field', 'deslocacoesPorAnoSH', '');
+      emit('update-field', 'horasAssistenciaAnualSH', '');
+      emit('update-field', 'precoSH', undefined);
+    } else if (oldLen >= 2 && newLen === 1) {
+      // Manual → Auto: restore plan base values
+      const planId = props.formData?.planIdSH;
+      if (planId) {
+        const plan = getPlanDetails('S&H', planId) as SHPlan | null;
+        if (plan) {
+          emit('update-field', 'deslocacoesPorAnoSH', plan.parameters.deslocacoesPorAno);
+          emit('update-field', 'horasAssistenciaAnualSH', plan.parameters.horasPorAno);
+        }
+      }
+      // Clear manual price since auto mode derives price from plan
+      emit('update-field', 'precoSH', undefined);
+    }
+  }
+);
+
+// Plan change handler with mode awareness
 const handlePlanSelection = (planId: string) => {
+  if (mode.value === 'auto' && planId) {
+    // In auto mode: re-populate parameters from new plan
+    const plan = getPlanDetails('S&H', planId) as SHPlan | null;
+    if (plan) {
+      emit('update-field', 'deslocacoesPorAnoSH', plan.parameters.deslocacoesPorAno);
+      emit('update-field', 'horasAssistenciaAnualSH', plan.parameters.horasPorAno);
+    }
+  }
+  // In manual mode: do NOT clear manual values (schedule info updates via selectedPlanDetails prop)
+  // Always emit plan-selected event
   emit('plan-selected', planId);
 };
 
@@ -204,18 +256,6 @@ const shouldShowPlanDetails = computed(() => {
 
   return shouldShow;
 });
-
-// Convert S&H equipments to the format expected by DynamicPlanDetails
-// S&H equipments don't have discounts, so we set discount to 0
-const shEquipmentsForPricing = computed(() => {
-  return props.shEquipments.map(equipment => ({
-    id: equipment.id,
-    modelo: equipment.modelo,
-    numeroSerie: equipment.numeroSerie,
-    desconto: 0, // S&H equipments don't have discounts
-    observacoes: equipment.observacoes,
-  }));
-});
 </script>
 
 <style scoped>
@@ -251,6 +291,18 @@ const shEquipmentsForPricing = computed(() => {
 
 .config-select:focus {
   @apply outline-none border-green-500 ring-2 ring-green-200;
+}
+
+.config-input {
+  @apply px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm transition-colors duration-200;
+}
+
+.config-input:focus {
+  @apply outline-none border-green-500 ring-2 ring-green-200;
+}
+
+.manual-price-field {
+  @apply mt-4;
 }
 
 .equipment-section {

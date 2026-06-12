@@ -467,7 +467,7 @@ export class BalanceMiddleware {
     const types: string[] = [];
 
     if (contract.data.hasCPAContract) {
-      types.push(contract.data.cpaContractType || 'CPA');
+      types.push('CPA');
     }
 
     if (contract.data.hasSHContract) {

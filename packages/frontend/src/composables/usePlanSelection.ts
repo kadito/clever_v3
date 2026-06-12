@@ -9,7 +9,8 @@ import {
 } from '../services/planSelection';
 
 /**
- * Composable for handling plan selection logic in Vue components
+ * Composable for handling plan selection logic in Vue components.
+ * Supports CPA (flat pricing) and S&H (distance-based pricing) only.
  */
 export function usePlanSelection() {
   const selectedContractType: Ref<ContractType | ''> = ref('');
@@ -29,7 +30,7 @@ export function usePlanSelection() {
 
   const setContractType = (contractType: ContractType | '') => {
     selectedContractType.value = contractType;
-    selectedPlanId.value = ''; // Clear plan when contract type changes
+    selectedPlanId.value = '';
     selectedDistance.value = '';
   };
 

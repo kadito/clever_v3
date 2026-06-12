@@ -182,24 +182,31 @@ const clearError = () => {
 
 // Computed properties
 const displayedClients = computed(() => {
-  if (!searchQuery.value) {
-    return clients.value;
+  let items = clients.value;
+
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    items = items.filter(client => {
+      const data = client.data;
+      return (
+        data.nomeEmpresa?.toLowerCase().includes(query) ||
+        data.nomeComercial?.toLowerCase().includes(query) ||
+        data.contribuinte?.toLowerCase().includes(query) ||
+        data.responsavel?.toLowerCase().includes(query) ||
+        data.localidade?.toLowerCase().includes(query) ||
+        data.telefoneContato?.toLowerCase().includes(query) ||
+        data.email?.toLowerCase().includes(query) ||
+        data.emailContato?.toLowerCase().includes(query) ||
+        data.softwares?.some(s => s.name.toLowerCase().includes(query))
+      );
+    });
   }
 
-  const query = searchQuery.value.toLowerCase();
-  return clients.value.filter(client => {
-    const data = client.data;
-    return (
-      data.nomeEmpresa?.toLowerCase().includes(query) ||
-      data.nomeComercial?.toLowerCase().includes(query) ||
-      data.contribuinte?.toLowerCase().includes(query) ||
-      data.responsavel?.toLowerCase().includes(query) ||
-      data.localidade?.toLowerCase().includes(query) ||
-      data.telefoneContato?.toLowerCase().includes(query) ||
-      data.email?.toLowerCase().includes(query) ||
-      data.emailContato?.toLowerCase().includes(query) ||
-      data.softwares?.some(s => s.name.toLowerCase().includes(query))
-    );
+  // Sort alphabetically by nomeComercial || nomeEmpresa using localeCompare pt-PT
+  return [...items].sort((a, b) => {
+    const nameA = (a.data.nomeComercial || a.data.nomeEmpresa || '').toLowerCase();
+    const nameB = (b.data.nomeComercial || b.data.nomeEmpresa || '').toLowerCase();
+    return nameA.localeCompare(nameB, 'pt-PT');
   });
 });
 

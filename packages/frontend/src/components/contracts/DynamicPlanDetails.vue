@@ -41,43 +41,29 @@
 
           <div class="feature-list">
             <div
-              v-if="planDetails.maintenancePerYear"
+              v-if="planDetails.parameters?.manutencoesPorAno"
               class="feature-item"
             >
               <span class="feature-icon">🔧</span>
-              <span class="feature-text">{{ planDetails.maintenancePerYear }} manutenções por ano</span>
+              <span class="feature-text">{{ planDetails.parameters.manutencoesPorAno }} manutenções por ano</span>
             </div>
             <div
-              v-if="planDetails.hoursPerYear"
+              v-if="planDetails.parameters?.horasPorAno"
               class="feature-item"
             >
               <span class="feature-icon">⏰</span>
-              <span class="feature-text">{{ planDetails.hoursPerYear }} horas por ano</span>
+              <span class="feature-text">{{ planDetails.parameters.horasPorAno }} horas por ano</span>
             </div>
             <div
-              v-if="planDetails.callouts"
-              class="feature-item"
-            >
-              <span class="feature-icon">📞</span>
-              <span class="feature-text">{{ planDetails.callouts }}</span>
-            </div>
-            <div
-              v-if="planDetails.displacementsIncluded"
+              v-if="planDetails.parameters?.deslocacoesPorAno"
               class="feature-item"
             >
               <span class="feature-icon">🚗</span>
               <span class="feature-text">{{
-                planDetails.displacementsIncluded === 'ilimitadas'
+                planDetails.parameters.deslocacoesPorAno === -1
                   ? 'Deslocações ilimitadas'
-                  : `${planDetails.displacementsIncluded} deslocações incluídas`
+                  : `${planDetails.parameters.deslocacoesPorAno} deslocações por ano`
               }}</span>
-            </div>
-            <div
-              v-if="planDetails.remoteSupport"
-              class="feature-item"
-            >
-              <span class="feature-icon">💻</span>
-              <span class="feature-text">{{ planDetails.remoteSupport }}</span>
             </div>
             <div
               v-if="planDetails.weekendSupport"
@@ -90,9 +76,27 @@
         </div>
       </div>
 
-      <!-- Price Breakdown (if has additional costs) -->
+      <!-- Schedule Info Display (read-only) -->
       <div
-        v-if="hasAdditionalCosts"
+        v-if="planDetails.schedule"
+        class="schedule-info-section"
+      >
+        <h4>INTERVALOS DE TRABALHO</h4>
+        <div class="schedule-details">
+          <div class="schedule-item">
+            <span class="schedule-label">Deslocação:</span>
+            <span class="schedule-value">{{ planDetails.schedule.deslocacao }}</span>
+          </div>
+          <div class="schedule-item">
+            <span class="schedule-label">Assistência Remota:</span>
+            <span class="schedule-value">{{ planDetails.schedule.remoteSupport }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Price Breakdown (POS package only) -->
+      <div
+        v-if="hasPOSPackage"
         class="price-breakdown-section"
       >
         <h4>COMPOSIÇÃO DO PREÇO:</h4>
@@ -101,19 +105,9 @@
             <span class="breakdown-label">Plano Base:</span>
             <span class="breakdown-value">Conforme modalidade selecionada</span>
           </div>
-          <div
-            v-if="hasPOSPackage"
-            class="breakdown-item"
-          >
+          <div class="breakdown-item">
             <span class="breakdown-label">Pack POS (10h assistência):</span>
-            <span class="breakdown-value">+{{ formatPrice(100) }}/ano</span>
-          </div>
-          <div
-            v-if="equipments && equipments.length > 1"
-            class="breakdown-item"
-          >
-            <span class="breakdown-label">Equipamentos adicionais:</span>
-            <span class="breakdown-value">{{ equipments.length - 1 }} × preço do plano (com descontos aplicados)</span>
+            <span class="breakdown-value">+{{ formatPrice(200) }}/ano</span>
           </div>
         </div>
       </div>
@@ -122,7 +116,7 @@
       <div class="payment-selection-section">
         <h4>SELECIONE A MODALIDADE DE PAGAMENTO:</h4>
 
-        <!-- Distance requirement notice for distance-based pricing -->
+        <!-- Distance requirement notice for S&H distance-based pricing -->
         <div
           v-if="requiresDistanceForPricing && !distance"
           class="distance-notice"
@@ -169,14 +163,6 @@
 <script setup lang="ts">
 import { computed, toRefs } from 'vue';
 
-interface ContractEquipment {
-  id: string;
-  modelo: string;
-  numeroSerie: string;
-  desconto: number; // Discount percentage (0-100)
-  observacoes: string;
-}
-
 interface Props {
   planDetails: any;
   selectedPayment: string;
@@ -184,7 +170,6 @@ interface Props {
   isLoading?: boolean;
   errorMessage?: string;
   hasPOSPackage?: boolean;
-  equipments?: ContractEquipment[];
   contractType?: string;
 }
 
@@ -195,7 +180,6 @@ interface Emits {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
-// Use toRefs for better performance with reactive props
 const {
   planDetails,
   selectedPayment,
@@ -203,65 +187,25 @@ const {
   isLoading,
   errorMessage,
   hasPOSPackage,
-  equipments,
   contractType,
 } = toRefs(props);
 
-// Equipment pricing: each additional equipment costs the same as the base plan price
-
-const selectPayment = (paymentId: string) => {
+const selectPayment = (paymentId: string): void => {
   emit('payment-selected', paymentId);
 };
 
 // Check if there's an error state
-const hasError = computed(() => {
+const hasError = computed((): boolean => {
   return !!errorMessage?.value || (!planDetails.value && !isLoading?.value);
 });
 
-// Determine if this plan requires distance for pricing (CPA 2023 and S&H)
-const requiresDistanceForPricing = computed(() => {
+// CPA never requires distance (flat pricing). Only S&H requires distance.
+const requiresDistanceForPricing = computed((): boolean => {
   if (!planDetails.value?.prices) return false;
-
-  // Check if the pricing structure has distance-based pricing
-  const prices = planDetails.value.prices;
-  return !!(prices.under180km || prices.over180km);
+  return contractType?.value === 'S&H';
 });
 
-// Check if there are additional costs to display
-const hasAdditionalCosts = computed(() => {
-  return hasPOSPackage?.value || (equipments?.value && equipments.value.length > 1);
-});
-
-// Calculate additional equipment costs
-const calculateEquipmentCosts = (basePlanPrice: number): number => {
-  if (!equipments?.value || equipments.value.length <= 1) {
-    return 0;
-  }
-
-  // Skip the first equipment (included in base price), calculate for additional ones
-  // Each additional equipment costs the same as the base plan price, with discount applied
-  const additionalEquipments = equipments.value.slice(1);
-
-  return additionalEquipments.reduce((total, equipment) => {
-    const discountMultiplier = 1 - equipment.desconto / 100;
-    return total + basePlanPrice * discountMultiplier;
-  }, 0);
-};
-
-// Calculate POS package cost
-const calculatePOSPackageCost = (): number => {
-  return hasPOSPackage?.value ? 100 : 0;
-};
-
-// Calculate total additional costs per year
-const calculateAdditionalCosts = (basePlanPrice: number): number => {
-  const posPackageCost = calculatePOSPackageCost();
-  const equipmentCosts = calculateEquipmentCosts(basePlanPrice);
-
-  return posPackageCost + equipmentCosts;
-};
-
-// Memoized price formatter for better performance
+// Memoized price formatter
 const formatPrice = (() => {
   const formatter = new Intl.NumberFormat('pt-PT', {
     style: 'currency',
@@ -271,75 +215,65 @@ const formatPrice = (() => {
   return (price: number): string => formatter.format(price);
 })();
 
-// Calculate savings percentage based on payment frequency (monthly is base)
-// Compute payment options based on plan structure - enhanced with dynamic pricing
+// Compute payment options based on contract type and plan pricing structure
 const paymentOptions = computed(() => {
   if (!planDetails.value?.prices) {
     return [];
   }
 
   const prices = planDetails.value.prices;
-  const options = [];
+  const options: Array<{ id: string; period: string; amount: string }> = [];
 
   try {
-    let basePrices: any = null;
-
-    // Handle distance-based pricing (CPA 2023 and S&H)
-    if (requiresDistanceForPricing.value && distance?.value && prices[distance.value]) {
-      basePrices = prices[distance.value];
-    }
-    // Handle flat pricing (CPA 1500)
-    else if (!requiresDistanceForPricing.value && prices.monthly !== undefined) {
-      basePrices = prices;
-    }
-
-    if (basePrices) {
-      // Monthly option
-      if (basePrices.monthly) {
-        const monthlyAdditionalCosts = calculateAdditionalCosts(basePrices.monthly);
-        const totalMonthly = basePrices.monthly + monthlyAdditionalCosts;
+    // CPA: flat pricing with mensal/semestral/anual keys
+    if (contractType?.value === 'CPA') {
+      if (prices.mensal !== undefined) {
         options.push({
           id: 'MENSAL',
           period: 'MENSAL',
-          amount: formatPrice(totalMonthly),
+          amount: formatPrice(prices.mensal),
         });
       }
-
-      // Quarterly option
-      if (basePrices.quarterly) {
-        const quarterlyAdditionalCosts = calculateAdditionalCosts(basePrices.quarterly);
-        const totalQuarterly = basePrices.quarterly + quarterlyAdditionalCosts;
-        options.push({
-          id: 'TRIMESTRAL',
-          period: 'TRIMESTRAL',
-          amount: formatPrice(totalQuarterly),
-        });
-      }
-
-      // Semiannual option
-      if (basePrices.semiannual) {
-        const semiannualAdditionalCosts = calculateAdditionalCosts(basePrices.semiannual);
-        const totalSemiannual = basePrices.semiannual + semiannualAdditionalCosts;
+      if (prices.semestral !== undefined) {
         options.push({
           id: 'SEMESTRAL',
           period: 'SEMESTRAL',
-          amount: formatPrice(totalSemiannual),
+          amount: formatPrice(prices.semestral),
         });
       }
-
-      // Annual option
-      if (basePrices.annual) {
-        const additionalCostsPerYear = calculateAdditionalCosts(basePrices.annual);
-        const totalAnnual = basePrices.annual + additionalCostsPerYear;
+      if (prices.anual !== undefined) {
         options.push({
           id: 'ANUAL',
           period: 'ANUAL',
-          amount: formatPrice(totalAnnual),
+          amount: formatPrice(prices.anual),
+        });
+      }
+    }
+    // S&H: distance-based pricing with mensal/anual keys only
+    else if (contractType?.value === 'S&H') {
+      if (!distance?.value || !prices[distance.value]) {
+        return [];
+      }
+
+      const distancePrices = prices[distance.value];
+
+      if (distancePrices.mensal !== undefined) {
+        options.push({
+          id: 'MENSAL',
+          period: 'MENSAL',
+          amount: formatPrice(distancePrices.mensal),
+        });
+      }
+      if (distancePrices.anual !== undefined) {
+        options.push({
+          id: 'ANUAL',
+          period: 'ANUAL',
+          amount: formatPrice(distancePrices.anual),
         });
       }
     }
   } catch (error) {
-    console.error('Error generating payment options:', error);
+    console.error('Error generating payment options:', JSON.stringify(error, null, 2));
   }
 
   return options;
@@ -418,6 +352,31 @@ const paymentOptions = computed(() => {
   @apply text-sm text-gray-700;
 }
 
+/* Schedule Info Section */
+.schedule-info-section {
+  @apply form-section-body-consistent bg-gray-50 border border-gray-200;
+}
+
+.schedule-info-section h4 {
+  @apply text-sm font-semibold text-gray-700 mb-3 uppercase;
+}
+
+.schedule-details {
+  @apply space-y-2;
+}
+
+.schedule-item {
+  @apply flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2;
+}
+
+.schedule-label {
+  @apply text-sm text-gray-600 font-medium;
+}
+
+.schedule-value {
+  @apply text-sm text-gray-800;
+}
+
 /* Price Breakdown Section */
 .price-breakdown-section {
   @apply form-section-body-consistent bg-blue-50 border border-blue-200;
@@ -472,7 +431,7 @@ const paymentOptions = computed(() => {
 
 @media (min-width: 640px) {
   .payment-options-grid {
-    @apply grid-cols-4;
+    @apply grid-cols-3;
   }
 }
 
@@ -495,11 +454,6 @@ const paymentOptions = computed(() => {
 
 .payment-amount {
   @apply text-base font-semibold;
-}
-
-/* Loading state for payment options */
-.payment-options-loading {
-  @apply form-loading-overlay;
 }
 
 /* Touch-friendly interactions */
@@ -543,6 +497,10 @@ const paymentOptions = computed(() => {
   .distance-notice,
   .no-pricing-notice {
     @apply p-3;
+  }
+
+  .schedule-info-section {
+    @apply p-4;
   }
 }
 </style>

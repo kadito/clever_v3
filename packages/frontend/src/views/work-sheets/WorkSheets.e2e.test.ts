@@ -158,6 +158,7 @@ const mockApiState = {
   currentItem: { value: mockWorkSheets[0] },
   loading: { loading: { value: false } },
   error: { value: null },
+  pagination: { value: { page: 1, limit: 10, total: 2, totalPages: 1 } },
 };
 
 vi.mock('@/composables/useApi', () => ({
