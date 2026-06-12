@@ -9,7 +9,7 @@
 ## Packages
 
 | Package            | Role                      |
-|--------------------|---------------------------|
+| --------------------| ---------------------------|
 | `@clever/shared`   | Types, utils, permissions |
 | `@clever/frontend` | Vue 3 SPA                 |
 | `@clever/backend`  | Hono API on CF Workers    |
