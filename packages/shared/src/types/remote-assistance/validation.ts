@@ -2,6 +2,7 @@ import type {
   RemoteAssistanceData,
   RemoteAssistanceCreationData,
   RemoteAssistanceUpdateData,
+  RemoteAssistancePricingSnapshot,
   TimeValidationResult,
   ValidMinute,
 } from './types.js';
@@ -13,6 +14,20 @@ export { REMOTE_ASSISTANCE_CONSTANTS };
 // ─── Split Billing Interfaces ────────────────────────────────────────────────
 
 /**
+ * Optional rate overrides for anchored pricing.
+ * When provided, these replace REMOTE_ASSISTANCE_CONSTANTS values in the calculation.
+ */
+export interface RemoteAssistanceRateOverrides {
+  priceBusinessHours: number;
+  priceAfterHours: number;
+  billingIncrementMinutes: number;
+  businessHoursMorningStart: number;
+  businessHoursMorningEnd: number;
+  businessHoursAfternoonStart: number;
+  businessHoursAfternoonEnd: number;
+}
+
+/**
  * Input for the unified remote assistance pricing calculation.
  */
 export interface RemoteAssistancePricingInput {
@@ -20,6 +35,8 @@ export interface RemoteAssistancePricingInput {
   endTime: string;           // HH:MM format
   isWeekendOrHoliday: boolean;
   paymentMethod?: 'Contrato' | 'Faturação' | 'Garantia' | '';
+  /** When provided, overrides REMOTE_ASSISTANCE_CONSTANTS. Used for anchored pricing recalculation. */
+  rateOverrides?: RemoteAssistanceRateOverrides;
 }
 
 /**
@@ -119,6 +136,17 @@ export function calculateRemoteAssistancePricing(
 ): RemoteAssistancePricingResult {
   const { startTime, endTime, isWeekendOrHoliday, paymentMethod } = input;
 
+  // Resolve rates: use overrides when provided, fall back to constants otherwise
+  const rates = input.rateOverrides ?? {
+    priceBusinessHours: REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS,
+    priceAfterHours: REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS,
+    billingIncrementMinutes: REMOTE_ASSISTANCE_CONSTANTS.BILLING_INCREMENT_MINUTES,
+    businessHoursMorningStart: REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_MORNING_START,
+    businessHoursMorningEnd: REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_MORNING_END,
+    businessHoursAfternoonStart: REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_AFTERNOON_START,
+    businessHoursAfternoonEnd: REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_AFTERNOON_END,
+  };
+
   // 1. Contract/Warranty → zero-cost
   if (paymentMethod === 'Contrato' || paymentMethod === 'Garantia') {
     return zeroPricingResult(true);
@@ -145,12 +173,12 @@ export function calculateRemoteAssistancePricing(
   }
 
   // Round total up to 15-min ceiling
-  const billingMinutes = Math.ceil(totalMinutes / REMOTE_ASSISTANCE_CONSTANTS.BILLING_INCREMENT_MINUTES)
-    * REMOTE_ASSISTANCE_CONSTANTS.BILLING_INCREMENT_MINUTES;
+  const billingMinutes = Math.ceil(totalMinutes / rates.billingIncrementMinutes)
+    * rates.billingIncrementMinutes;
 
   // 2. Weekend/Holiday → entire duration at off-hours rate
   if (isWeekendOrHoliday) {
-    const rate = REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS;
+    const rate = rates.priceAfterHours;
     const value = Math.round((billingMinutes / 60) * rate * 100) / 100;
     return {
       totalValue: value,
@@ -175,17 +203,33 @@ export function calculateRemoteAssistancePricing(
   // 3. Weekday: split session into segments by boundary crossings
   const effectiveEnd = endMinutes <= startMinutes ? endMinutes + 24 * 60 : endMinutes;
 
+  // Build boundaries from rates (dynamic, supports overrides)
+  const boundaries = [
+    rates.businessHoursMorningStart,
+    rates.businessHoursMorningEnd,
+    rates.businessHoursAfternoonStart,
+    rates.businessHoursAfternoonEnd,
+  ];
+
+  // Local helper using resolved rates
+  const isMinuteBusiness = (m: number): boolean => {
+    return (
+      (m >= rates.businessHoursMorningStart && m < rates.businessHoursMorningEnd) ||
+      (m >= rates.businessHoursAfternoonStart && m < rates.businessHoursAfternoonEnd)
+    );
+  };
+
   // Collect boundaries between start and end (including next-day boundaries for overnight)
   const splitPoints: number[] = [];
   // First pass: boundaries as-is
-  for (const b of BOUNDARIES) {
+  for (const b of boundaries) {
     if (b > startMinutes && b < effectiveEnd) {
       splitPoints.push(b);
     }
   }
   // Second pass: boundaries + 24h for overnight sessions
   if (effectiveEnd > 24 * 60) {
-    for (const b of BOUNDARIES) {
+    for (const b of boundaries) {
       const shifted = b + 24 * 60;
       if (shifted > startMinutes && shifted < effectiveEnd) {
         splitPoints.push(shifted);
@@ -222,7 +266,7 @@ export function calculateRemoteAssistancePricing(
     const segMinutes = segEnd - segStart;
     // Classify using the start minute of the segment (mod 1440 for overnight)
     const classificationMinute = segStart % (24 * 60);
-    const isBusiness = isMinuteBusinessHours(classificationMinute);
+    const isBusiness = isMinuteBusiness(classificationMinute);
 
     rawSegments.push({
       startMinute: segStart,
@@ -279,8 +323,8 @@ export function calculateRemoteAssistancePricing(
     }
 
     const rate = seg.isBusinessHours
-      ? REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS
-      : REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS;
+      ? rates.priceBusinessHours
+      : rates.priceAfterHours;
 
     const value = Math.round((segBillingMinutes / 60) * rate * 100) / 100;
 
@@ -867,4 +911,79 @@ export function formatDateTimeForDisplay(dateString: string): string {
 function isValidUUID(uuid: string): boolean {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   return uuidRegex.test(uuid);
+}
+
+// ─── Pricing Snapshot Helpers ────────────────────────────────────────────────
+
+/**
+ * Creates a pricing snapshot by capturing current constants and calculating totals.
+ * Called at record creation time to anchor pricing rates.
+ */
+export function createRemoteAssistancePricingSnapshot(input: {
+  startTime: string;
+  endTime: string;
+  isWeekendOrHoliday: boolean;
+  paymentMethod?: 'Contrato' | 'Faturação' | 'Garantia' | '';
+}): RemoteAssistancePricingSnapshot {
+  const rates: RemoteAssistancePricingSnapshot['rates'] = {
+    priceBusinessHours: REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS,
+    priceAfterHours: REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS,
+    billingIncrementMinutes: REMOTE_ASSISTANCE_CONSTANTS.BILLING_INCREMENT_MINUTES,
+    businessHoursMorningStart: REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_MORNING_START,
+    businessHoursMorningEnd: REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_MORNING_END,
+    businessHoursAfternoonStart: REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_AFTERNOON_START,
+    businessHoursAfternoonEnd: REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_AFTERNOON_END,
+  };
+
+  const result = calculateRemoteAssistancePricing({
+    ...input,
+    rateOverrides: rates,
+  });
+
+  return {
+    rates,
+    calculated: {
+      totalValue: result.totalValue,
+      businessHoursValue: result.businessHoursValue,
+      offHoursValue: result.offHoursValue,
+      totalMinutes: result.totalMinutes,
+      billingMinutes: result.billingMinutes,
+      businessMinutes: result.businessMinutes,
+      offHoursMinutes: result.offHoursMinutes,
+      isZeroCost: result.isZeroCost,
+    },
+  };
+}
+
+/**
+ * Recalculates pricing using EXISTING anchored rates (for record updates).
+ * Rates are preserved from creation; only calculated values are updated.
+ */
+export function recalculateRemoteAssistancePricingSnapshot(
+  existingRates: RemoteAssistancePricingSnapshot['rates'],
+  input: {
+    startTime: string;
+    endTime: string;
+    isWeekendOrHoliday: boolean;
+    paymentMethod?: 'Contrato' | 'Faturação' | 'Garantia' | '';
+  }
+): RemoteAssistancePricingSnapshot {
+  const result = calculateRemoteAssistancePricing({
+    ...input,
+    rateOverrides: existingRates,
+  });
+
+  return {
+    rates: existingRates, // preserved from creation
+    calculated: {
+      totalValue: result.totalValue,
+      businessHoursValue: result.businessHoursValue,
+      offHoursValue: result.offHoursValue,
+      totalMinutes: result.totalMinutes,
+      billingMinutes: result.billingMinutes,
+      businessMinutes: result.businessMinutes,
+      offHoursMinutes: result.offHoursMinutes,
+      isZeroCost: result.isZeroCost,
+    },
+  };
 }

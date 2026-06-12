@@ -12,6 +12,7 @@
 
 // Export all types
 export type {
+  RemoteAssistancePricingSnapshot,
   RemoteAssistanceData,
   RemoteAssistance,
   RemoteAssistanceCreationData,
@@ -26,6 +27,7 @@ export type {
 
 // Export pricing interfaces
 export type {
+  RemoteAssistanceRateOverrides,
   RemoteAssistancePricingInput,
   RemoteAssistancePricingResult,
   TimeSegment,
@@ -37,6 +39,8 @@ export { REMOTE_ASSISTANCE_CONSTANTS } from './types';
 // Export all validation functions
 export {
   calculateRemoteAssistancePricing,
+  createRemoteAssistancePricingSnapshot,
+  recalculateRemoteAssistancePricingSnapshot,
   validateAndFormatTime,
   validateTimeSequence,
   calculateTotalHours,

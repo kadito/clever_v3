@@ -136,11 +136,14 @@ export function extractWorkSheetDebtTransaction(workSheet: WorkSheet): Transacti
   }
 
   // Other payment methods - add to debt
-  // Calculate total value from hours worked and displacement costs
-  const totals = calculateWorkSheetTotals(workSheet.data);
+  // Use anchored price if available; fallback to deprecated calculation for legacy
+  const snapshotPrice = workSheet.data.pricingSnapshot?.calculated.totalPrice;
+  const totalPrice = (snapshotPrice != null && Number.isFinite(snapshotPrice))
+    ? snapshotPrice
+    : calculateWorkSheetTotals(workSheet.data).totalPrice;
 
   return {
-    balanceChange: totals.totalPrice,
+    balanceChange: totalPrice,
   };
 }
 

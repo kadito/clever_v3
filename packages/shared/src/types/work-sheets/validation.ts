@@ -4,8 +4,23 @@ import type {
   WorkSheetUpdateData,
   WorkSheetDisplayData,
   WorkSheet,
+  WorkSheetPricingSnapshot,
 } from './types';
 import { WORK_SHEET_CONSTANTS } from './types';
+
+/**
+ * Optional rate overrides for anchored pricing.
+ * When provided, these replace WORK_SHEET_CONSTANTS values in the calculation.
+ */
+export interface WorkSheetRateOverrides {
+  hourlyRateWeekday: number;
+  hourlyRateWeekendHoliday: number;
+  mileageRatePerKm: number;
+  travelFeeShort: number;
+  travelFeeLong: number;
+  travelFeeThresholdKm: number;
+  minimumHours: number;
+}
 
 /**
  * Input for the unified work sheet pricing calculation.
@@ -16,6 +31,8 @@ export interface WorkSheetPricingInput {
   totalKms: number;
   arrivalTime: string;   // HH:MM format
   departureTime: string; // HH:MM format
+  /** When provided, overrides WORK_SHEET_CONSTANTS. Used for anchored pricing recalculation. */
+  rateOverrides?: WorkSheetRateOverrides;
 }
 
 /**
@@ -33,16 +50,26 @@ export interface WorkSheetPricingResult {
 }
 
 /**
- * Calculates work sheet pricing using centralized constants.
+ * Calculates work sheet pricing using centralized constants or provided rate overrides.
  * Single source of truth for all views and backend extraction.
  */
 export function calculateWorkSheetPricing(input: WorkSheetPricingInput): WorkSheetPricingResult {
   const { weekendHoliday, hasDisplacement, arrivalTime, departureTime } = input;
   const totalKms = input.totalKms < 0 ? 0 : input.totalKms;
 
+  const rates = input.rateOverrides ?? {
+    hourlyRateWeekday: WORK_SHEET_CONSTANTS.HOURLY_RATE_WEEKDAY,
+    hourlyRateWeekendHoliday: WORK_SHEET_CONSTANTS.HOURLY_RATE_WEEKEND_HOLIDAY,
+    mileageRatePerKm: WORK_SHEET_CONSTANTS.MILEAGE_RATE_PER_KM,
+    travelFeeShort: WORK_SHEET_CONSTANTS.TRAVEL_FEE_SHORT,
+    travelFeeLong: WORK_SHEET_CONSTANTS.TRAVEL_FEE_LONG,
+    travelFeeThresholdKm: WORK_SHEET_CONSTANTS.TRAVEL_FEE_THRESHOLD_KM,
+    minimumHours: WORK_SHEET_CONSTANTS.MINIMUM_HOURS,
+  };
+
   const hourlyRate = weekendHoliday
-    ? WORK_SHEET_CONSTANTS.HOURLY_RATE_WEEKEND_HOLIDAY
-    : WORK_SHEET_CONSTANTS.HOURLY_RATE_WEEKDAY;
+    ? rates.hourlyRateWeekendHoliday
+    : rates.hourlyRateWeekday;
 
   const zeroed: WorkSheetPricingResult = {
     hourlyRate,
@@ -74,10 +101,10 @@ export function calculateWorkSheetPricing(input: WorkSheetPricingInput): WorkShe
     return zeroed;
   }
 
-  // Apply minimum 1 hour rule
+  // Apply minimum hours rule
   const durationHours = durationMinutes / 60;
-  const laborHours = durationHours < WORK_SHEET_CONSTANTS.MINIMUM_HOURS
-    ? WORK_SHEET_CONSTANTS.MINIMUM_HOURS
+  const laborHours = durationHours < rates.minimumHours
+    ? rates.minimumHours
     : durationHours;
 
   const laborPrice = Math.round(laborHours * hourlyRate * 100) / 100;
@@ -87,10 +114,10 @@ export function calculateWorkSheetPricing(input: WorkSheetPricingInput): WorkShe
   let mileagePrice = 0;
 
   if (hasDisplacement) {
-    mileagePrice = Math.round(totalKms * WORK_SHEET_CONSTANTS.MILEAGE_RATE_PER_KM * 100) / 100;
-    travelFee = totalKms > WORK_SHEET_CONSTANTS.TRAVEL_FEE_THRESHOLD_KM
-      ? WORK_SHEET_CONSTANTS.TRAVEL_FEE_LONG
-      : WORK_SHEET_CONSTANTS.TRAVEL_FEE_SHORT;
+    mileagePrice = Math.round(totalKms * rates.mileageRatePerKm * 100) / 100;
+    travelFee = totalKms > rates.travelFeeThresholdKm
+      ? rates.travelFeeLong
+      : rates.travelFeeShort;
   }
 
   const totalPrice = Math.round((laborPrice + travelFee + mileagePrice) * 100) / 100;
@@ -446,4 +473,76 @@ function isValidTimeFormat(time: string): boolean {
 function isValidUUID(uuid: string): boolean {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   return uuidRegex.test(uuid);
+}
+
+
+/**
+ * Creates a pricing snapshot by capturing current constants and calculating totals.
+ * Called at record creation and on every update that may affect pricing.
+ */
+export function createWorkSheetPricingSnapshot(input: {
+  weekendHoliday: boolean;
+  hasDisplacement: boolean;
+  totalKms: number;
+  arrivalTime: string;
+  departureTime: string;
+}): WorkSheetPricingSnapshot {
+  const rates: WorkSheetPricingSnapshot['rates'] = {
+    hourlyRateWeekday: WORK_SHEET_CONSTANTS.HOURLY_RATE_WEEKDAY,
+    hourlyRateWeekendHoliday: WORK_SHEET_CONSTANTS.HOURLY_RATE_WEEKEND_HOLIDAY,
+    mileageRatePerKm: WORK_SHEET_CONSTANTS.MILEAGE_RATE_PER_KM,
+    travelFeeShort: WORK_SHEET_CONSTANTS.TRAVEL_FEE_SHORT,
+    travelFeeLong: WORK_SHEET_CONSTANTS.TRAVEL_FEE_LONG,
+    travelFeeThresholdKm: WORK_SHEET_CONSTANTS.TRAVEL_FEE_THRESHOLD_KM,
+    minimumHours: WORK_SHEET_CONSTANTS.MINIMUM_HOURS,
+  };
+
+  const result = calculateWorkSheetPricing({
+    ...input,
+    rateOverrides: rates,
+  });
+
+  return {
+    rates,
+    calculated: {
+      hourlyRate: result.hourlyRate,
+      laborHours: result.laborHours,
+      laborPrice: result.laborPrice,
+      travelFee: result.travelFee,
+      mileagePrice: result.mileagePrice,
+      totalPrice: result.totalPrice,
+    },
+  };
+}
+
+/**
+ * Recalculates pricing using EXISTING anchored rates (for record updates).
+ * Rates are preserved from creation; only calculated values are updated.
+ */
+export function recalculateWorkSheetPricingSnapshot(
+  existingRates: WorkSheetPricingSnapshot['rates'],
+  input: {
+    weekendHoliday: boolean;
+    hasDisplacement: boolean;
+    totalKms: number;
+    arrivalTime: string;
+    departureTime: string;
+  }
+): WorkSheetPricingSnapshot {
+  const result = calculateWorkSheetPricing({
+    ...input,
+    rateOverrides: existingRates,
+  });
+
+  return {
+    rates: existingRates,
+    calculated: {
+      hourlyRate: result.hourlyRate,
+      laborHours: result.laborHours,
+      laborPrice: result.laborPrice,
+      travelFee: result.travelFee,
+      mileagePrice: result.mileagePrice,
+      totalPrice: result.totalPrice,
+    },
+  };
 }

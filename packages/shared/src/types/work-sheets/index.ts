@@ -18,6 +18,7 @@ export type {
   WorkSheetUpdateData,
   WorkSheetDisplayData,
   WorkSheetSearchFilters,
+  WorkSheetPricingSnapshot,
 } from './types';
 
 // Export constants
@@ -30,11 +31,13 @@ export {
   validateWorkSheetForDisplay,
   calculateWorkSheetTotals,
   calculateWorkSheetPricing,
+  createWorkSheetPricingSnapshot,
+  recalculateWorkSheetPricingSnapshot,
   getWorkSheetSummary,
 } from './validation';
 
 // Export pricing interfaces
-export type { WorkSheetPricingInput, WorkSheetPricingResult } from './validation';
+export type { WorkSheetPricingInput, WorkSheetPricingResult, WorkSheetRateOverrides } from './validation';
 
 // Content type constant
 export const WORK_SHEETS_CONTENT_TYPE = 'work-sheets' as const;

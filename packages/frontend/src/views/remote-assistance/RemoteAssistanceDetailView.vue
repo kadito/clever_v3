@@ -219,7 +219,7 @@
                       <label class="breakdown-label">Horário Comercial (09:00-12:30, 14:30-18:00)</label>
                       <div class="breakdown-value">
                         {{ formatMinutesAsHours(pricingResult.businessMinutes) }} ×
-                        {{ formatCurrency(REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS) }}/h =
+                        {{ formatCurrency(displayRates.businessRate) }}/h =
                         {{ formatCurrency(pricingResult.businessHoursValue) }}
                       </div>
                     </div>
@@ -230,7 +230,7 @@
                       <label class="breakdown-label">Fora do Horário Comercial (inclui 12:30-14:30)</label>
                       <div class="breakdown-value">
                         {{ formatMinutesAsHours(pricingResult.offHoursMinutes) }} ×
-                        {{ formatCurrency(REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS) }}/h =
+                        {{ formatCurrency(displayRates.afterHoursRate) }}/h =
                         {{ formatCurrency(pricingResult.offHoursValue) }}
                       </div>
                     </div>
@@ -276,9 +276,9 @@
                     />
                   </svg>
                   <span class="text-sm text-gray-600">
-                    💶 Preço: {{ REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS }}€/hora
+                    💶 Preço: {{ displayRates.businessRate }}€/hora
                     (09:00-12:30, 14:30-18:00) |
-                    {{ REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS }}€/hora (outras horas) + IVA
+                    {{ displayRates.afterHoursRate }}€/hora (outras horas) + IVA
                   </span>
                 </div>
               </div>
@@ -658,12 +658,45 @@ const pricingResult = computed(() => {
     return null;
   }
 
+  const snapshot = remoteAssistance.value.data.pricingSnapshot;
+
+  if (snapshot) {
+    // Anchored record: use stored calculated values (PRICE-BR-004)
+    return {
+      totalValue: snapshot.calculated.totalValue,
+      businessHoursValue: snapshot.calculated.businessHoursValue,
+      offHoursValue: snapshot.calculated.offHoursValue,
+      totalMinutes: snapshot.calculated.totalMinutes,
+      billingMinutes: snapshot.calculated.billingMinutes,
+      businessMinutes: snapshot.calculated.businessMinutes,
+      offHoursMinutes: snapshot.calculated.offHoursMinutes,
+      isZeroCost: snapshot.calculated.isZeroCost,
+    };
+  }
+
+  // Legacy fallback: dynamic calculation with current constants (PRICE-AC-011)
   return calculateRemoteAssistancePricing({
     startTime: remoteAssistance.value.data.inicioAssistencia ?? '',
     endTime: remoteAssistance.value.data.fimAssistencia ?? '',
     isWeekendOrHoliday: remoteAssistance.value.data.weekendHoliday ?? false,
     paymentMethod: remoteAssistance.value.data.paymentMethod ?? '',
   });
+});
+
+// Rate display computed for pricing breakdown (PRICE-BR-008)
+const displayRates = computed(() => {
+  const snapshot = remoteAssistance.value?.data.pricingSnapshot;
+  if (snapshot) {
+    return {
+      businessRate: snapshot.rates.priceBusinessHours,
+      afterHoursRate: snapshot.rates.priceAfterHours,
+    };
+  }
+  // Legacy fallback
+  return {
+    businessRate: REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS,
+    afterHoursRate: REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS,
+  };
 });
 
 const anexosFiles = computed((): FileReference[] => {

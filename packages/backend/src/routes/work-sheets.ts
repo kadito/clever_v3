@@ -28,7 +28,10 @@ import {
   validateWorkSheetUpdate,
   getWorkSheetSummary,
   calculateWorkSheetPricing,
+  createWorkSheetPricingSnapshot,
+  recalculateWorkSheetPricingSnapshot,
 } from '@clever/shared';
+import type { WorkSheetPricingSnapshot } from '@clever/shared';
 import { autoAssignTechnician, validateTechnicianAssignment } from '../utils/technician-assignment';
 import { createBalanceService, ValidationError } from '../services/balance-service';
 import { createBalanceMiddleware } from '../middleware/balance-middleware';
@@ -405,6 +408,30 @@ workSheetsRouter.post('/', async (c: Context) => {
     contentData.contractId = resolvedContractId;
 
     // ========================================================================
+    // Build pricing snapshot from current constants (PRICE-BR-001, PRICE-AC-013)
+    // ========================================================================
+    const pricingSnapshot = createWorkSheetPricingSnapshot({
+      weekendHoliday: contentData.displacement?.weekendHoliday ?? false,
+      hasDisplacement: contentData.displacement?.hasDisplacement ?? false,
+      totalKms: contentData.displacement?.totalKms ?? 0,
+      arrivalTime: contentData.request?.arrivalTime ?? '',
+      departureTime: contentData.request?.departureTime ?? '',
+    });
+
+    // Validate pricing result (PRICE-AC-013)
+    if (isNaN(pricingSnapshot.calculated.totalPrice)) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Não foi possível calcular o preço. Verifique os dados inseridos.',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 400);
+    }
+
+    // Attach to content data before storage
+    contentData.pricingSnapshot = pricingSnapshot;
+
+    // ========================================================================
     // Validate resource availability BEFORE creating content (REQ-04.4)
     // If resources are insufficient, reject with HTTP 400 — content NOT created
     // ========================================================================
@@ -478,6 +505,156 @@ workSheetsRouter.post('/', async (c: Context) => {
     const response: ApiResponse = {
       success: false,
       error: 'Failed to create work sheet',
+      timestamp: new Date().toISOString(),
+    };
+    return c.json(response, 500);
+  }
+});
+
+/**
+ * Override PUT handler to integrate pricing snapshot recalculation
+ * Reads existing snapshot from stored record and either recalculates with anchored rates
+ * or creates a new snapshot for legacy records
+ * Requirements: PRICE-BR-003, PRICE-BR-007, PRICE-AC-007, PRICE-AC-009, PRICE-AC-010
+ */
+workSheetsRouter.put('/:uuid', async (c: Context) => {
+  try {
+    const user = requireUserContext(c);
+    const uuid = c.req.param('uuid');
+    const r2Bucket = c.env?.R2_BUCKET as StorageBucket;
+
+    if (!r2Bucket) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Storage not available',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 500);
+    }
+
+    // Validate UUID format
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(uuid)) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Invalid UUID format',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 400);
+    }
+
+    // Parse request body
+    let requestData;
+    try {
+      requestData = await c.req.json();
+    } catch (error) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Invalid JSON body',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 400);
+    }
+
+    // Read existing record from R2
+    const existingObject = await r2Bucket.get(`content/work-sheets/${uuid}.json`);
+    if (!existingObject) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'work-sheets not found',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 404);
+    }
+
+    const existingRecord = (await existingObject.json()) as WorkSheet;
+    if (existingRecord.isDeleted) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'work-sheets not found',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 404);
+    }
+
+    // Validate update data
+    if (workSheetConfig.validateUpdate) {
+      try {
+        await workSheetConfig.validateUpdate(requestData, existingRecord, user);
+      } catch (validationError) {
+        const response: ApiResponse = {
+          success: false,
+          error: validationError instanceof Error ? validationError.message : 'Validation failed',
+          timestamp: new Date().toISOString(),
+        };
+        return c.json(response, 400);
+      }
+    }
+
+    const contentData = requestData.data || requestData;
+
+    // Merge existing data with update payload (same logic as ContentStorageService.update)
+    const mergedData = { ...existingRecord.data, ...contentData };
+
+    // ========================================================================
+    // Pricing snapshot recalculation (PRICE-BR-003, PRICE-BR-007, PRICE-AC-009)
+    // ========================================================================
+    const existingSnapshot: WorkSheetPricingSnapshot | undefined = existingRecord.data.pricingSnapshot;
+
+    let updatedSnapshot: WorkSheetPricingSnapshot;
+    if (existingSnapshot) {
+      // Record has anchored rates — recalculate with original rates (PRICE-BR-007)
+      updatedSnapshot = recalculateWorkSheetPricingSnapshot(
+        existingSnapshot.rates,
+        {
+          weekendHoliday: mergedData.displacement?.weekendHoliday ?? false,
+          hasDisplacement: mergedData.displacement?.hasDisplacement ?? false,
+          totalKms: mergedData.displacement?.totalKms ?? 0,
+          arrivalTime: mergedData.request?.arrivalTime ?? '',
+          departureTime: mergedData.request?.departureTime ?? '',
+        }
+      );
+    } else {
+      // Legacy record — use current constants (PRICE-AC-010)
+      updatedSnapshot = createWorkSheetPricingSnapshot({
+        weekendHoliday: mergedData.displacement?.weekendHoliday ?? false,
+        hasDisplacement: mergedData.displacement?.hasDisplacement ?? false,
+        totalKms: mergedData.displacement?.totalKms ?? 0,
+        arrivalTime: mergedData.request?.arrivalTime ?? '',
+        departureTime: mergedData.request?.departureTime ?? '',
+      });
+    }
+
+    // Validate pricing result (PRICE-AC-013)
+    if (isNaN(updatedSnapshot.calculated.totalPrice)) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Não foi possível calcular o preço. Verifique os dados inseridos.',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 400);
+    }
+
+    // Attach updated snapshot to content data before storage
+    contentData.pricingSnapshot = updatedSnapshot;
+
+    // Use ContentStorageService for the actual update (handles versioning, indexing, relations)
+    const { ContentStorageService } = await import('@clever/shared');
+    const storage = new ContentStorageService<WorkSheet>(r2Bucket, 'work-sheets');
+    const updatedWorkSheet = await storage.update(uuid, contentData, { userId: user.userId });
+
+    const response: ApiResponse<ContentWithRelations<any>> = {
+      success: true,
+      data: updatedWorkSheet,
+      timestamp: new Date().toISOString(),
+    };
+    return c.json(response);
+  } catch (error) {
+    console.error('Error updating work sheet:', error);
+    const response: ApiResponse = {
+      success: false,
+      error: 'Failed to update work sheet',
       timestamp: new Date().toISOString(),
     };
     return c.json(response, 500);

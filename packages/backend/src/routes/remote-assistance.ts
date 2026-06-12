@@ -28,12 +28,15 @@ import {
   validateRemoteAssistanceUpdate,
   getRemoteAssistanceSummary,
   calculateRemoteAssistancePricing,
+  createRemoteAssistancePricingSnapshot,
+  recalculateRemoteAssistancePricingSnapshot,
   validateAndFormatTime,
   generateAssistanceNumber,
   getYearFromAssistanceDate,
   hasBillableValue,
   REMOTE_ASSISTANCE_CONSTANTS,
 } from '@clever/shared';
+import type { RemoteAssistancePricingSnapshot } from '@clever/shared';
 import { autoAssignTechnician, validateTechnicianAssignment } from '../utils/technician-assignment';
 import { createBalanceService, ValidationError } from '../services/balance-service';
 import { createBalanceMiddleware } from '../middleware/balance-middleware';
@@ -453,6 +456,33 @@ remoteAssistanceRouter.post('/', async (c: Context) => {
     // Create remote assistance using storage service
     const { ContentStorageService } = await import('@clever/shared');
     const storage = new ContentStorageService<RemoteAssistance>(r2Bucket, 'remote-assistance');
+
+    // ========================================================================
+    // Build pricing snapshot from current constants (PRICE-BR-001, PRICE-AC-013)
+    // ========================================================================
+    const pricingSnapshot = createRemoteAssistancePricingSnapshot({
+      startTime: contentData.inicioAssistencia ?? '',
+      endTime: contentData.fimAssistencia ?? '',
+      isWeekendOrHoliday: false,
+      paymentMethod: contentData.paymentMethod ?? '',
+    });
+
+    // Validate pricing result (PRICE-AC-013)
+    if (isNaN(pricingSnapshot.calculated.totalValue)) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Não foi possível calcular o preço. Verifique os dados inseridos.',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 400);
+    }
+
+    // Attach to content data before storage
+    contentData.pricingSnapshot = pricingSnapshot;
+
+    // Update valorAssist from snapshot for backward compat with balance extraction
+    contentData.valorAssist = pricingSnapshot.calculated.totalValue;
+
     const newRemoteAssistance = await storage.create(contentData, { userId: user.userId });
 
     // Process balance update asynchronously (don't await - fire and forget)
@@ -495,6 +525,161 @@ remoteAssistanceRouter.post('/', async (c: Context) => {
     const response: ApiResponse = {
       success: false,
       error: 'Failed to create remote assistance',
+      timestamp: new Date().toISOString(),
+    };
+    return c.json(response, 500);
+  }
+});
+
+// ============================================================================
+// Custom PUT handler — pricing snapshot recalculation
+// ============================================================================
+
+/**
+ * Override PUT handler to integrate pricing snapshot recalculation
+ * Reads existing snapshot from stored record and either recalculates with anchored rates
+ * or creates a new snapshot for legacy records
+ * Requirements: PRICE-BR-003, PRICE-BR-007, PRICE-AC-009, PRICE-AC-010
+ */
+remoteAssistanceRouter.put('/:uuid', async (c: Context) => {
+  try {
+    const user = requireUserContext(c);
+    const uuid = c.req.param('uuid');
+    const r2Bucket = c.env?.R2_BUCKET as StorageBucket;
+
+    if (!r2Bucket) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Storage not available',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 500);
+    }
+
+    // Validate UUID format
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(uuid)) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Invalid UUID format',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 400);
+    }
+
+    // Parse request body
+    let requestData;
+    try {
+      requestData = await c.req.json();
+    } catch (error) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Invalid JSON body',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 400);
+    }
+
+    // Read existing record from R2
+    const existingObject = await r2Bucket.get(`content/remote-assistance/${uuid}.json`);
+    if (!existingObject) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'remote-assistance not found',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 404);
+    }
+
+    const existingRecord = (await existingObject.json()) as RemoteAssistance;
+    if (existingRecord.isDeleted) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'remote-assistance not found',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 404);
+    }
+
+    // Validate update data
+    if (remoteAssistanceConfig.validateUpdate) {
+      try {
+        await remoteAssistanceConfig.validateUpdate(requestData, existingRecord, user);
+      } catch (validationError) {
+        const response: ApiResponse = {
+          success: false,
+          error: validationError instanceof Error ? validationError.message : 'Validation failed',
+          timestamp: new Date().toISOString(),
+        };
+        return c.json(response, 400);
+      }
+    }
+
+    const contentData = requestData.data || requestData;
+
+    // Merge existing data with update payload (same logic as ContentStorageService.update)
+    const mergedData = { ...existingRecord.data, ...contentData };
+
+    // ========================================================================
+    // Pricing snapshot recalculation (PRICE-BR-003, PRICE-BR-007, PRICE-AC-009)
+    // ========================================================================
+    const existingSnapshot: RemoteAssistancePricingSnapshot | undefined = existingRecord.data.pricingSnapshot;
+
+    let updatedSnapshot: RemoteAssistancePricingSnapshot;
+    if (existingSnapshot) {
+      // Record has anchored rates — recalculate with original rates (PRICE-BR-007)
+      updatedSnapshot = recalculateRemoteAssistancePricingSnapshot(
+        existingSnapshot.rates,
+        {
+          startTime: mergedData.inicioAssistencia ?? '',
+          endTime: mergedData.fimAssistencia ?? '',
+          isWeekendOrHoliday: false,
+          paymentMethod: mergedData.paymentMethod ?? '',
+        }
+      );
+    } else {
+      // Legacy record — use current constants (PRICE-AC-010)
+      updatedSnapshot = createRemoteAssistancePricingSnapshot({
+        startTime: mergedData.inicioAssistencia ?? '',
+        endTime: mergedData.fimAssistencia ?? '',
+        isWeekendOrHoliday: false,
+        paymentMethod: mergedData.paymentMethod ?? '',
+      });
+    }
+
+    // Validate pricing result (PRICE-AC-013)
+    if (isNaN(updatedSnapshot.calculated.totalValue)) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Não foi possível calcular o preço. Verifique os dados inseridos.',
+        timestamp: new Date().toISOString(),
+      };
+      return c.json(response, 400);
+    }
+
+    // Attach updated snapshot to content data before storage
+    contentData.pricingSnapshot = updatedSnapshot;
+
+    // Update valorAssist from recalculated snapshot for backward compat with balance extraction
+    contentData.valorAssist = updatedSnapshot.calculated.totalValue;
+
+    // Use ContentStorageService for the actual update (handles versioning, indexing, relations)
+    const { ContentStorageService } = await import('@clever/shared');
+    const storage = new ContentStorageService<RemoteAssistance>(r2Bucket, 'remote-assistance');
+    const updatedRemoteAssistance = await storage.update(uuid, contentData, { userId: user.userId });
+
+    const response: ApiResponse<ContentWithRelations<any>> = {
+      success: true,
+      data: updatedRemoteAssistance,
+      timestamp: new Date().toISOString(),
+    };
+    return c.json(response);
+  } catch (error) {
+    console.error('Error updating remote assistance:', error);
+    const response: ApiResponse = {
+      success: false,
+      error: 'Failed to update remote assistance',
       timestamp: new Date().toISOString(),
     };
     return c.json(response, 500);

@@ -88,6 +88,32 @@ export interface WorkSheetOtherData {
 }
 
 /**
+ * Snapshot of pricing rates captured at Work Sheet creation time.
+ * Once stored, these rates are NEVER updated — they anchor the price to creation-time values.
+ */
+export interface WorkSheetPricingSnapshot {
+  /** Rates active at creation time */
+  rates: {
+    hourlyRateWeekday: number;       // from WORK_SHEET_CONSTANTS.HOURLY_RATE_WEEKDAY
+    hourlyRateWeekendHoliday: number; // from WORK_SHEET_CONSTANTS.HOURLY_RATE_WEEKEND_HOLIDAY
+    mileageRatePerKm: number;        // from WORK_SHEET_CONSTANTS.MILEAGE_RATE_PER_KM
+    travelFeeShort: number;          // from WORK_SHEET_CONSTANTS.TRAVEL_FEE_SHORT
+    travelFeeLong: number;           // from WORK_SHEET_CONSTANTS.TRAVEL_FEE_LONG
+    travelFeeThresholdKm: number;    // from WORK_SHEET_CONSTANTS.TRAVEL_FEE_THRESHOLD_KM
+    minimumHours: number;            // from WORK_SHEET_CONSTANTS.MINIMUM_HOURS
+  };
+  /** Calculated totals using anchored rates */
+  calculated: {
+    hourlyRate: number;     // effective rate used (weekday or weekend)
+    laborHours: number;     // hours charged (min 1h applied)
+    laborPrice: number;     // laborHours × hourlyRate
+    travelFee: number;      // 0 if no displacement
+    mileagePrice: number;   // 0 if no displacement
+    totalPrice: number;     // laborPrice + travelFee + mileagePrice
+  };
+}
+
+/**
  * Work Sheet Data Interface
  * Complete data structure for work sheets based on legacy analysis
  */
@@ -102,6 +128,9 @@ export interface WorkSheetData {
   request: WorkSheetRequestData;
   displacement: WorkSheetDisplacementData;
   otherData: WorkSheetOtherData;
+
+  /** Pricing snapshot anchored at creation time. Absent for legacy records. */
+  pricingSnapshot?: WorkSheetPricingSnapshot;
 }
 
 /**

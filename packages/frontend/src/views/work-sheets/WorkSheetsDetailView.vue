@@ -379,7 +379,7 @@
                   </div>
                   <div class="pricing-row">
                     <span class="pricing-label">Preço KMs:
-                      <span class="pricing-detail">{{ pricing.totalKms }} km × {{ WORK_SHEET_CONSTANTS.MILEAGE_RATE_PER_KM }}€</span>
+                      <span class="pricing-detail">{{ pricing.totalKms }} km × {{ displayMileageRate }}€</span>
                     </span>
                     <span class="pricing-value">{{ pricing.mileagePrice }}€ <span class="text-xs text-red-600">sem IVA</span></span>
                   </div>
@@ -814,9 +814,27 @@ const getTechnicianDisplayName = (technician: TechnicianUser | string | undefine
   return '-';
 };
 
-// Pricing computed property using shared calculation
+// Pricing computed property — prefers anchored snapshot values (PRICE-BR-004)
 const pricing = computed(() => {
   if (!workSheet.value?.data) return null;
+
+  const snapshot = workSheet.value.data.pricingSnapshot;
+
+  if (snapshot) {
+    // Anchored record: use stored calculated values (PRICE-BR-004)
+    return {
+      hourlyRate: snapshot.calculated.hourlyRate,
+      laborHours: snapshot.calculated.laborHours,
+      laborPrice: snapshot.calculated.laborPrice,
+      hasDisplacement: workSheet.value.data.displacement?.hasDisplacement ?? false,
+      travelFee: snapshot.calculated.travelFee,
+      mileagePrice: snapshot.calculated.mileagePrice,
+      totalKms: workSheet.value.data.displacement?.totalKms ?? 0,
+      totalPrice: snapshot.calculated.totalPrice,
+    };
+  }
+
+  // Legacy fallback: dynamic calculation with current constants (PRICE-AC-011)
   return calculateWorkSheetPricing({
     weekendHoliday: workSheet.value.data.displacement?.weekendHoliday ?? false,
     hasDisplacement: workSheet.value.data.displacement?.hasDisplacement ?? false,
@@ -824,6 +842,15 @@ const pricing = computed(() => {
     arrivalTime: workSheet.value.data.request?.arrivalTime ?? '',
     departureTime: workSheet.value.data.request?.departureTime ?? '',
   });
+});
+
+// Mileage rate display — uses snapshot rate when available, falls back to constants
+const displayMileageRate = computed(() => {
+  const snapshot = workSheet.value?.data?.pricingSnapshot;
+  if (snapshot) {
+    return snapshot.rates.mileageRatePerKm;
+  }
+  return WORK_SHEET_CONSTANTS.MILEAGE_RATE_PER_KM;
 });
 
 // Contract helper functions

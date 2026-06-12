@@ -3,6 +3,34 @@ import type { TechnicianUser } from '../../types';
 import type { FileReference } from '../../file-validation';
 
 /**
+ * Snapshot of pricing rates captured at Remote Assistance creation time.
+ * Once stored, these rates are NEVER updated.
+ */
+export interface RemoteAssistancePricingSnapshot {
+  /** Rates active at creation time */
+  rates: {
+    priceBusinessHours: number;
+    priceAfterHours: number;
+    billingIncrementMinutes: number;
+    businessHoursMorningStart: number;
+    businessHoursMorningEnd: number;
+    businessHoursAfternoonStart: number;
+    businessHoursAfternoonEnd: number;
+  };
+  /** Calculated totals using anchored rates */
+  calculated: {
+    totalValue: number;
+    businessHoursValue: number;
+    offHoursValue: number;
+    totalMinutes: number;
+    billingMinutes: number;
+    businessMinutes: number;
+    offHoursMinutes: number;
+    isZeroCost: boolean;
+  };
+}
+
+/**
  * Remote Assistance Data Interface
  * Based on analysis of old_src/views/assistencias-remotas/AssistenciasRemotasDetail.vue and AssistenciasRemotasForm.vue
  *
@@ -44,6 +72,9 @@ export interface RemoteAssistanceData {
 
   // File attachments — structured references to files stored in R2
   anexosFiles: FileReference[];
+
+  /** Pricing snapshot anchored at creation time. Absent for legacy records. */
+  pricingSnapshot?: RemoteAssistancePricingSnapshot;
 }
 
 /**
