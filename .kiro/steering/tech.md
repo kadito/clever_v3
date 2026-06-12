@@ -19,20 +19,23 @@
 - Vue 3 + Composition API (no Options API, no class components)
 - Vue Router 4, Pinia, Vite, Tailwind CSS v3
 - Clerk (`@clerk/clerk-js`) for auth
+- File uploads via `useFileUpload` composable + `FileUploadZone` component
+- Services layer: `services/api.ts` (HTTP client), `services/planSelection.ts`
 - Testing: Vitest + @vue/test-utils + fast-check (PBT)
 - Path alias: `@/` → `packages/frontend/src/`
 
 ## Backend
 
-- Hono on Cloudflare Workers
+- Hono on Cloudflare Workers (wrangler ^3.114)
 - `@hono/clerk-auth` for JWT verification
-- Storage: Cloudflare R2 (JSON docs) + KV (static assets)
+- Storage: Cloudflare R2 (JSON docs + file attachments) + KV (static assets)
+- File routes: `/api/content/{type}/{uuid}/files` (multipart upload)
 - Testing: Vitest + fast-check
 
 ## Shared
 
 - Pure TypeScript, no runtime deps
-- Exports: types, permissions, utils, relation helpers, balance types
+- Exports: types, permissions, utils, relation helpers, balance types, file-validation
 
 ## Commands
 

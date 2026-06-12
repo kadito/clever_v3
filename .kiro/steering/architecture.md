@@ -15,6 +15,7 @@ Request → other  → KV static assets → Vue SPA (index.html fallback)
 ## Storage
 
 - R2: `content/{type}/{uuid}.json` — JSON documents
+- R2: `content/{type}/{uuid}/files/{filename}` — file attachments
 - R2: `indexes/{type}-index.json` — search indexes
 - KV (ASSETS binding): Vue build artifacts
 
@@ -38,13 +39,15 @@ interface BaseContent {
 - All responses include `relations: Record<string, ResolvedRelation | RelationError>`
 - Errors: `{ type: 'error', code: 404 | 500, message: string }`
 - Use `isRelationError()` / `isResolvedRelation()` from `@clever/shared`
-- Supported: License→Client, Contract→Client, WorkSheet→Client, RemoteAssistance→Client, InstallationsProgramming→Client
+- Supported: License→Client, Contract→Client, WorkSheet→Client, RemoteAssistance→Client, InstallationsProgramming→Client, DailyRecords→Client
 
 ## API endpoints
 
 ```
 GET/POST        /api/content/{type}
 GET/PUT/DELETE  /api/content/{type}/{uuid}
+POST            /api/content/{type}/{uuid}/files    (multipart upload)
+GET             /api/content/{type}/{uuid}/files/{filename}
 GET             /api/balance/report
 GET             /api/balance/report/export
 ```
