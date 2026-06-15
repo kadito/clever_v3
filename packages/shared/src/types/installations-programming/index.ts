@@ -23,3 +23,44 @@ export {
 
 // Export validation
 export { calculateCompletedPhases, calculateIsCompleted } from './validation';
+
+// ── Seven Phases ────────────────────────────────────────────────────
+
+// Export seven-phase types
+export type {
+  InstallationType,
+  PhaseStatus,
+  InstallationStatus,
+  Phase1SetupData,
+  Phase2RececaoData,
+  Phase3ProgramacaoData,
+  Phase4PreparacaoData,
+  Phase5InstalacaoData,
+  Phase6TestesData,
+  Phase7FinalizacaoData,
+  ChecklistCategory,
+  CpaChecklistCategory,
+  EquipmentChecklist,
+  InstallationSevenPhasesData,
+  InstallationSevenPhases,
+} from './types-seven-phases';
+
+// Export seven-phase constants
+export {
+  PHASE_NAMES_SEVEN,
+  CHECKLIST_ITEMS_SEVEN,
+  CHECKLIST_LABELS_SEVEN,
+  CHECKLIST_CATEGORY_LABELS_SEVEN,
+  INSTALLATION_TYPES,
+} from './types-seven-phases';
+
+// Export seven-phase validation
+export {
+  validatePhaseCompletion,
+  deriveCurrentPhase,
+  deriveInstallationStatus,
+  getPhaseValidationErrors,
+} from './validation-seven-phases';
+
+// Export legacy adapter
+export { adaptLegacyData } from './legacy-adapter';

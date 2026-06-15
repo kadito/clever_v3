@@ -8,7 +8,7 @@
     :search-query="searchQuery"
     search-placeholder="Pesquisar instalações..."
     :show-create-button="true"
-    create-button-text="Criar Instalação"
+    create-button-text="Nova Instalação"
     empty-icon="🔧"
     empty-title="Nenhuma instalação encontrada"
     empty-message="Não há instalações cadastradas no sistema."
@@ -45,87 +45,79 @@
 
     <!-- Custom meta information -->
     <template #itemMeta="{ item }">
-      <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
-        <!-- Progress indicator -->
-        <span
-          class="progress-badge"
-          :class="getProgressClass(item)"
-        >
-          <svg
-            class="w-3 h-3 mr-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+      <div class="flex flex-col gap-2">
+        <!-- Row 1: Installation type badge + Status text -->
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <!-- Installation type badge -->
+          <span
+            v-if="getInstallationType(item)"
+            class="px-2 py-0.5 rounded text-xs font-medium"
+            :class="getInstallationTypeBadgeClass(item)"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-            />
-          </svg>
-          {{ getCompletedPhasesCount(item) }}/5 fases
-        </span>
+            {{ getInstallationType(item) }}
+          </span>
 
-        <!-- Completed badge -->
-        <span
-          v-if="getIsCompleted(item)"
-          class="px-2 py-1 rounded text-xs font-medium bg-emerald-100 text-emerald-800 flex items-center"
-        >
-          <svg
-            class="w-3 h-3 mr-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+          <!-- Status text -->
+          <span
+            class="px-2 py-0.5 rounded text-xs font-medium"
+            :class="getStatusClass(item)"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          Concluída
-        </span>
+            {{ getStatusText(item) }}
+          </span>
+        </div>
 
-        <!-- Technician -->
-        <span
-          v-if="getTechnicianName(item)"
-          class="flex items-center before:content-['•'] before:mx-1"
-        >
-          <svg
-            class="w-3 h-3 mr-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-            />
-          </svg>
-          {{ getTechnicianName(item) }}
-        </span>
+        <!-- Row 2: 7 progress dots -->
+        <div class="flex items-center gap-1">
+          <span
+            v-for="phase in 7"
+            :key="phase"
+            class="w-2.5 h-2.5 rounded-full border"
+            :class="getPhaseDotClass(item, phase)"
+            :title="`Fase ${phase}`"
+          />
+        </div>
 
-        <!-- Created date -->
-        <span class="flex items-center before:content-['•'] before:mx-1">
-          <svg
-            class="w-3 h-3 mr-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+        <!-- Row 3: Technician + date -->
+        <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
+          <!-- Technician -->
+          <span
+            v-if="getTechnicianName(item)"
+            class="flex items-center"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
-          {{ formatDate(item.createdAt) }}
-        </span>
+            <svg
+              class="w-3 h-3 mr-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
+            </svg>
+            {{ getTechnicianName(item) }}
+          </span>
+
+          <!-- Created date -->
+          <span class="flex items-center before:content-['•'] before:mx-1">
+            <svg
+              class="w-3 h-3 mr-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            {{ formatDate(item.createdAt) }}
+          </span>
+        </div>
       </div>
     </template>
   </ContentListTemplate>
@@ -139,7 +131,10 @@ import type {
   BaseContent,
   ContentWithRelations,
   TechnicianUser,
+  InstallationSevenPhasesData,
+  PhaseStatus,
 } from '@clever/shared';
+import { adaptLegacyData } from '@clever/shared';
 import ContentListTemplate from '@/components/common/ContentListTemplate.vue';
 import { useApi } from '@/composables/useApi';
 
@@ -159,6 +154,12 @@ const itemsPerPage = ref(10);
 // Clear error
 const clearError = () => {
   error.value = null;
+};
+
+// Helper: get adapted data for an item (handles legacy format)
+const getAdaptedData = (item: BaseContent): InstallationSevenPhasesData => {
+  const installation = item as ContentWithRelations<InstallationsProgramming['data']>;
+  return adaptLegacyData(installation.data);
 };
 
 // Computed
@@ -185,6 +186,12 @@ const displayedInstallations = computed(() => {
     // Search in technician name
     const techName = getTechnicianDisplayName(item.data.technician);
     if (techName.toLowerCase().includes(query)) return true;
+
+    // Search in installation type
+    const adapted = adaptLegacyData(item.data);
+    if (adapted.installationType && adapted.installationType.toLowerCase().includes(query)) {
+      return true;
+    }
 
     return false;
   });
@@ -240,46 +247,91 @@ const getItemTitle = (item: BaseContent): string => {
 };
 
 const getItemSubtitle = (item: BaseContent): string => {
-  const installation = item as ContentWithRelations<InstallationsProgramming['data']>;
-  const techName = getTechnicianDisplayName(installation.data.technician);
-  const count = installation.data.completedPhases?.length ?? 0;
+  const adapted = getAdaptedData(item);
+  const techName = getTechnicianDisplayName(adapted.technician);
+  const status = adapted.status === 'complete' ? 'Completa' : `Em curso — Fase ${adapted.currentPhase}`;
 
   const parts: string[] = [];
   if (techName) parts.push(techName);
-  if (count === 5) {
-    parts.push('Instalação concluída');
-  } else {
-    parts.push(`${count}/5 fases completas`);
-  }
+  parts.push(status);
 
   return parts.join(' • ');
 };
 
 const getItemMeta1 = (item: BaseContent): string => {
-  const installation = item as ContentWithRelations<InstallationsProgramming['data']>;
-  const count = installation.data.completedPhases?.length ?? 0;
-  return count === 5 ? 'Concluída' : `${count}/5 fases`;
+  const adapted = getAdaptedData(item);
+  return adapted.status === 'complete' ? 'Completa' : `Fase ${adapted.currentPhase}/7`;
 };
 
 const getItemMeta2 = (item: BaseContent): string => {
-  const installation = item as ContentWithRelations<InstallationsProgramming['data']>;
-  return getTechnicianDisplayName(installation.data.technician);
+  const adapted = getAdaptedData(item);
+  return getTechnicianDisplayName(adapted.technician);
+};
+
+// ── New display helpers for 7-phase progress ────────────────────────
+
+const getInstallationType = (item: BaseContent): string => {
+  const adapted = getAdaptedData(item);
+  return adapted.installationType || '';
+};
+
+const getInstallationTypeBadgeClass = (item: BaseContent): string => {
+  const adapted = getAdaptedData(item);
+  const type = adapted.installationType;
+
+  switch (type) {
+    case 'POS':
+      return 'bg-blue-100 text-blue-800';
+    case 'CPA':
+      return 'bg-purple-100 text-purple-800';
+    case 'balanças':
+      return 'bg-amber-100 text-amber-800';
+    case 'CCTV':
+      return 'bg-red-100 text-red-800';
+    case 'Alarmes':
+      return 'bg-orange-100 text-orange-800';
+    case 'Botões de chamada e relógios':
+      return 'bg-teal-100 text-teal-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
+};
+
+const getStatusText = (item: BaseContent): string => {
+  const adapted = getAdaptedData(item);
+  if (adapted.status === 'complete') {
+    return 'Completa';
+  }
+  return `Em curso — Fase ${adapted.currentPhase}`;
+};
+
+const getStatusClass = (item: BaseContent): string => {
+  const adapted = getAdaptedData(item);
+  if (adapted.status === 'complete') {
+    return 'bg-emerald-100 text-emerald-800';
+  }
+  return 'bg-yellow-100 text-yellow-800';
+};
+
+const getPhaseDotClass = (item: BaseContent, phase: number): string => {
+  const adapted = getAdaptedData(item);
+  const phaseStatuses: PhaseStatus[] = adapted.phaseStatuses || [];
+  const status = phaseStatuses[phase - 1];
+
+  if (status === 'completed') {
+    return 'bg-emerald-500 border-emerald-500';
+  }
+  if (status === 'in_progress' || status === 'unlocked') {
+    return 'bg-yellow-400 border-yellow-400';
+  }
+  // not_started or undefined
+  return 'bg-gray-200 border-gray-300';
 };
 
 // Helper functions for custom template slots
-const getCompletedPhasesCount = (item: BaseContent): number => {
-  const installation = item as ContentWithRelations<InstallationsProgramming['data']>;
-  return installation.data.completedPhases?.length ?? 0;
-};
-
-const getIsCompleted = (item: BaseContent): boolean => {
-  const installation = item as ContentWithRelations<InstallationsProgramming['data']>;
-  return installation.data.isCompleted === true;
-};
-
 const getTechnicianName = (item: BaseContent): string => {
-  const installation = item as ContentWithRelations<InstallationsProgramming['data']>;
-  return getTechnicianDisplayName(installation.data.technician);
+  const adapted = getAdaptedData(item);
+  return getTechnicianDisplayName(adapted.technician);
 };
 
 const getInitials = (item: BaseContent): string => {
@@ -314,27 +366,20 @@ const getIconClass = (item: BaseContent): string => {
     return 'bg-red-500 text-white';
   }
 
+  const adapted = getAdaptedData(item);
+
   // Completed
-  if (installation.data.isCompleted) {
+  if (adapted.status === 'complete') {
     return 'bg-[#75AE93] text-white';
   }
 
-  // In progress
-  const count = installation.data.completedPhases?.length ?? 0;
-  if (count > 0) {
+  // In progress — determine by how far along
+  const completedCount = adapted.phaseStatuses?.filter((s: PhaseStatus) => s === 'completed').length ?? 0;
+  if (completedCount > 0) {
     return 'bg-yellow-500 text-white';
   }
 
   return 'bg-gray-500 text-white';
-};
-
-const getProgressClass = (item: BaseContent): string => {
-  const installation = item as ContentWithRelations<InstallationsProgramming['data']>;
-  const count = installation.data.completedPhases?.length ?? 0;
-
-  if (count === 5) return 'bg-emerald-100 text-emerald-800';
-  if (count > 0) return 'bg-yellow-100 text-yellow-800';
-  return 'bg-gray-100 text-gray-800';
 };
 
 const formatDate = (dateString: string): string => {
@@ -442,10 +487,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.progress-badge {
-  @apply px-2 py-1 rounded text-xs font-medium flex items-center;
-}
-
 /* Mobile-first responsive adjustments */
 @media (max-width: 640px) {
   .progress-badge {

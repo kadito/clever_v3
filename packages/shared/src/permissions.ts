@@ -36,6 +36,14 @@ export function canViewAuditTrail(userType: UserType | null | undefined): boolea
 }
 
 /**
+ * Check if user can unlock a completed phase
+ * Only Admins can unlock phases for re-editing
+ */
+export function canUnlockPhase(userType: UserType | null | undefined): boolean {
+  return isAdmin(userType);
+}
+
+/**
  * Get all permissions for a user type
  * Returns an object with all permission flags
  */

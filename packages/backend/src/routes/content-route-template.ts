@@ -29,6 +29,21 @@ import type {
 export type SortStrategy = 'alphabetical' | 'date-desc' | 'date-asc';
 
 /**
+ * Custom validation error that carries an HTTP status code.
+ * Throw this from validateCreate/validateUpdate hooks to return
+ * a specific HTTP status (e.g., 403 for permission denied).
+ */
+export class HttpValidationError extends Error {
+  public readonly statusCode: number;
+
+  constructor(message: string, statusCode: number) {
+    super(message);
+    this.name = 'HttpValidationError';
+    this.statusCode = statusCode;
+  }
+}
+
+/**
  * Content route configuration
  */
 export interface ContentRouteConfig<T extends BaseContent> {
@@ -422,12 +437,13 @@ export function createContentRoutes<T extends BaseContent>(config: ContentRouteC
         try {
           await config.validateCreate(requestData, user);
         } catch (validationError) {
+          const statusCode = validationError instanceof HttpValidationError ? validationError.statusCode : 400;
           const response: ApiResponse = {
             success: false,
             error: validationError instanceof Error ? validationError.message : 'Validation failed',
             timestamp: new Date().toISOString(),
           };
-          return c.json(response, 400);
+          return c.json(response, statusCode);
         }
       }
 
@@ -527,12 +543,13 @@ export function createContentRoutes<T extends BaseContent>(config: ContentRouteC
 
           await config.validateUpdate(requestData, existingContent, user);
         } catch (validationError) {
+          const statusCode = validationError instanceof HttpValidationError ? validationError.statusCode : 400;
           const response: ApiResponse = {
             success: false,
             error: validationError instanceof Error ? validationError.message : 'Validation failed',
             timestamp: new Date().toISOString(),
           };
-          return c.json(response, 400);
+          return c.json(response, statusCode);
         }
       }
 

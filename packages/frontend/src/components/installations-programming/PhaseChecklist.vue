@@ -11,6 +11,7 @@
         class="category-header"
         :aria-expanded="expandedCategories[categoryKey]"
         :aria-controls="`category-${categoryKey}`"
+        :disabled="disabled"
         @click="toggleCategory(categoryKey)"
       >
         <div class="category-header-left">
@@ -30,13 +31,13 @@
               d="M6 8l4 4 4-4"
             />
           </svg>
-          <span class="category-name">{{ CHECKLIST_CATEGORY_LABELS[categoryKey] }}</span>
+          <span class="category-name">{{ CHECKLIST_CATEGORY_LABELS_SEVEN[categoryKey] }}</span>
         </div>
         <span
           class="category-progress"
           :class="getCategoryProgressClass(categoryKey)"
         >
-          {{ getCategoryCheckedCount(categoryKey) }}/{{ CHECKLIST_CATEGORIES[categoryKey].length }}
+          {{ getCategoryCheckedCount(categoryKey) }}/{{ CHECKLIST_ITEMS_SEVEN[categoryKey].length }}
         </span>
       </button>
 
@@ -47,23 +48,41 @@
         class="category-items"
       >
         <label
-          v-for="itemKey in CHECKLIST_CATEGORIES[categoryKey]"
+          v-for="itemKey in CHECKLIST_ITEMS_SEVEN[categoryKey]"
           :key="itemKey"
           class="checklist-item"
         >
-          <span class="item-label">{{ CHECKLIST_LABELS[categoryKey]?.[itemKey] ?? itemKey }}</span>
+          <span class="item-label">{{ CHECKLIST_LABELS_SEVEN[categoryKey][itemKey] }}</span>
           <button
             type="button"
             role="switch"
             :aria-checked="getItemValue(categoryKey, itemKey)"
-            :aria-label="CHECKLIST_LABELS[categoryKey]?.[itemKey] ?? itemKey"
+            :aria-label="CHECKLIST_LABELS_SEVEN[categoryKey][itemKey]"
             class="switch"
             :class="{ 'switch--on': getItemValue(categoryKey, itemKey) }"
+            :disabled="disabled"
             @click="toggleItem(categoryKey, itemKey)"
           >
             <span class="switch-thumb" />
           </button>
         </label>
+
+        <!-- CPA miniPcDetails text area -->
+        <div
+          v-if="categoryKey === 'cpa'"
+          class="mini-pc-details"
+        >
+          <label class="mini-pc-label" for="miniPcDetails">Mini PC</label>
+          <textarea
+            id="miniPcDetails"
+            class="mini-pc-textarea"
+            placeholder="Marca, Modelo, n.º série, materiais"
+            :value="modelValue.cpa.miniPcDetails"
+            :readonly="disabled"
+            :disabled="disabled"
+            @input="updateMiniPcDetails(($event.target as HTMLTextAreaElement).value)"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -72,59 +91,89 @@
 <script setup lang="ts">
 import { reactive, computed } from 'vue';
 import {
-  CHECKLIST_CATEGORIES,
-  CHECKLIST_LABELS,
-  CHECKLIST_CATEGORY_LABELS,
+  CHECKLIST_ITEMS_SEVEN,
+  CHECKLIST_LABELS_SEVEN,
+  CHECKLIST_CATEGORY_LABELS_SEVEN,
 } from '@clever/shared';
+import type { EquipmentChecklist } from '@clever/shared';
+
+type CategoryKey = keyof typeof CHECKLIST_ITEMS_SEVEN;
 
 interface Props {
-  modelValue: Record<string, Record<string, boolean>>;
+  modelValue: EquipmentChecklist;
+  disabled?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  disabled: false,
+});
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: Record<string, Record<string, boolean>>): void;
+  (e: 'update:modelValue', value: EquipmentChecklist): void;
 }>();
 
-const categoryKeys = computed(() => Object.keys(CHECKLIST_CATEGORIES));
-
-// All categories start collapsed
-const expandedCategories = reactive<Record<string, boolean>>(
-  Object.fromEntries(categoryKeys.value.map((key) => [key, false]))
+const categoryKeys = computed<CategoryKey[]>(() =>
+  Object.keys(CHECKLIST_ITEMS_SEVEN) as CategoryKey[]
 );
 
-const toggleCategory = (categoryKey: string): void => {
+// All categories start collapsed
+const expandedCategories = reactive<Record<CategoryKey, boolean>>(
+  Object.fromEntries(categoryKeys.value.map((key) => [key, false])) as Record<CategoryKey, boolean>
+);
+
+const toggleCategory = (categoryKey: CategoryKey): void => {
   expandedCategories[categoryKey] = !expandedCategories[categoryKey];
 };
 
-const getItemValue = (categoryKey: string, itemKey: string): boolean => {
-  return props.modelValue?.[categoryKey]?.[itemKey] ?? false;
+const getItemValue = (categoryKey: CategoryKey, itemKey: string): boolean => {
+  return props.modelValue?.[categoryKey]?.items?.[itemKey] ?? false;
 };
 
-const getCategoryCheckedCount = (categoryKey: string): number => {
-  const items = CHECKLIST_CATEGORIES[categoryKey];
+const getCategoryCheckedCount = (categoryKey: CategoryKey): number => {
+  const items = CHECKLIST_ITEMS_SEVEN[categoryKey];
   return items.filter((itemKey) => getItemValue(categoryKey, itemKey)).length;
 };
 
-const getCategoryProgressClass = (categoryKey: string): Record<string, boolean> => {
+const getCategoryProgressClass = (categoryKey: CategoryKey): Record<string, boolean> => {
   const checked = getCategoryCheckedCount(categoryKey);
-  const total = CHECKLIST_CATEGORIES[categoryKey].length;
+  const total = CHECKLIST_ITEMS_SEVEN[categoryKey].length;
   return {
     'progress--complete': checked === total && total > 0,
     'progress--partial': checked > 0 && checked < total,
   };
 };
 
-const toggleItem = (categoryKey: string, itemKey: string): void => {
+const toggleItem = (categoryKey: CategoryKey, itemKey: string): void => {
+  if (props.disabled) return;
+
   const currentValue = getItemValue(categoryKey, itemKey);
-  const updatedChecklist: Record<string, Record<string, boolean>> = {
+  const currentCategory = props.modelValue[categoryKey];
+  const updatedItems = {
+    ...currentCategory.items,
+    [itemKey]: !currentValue,
+  };
+
+  const updatedChecklist: EquipmentChecklist = {
     ...props.modelValue,
-    [categoryKey]: {
-      ...(props.modelValue?.[categoryKey] ?? {}),
-      [itemKey]: !currentValue,
+    [categoryKey]: categoryKey === 'cpa'
+      ? { ...currentCategory, items: updatedItems }
+      : { items: updatedItems },
+  };
+
+  emit('update:modelValue', updatedChecklist);
+};
+
+const updateMiniPcDetails = (value: string): void => {
+  if (props.disabled) return;
+
+  const updatedChecklist: EquipmentChecklist = {
+    ...props.modelValue,
+    cpa: {
+      ...props.modelValue.cpa,
+      miniPcDetails: value,
     },
   };
+
   emit('update:modelValue', updatedChecklist);
 };
 </script>
@@ -149,6 +198,10 @@ const toggleItem = (categoryKey: string, itemKey: string): void => {
 
 .category-header:active {
   @apply bg-gray-100;
+}
+
+.category-header:disabled {
+  @apply cursor-default;
 }
 
 .category-header-left {
@@ -204,6 +257,10 @@ const toggleItem = (categoryKey: string, itemKey: string): void => {
   -webkit-tap-highlight-color: transparent;
 }
 
+.switch:disabled {
+  @apply cursor-not-allowed opacity-60;
+}
+
 .switch--on {
   background-color: rgb(117, 174, 147);
 }
@@ -242,5 +299,34 @@ const toggleItem = (categoryKey: string, itemKey: string): void => {
 .switch:focus-visible {
   @apply outline-none ring-2 ring-offset-2;
   ring-color: #75AE93;
+}
+
+/* Mini PC Details textarea */
+.mini-pc-details {
+  @apply px-4 py-3 border-t border-gray-100;
+}
+
+.mini-pc-label {
+  @apply block text-sm font-medium text-gray-700 mb-1;
+  font-size: 16px;
+}
+
+.mini-pc-textarea {
+  @apply w-full rounded-md border border-gray-300 px-3 py-2
+         text-gray-700 placeholder-gray-400
+         focus:outline-none focus:ring-2 focus:border-transparent
+         resize-y;
+  min-height: 80px;
+  font-size: 16px;
+  focus-ring-color: #75AE93;
+}
+
+.mini-pc-textarea:focus {
+  --tw-ring-color: #75AE93;
+}
+
+.mini-pc-textarea:disabled,
+.mini-pc-textarea[readonly] {
+  @apply bg-gray-50 cursor-not-allowed opacity-75;
 }
 </style>

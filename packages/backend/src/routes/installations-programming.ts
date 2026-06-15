@@ -1,84 +1,98 @@
 /**
- * Installations & Programming API routes using the generic content route template
- * Implements full CRUD operations with phase-based validation and progress tracking
- * Requirements: REQ-01, REQ-07, REQ-08, REQ-10
+ * Installations & Programming API routes — 7-phase workflow
+ * Implements full CRUD operations with sequential phase completion, save, and admin unlock actions
+ * Requirements: INST7-BR-001, INST7-BR-002, INST7-BR-006, INST7-BR-007, INST7-BR-008,
+ *              INST7-BR-011, INST7-BR-012, INST7-BR-013, INST7-AC-034, INST7-AC-035,
+ *              INST7-AC-038, INST7-AC-039, INST7-AC-040, INST7-NFR-001
  */
 
 import {
   createContentRoutes,
   createStandardContentConfig,
   contentErrorHandler,
+  HttpValidationError,
 } from './content-route-template';
-import type {
-  UserContext,
-  InstallationsProgramming,
-  InstallationsProgrammingData,
-} from '@clever/shared';
-import { calculateCompletedPhases } from '@clever/shared';
+import type { UserContext, InstallationSevenPhases, InstallationSevenPhasesData, PhaseStatus } from '@clever/shared';
+import { validatePhaseCompletion, deriveCurrentPhase, deriveInstallationStatus, canUnlockPhase } from '@clever/shared';
 import { extractTechnicianUser } from '../utils/technician-assignment';
 import { Hono } from 'hono';
 
-// ── Default phase data factories ────────────────────────────────────
+// ── Types ───────────────────────────────────────────────────────────
 
-function defaultPhase1() {
-  return {
-    tipoProgramacao: '',
-    numeroSerie: '',
-    numeroEquipamento: '',
-    leiturasGuardadas: '',
-    testeFinal: false,
-  };
+type WorkflowAction = 'save' | 'complete-phase' | 'unlock-phase';
+
+interface UpdatePayload {
+  action?: WorkflowAction;
+  targetPhase?: number;
+  [key: string]: unknown;
 }
 
-function defaultPhase2() {
-  return { checklist: {} as Record<string, Record<string, boolean>> };
-}
+// ── Default data factory ────────────────────────────────────────────
 
-function defaultPhase3() {
+function createDefaultInstallationData(): Omit<InstallationSevenPhasesData, 'technician'> {
   return {
-    nrFatura: '',
-    nrGuiaTransportes: '',
-    dataInstalacao: '',
-    horaInicialInstalacao: '',
-    horaFinalInstalacao: '',
-    dataFormacao: '',
-    horaInicialFormacao: '',
-    horaFinalFormacao: '',
-    quemRecebeuFormacao: '',
-    tecnicoFormacao: '',
-    materialInstalado: {
-      pos: false,
-      cpa: false,
-      balanca: false,
-      cctv: false,
-      alarme: false,
-      impressora: false,
-      ups: false,
-      router: false,
-      switchEquip: false,
-      rolos: false,
-      rolosQuantidade: 0,
+    clientId: '',
+    installationType: '' as InstallationSevenPhasesData['installationType'],
+    equipmentMarca: '',
+    equipmentModelo: '',
+    equipmentNumeroSerie: '',
+    equipmentFornecedor: '',
+    phase1: {},
+    phase2: {
+      equipmentConditionOk: null,
+      equipamentoCliente: '',
+      verificacaoCabo: false,
+      verificacaoFechadura: false,
+      verificacaoChaves: false,
+      verificacaoTestes: false,
+      observacoes: '',
     },
-  };
-}
-
-function defaultPhase4() {
-  return {
-    anydeskTestado: false,
-    anydeskCodigo: '',
-    anydeskMotivo: '',
-    vectronConnectTestado: false,
-    vectronConnectCodigo: '',
-    vectronConnectMotivo: '',
-  };
-}
-
-function defaultPhase5() {
-  return {
-    dumpLido: false,
-    copiaSeguranca: false,
-    fotoInstalacao: false,
-    fotoURL: null,
+    phase3: {
+      software: '',
+      identificacaoReferencia: '',
+      numeroLicenca: '',
+      verificacaoInicioProgramacao: false,
+      testeFinalEquipamentos: false,
+      notasProgramacao: '',
+    },
+    phase4: {
+      materialAdicional: '',
+      checklist: {
+        pos: { items: {} },
+        impressora: { items: {} },
+        gavetaMetalica: { items: {} },
+        cpa: { items: {}, miniPcDetails: '' },
+        acessorios: { items: {} },
+      },
+    },
+    phase5: {
+      nrFatura: '',
+      nrGuiaTransporte: '',
+      dataInstalacao: '',
+      tecnicoInstalacao: '',
+      horaInicial: '',
+      horaFinal: '',
+      dataFormacao: '',
+      formacaoHoraInicial: '',
+      formacaoHoraFinal: '',
+      quemRecebeuFormacao: '',
+    },
+    phase6: {
+      anydeskConfigurado: null,
+      anydeskCodigo: '',
+      anydeskMotivo: '',
+      vectronConnectConfigurado: null,
+      vectronConnectCodigo: '',
+      vectronConnectMotivo: '',
+    },
+    phase7: {
+      dumpLido: false,
+      copiaSeguranca: false,
+      fotosInstalacao: [],
+    },
+    phaseStatuses: ['in_progress', 'not_started', 'not_started', 'not_started', 'not_started', 'not_started', 'not_started'],
+    currentPhase: 1,
+    status: 'in_progress',
   };
 }
 
@@ -87,9 +101,9 @@ function defaultPhase5() {
 /**
  * Validate and initialize data on creation
  * - Auto-assign technician from user context
- * - Initialize all phases with defaults
- * - Set completedPhases: [] and isCompleted: false
- * Requirements: CA-01.1, CA-01.6
+ * - Initialize all 7 phases with defaults
+ * - Merge any provided Phase 1 data (clientId, installationType, equipment fields)
+ * Requirements: INST7-BR-001, INST7-AC-034
  */
 function validateCreate(requestData: Record<string, unknown>, userContext?: UserContext): void {
   const data = (requestData.data || requestData) as Record<string, unknown>;
@@ -99,80 +113,248 @@ function validateCreate(requestData: Record<string, unknown>, userContext?: User
   }
 
   // Auto-assign technician
-  data.technician = extractTechnicianUser(userContext);
+  const technician = extractTechnicianUser(userContext);
 
-  // Initialize phases with defaults (preserve any provided values)
-  data.phase1 = { ...defaultPhase1(), ...(data.phase1 as Record<string, unknown> || {}) };
-  data.phase2 = { ...defaultPhase2(), ...(data.phase2 as Record<string, unknown> || {}) };
-  data.phase3 = { ...defaultPhase3(), ...(data.phase3 as Record<string, unknown> || {}) };
-  data.phase4 = { ...defaultPhase4(), ...(data.phase4 as Record<string, unknown> || {}) };
-  data.phase5 = { ...defaultPhase5(), ...(data.phase5 as Record<string, unknown> || {}) };
-
-  // Initialize progress tracking
-  data.completedPhases = [];
-  data.isCompleted = false;
-  data.clientId = data.clientId || '';
+  // Create defaults and merge provided Phase 1 data
+  const defaults = createDefaultInstallationData();
+  const mergedData: Record<string, unknown> = {
+    ...defaults,
+    technician,
+    clientId: (data.clientId as string) || defaults.clientId,
+    installationType: (data.installationType as string) || defaults.installationType,
+    equipmentMarca: (data.equipmentMarca as string) || defaults.equipmentMarca,
+    equipmentModelo: (data.equipmentModelo as string) || defaults.equipmentModelo,
+    equipmentNumeroSerie: (data.equipmentNumeroSerie as string) || defaults.equipmentNumeroSerie,
+    equipmentFornecedor: (data.equipmentFornecedor as string) || defaults.equipmentFornecedor,
+  };
 
   // Update original request
   if (requestData.data) {
-    requestData.data = data;
+    requestData.data = mergedData;
   } else {
-    Object.assign(requestData, data);
+    Object.keys(requestData).forEach((key) => delete requestData[key]);
+    Object.assign(requestData, mergedData);
   }
 }
 
 /**
- * Validate and merge data on update
- * - Auto-assign technician to current user
- * - Merge partial phase data (preserve existing for phases not in payload)
- * - Recalculate completedPhases and isCompleted
- * Requirements: CA-01.3, CA-08.4, CA-08.5
+ * Validate and process update based on action type
+ * - 'save' (default): merge partial phase data without validation
+ * - 'complete-phase': validate completion criteria, advance workflow
+ * - 'unlock-phase': Admin-only, sets phase to unlocked state
+ * Requirements: INST7-BR-002, INST7-BR-006, INST7-BR-007, INST7-BR-008,
+ *              INST7-BR-011, INST7-BR-012, INST7-BR-013, INST7-AC-035,
+ *              INST7-AC-038, INST7-AC-039, INST7-AC-040
  */
 function validateUpdate(
   requestData: Record<string, unknown>,
-  existingContent?: InstallationsProgramming,
-  userContext?: UserContext
+  existingContent?: InstallationSevenPhases,
+  userContext?: UserContext,
 ): void {
-  const data = (requestData.data || requestData) as Record<string, unknown>;
+  const data = (requestData.data || requestData) as UpdatePayload;
+  const action: WorkflowAction = data.action || 'save';
 
-  // Auto-assign technician to current user
-  if (userContext) {
-    data.technician = extractTechnicianUser(userContext);
+  if (!existingContent) {
+    throw new Error('Conteúdo não encontrado');
   }
 
-  // Merge partial phase data — preserve existing data for phases not included in payload
-  if (existingContent) {
-    const existing = existingContent.data;
-
-    if (!data.phase1) data.phase1 = existing.phase1;
-    else data.phase1 = { ...existing.phase1, ...(data.phase1 as Record<string, unknown>) };
-
-    if (!data.phase2) data.phase2 = existing.phase2;
-    else data.phase2 = { ...existing.phase2, ...(data.phase2 as Record<string, unknown>) };
-
-    if (!data.phase3) data.phase3 = existing.phase3;
-    else data.phase3 = { ...existing.phase3, ...(data.phase3 as Record<string, unknown>) };
-
-    if (!data.phase4) data.phase4 = existing.phase4;
-    else data.phase4 = { ...existing.phase4, ...(data.phase4 as Record<string, unknown>) };
-
-    if (!data.phase5) data.phase5 = existing.phase5;
-    else data.phase5 = { ...existing.phase5, ...(data.phase5 as Record<string, unknown>) };
-
-    // Preserve clientId if not provided
-    if (data.clientId === undefined) data.clientId = existing.clientId;
+  if (!userContext) {
+    throw new Error('Autenticação necessária');
   }
 
-  // Recalculate completed phases
-  const completedPhases = calculateCompletedPhases(data as unknown as InstallationsProgrammingData);
-  data.completedPhases = completedPhases;
-  data.isCompleted = completedPhases.length === 5;
+  const existing = existingContent.data;
 
-  // Update original request
+  switch (action) {
+    case 'save':
+      handleSaveAction(data, existing, requestData);
+      break;
+    case 'complete-phase':
+      handleCompletePhaseAction(data, existing, requestData);
+      break;
+    case 'unlock-phase':
+      handleUnlockPhaseAction(data, existing, userContext, requestData);
+      break;
+    default:
+      throw new Error(`Ação inválida: ${action as string}`);
+  }
+}
+
+// ── Action Handlers ─────────────────────────────────────────────────
+
+/**
+ * Save action: merge partial phase data without completion validation
+ * Requirements: INST7-BR-006, INST7-AC-035
+ */
+function handleSaveAction(
+  data: UpdatePayload,
+  existing: InstallationSevenPhasesData,
+  requestData: Record<string, unknown>,
+): void {
+  const merged: Record<string, unknown> = { ...existing };
+
+  // Merge top-level fields if provided
+  if (data.clientId !== undefined) merged.clientId = data.clientId;
+  if (data.installationType !== undefined) merged.installationType = data.installationType;
+  if (data.equipmentMarca !== undefined) merged.equipmentMarca = data.equipmentMarca;
+  if (data.equipmentModelo !== undefined) merged.equipmentModelo = data.equipmentModelo;
+  if (data.equipmentNumeroSerie !== undefined) merged.equipmentNumeroSerie = data.equipmentNumeroSerie;
+  if (data.equipmentFornecedor !== undefined) merged.equipmentFornecedor = data.equipmentFornecedor;
+
+  // Merge phase data (shallow merge per phase)
+  if (data.phase1) merged.phase1 = { ...existing.phase1, ...(data.phase1 as Record<string, unknown>) };
+  if (data.phase2) merged.phase2 = { ...existing.phase2, ...(data.phase2 as Record<string, unknown>) };
+  if (data.phase3) merged.phase3 = { ...existing.phase3, ...(data.phase3 as Record<string, unknown>) };
+  if (data.phase4) {
+    const incomingPhase4 = data.phase4 as Record<string, unknown>;
+    const existingPhase4 = existing.phase4;
+    merged.phase4 = {
+      ...existingPhase4,
+      ...incomingPhase4,
+      checklist: incomingPhase4.checklist
+        ? { ...existingPhase4.checklist, ...(incomingPhase4.checklist as Record<string, unknown>) }
+        : existingPhase4.checklist,
+    };
+  }
+  if (data.phase5) merged.phase5 = { ...existing.phase5, ...(data.phase5 as Record<string, unknown>) };
+  if (data.phase6) merged.phase6 = { ...existing.phase6, ...(data.phase6 as Record<string, unknown>) };
+  if (data.phase7) merged.phase7 = { ...existing.phase7, ...(data.phase7 as Record<string, unknown>) };
+
+  // Remove action/targetPhase from persisted data
+  delete (merged as UpdatePayload).action;
+  delete (merged as UpdatePayload).targetPhase;
+
+  setRequestData(requestData, merged);
+}
+
+/**
+ * Complete-phase action: validate phase criteria, advance workflow state
+ * Requirements: INST7-BR-007, INST7-BR-008, INST7-BR-011, INST7-AC-038, INST7-AC-039
+ */
+function handleCompletePhaseAction(
+  data: UpdatePayload,
+  existing: InstallationSevenPhasesData,
+  requestData: Record<string, unknown>,
+): void {
+  const targetPhase = data.targetPhase;
+
+  if (!targetPhase || targetPhase < 1 || targetPhase > 7) {
+    throw new Error('targetPhase inválido: deve ser entre 1 e 7');
+  }
+
+  // First merge any incoming phase data with existing (same as save)
+  const merged: Record<string, unknown> = { ...existing };
+
+  // Merge top-level fields if provided
+  if (data.clientId !== undefined) merged.clientId = data.clientId;
+  if (data.installationType !== undefined) merged.installationType = data.installationType;
+  if (data.equipmentMarca !== undefined) merged.equipmentMarca = data.equipmentMarca;
+  if (data.equipmentModelo !== undefined) merged.equipmentModelo = data.equipmentModelo;
+  if (data.equipmentNumeroSerie !== undefined) merged.equipmentNumeroSerie = data.equipmentNumeroSerie;
+  if (data.equipmentFornecedor !== undefined) merged.equipmentFornecedor = data.equipmentFornecedor;
+
+  // Merge phase data
+  if (data.phase1) merged.phase1 = { ...existing.phase1, ...(data.phase1 as Record<string, unknown>) };
+  if (data.phase2) merged.phase2 = { ...existing.phase2, ...(data.phase2 as Record<string, unknown>) };
+  if (data.phase3) merged.phase3 = { ...existing.phase3, ...(data.phase3 as Record<string, unknown>) };
+  if (data.phase4) {
+    const incomingPhase4 = data.phase4 as Record<string, unknown>;
+    const existingPhase4 = existing.phase4;
+    merged.phase4 = {
+      ...existingPhase4,
+      ...incomingPhase4,
+      checklist: incomingPhase4.checklist
+        ? { ...existingPhase4.checklist, ...(incomingPhase4.checklist as Record<string, unknown>) }
+        : existingPhase4.checklist,
+    };
+  }
+  if (data.phase5) merged.phase5 = { ...existing.phase5, ...(data.phase5 as Record<string, unknown>) };
+  if (data.phase6) merged.phase6 = { ...existing.phase6, ...(data.phase6 as Record<string, unknown>) };
+  if (data.phase7) merged.phase7 = { ...existing.phase7, ...(data.phase7 as Record<string, unknown>) };
+
+  // Validate phase completion criteria
+  const isValid = validatePhaseCompletion(targetPhase, merged as unknown as InstallationSevenPhasesData);
+  if (!isValid) {
+    throw new Error(`Fase ${targetPhase} não pode ser concluída: campos obrigatórios em falta`);
+  }
+
+  // Update phase statuses
+  const phaseStatuses = [...existing.phaseStatuses] as PhaseStatus[];
+  phaseStatuses[targetPhase - 1] = 'completed';
+
+  // If not the last phase, set next phase to in_progress
+  if (targetPhase < 7 && phaseStatuses[targetPhase] === 'not_started') {
+    phaseStatuses[targetPhase] = 'in_progress';
+  }
+
+  merged.phaseStatuses = phaseStatuses;
+  merged.currentPhase = deriveCurrentPhase(phaseStatuses);
+  merged.status = deriveInstallationStatus(phaseStatuses);
+
+  // Remove action/targetPhase from persisted data
+  delete (merged as UpdatePayload).action;
+  delete (merged as UpdatePayload).targetPhase;
+
+  setRequestData(requestData, merged);
+}
+
+/**
+ * Unlock-phase action: Admin-only, set phase to unlocked for re-editing
+ * Requirements: INST7-BR-012, INST7-BR-013, INST7-AC-040
+ */
+function handleUnlockPhaseAction(
+  data: UpdatePayload,
+  existing: InstallationSevenPhasesData,
+  userContext: UserContext,
+  requestData: Record<string, unknown>,
+): void {
+  // Permission check — Admin only
+  if (!canUnlockPhase(userContext.userType)) {
+    console.warn('Phase unlock denied:', JSON.stringify({
+      userId: userContext.userId,
+      userType: userContext.userType,
+      path: 'installations-programming',
+    }, null, 2));
+    throw new HttpValidationError('Não tem permissão para desbloquear fases', 403);
+  }
+
+  const targetPhase = data.targetPhase;
+
+  if (!targetPhase || targetPhase < 1 || targetPhase > 7) {
+    throw new Error('targetPhase inválido: deve ser entre 1 e 7');
+  }
+
+  // Phase must be completed to be unlocked
+  if (existing.phaseStatuses[targetPhase - 1] !== 'completed') {
+    throw new Error(`Fase ${targetPhase} não está concluída e não pode ser desbloqueada`);
+  }
+
+  // Update phase statuses
+  const phaseStatuses = [...existing.phaseStatuses] as PhaseStatus[];
+  phaseStatuses[targetPhase - 1] = 'unlocked';
+
+  const merged: Record<string, unknown> = {
+    ...existing,
+    phaseStatuses,
+    currentPhase: targetPhase,
+    status: deriveInstallationStatus(phaseStatuses),
+  };
+
+  // Remove action/targetPhase from persisted data
+  delete (merged as UpdatePayload).action;
+  delete (merged as UpdatePayload).targetPhase;
+
+  setRequestData(requestData, merged);
+}
+
+// ── Helpers ─────────────────────────────────────────────────────────
+
+/** Replace requestData content with merged data */
+function setRequestData(requestData: Record<string, unknown>, merged: Record<string, unknown>): void {
   if (requestData.data) {
-    requestData.data = data;
+    requestData.data = merged;
   } else {
-    Object.assign(requestData, data);
+    Object.keys(requestData).forEach((key) => delete requestData[key]);
+    Object.assign(requestData, merged);
   }
 }
 
@@ -181,9 +363,8 @@ function validateUpdate(
 /**
  * Extract searchable text from content
  * Returns technician name in lowercase (client name resolved via relation in template)
- * Requirements: CA-01.5, CA-10.5
  */
-function extractSearchableText(content: InstallationsProgramming): string {
+function extractSearchableText(content: InstallationSevenPhases): string {
   const tech = content.data.technician;
   if (tech?.firstName || tech?.lastName) {
     return `${tech.firstName || ''} ${tech.lastName || ''}`.trim().toLowerCase();
@@ -193,9 +374,9 @@ function extractSearchableText(content: InstallationsProgramming): string {
 
 /**
  * Extract index fields for the search index
- * Requirements: CA-10.5
+ * Requirements: INST7-NFR-001
  */
-function extractIndexFields(content: InstallationsProgramming): Record<string, unknown> {
+function extractIndexFields(content: InstallationSevenPhases): Record<string, unknown> {
   const data = content.data;
   const tech = data.technician;
   const technicianName = tech
@@ -205,8 +386,14 @@ function extractIndexFields(content: InstallationsProgramming): Record<string, u
   return {
     clientId: data.clientId || '',
     technicianName,
-    completedPhasesCount: data.completedPhases?.length || 0,
-    isCompleted: data.isCompleted || false,
+    technicianUserId: tech?.userId || '',
+    installationType: data.installationType || '',
+    currentPhase: data.currentPhase || 1,
+    status: data.status || 'in_progress',
+    isCompleted: data.status === 'complete',
+    completedPhasesCount: data.phaseStatuses
+      ? data.phaseStatuses.filter((s: PhaseStatus) => s === 'completed').length
+      : 0,
   };
 }
 
@@ -216,9 +403,9 @@ const installationsProgrammingRouter = new Hono();
 
 installationsProgrammingRouter.use('*', contentErrorHandler);
 
-const config = createStandardContentConfig<InstallationsProgramming>(
+const config = createStandardContentConfig<InstallationSevenPhases>(
   'installations-programming',
-  'date-desc'
+  'date-desc',
 );
 
 config.searchFields = ['searchableText'];
@@ -227,7 +414,7 @@ config.validateUpdate = validateUpdate;
 config.extractSearchableText = extractSearchableText;
 config.extractIndexFields = extractIndexFields;
 
-const crudRoutes = createContentRoutes<InstallationsProgramming>(config);
+const crudRoutes = createContentRoutes<InstallationSevenPhases>(config);
 installationsProgrammingRouter.route('/', crudRoutes);
 
 export default installationsProgrammingRouter;
