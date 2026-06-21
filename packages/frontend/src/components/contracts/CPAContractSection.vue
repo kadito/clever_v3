@@ -178,9 +178,9 @@ const handlePlanSelection = (planId: string): void => {
   emit('plan-selected', planId);
 };
 
-// Show POS package option only for cpa_premium plan
+// Show POS package option for plans that include posPackage (cpa_professional, cpa_premium)
 const showPOSPackageOption = computed(() => {
-  return props.formData?.planIdCPA === 'cpa_premium';
+  return props.formData?.planIdCPA === 'cpa_professional' || props.formData?.planIdCPA === 'cpa_premium';
 });
 
 // Determine if plan details should be shown

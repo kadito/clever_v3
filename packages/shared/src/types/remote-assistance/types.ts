@@ -181,7 +181,7 @@ export const REMOTE_ASSISTANCE_CONSTANTS = {
 
   /** Business hours windows (morning) */
   BUSINESS_HOURS_MORNING_START: 9 * 60, // 09:00 in minutes
-  BUSINESS_HOURS_MORNING_END: 12 * 60 + 30, // 12:30 in minutes
+  BUSINESS_HOURS_MORNING_END: 13 * 60, // 13:00 in minutes
   /** Business hours windows (afternoon) */
   BUSINESS_HOURS_AFTERNOON_START: 14 * 60 + 30, // 14:30 in minutes
   BUSINESS_HOURS_AFTERNOON_END: 18 * 60, // 18:00 in minutes

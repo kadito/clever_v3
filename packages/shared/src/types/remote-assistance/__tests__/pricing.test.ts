@@ -12,7 +12,7 @@ describe('REMOTE_ASSISTANCE_CONSTANTS', () => {
     expect(REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS).toBe(45.0);
     expect(REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS).toBe(60.0);
     expect(REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_MORNING_START).toBe(540);   // 09:00
-    expect(REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_MORNING_END).toBe(750);     // 12:30
+    expect(REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_MORNING_END).toBe(780);     // 13:00
     expect(REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_AFTERNOON_START).toBe(870); // 14:30
     expect(REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_AFTERNOON_END).toBe(1080);  // 18:00
     expect(REMOTE_ASSISTANCE_CONSTANTS.BILLING_INCREMENT_MINUTES).toBe(15);
@@ -74,16 +74,16 @@ describe('calculateRemoteAssistancePricing', () => {
   });
 
   /**
-   * MI-13: Lunch gap crossing — session 12:00-13:00 splits at 12:30
-   * Business [12:00-12:30] = 30min, Off-hours [12:30-13:00] = 30min
+   * MI-13: Lunch gap crossing — session 12:30-13:30 splits at 13:00
+   * Business [12:30-13:00] = 30min, Off-hours [13:00-13:30] = 30min
    * Raw 60min → billing 60min. businessValue = (30/60)*45 = 22.50, offHoursValue = (30/60)*60 = 30.00
    * Validates: Requirements PRICE-AC-008, PRICE-BR-008
    */
-  it('MI-13: lunch gap crossing — split at 12:30', () => {
+  it('MI-13: lunch gap crossing — split at 13:00', () => {
     const input: RemoteAssistancePricingInput = {
       ...baseInput,
-      startTime: '12:00',
-      endTime: '13:00',
+      startTime: '12:30',
+      endTime: '13:30',
     };
 
     const result = calculateRemoteAssistancePricing(input);
@@ -135,10 +135,10 @@ describe('calculateRemoteAssistancePricing', () => {
 
   /**
    * MI-15: Full-day crossing — session 08:00-19:00 crosses all boundaries
-   * Segments: off [08:00-09:00]=60min, business [09:00-12:30]=210min,
-   *           off [12:30-14:30]=120min, business [14:30-18:00]=210min, off [18:00-19:00]=60min
+   * Segments: off [08:00-09:00]=60min, business [09:00-13:00]=240min,
+   *           off [13:00-14:30]=90min, business [14:30-18:00]=210min, off [18:00-19:00]=60min
    * Total raw = 660min, billing = 660min (already multiple of 15)
-   * Business raw = 420min, off-hours raw = 240min
+   * Business raw = 450min, off-hours raw = 210min
    * Validates: Requirements PRICE-AC-006, PRICE-AC-007, PRICE-AC-008, PRICE-BR-006, PRICE-BR-007, PRICE-BR-008
    */
   it('MI-15: full-day crossing — multiple segments across all boundaries', () => {
@@ -154,15 +154,15 @@ describe('calculateRemoteAssistancePricing', () => {
     expect(result.billingMinutes).toBe(660); // 660 is divisible by 15
     expect(result.isZeroCost).toBe(false);
 
-    // Business: 420min, Off-hours: 240min (proportionally distributed)
+    // Business: 450min, Off-hours: 210min (proportionally distributed)
     expect(result.businessMinutes + result.offHoursMinutes).toBe(660);
-    expect(result.businessMinutes).toBe(420);
-    expect(result.offHoursMinutes).toBe(240);
+    expect(result.businessMinutes).toBe(450);
+    expect(result.offHoursMinutes).toBe(210);
 
-    // Values: business = 420/60 × 45 = 315, off = 240/60 × 60 = 240
-    expect(result.businessHoursValue).toBe(315);
-    expect(result.offHoursValue).toBe(240);
-    expect(result.totalValue).toBe(555);
+    // Values: business = 450/60 × 45 = 337.5, off = 210/60 × 60 = 210
+    expect(result.businessHoursValue).toBe(337.5);
+    expect(result.offHoursValue).toBe(210);
+    expect(result.totalValue).toBe(547.5);
 
     // Verify 5 segments
     expect(result.breakdown.length).toBe(5);

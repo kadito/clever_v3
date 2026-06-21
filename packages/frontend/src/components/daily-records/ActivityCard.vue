@@ -182,6 +182,7 @@
             class="form-input"
             placeholder="HH:MM"
             maxlength="5"
+            :disabled="timeFieldsLocked"
             @input="handleTimeInput($event, 'horaInicio')"
             @blur="validateTimeFormat('horaInicio')"
           >
@@ -203,6 +204,7 @@
             class="form-input"
             placeholder="HH:MM"
             maxlength="5"
+            :disabled="timeFieldsLocked"
             @input="handleTimeInput($event, 'horaFim')"
             @blur="validateTimeFormat('horaFim')"
           >
@@ -224,6 +226,7 @@
             class="form-input"
             placeholder="0"
             min="0"
+            :disabled="timeFieldsLocked"
             @input="emitUpdate"
           >
           <div
@@ -241,6 +244,14 @@
             {{ calculatedTotalHours }}
           </div>
         </div>
+      </div>
+
+      <!-- Fetch Error Warning (DR-LIG-AC-018, DR-LIG-AC-019) -->
+      <div
+        v-if="fetchError && isEditMode"
+        class="text-amber-600 text-xs flex items-center gap-1"
+      >
+        ⚠️ {{ fetchError }}
       </div>
 
       <!-- Description -->
@@ -301,6 +312,9 @@ const localActivity = ref<Activity>({ ...props.activity });
 // Track whether time fields were auto-populated (to know what to clear on client change)
 const timeAutoPopulated = ref(false);
 
+// Error state for failed document time fetch (DR-LIG-AC-018, DR-LIG-AC-019)
+const fetchError = ref<string | null>(null);
+
 // Only sync from prop on initial mount or when switching to view mode
 // In edit mode, local state is the source of truth
 onMounted(() => {
@@ -318,6 +332,11 @@ const activityTypeClass = computed(() => {
 const isLegacyActivity = computed(() => {
   return !localActivity.value.clientId &&
     (!!localActivity.value.workSheetId || !!localActivity.value.remoteAssistanceId);
+});
+
+// Time fields are locked when auto-populated from a linked document (DR-LIG-AC-006, DR-LIG-AC-009, DR-LIG-BR-006)
+const timeFieldsLocked = computed(() => {
+  return timeAutoPopulated.value && (!!localActivity.value.workSheetId || !!localActivity.value.remoteAssistanceId);
 });
 
 const calculatedTotalHours = computed(() => {
@@ -436,6 +455,8 @@ function extractTimeFromRemoteAssistance(ra: RemoteAssistance): { horaInicio: st
 }
 
 const handleLinkTypeChange = () => {
+  fetchError.value = null;
+
   // Clear previous selections when link type changes
   if (localActivity.value.tipoLigacao === 'Nenhuma') {
     localActivity.value.workSheetId = undefined;
@@ -460,6 +481,8 @@ const handleActivityTypeChange = () => {
 const handleClientSelected = (client: Client | null) => {
   const previousClientId = localActivity.value.clientId;
   const newClientId = client?.uuid || '';
+
+  fetchError.value = null;
 
   // Update clientId
   localActivity.value.clientId = newClientId;
@@ -496,19 +519,26 @@ const handleClientSelected = (client: Client | null) => {
 const handleWorkSheetSelected = (workSheet: WorkSheet | null) => {
   if (workSheet) {
     localActivity.value.workSheetId = workSheet.uuid;
+    fetchError.value = null;
     workSheetApi.fetchById(workSheet.uuid)
       .then(() => {
         const ws = workSheetApi.currentItem.value;
         if (ws) {
           const { horaInicio, horaFim } = extractTimeFromWorkSheet(ws);
+          if (!horaInicio && !horaFim) {
+            // No time data available — treat as fetch failure
+            fetchError.value = 'Os tempos não puderam ser preenchidos automaticamente';
+            return;
+          }
           localActivity.value.horaInicio = horaInicio;
           localActivity.value.horaFim = horaFim;
+          localActivity.value.tempoPausa = 0;
           timeAutoPopulated.value = true;
         }
       })
       .catch((err: unknown) => {
         console.error('Time prefill fetch failed (work-sheet):', JSON.stringify({ error: String(err) }, null, 2));
-        // Fields unchanged on error — user fills manually
+        fetchError.value = 'Os tempos não puderam ser preenchidos automaticamente';
       })
       .finally(() => {
         emitUpdate();
@@ -528,19 +558,26 @@ const handleWorkSheetSelected = (workSheet: WorkSheet | null) => {
 const handleRemoteAssistanceSelected = (remoteAssistance: RemoteAssistance | null) => {
   if (remoteAssistance) {
     localActivity.value.remoteAssistanceId = remoteAssistance.uuid;
+    fetchError.value = null;
     remoteAssistanceApi.fetchById(remoteAssistance.uuid)
       .then(() => {
         const ra = remoteAssistanceApi.currentItem.value;
         if (ra) {
           const { horaInicio, horaFim } = extractTimeFromRemoteAssistance(ra);
+          if (!horaInicio && !horaFim) {
+            // No time data available — treat as fetch failure
+            fetchError.value = 'Os tempos não puderam ser preenchidos automaticamente';
+            return;
+          }
           localActivity.value.horaInicio = horaInicio;
           localActivity.value.horaFim = horaFim;
+          localActivity.value.tempoPausa = 0;
           timeAutoPopulated.value = true;
         }
       })
       .catch((err: unknown) => {
         console.error('Time prefill fetch failed (remote-assistance):', JSON.stringify({ error: String(err) }, null, 2));
-        // Fields unchanged on error — user fills manually
+        fetchError.value = 'Os tempos não puderam ser preenchidos automaticamente';
       })
       .finally(() => {
         emitUpdate();

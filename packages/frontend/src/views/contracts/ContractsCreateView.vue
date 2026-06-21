@@ -592,8 +592,8 @@ const handleSHEquipmentUpdate = (data: {
 const stopCPAPlanWatcher = watch(
   () => formData.value?.planIdCPA,
   (planId) => {
-    // Clear POS package if not cpa_premium plan
-    if (planId !== 'cpa_premium') {
+    // Clear POS package if plan does not support it (only cpa_professional and cpa_premium do)
+    if (planId !== 'cpa_professional' && planId !== 'cpa_premium') {
       if (formData.value?.hasPOSPackage) {
         updateFieldValue('hasPOSPackage', false);
       }

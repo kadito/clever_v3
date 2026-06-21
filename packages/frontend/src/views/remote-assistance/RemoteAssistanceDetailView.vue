@@ -216,7 +216,7 @@
                       v-if="pricingResult.businessMinutes > 0"
                       class="breakdown-item"
                     >
-                      <label class="breakdown-label">Horário Comercial (09:00-12:30, 14:30-18:00)</label>
+                      <label class="breakdown-label">Horário Comercial (09:00-13:00, 14:30-18:00)</label>
                       <div class="breakdown-value">
                         {{ formatMinutesAsHours(pricingResult.businessMinutes) }} ×
                         {{ formatCurrency(displayRates.businessRate) }}/h =
@@ -227,7 +227,7 @@
                       v-if="pricingResult.offHoursMinutes > 0"
                       class="breakdown-item"
                     >
-                      <label class="breakdown-label">Fora do Horário Comercial (inclui 12:30-14:30)</label>
+                      <label class="breakdown-label">Fora do Horário Comercial (inclui 13:00-14:30)</label>
                       <div class="breakdown-value">
                         {{ formatMinutesAsHours(pricingResult.offHoursMinutes) }} ×
                         {{ formatCurrency(displayRates.afterHoursRate) }}/h =
@@ -277,7 +277,7 @@
                   </svg>
                   <span class="text-sm text-gray-600">
                     💶 Preço: {{ displayRates.businessRate }}€/hora
-                    (09:00-12:30, 14:30-18:00) |
+                    (09:00-13:00, 14:30-18:00) |
                     {{ displayRates.afterHoursRate }}€/hora (outras horas) + IVA
                   </span>
                 </div>

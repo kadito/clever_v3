@@ -46,6 +46,24 @@
     <!-- Custom daily record meta information -->
     <template #itemMeta="{ item }">
       <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
+        <!-- Collaborator badge -->
+        <span class="collaborator-badge">
+          <svg
+            class="w-3 h-3 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            />
+          </svg>
+          {{ (item as ContentWithRelations<DailyRecord['data']>).data.technician ? (item as ContentWithRelations<DailyRecord['data']>).data.technician!.firstName + ' ' + (item as ContentWithRelations<DailyRecord['data']>).data.technician!.lastName : 'Não atribuído' }}
+        </span>
+
         <!-- Date badge -->
         <span class="date-badge">
           <svg
@@ -563,6 +581,10 @@ onMounted(() => {
   @apply w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold;
 }
 
+.collaborator-badge {
+  @apply px-2 py-1 bg-amber-100 text-amber-800 rounded text-xs font-medium flex items-center;
+}
+
 .date-badge {
   @apply px-2 py-1 bg-slate-100 text-slate-700 rounded text-xs font-medium flex items-center;
 }
@@ -590,6 +612,7 @@ onMounted(() => {
   }
 
   .date-badge,
+  .collaborator-badge,
   .activity-count-badge,
   .total-hours-badge,
   .activity-type-badge,
@@ -600,6 +623,7 @@ onMounted(() => {
 
 /* Portuguese text optimization */
 .daily-record-icon,
+.collaborator-badge,
 .date-badge,
 .activity-count-badge,
 .total-hours-badge,
@@ -610,6 +634,7 @@ onMounted(() => {
 
 /* Touch-friendly interactions */
 @media (hover: none) {
+  .collaborator-badge:active,
   .date-badge:active,
   .activity-count-badge:active,
   .total-hours-badge:active,
@@ -620,6 +645,7 @@ onMounted(() => {
 }
 
 /* Badge icon styling */
+.collaborator-badge svg,
 .date-badge svg,
 .activity-count-badge svg,
 .total-hours-badge svg,
@@ -630,6 +656,7 @@ onMounted(() => {
 
 /* Responsive badge layout */
 @media (max-width: 640px) {
+  .collaborator-badge svg,
   .date-badge svg,
   .activity-count-badge svg,
   .total-hours-badge svg,

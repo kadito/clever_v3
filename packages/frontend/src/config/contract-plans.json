@@ -35,6 +35,10 @@
           "remoteSupport": "Segunda a Sábado entre as 9:00 e as 22:00"
         },
         "weekendSupport": true,
+        "posPackage": {
+          "description": "Pack de 10h de assistência para POS",
+          "pricePerYear": 200
+        },
         "prices": {
           "mensal": 60,
           "semestral": 345,

@@ -291,7 +291,7 @@
               </svg>
               <span class="text-sm text-gray-600">
                 💶 Preço: {{ REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS }}€/hora
-                (09:00-12:30, 14:30-18:00) |
+                (09:00-13:00, 14:30-18:00) |
                 {{ REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS }}€/hora (outras horas) + IVA
               </span>
             </div>
@@ -306,7 +306,7 @@
                   v-if="pricingResult.businessMinutes > 0"
                   class="pricing-row"
                 >
-                  <span class="pricing-label">Horário Comercial (09:00-12:30, 14:30-18:00):</span>
+                  <span class="pricing-label">Horário Comercial (09:00-13:00, 14:30-18:00):</span>
                   <span class="pricing-value">
                     {{ formatMinutesAsHours(pricingResult.businessMinutes) }} ×
                     {{ formatCurrency(REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS) }}/h =
@@ -317,7 +317,7 @@
                   v-if="pricingResult.offHoursMinutes > 0"
                   class="pricing-row"
                 >
-                  <span class="pricing-label">Fora do Horário Comercial (inclui 12:30-14:30):</span>
+                  <span class="pricing-label">Fora do Horário Comercial (inclui 13:00-14:30):</span>
                   <span class="pricing-value">
                     {{ formatMinutesAsHours(pricingResult.offHoursMinutes) }} ×
                     {{ formatCurrency(REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS) }}/h =

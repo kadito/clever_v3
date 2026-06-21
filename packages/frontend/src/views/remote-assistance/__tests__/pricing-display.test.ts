@@ -71,7 +71,7 @@ const PricingDisplayTestComponent = defineComponent({
       <div class="pricing-note" data-testid="pricing-note">
         <span class="text-sm text-gray-600">
           💶 Preço: {{ REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS }}€/hora
-          (09:00-12:30, 14:30-18:00) |
+          (09:00-13:00, 14:30-18:00) |
           {{ REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS }}€/hora (outras horas) + IVA
         </span>
       </div>
@@ -80,7 +80,7 @@ const PricingDisplayTestComponent = defineComponent({
       <div v-if="pricingResult && !pricingResult.isZeroCost" class="pricing-breakdown" data-testid="pricing-breakdown">
         <div class="pricing-table">
           <div v-if="pricingResult.businessMinutes > 0" class="pricing-row" data-testid="business-hours-row">
-            <span class="pricing-label">Horário Comercial (09:00-12:30, 14:30-18:00):</span>
+            <span class="pricing-label">Horário Comercial (09:00-13:00, 14:30-18:00):</span>
             <span class="pricing-value">
               {{ formatMinutesAsHours(pricingResult.businessMinutes) }} ×
               {{ formatCurrency(REMOTE_ASSISTANCE_CONSTANTS.PRICE_BUSINESS_HOURS) }}/h =
@@ -88,7 +88,7 @@ const PricingDisplayTestComponent = defineComponent({
             </span>
           </div>
           <div v-if="pricingResult.offHoursMinutes > 0" class="pricing-row" data-testid="off-hours-row">
-            <span class="pricing-label">Fora do Horário Comercial (inclui 12:30-14:30):</span>
+            <span class="pricing-label">Fora do Horário Comercial (inclui 13:00-14:30):</span>
             <span class="pricing-value">
               {{ formatMinutesAsHours(pricingResult.offHoursMinutes) }} ×
               {{ formatCurrency(REMOTE_ASSISTANCE_CONSTANTS.PRICE_AFTER_HOURS) }}/h =
@@ -134,7 +134,7 @@ describe('Remote Assistance Pricing Display — Integration Tests', () => {
       const note = wrapper.find('[data-testid="pricing-note"]');
       expect(note.exists()).toBe(true);
       expect(note.text()).toContain('45€/hora');
-      expect(note.text()).toContain('(09:00-12:30, 14:30-18:00)');
+      expect(note.text()).toContain('(09:00-13:00, 14:30-18:00)');
     });
 
     it('pricing note contains "60€/hora" and "(outras horas)"', () => {
@@ -196,7 +196,7 @@ describe('Remote Assistance Pricing Display — Integration Tests', () => {
    * - Breakdown only shows when pricingResult && !pricingResult.isZeroCost
    */
   describe('MI-25: Breakdown labels show correct new windows', () => {
-    it('business hours label shows "Horário Comercial (09:00-12:30, 14:30-18:00)"', () => {
+    it('business hours label shows "Horário Comercial (09:00-13:00, 14:30-18:00)"', () => {
       const wrapper = mount(PricingDisplayTestComponent, {
         props: {
           startTime: '09:00',
@@ -209,15 +209,15 @@ describe('Remote Assistance Pricing Display — Integration Tests', () => {
       const businessRow = wrapper.find('[data-testid="business-hours-row"]');
       expect(businessRow.exists()).toBe(true);
       expect(businessRow.find('.pricing-label').text()).toContain(
-        'Horário Comercial (09:00-12:30, 14:30-18:00)'
+        'Horário Comercial (09:00-13:00, 14:30-18:00)'
       );
     });
 
-    it('off-hours label shows "Fora do Horário Comercial (inclui 12:30-14:30)"', () => {
+    it('off-hours label shows "Fora do Horário Comercial (inclui 13:00-14:30)"', () => {
       const wrapper = mount(PricingDisplayTestComponent, {
         props: {
-          startTime: '12:00',
-          endTime: '13:00',
+          startTime: '12:30',
+          endTime: '13:30',
           isWeekendOrHoliday: false,
           paymentMethod: 'Faturação',
         },
@@ -226,7 +226,7 @@ describe('Remote Assistance Pricing Display — Integration Tests', () => {
       const offHoursRow = wrapper.find('[data-testid="off-hours-row"]');
       expect(offHoursRow.exists()).toBe(true);
       expect(offHoursRow.find('.pricing-label').text()).toContain(
-        'Fora do Horário Comercial (inclui 12:30-14:30)'
+        'Fora do Horário Comercial (inclui 13:00-14:30)'
       );
     });
 
