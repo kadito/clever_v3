@@ -5,7 +5,7 @@
       <div class="px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           <!-- Logo and title -->
-          <div class="flex items-center">
+          <div class="flex items-center gap-3">
             <router-link
               to="/"
               class="flex items-center"
@@ -14,6 +14,12 @@
                 CLEVER
               </h1>
             </router-link>
+            <span
+              v-if="isTestEnv"
+              class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300"
+            >
+              Aplicação de Testes
+            </span>
           </div>
 
           <!-- Mobile menu button -->
@@ -168,6 +174,7 @@ import { useAuth } from '@/composables/useAuth';
 
 const route = useRoute();
 const { isLoaded, isAuthenticated, user } = useAuth();
+const isTestEnv = import.meta.env.VITE_APP_ENV === 'test';
 
 const isMobileMenuOpen = ref(false);
 
