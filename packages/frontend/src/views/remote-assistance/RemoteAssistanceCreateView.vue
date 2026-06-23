@@ -464,8 +464,8 @@ const fetchClientContracts = async (clientId: string) => {
       clientContracts.value = (contractsApi.items.value || []).filter(
         (c: Contract) => c.data.clientId === clientId
       );
-      // Auto-select if only one contract
-      if (clientContracts.value.length === 1) {
+      // Pre-select first contract
+      if (clientContracts.value.length >= 1) {
         updateFieldValue('contractId', clientContracts.value[0].uuid);
       }
     })

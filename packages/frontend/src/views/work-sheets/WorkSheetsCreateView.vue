@@ -348,7 +348,7 @@ const fetchClientContracts = async (clientId: string) => {
       clientContracts.value = (contractsApi.items.value || []).filter(
         (c: Contract) => c.data.clientId === clientId
       );
-      if (clientContracts.value.length === 1) {
+      if (clientContracts.value.length >= 1) {
         updateFieldValue('contractId', clientContracts.value[0].uuid);
       }
     })
