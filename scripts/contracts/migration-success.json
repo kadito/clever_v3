@@ -142,5 +142,11 @@
     "clientId": "701208ba-c469-4c16-9cd0-9d1cb05760f8",
     "hasCPAContract": false,
     "hasSHContract": true
+  },
+  {
+    "uuid": "f8055d70-cce5-48c8-b67b-28cbe8b859ee",
+    "clientId": "944241ef-b8e5-438b-b490-92e06ea54a9e",
+    "hasCPAContract": true,
+    "hasSHContract": true
   }
 ]
