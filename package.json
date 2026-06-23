@@ -21,8 +21,8 @@
     "type-check:frontend": "pnpm --filter @clever/frontend type-check",
     "type-check:backend": "pnpm --filter @clever/backend type-check",
     "check-all": "pnpm type-check && pnpm lint && pnpm format:check",
-    "deploy:test": "VITE_APP_ENV=test pnpm build && wrangler deploy",
-    "deploy:prod": "VITE_APP_ENV=production pnpm build && wrangler deploy --env production"
+    "deploy:test": "pnpm build && wrangler deploy",
+    "deploy:prod": "pnpm build && wrangler deploy --env production"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.0.0",
