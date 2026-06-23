@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Dev Playbook Autoload",
+      "trigger": "UserPromptSubmit",
+      "description": "Activates kiro-dev-playbook at the start of every session — detects the project stack from tech.md, architecture.md or manifest files and loads the relevant development standards.",
+      "action": {
+        "type": "agent",
+        "prompt": "MANDATORY PREREQUISITE — execute this before anything else, before reading any file, before answering the user.\n\n1. Activate the power \"kiro-dev-playbook\" using the activate action.\n2. Read .kiro/steering/tech.md if it exists. If not, read .kiro/steering/architecture.md. If neither exists, check for package.json, composer.json, tsconfig.json.\n3. Based on what you found, load the relevant steerings via readSteering following the routing table in the power. All steering file names are flat — use names like 'fw-vue3.md', 'lang-typescript.md', 'runtime-lambda.md', 'deploy-ucpa.md'.\n4. Announce in one line: \"✅ Dev Playbook — Stack: [detected] — Loaded: [list]\"\n\nOnly after this announcement is done, proceed to handle the user request."
+      }
+    }
+  ]
+}
