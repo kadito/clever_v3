@@ -123,6 +123,67 @@
         </div>
       </div>
     </div>
+
+    <!-- Falhas Detectadas Section -->
+    <div class="form-section">
+      <h3 class="section-title">Falhas detectadas</h3>
+
+      <!-- Falhas Detectadas Toggle -->
+      <div class="form-field">
+        <label class="form-label" :class="{ 'label-error': hasError('falhasDetectadas') }">
+          Foram detectadas falhas?
+        </label>
+        <div class="toggle-group">
+          <button
+            type="button"
+            class="toggle-btn"
+            :class="modelValue.falhasDetectadas === true ? 'toggle-btn-active-yes' : 'toggle-btn-inactive'"
+            :disabled="disabled"
+            @click="updateField('falhasDetectadas', true)"
+          >
+            Sim
+          </button>
+          <button
+            type="button"
+            class="toggle-btn"
+            :class="modelValue.falhasDetectadas === false ? 'toggle-btn-active-no' : 'toggle-btn-inactive'"
+            :disabled="disabled"
+            @click="updateField('falhasDetectadas', false)"
+          >
+            Não
+          </button>
+        </div>
+        <span v-if="hasError('falhasDetectadas')" class="error-text">
+          Este campo é obrigatório
+        </span>
+      </div>
+
+      <!-- Falhas Descrição (shown when falhasDetectadas === true) -->
+      <div v-if="modelValue.falhasDetectadas === true" class="conditional-field">
+        <div class="form-field">
+          <label
+            class="form-label"
+            :class="{ 'label-error': hasError('falhasDescricao') }"
+            for="phase6FalhasDescricao"
+          >
+            Descrição das falhas
+          </label>
+          <textarea
+            id="phase6FalhasDescricao"
+            class="form-textarea"
+            :class="{ 'input-error': hasError('falhasDescricao') }"
+            :value="modelValue.falhasDescricao"
+            :disabled="disabled"
+            placeholder="Descreva as falhas detectadas..."
+            rows="4"
+            @input="updateField('falhasDescricao', ($event.target as HTMLTextAreaElement).value)"
+          />
+          <span v-if="hasError('falhasDescricao')" class="error-text">
+            A descrição das falhas é obrigatória
+          </span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -227,5 +288,34 @@ const updateField = (field: keyof Phase6TestesData, value: string | boolean | nu
 
 .conditional-field {
   @apply pl-2 border-l-2 border-gray-300;
+}
+
+.form-textarea {
+  @apply w-full rounded-md border border-gray-300 px-3 py-2
+         text-gray-700 placeholder-gray-400
+         focus:outline-none focus:ring-2 focus:border-transparent resize-y;
+  min-height: 44px;
+  font-size: 16px;
+  --tw-ring-color: #75AE93;
+}
+
+.form-textarea:focus {
+  --tw-ring-color: #75AE93;
+}
+
+.form-textarea:disabled {
+  @apply bg-gray-50 cursor-not-allowed opacity-75;
+}
+
+.input-error {
+  @apply border-red-500;
+}
+
+.label-error {
+  @apply text-red-600;
+}
+
+.error-text {
+  @apply text-xs text-red-600 mt-1;
 }
 </style>

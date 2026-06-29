@@ -197,7 +197,7 @@ import {
 } from '@clever/shared';
 import type {
   InstallationSevenPhasesData,
-  InstallationType,
+  InstallationEntry,
   Phase2RececaoData,
   Phase3ProgramacaoData,
   Phase4PreparacaoData,
@@ -241,11 +241,7 @@ const installationData = ref<InstallationSevenPhasesData | null>(null);
 // ── Phase 1 uses top-level fields (not a phase1 object) ─────────────
 const phase1FormData = reactive({
   clientId: '',
-  installationType: '' as InstallationType,
-  equipmentMarca: '',
-  equipmentModelo: '',
-  equipmentNumeroSerie: '',
-  equipmentFornecedor: '',
+  installationEntries: [] as InstallationEntry[],
 });
 
 // ── File upload state (Phase 7) ─────────────────────────────────────
@@ -279,11 +275,7 @@ const populateFromData = (data: InstallationSevenPhasesData): void => {
 
   // Phase 1 top-level fields
   phase1FormData.clientId = data.clientId || '';
-  phase1FormData.installationType = data.installationType || ('' as InstallationType);
-  phase1FormData.equipmentMarca = data.equipmentMarca || '';
-  phase1FormData.equipmentModelo = data.equipmentModelo || '';
-  phase1FormData.equipmentNumeroSerie = data.equipmentNumeroSerie || '';
-  phase1FormData.equipmentFornecedor = data.equipmentFornecedor || '';
+  phase1FormData.installationEntries = data.installationEntries || [];
 
   // Set viewing phase: use query param if provided, otherwise use currentPhase from data
   viewingPhase.value = initialPhase || data.currentPhase || 1;
@@ -329,11 +321,7 @@ const buildPhasePayload = (): Record<string, unknown> => {
   if (phase === 1) {
     return {
       clientId: phase1FormData.clientId,
-      installationType: phase1FormData.installationType,
-      equipmentMarca: phase1FormData.equipmentMarca,
-      equipmentModelo: phase1FormData.equipmentModelo,
-      equipmentNumeroSerie: phase1FormData.equipmentNumeroSerie,
-      equipmentFornecedor: phase1FormData.equipmentFornecedor,
+      installationEntries: phase1FormData.installationEntries,
     };
   }
 
@@ -353,11 +341,7 @@ const buildCurrentPhaseData = (): InstallationSevenPhasesData => {
   return {
     ...installationData.value,
     clientId: phase1FormData.clientId,
-    installationType: phase1FormData.installationType,
-    equipmentMarca: phase1FormData.equipmentMarca,
-    equipmentModelo: phase1FormData.equipmentModelo,
-    equipmentNumeroSerie: phase1FormData.equipmentNumeroSerie,
-    equipmentFornecedor: phase1FormData.equipmentFornecedor,
+    installationEntries: phase1FormData.installationEntries,
   };
 };
 

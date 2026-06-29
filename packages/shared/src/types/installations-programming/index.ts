@@ -29,6 +29,7 @@ export { calculateCompletedPhases, calculateIsCompleted } from './validation';
 // Export seven-phase types
 export type {
   InstallationType,
+  InstallationEntry,
   PhaseStatus,
   InstallationStatus,
   Phase1SetupData,
@@ -38,9 +39,8 @@ export type {
   Phase5InstalacaoData,
   Phase6TestesData,
   Phase7FinalizacaoData,
-  ChecklistCategory,
-  CpaChecklistCategory,
-  EquipmentChecklist,
+  ToggleableChecklistCategory,
+  ToggleableCpaChecklistCategory,
   InstallationSevenPhasesData,
   InstallationSevenPhases,
 } from './types-seven-phases';
@@ -64,3 +64,7 @@ export {
 
 // Export legacy adapter
 export { adaptLegacyData } from './legacy-adapter';
+
+// Export software hierarchy config
+export type { SoftwareHierarchy, SoftwareSelection } from './software-config';
+export { SOFTWARE_HIERARCHY, validateSoftwareSelection } from './software-config';

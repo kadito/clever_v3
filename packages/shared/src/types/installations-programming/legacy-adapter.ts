@@ -1,13 +1,18 @@
 import type {
   InstallationSevenPhasesData,
+  InstallationType,
+  InstallationEntry,
+  Phase2RececaoData,
   Phase3ProgramacaoData,
   Phase4PreparacaoData,
   Phase5InstalacaoData,
   Phase6TestesData,
   Phase7FinalizacaoData,
   PhaseStatus,
-  EquipmentChecklist,
+  ToggleableChecklistCategory,
+  ToggleableCpaChecklistCategory,
 } from './types-seven-phases';
+import type { SoftwareSelection } from './software-config';
 import type { TechnicianUser } from '../../types';
 import type {
   Phase1Data,
@@ -37,6 +42,58 @@ interface LegacyInstallationData {
 }
 
 /**
+ * Type representing the old 7-phase format (before this refactor).
+ * Has `installationType` as string instead of `installationTypes` as array.
+ * Phase2 has old fields (equipmentConditionOk, verificacaoTestes), Phase3
+ * has software as string, Phase4 has materialAdicional + flat checklist,
+ * Phase6 lacks falhasDetectadas.
+ */
+interface OldSevenPhaseData {
+  clientId: string;
+  technician: TechnicianUser;
+  installationType: string;
+  equipmentMarca: string;
+  equipmentModelo: string;
+  equipmentNumeroSerie: string;
+  equipmentFornecedor: string;
+  phase1: Record<string, unknown>;
+  phase2: {
+    equipamentoCliente?: string;
+    equipmentConditionOk?: boolean | null;
+    verificacaoCabo?: boolean;
+    verificacaoFechadura?: boolean;
+    verificacaoChaves?: boolean;
+    verificacaoTestes?: boolean;
+    observacoes?: string;
+  };
+  phase3: {
+    software?: string;
+    identificacaoReferencia?: string;
+    numeroLicenca?: string;
+    verificacaoInicioProgramacao?: boolean;
+    testeFinalEquipamentos?: boolean;
+    notasProgramacao?: string;
+  };
+  phase4: {
+    materialAdicional?: string;
+    checklist?: Record<string, { items: Record<string, boolean>; miniPcDetails?: string }>;
+  };
+  phase5: Phase5InstalacaoData;
+  phase6: {
+    anydeskConfigurado?: boolean | null;
+    anydeskCodigo?: string;
+    anydeskMotivo?: string;
+    vectronConnectConfigurado?: boolean | null;
+    vectronConnectCodigo?: string;
+    vectronConnectMotivo?: string;
+  };
+  phase7: Phase7FinalizacaoData;
+  phaseStatuses: PhaseStatus[];
+  currentPhase: number;
+  status: 'in_progress' | 'complete';
+}
+
+/**
  * Detects whether the input data is in the legacy 5-phase format.
  * Legacy format is identified by the presence of a `completedPhases` array
  * and the absence of a `phaseStatuses` array.
@@ -49,16 +106,34 @@ function isLegacyFormat(data: unknown): data is LegacyInstallationData {
   return Array.isArray(record.completedPhases) && !record.phaseStatuses;
 }
 
+/**
+ * Detects whether the input data is in the old 7-phase format (pre-refactor).
+ * Identified by having `installationType` as a string (not an array) and
+ * having `phaseStatuses` (distinguishing from legacy 5-phase).
+ */
+function isOldSevenPhaseFormat(data: unknown): data is OldSevenPhaseData {
+  if (typeof data !== 'object' || data === null) {
+    return false;
+  }
+  const record = data as Record<string, unknown>;
+  return (
+    typeof record.installationType === 'string' &&
+    !Array.isArray(record.installationTypes) &&
+    Array.isArray(record.phaseStatuses)
+  );
+}
+
 // ── Phase Mapping Functions ─────────────────────────────────────────
 
 /**
  * Maps legacy Phase 1 (Programação) → new Phase 3 (Programação / Preparação).
  * Legacy phase1 has: tipoProgramacao, numeroSerie, numeroEquipamento, leiturasGuardadas, testeFinal
+ * Converts software string → SoftwareSelection object with only brand filled.
  */
 function mapLegacyPhase1ToPhase3(legacyPhase1: Phase1Data | undefined): Phase3ProgramacaoData {
   if (!legacyPhase1) {
     return {
-      software: '',
+      software: null,
       identificacaoReferencia: '',
       numeroLicenca: '',
       verificacaoInicioProgramacao: false,
@@ -67,8 +142,13 @@ function mapLegacyPhase1ToPhase3(legacyPhase1: Phase1Data | undefined): Phase3Pr
     };
   }
 
+  const softwareValue = legacyPhase1.tipoProgramacao || '';
+  const software: SoftwareSelection | null = softwareValue
+    ? { brand: softwareValue }
+    : null;
+
   return {
-    software: legacyPhase1.tipoProgramacao || '',
+    software,
     identificacaoReferencia: legacyPhase1.numeroEquipamento || '',
     numeroLicenca: legacyPhase1.numeroSerie || '',
     verificacaoInicioProgramacao: Boolean(legacyPhase1.leiturasGuardadas),
@@ -78,35 +158,133 @@ function mapLegacyPhase1ToPhase3(legacyPhase1: Phase1Data | undefined): Phase3Pr
 }
 
 /**
- * Maps legacy Phase 2 checklist → new Phase 4 EquipmentChecklist.
+ * Maps legacy Phase 2 checklist → new Phase 4 with toggleable categories.
  * Legacy phase2 has: checklist (Record<string, Record<string, boolean>>)
+ * Sets `enabled: true` on all categories (preserves old behavior where all were visible).
  */
-function mapLegacyChecklist(legacyPhase2: Phase2Data | undefined): EquipmentChecklist {
-  const defaultChecklist = createDefaultChecklist();
-
+function mapLegacyChecklistToPhase4(legacyPhase2: Phase2Data | undefined, materialAdicional?: string): Phase4PreparacaoData {
   if (!legacyPhase2 || !legacyPhase2.checklist) {
-    return defaultChecklist;
+    return createDefaultPhase4();
   }
 
   const legacy = legacyPhase2.checklist;
 
   return {
-    pos: {
-      items: mapChecklistItems('pos', legacy.pos),
+    checklist: {
+      pos: {
+        enabled: true,
+        items: mapChecklistItems('pos', legacy.pos),
+      },
+      impressora: {
+        enabled: true,
+        items: mapChecklistItems('impressora', legacy.displayCliente),
+      },
+      gavetaMetalica: {
+        enabled: true,
+        items: mapChecklistItems('gavetaMetalica', legacy.gavetaMetalica),
+      },
+      cpa: {
+        enabled: true,
+        items: mapChecklistItems('cpa', legacy.cpa),
+        miniPcDetails: '',
+      },
+      acessorios: {
+        enabled: true,
+        items: mapChecklistItems('acessorios', legacy.acessorios),
+      },
     },
-    impressora: {
-      items: mapChecklistItems('impressora', legacy.displayCliente),
+    equipamentoAdicional: true,
+    equipamentoAdicionalMotivo: materialAdicional || '',
+  };
+}
+
+/**
+ * Maps legacy Phase 2 (Receção) → new Phase 2 (Receção do Material).
+ * Old format had: equipmentConditionOk, equipamentoCliente as string,
+ * verificacaoCabo, verificacaoFechadura, verificacaoChaves, verificacaoTestes, observacoes.
+ * New format has: equipamentoCliente as boolean|null, equipamentoClienteDescricao,
+ * verificacaoCabo, verificacaoTransformador (new), verificacaoFechadura,
+ * verificacaoChaves, verificacaoTestesEquipamento (renamed), observacoes.
+ */
+function mapOldPhase2ToNew(oldPhase2: OldSevenPhaseData['phase2']): Phase2RececaoData {
+  return {
+    equipamentoCliente: null, // not answered in old format
+    equipamentoClienteDescricao: '',
+    verificacaoCabo: oldPhase2.verificacaoCabo ?? false,
+    verificacaoTransformador: false, // didn't exist before
+    verificacaoFechadura: oldPhase2.verificacaoFechadura ?? false,
+    verificacaoChaves: oldPhase2.verificacaoChaves ?? false,
+    verificacaoTestesEquipamento: oldPhase2.verificacaoTestes ?? false, // renamed
+    observacoes: oldPhase2.observacoes || '',
+  };
+}
+
+/**
+ * Maps old Phase 3 software string → SoftwareSelection object.
+ * Best-effort: only brand is filled, sub-fields remain empty.
+ */
+function mapOldPhase3ToNew(oldPhase3: OldSevenPhaseData['phase3']): Phase3ProgramacaoData {
+  const softwareValue = oldPhase3.software || '';
+  const software: SoftwareSelection | null = softwareValue
+    ? { brand: softwareValue }
+    : null;
+
+  return {
+    software,
+    identificacaoReferencia: oldPhase3.identificacaoReferencia || '',
+    numeroLicenca: oldPhase3.numeroLicenca || '',
+    verificacaoInicioProgramacao: oldPhase3.verificacaoInicioProgramacao ?? false,
+    testeFinalEquipamentos: oldPhase3.testeFinalEquipamentos ?? false,
+    notasProgramacao: oldPhase3.notasProgramacao || '',
+  };
+}
+
+/**
+ * Maps old Phase 4 (flat checklist + materialAdicional) → new Phase 4 (toggleable categories).
+ * Sets `enabled: true` on all categories (preserves old behavior).
+ * Maps `materialAdicional` → `equipamentoAdicionalMotivo`, sets `equipamentoAdicional: true`.
+ */
+function mapOldPhase4ToNew(oldPhase4: OldSevenPhaseData['phase4']): Phase4PreparacaoData {
+  const checklist = oldPhase4.checklist;
+
+  const mapCategory = (categoryKey: keyof typeof CHECKLIST_ITEMS_SEVEN, legacyItems?: Record<string, boolean>): ToggleableChecklistCategory => ({
+    enabled: true,
+    items: legacyItems ? mapChecklistItems(categoryKey, legacyItems) : initChecklistItems(categoryKey),
+  });
+
+  const mapCpaCategory = (legacyItems?: Record<string, boolean>, miniPcDetails?: string): ToggleableCpaChecklistCategory => ({
+    enabled: true,
+    items: legacyItems ? mapChecklistItems('cpa', legacyItems) : initChecklistItems('cpa'),
+    miniPcDetails: miniPcDetails || '',
+  });
+
+  return {
+    checklist: {
+      pos: mapCategory('pos', checklist?.pos?.items),
+      impressora: mapCategory('impressora', checklist?.impressora?.items),
+      gavetaMetalica: mapCategory('gavetaMetalica', checklist?.gavetaMetalica?.items),
+      cpa: mapCpaCategory(checklist?.cpa?.items, checklist?.cpa?.miniPcDetails),
+      acessorios: mapCategory('acessorios', checklist?.acessorios?.items),
     },
-    gavetaMetalica: {
-      items: mapChecklistItems('gavetaMetalica', legacy.gavetaMetalica),
-    },
-    cpa: {
-      items: mapChecklistItems('cpa', legacy.cpa),
-      miniPcDetails: '',
-    },
-    acessorios: {
-      items: mapChecklistItems('acessorios', legacy.acessorios),
-    },
+    equipamentoAdicional: true,
+    equipamentoAdicionalMotivo: oldPhase4.materialAdicional || '',
+  };
+}
+
+/**
+ * Maps old Phase 6 (no falhasDetectadas) → new Phase 6 (with falhasDetectadas).
+ * Adds `falhasDetectadas: null` and `falhasDescricao: ''`.
+ */
+function mapOldPhase6ToNew(oldPhase6: OldSevenPhaseData['phase6']): Phase6TestesData {
+  return {
+    anydeskConfigurado: oldPhase6.anydeskConfigurado ?? null,
+    anydeskCodigo: oldPhase6.anydeskCodigo || '',
+    anydeskMotivo: oldPhase6.anydeskMotivo || '',
+    vectronConnectConfigurado: oldPhase6.vectronConnectConfigurado ?? null,
+    vectronConnectCodigo: oldPhase6.vectronConnectCodigo || '',
+    vectronConnectMotivo: oldPhase6.vectronConnectMotivo || '',
+    falhasDetectadas: null,
+    falhasDescricao: '',
   };
 }
 
@@ -147,6 +325,7 @@ function mapLegacyPhase3ToPhase5(legacyPhase3: Phase3Data | undefined): Phase5In
 /**
  * Maps legacy Phase 4 (Testes) → new Phase 6 (Testes).
  * Legacy phase4 has: anydeskTestado, anydeskCodigo, vectronConnectTestado, etc.
+ * Adds `falhasDetectadas: null` and `falhasDescricao: ''` (didn't exist before).
  */
 function mapLegacyPhase4ToPhase6(legacyPhase4: Phase4Data | undefined): Phase6TestesData {
   if (!legacyPhase4) {
@@ -157,6 +336,8 @@ function mapLegacyPhase4ToPhase6(legacyPhase4: Phase4Data | undefined): Phase6Te
       vectronConnectConfigurado: null,
       vectronConnectCodigo: '',
       vectronConnectMotivo: '',
+      falhasDetectadas: null,
+      falhasDescricao: '',
     };
   }
 
@@ -167,6 +348,8 @@ function mapLegacyPhase4ToPhase6(legacyPhase4: Phase4Data | undefined): Phase6Te
     vectronConnectConfigurado: legacyPhase4.vectronConnectTestado ?? null,
     vectronConnectCodigo: legacyPhase4.vectronConnectCodigo || '',
     vectronConnectMotivo: legacyPhase4.vectronConnectMotivo || '',
+    falhasDetectadas: null,
+    falhasDescricao: '',
   };
 }
 
@@ -259,15 +442,19 @@ function deriveLegacyCurrentPhase(completedPhases: number[]): number {
 // ── Checklist Helpers ───────────────────────────────────────────────
 
 /**
- * Creates a default EquipmentChecklist with all items set to false.
+ * Creates a default Phase4PreparacaoData with all categories enabled and items false.
  */
-function createDefaultChecklist(): EquipmentChecklist {
+function createDefaultPhase4(): Phase4PreparacaoData {
   return {
-    pos: { items: initChecklistItems('pos') },
-    impressora: { items: initChecklistItems('impressora') },
-    gavetaMetalica: { items: initChecklistItems('gavetaMetalica') },
-    cpa: { items: initChecklistItems('cpa'), miniPcDetails: '' },
-    acessorios: { items: initChecklistItems('acessorios') },
+    checklist: {
+      pos: { enabled: true, items: initChecklistItems('pos') },
+      impressora: { enabled: true, items: initChecklistItems('impressora') },
+      gavetaMetalica: { enabled: true, items: initChecklistItems('gavetaMetalica') },
+      cpa: { enabled: true, items: initChecklistItems('cpa'), miniPcDetails: '' },
+      acessorios: { enabled: true, items: initChecklistItems('acessorios') },
+    },
+    equipamentoAdicional: true,
+    equipamentoAdicionalMotivo: '',
   };
 }
 
@@ -309,26 +496,49 @@ function mapChecklistItems(
 // ── Main Adapter Function ───────────────────────────────────────────
 
 /**
- * Adapts legacy 5-phase installation data to the new 7-phase format at read time.
+ * Adapts old installation data to the current 7-phase format at read time.
  *
- * Detection: A record is considered legacy if it has a `completedPhases` array
- * and no `phaseStatuses` array.
+ * Handles two legacy formats:
  *
- * Mapping:
- *   - Legacy phase 1 (Programação) → New phase 3 (Programação / Preparação)
- *   - Legacy phase 2 (Material Instalado) → New phase 4 (Preparação Instalação checklist)
- *   - Legacy phase 3 (Instalação no Cliente) → New phase 5 (Instalação no Cliente)
- *   - Legacy phase 4 (Testes) → New phase 6 (Testes)
- *   - Legacy phase 5 (Finalização) → New phase 7 (Finalização)
- *   - New phases 1 (Setup) and 2 (Receção) have no legacy equivalent
+ * 1. **Legacy 5-phase format** — identified by `completedPhases` array + no `phaseStatuses`.
+ *    Mapping:
+ *    - Legacy phase 1 (Programação) → New phase 3 (Programação / Preparação)
+ *    - Legacy phase 2 (Material Instalado) → New phase 4 (Preparação Instalação checklist)
+ *    - Legacy phase 3 (Instalação no Cliente) → New phase 5 (Instalação no Cliente)
+ *    - Legacy phase 4 (Testes) → New phase 6 (Testes)
+ *    - Legacy phase 5 (Finalização) → New phase 7 (Finalização)
+ *    - New phases 1 (Setup) and 2 (Receção) have no legacy equivalent
  *
- * If data is already in the new format, it is returned unchanged.
+ * 2. **Old 7-phase format** (pre-refactor) — identified by `installationType` as string +
+ *    `phaseStatuses` present + no `installationTypes` array.
+ *    Transformations:
+ *    - `installationType: string` → `installationTypes: [value]`
+ *    - Old Phase2 fields → new Phase2RececaoData structure
+ *    - `software: string` → `{ brand: software }` (SoftwareSelection)
+ *    - Old Phase4 (materialAdicional + flat checklist) → toggleable categories
+ *    - Old Phase6 (no falhasDetectadas) → adds `falhasDetectadas: null`, `falhasDescricao: ''`
+ *
+ * If data is already in the current format, it is returned unchanged.
  */
 export function adaptLegacyData(data: unknown): InstallationSevenPhasesData {
-  if (!isLegacyFormat(data)) {
-    return data as InstallationSevenPhasesData;
+  // Case 1: Legacy 5-phase format
+  if (isLegacyFormat(data)) {
+    return adaptFromFivePhaseFormat(data);
   }
 
+  // Case 2: Old 7-phase format (pre-refactor)
+  if (isOldSevenPhaseFormat(data)) {
+    return adaptFromOldSevenPhaseFormat(data);
+  }
+
+  // Already in current format
+  return data as InstallationSevenPhasesData;
+}
+
+/**
+ * Adapts legacy 5-phase data to current 7-phase format.
+ */
+function adaptFromFivePhaseFormat(data: LegacyInstallationData): InstallationSevenPhasesData {
   const phaseStatuses = deriveLegacyPhaseStatuses(data.completedPhases);
   const currentPhase = deriveLegacyCurrentPhase(data.completedPhases);
 
@@ -338,30 +548,22 @@ export function adaptLegacyData(data: unknown): InstallationSevenPhasesData {
 
     // Metadata
     technician: data.technician,
-    installationType: '' as InstallationSevenPhasesData['installationType'],
-
-    // Equipment (Phase 1) — legacy didn't have these at top level
-    equipmentMarca: '',
-    equipmentModelo: '',
-    equipmentNumeroSerie: '',
-    equipmentFornecedor: '',
+    installationEntries: [],
 
     // Phase data
     phase1: {},
     phase2: {
-      equipamentoCliente: '',
-      equipmentConditionOk: null,
+      equipamentoCliente: null,
+      equipamentoClienteDescricao: '',
       verificacaoCabo: false,
+      verificacaoTransformador: false,
       verificacaoFechadura: false,
       verificacaoChaves: false,
-      verificacaoTestes: false,
+      verificacaoTestesEquipamento: false,
       observacoes: '',
     },
     phase3: mapLegacyPhase1ToPhase3(data.phase1),
-    phase4: {
-      materialAdicional: '',
-      checklist: mapLegacyChecklist(data.phase2),
-    } satisfies Phase4PreparacaoData,
+    phase4: mapLegacyChecklistToPhase4(data.phase2),
     phase5: mapLegacyPhase3ToPhase5(data.phase3),
     phase6: mapLegacyPhase4ToPhase6(data.phase4),
     phase7: mapLegacyPhase5ToPhase7(data.phase5),
@@ -370,5 +572,39 @@ export function adaptLegacyData(data: unknown): InstallationSevenPhasesData {
     phaseStatuses,
     currentPhase,
     status: data.isCompleted ? 'complete' : 'in_progress',
+  };
+}
+
+/**
+ * Adapts old 7-phase data (pre-refactor) to current format.
+ * Detects old field names and maps them to new structures.
+ */
+function adaptFromOldSevenPhaseFormat(data: OldSevenPhaseData): InstallationSevenPhasesData {
+  // Convert single installationType + equipment fields into an installationEntries array
+  const installationEntries: InstallationEntry[] = data.installationType
+    ? [{ tipo: data.installationType as InstallationType, marca: data.equipmentMarca || '', modelo: data.equipmentModelo || '', numeroSerie: data.equipmentNumeroSerie || '', fornecedor: data.equipmentFornecedor || '' }]
+    : [];
+
+  return {
+    // Relation
+    clientId: data.clientId || '',
+
+    // Metadata
+    technician: data.technician,
+    installationEntries,
+
+    // Phase data
+    phase1: {},
+    phase2: mapOldPhase2ToNew(data.phase2),
+    phase3: mapOldPhase3ToNew(data.phase3),
+    phase4: mapOldPhase4ToNew(data.phase4),
+    phase5: data.phase5,
+    phase6: mapOldPhase6ToNew(data.phase6),
+    phase7: data.phase7,
+
+    // Workflow state — preserved
+    phaseStatuses: data.phaseStatuses,
+    currentPhase: data.currentPhase,
+    status: data.status,
   };
 }
