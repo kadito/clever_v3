@@ -1,5 +1,6 @@
 import type { BaseContent, TechnicianUser } from '../../types';
 import type { FileReference } from '../../file-validation';
+import type { SoftwareSelection } from './software-config';
 
 // ── Type Aliases ────────────────────────────────────────────────────
 
@@ -22,30 +23,37 @@ export interface Phase1SetupData {}
 
 /** Phase 2 — Receção do Material */
 export interface Phase2RececaoData {
-  equipamentoCliente: string; // textarea for equipment description
-  equipmentConditionOk: boolean | null; // null = not yet answered
-  // Conditional fields (shown when equipmentConditionOk === false)
+  equipamentoCliente: boolean | null;
+  equipamentoClienteDescricao: string;
   verificacaoCabo: boolean;
+  verificacaoTransformador: boolean;
   verificacaoFechadura: boolean;
   verificacaoChaves: boolean;
-  verificacaoTestes: boolean;
+  verificacaoTestesEquipamento: boolean;
   observacoes: string;
 }
 
 /** Phase 3 — Programação / Preparação */
 export interface Phase3ProgramacaoData {
-  software: string;
+  software: SoftwareSelection | null;
   identificacaoReferencia: string;
   numeroLicenca: string;
   verificacaoInicioProgramacao: boolean;
   testeFinalEquipamentos: boolean;
-  notasProgramacao: string; // multiline text area (supports line breaks)
+  notasProgramacao: string;
 }
 
 /** Phase 4 — Preparação Instalação */
 export interface Phase4PreparacaoData {
-  materialAdicional: string;
-  checklist: EquipmentChecklist;
+  checklist: {
+    pos: ToggleableChecklistCategory;
+    impressora: ToggleableChecklistCategory;
+    gavetaMetalica: ToggleableChecklistCategory;
+    cpa: ToggleableCpaChecklistCategory;
+    acessorios: ToggleableChecklistCategory;
+  };
+  equipamentoAdicional: boolean;
+  equipamentoAdicionalMotivo: string;
 }
 
 /** Phase 5 — Instalação no Cliente */
@@ -65,12 +73,14 @@ export interface Phase5InstalacaoData {
 
 /** Phase 6 — Testes */
 export interface Phase6TestesData {
-  anydeskConfigurado: boolean | null; // null = not yet answered
-  anydeskCodigo: string; // required when anydeskConfigurado === true
-  anydeskMotivo: string; // required when anydeskConfigurado === false
+  anydeskConfigurado: boolean | null;
+  anydeskCodigo: string;
+  anydeskMotivo: string;
   vectronConnectConfigurado: boolean | null;
   vectronConnectCodigo: string;
   vectronConnectMotivo: string;
+  falhasDetectadas: boolean | null;
+  falhasDescricao: string;
 }
 
 /** Phase 7 — Finalização */
@@ -80,24 +90,28 @@ export interface Phase7FinalizacaoData {
   fotosInstalacao: FileReference[];
 }
 
-// ── Equipment Checklist ─────────────────────────────────────────────
+// ── Toggleable Checklist Categories ─────────────────────────────────
 
-/** Standard category — items are boolean checkboxes */
-export interface ChecklistCategory {
+/** Standard category — parent toggle + items are boolean checkboxes */
+export interface ToggleableChecklistCategory {
+  enabled: boolean;
   items: Record<string, boolean>;
 }
 
 /** CPA has an additional text area for mini PC details */
-export interface CpaChecklistCategory extends ChecklistCategory {
-  miniPcDetails: string; // placeholder: "Marca, Modelo, n.º série, materiais"
+export interface ToggleableCpaChecklistCategory extends ToggleableChecklistCategory {
+  miniPcDetails: string;
 }
 
-export interface EquipmentChecklist {
-  pos: ChecklistCategory;
-  impressora: ChecklistCategory;
-  gavetaMetalica: ChecklistCategory;
-  cpa: CpaChecklistCategory;
-  acessorios: ChecklistCategory;
+// ── Installation Entry ───────────────────────────────────────────────
+
+/** A single installation item with type and equipment details */
+export interface InstallationEntry {
+  tipo: InstallationType;
+  marca: string;
+  modelo: string;
+  numeroSerie: string;
+  fornecedor: string;
 }
 
 // ── Main Data Interface ─────────────────────────────────────────────
@@ -108,13 +122,9 @@ export interface InstallationSevenPhasesData {
 
   // Metadata
   technician: TechnicianUser; // auto-assigned from auth context
-  installationType: InstallationType;
 
-  // Equipment (Phase 1)
-  equipmentMarca: string;
-  equipmentModelo: string;
-  equipmentNumeroSerie: string;
-  equipmentFornecedor: string;
+  // Installations (Phase 1) — repeatable entries
+  installationEntries: InstallationEntry[];
 
   // Phase data
   phase1: Phase1SetupData;

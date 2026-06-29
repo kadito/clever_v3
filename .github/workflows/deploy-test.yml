@@ -47,6 +47,7 @@ jobs:
         run: pnpm --filter @clever/frontend build
         env:
           VITE_CLERK_PUBLISHABLE_KEY: ${{ vars.CLERK_PUBLISHABLE_KEY }}
+          VITE_APP_ENV: test
 
       - name: Build backend package
         run: pnpm --filter @clever/backend build

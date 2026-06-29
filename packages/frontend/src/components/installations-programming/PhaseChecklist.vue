@@ -5,45 +5,64 @@
       :key="categoryKey"
       class="category"
     >
-      <!-- Category Header (collapsible) -->
-      <button
-        type="button"
-        class="category-header"
-        :aria-expanded="expandedCategories[categoryKey]"
-        :aria-controls="`category-${categoryKey}`"
-        :disabled="disabled"
-        @click="toggleCategory(categoryKey)"
-      >
-        <div class="category-header-left">
-          <svg
-            class="chevron"
-            :class="{ 'chevron--expanded': expandedCategories[categoryKey] }"
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 8l4 4 4-4"
-            />
-          </svg>
-          <span class="category-name">{{ CHECKLIST_CATEGORY_LABELS_SEVEN[categoryKey] }}</span>
-        </div>
-        <span
-          class="category-progress"
-          :class="getCategoryProgressClass(categoryKey)"
+      <!-- Category Header (collapsible + enabled toggle) -->
+      <div class="category-header">
+        <button
+          type="button"
+          class="category-header-expand"
+          :aria-expanded="expandedCategories[categoryKey] && getCategoryEnabled(categoryKey)"
+          :aria-controls="`category-${categoryKey}`"
+          :disabled="disabled || !getCategoryEnabled(categoryKey)"
+          @click="toggleCategory(categoryKey)"
         >
-          {{ getCategoryCheckedCount(categoryKey) }}/{{ CHECKLIST_ITEMS_SEVEN[categoryKey].length }}
-        </span>
-      </button>
+          <div class="category-header-left">
+            <svg
+              class="chevron"
+              :class="{ 'chevron--expanded': expandedCategories[categoryKey] && getCategoryEnabled(categoryKey) }"
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 8l4 4 4-4"
+              />
+            </svg>
+            <span class="category-name" :class="{ 'category-name--disabled': !getCategoryEnabled(categoryKey) }">
+              {{ CHECKLIST_CATEGORY_LABELS_SEVEN[categoryKey] }}
+            </span>
+          </div>
+          <span
+            v-if="getCategoryEnabled(categoryKey)"
+            class="category-progress"
+            :class="getCategoryProgressClass(categoryKey)"
+          >
+            {{ getCategoryCheckedCount(categoryKey) }}/{{ CHECKLIST_ITEMS_SEVEN[categoryKey].length }}
+          </span>
+        </button>
 
-      <!-- Category Items -->
+        <!-- Enabled toggle switch -->
+        <button
+          type="button"
+          role="switch"
+          :aria-checked="getCategoryEnabled(categoryKey)"
+          :aria-label="`Ativar ${CHECKLIST_CATEGORY_LABELS_SEVEN[categoryKey]}`"
+          class="switch category-switch"
+          :class="{ 'switch--on': getCategoryEnabled(categoryKey) }"
+          :disabled="disabled"
+          @click="toggleCategoryEnabled(categoryKey)"
+        >
+          <span class="switch-thumb" />
+        </button>
+      </div>
+
+      <!-- Category Items (only shown when enabled AND expanded) -->
       <div
-        v-if="expandedCategories[categoryKey]"
+        v-if="getCategoryEnabled(categoryKey) && expandedCategories[categoryKey]"
         :id="`category-${categoryKey}`"
         class="category-items"
       >
@@ -77,7 +96,7 @@
             id="miniPcDetails"
             class="mini-pc-textarea"
             placeholder="Marca, Modelo, n.º série, materiais"
-            :value="modelValue.cpa.miniPcDetails"
+            :value="(modelValue.cpa as ToggleableCpaChecklistCategory).miniPcDetails"
             :readonly="disabled"
             :disabled="disabled"
             @input="updateMiniPcDetails(($event.target as HTMLTextAreaElement).value)"
@@ -95,12 +114,14 @@ import {
   CHECKLIST_LABELS_SEVEN,
   CHECKLIST_CATEGORY_LABELS_SEVEN,
 } from '@clever/shared';
-import type { EquipmentChecklist } from '@clever/shared';
+import type { ToggleableChecklistCategory, ToggleableCpaChecklistCategory } from '@clever/shared';
 
 type CategoryKey = keyof typeof CHECKLIST_ITEMS_SEVEN;
 
+type ChecklistModelValue = Record<string, ToggleableChecklistCategory | ToggleableCpaChecklistCategory>;
+
 interface Props {
-  modelValue: EquipmentChecklist;
+  modelValue: ChecklistModelValue;
   disabled?: boolean;
 }
 
@@ -109,7 +130,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: EquipmentChecklist): void;
+  (e: 'update:modelValue', value: ChecklistModelValue): void;
 }>();
 
 const categoryKeys = computed<CategoryKey[]>(() =>
@@ -121,8 +142,35 @@ const expandedCategories = reactive<Record<CategoryKey, boolean>>(
   Object.fromEntries(categoryKeys.value.map((key) => [key, false])) as Record<CategoryKey, boolean>
 );
 
+const getCategoryEnabled = (categoryKey: CategoryKey): boolean => {
+  return props.modelValue?.[categoryKey]?.enabled ?? true;
+};
+
 const toggleCategory = (categoryKey: CategoryKey): void => {
+  if (!getCategoryEnabled(categoryKey)) return;
   expandedCategories[categoryKey] = !expandedCategories[categoryKey];
+};
+
+const toggleCategoryEnabled = (categoryKey: CategoryKey): void => {
+  if (props.disabled) return;
+
+  const currentCategory = props.modelValue[categoryKey];
+  const newEnabled = !currentCategory.enabled;
+
+  // When disabling, collapse the category
+  if (!newEnabled) {
+    expandedCategories[categoryKey] = false;
+  }
+
+  const updatedChecklist: ChecklistModelValue = {
+    ...props.modelValue,
+    [categoryKey]: {
+      ...currentCategory,
+      enabled: newEnabled,
+    },
+  };
+
+  emit('update:modelValue', updatedChecklist);
 };
 
 const getItemValue = (categoryKey: CategoryKey, itemKey: string): boolean => {
@@ -153,11 +201,12 @@ const toggleItem = (categoryKey: CategoryKey, itemKey: string): void => {
     [itemKey]: !currentValue,
   };
 
-  const updatedChecklist: EquipmentChecklist = {
+  const updatedChecklist: ChecklistModelValue = {
     ...props.modelValue,
-    [categoryKey]: categoryKey === 'cpa'
-      ? { ...currentCategory, items: updatedItems }
-      : { items: updatedItems },
+    [categoryKey]: {
+      ...currentCategory,
+      items: updatedItems,
+    },
   };
 
   emit('update:modelValue', updatedChecklist);
@@ -166,7 +215,7 @@ const toggleItem = (categoryKey: CategoryKey, itemKey: string): void => {
 const updateMiniPcDetails = (value: string): void => {
   if (props.disabled) return;
 
-  const updatedChecklist: EquipmentChecklist = {
+  const updatedChecklist: ChecklistModelValue = {
     ...props.modelValue,
     cpa: {
       ...props.modelValue.cpa,
@@ -188,19 +237,26 @@ const updateMiniPcDetails = (value: string): void => {
 }
 
 .category-header {
-  @apply w-full flex items-center justify-between px-4 py-3
-         bg-gray-50 text-left cursor-pointer
+  @apply flex items-center bg-gray-50;
+  min-height: 44px;
+}
+
+.category-header-expand {
+  @apply flex-1 flex items-center justify-between px-4 py-3
+         text-left cursor-pointer
          transition-colors duration-150;
   min-height: 44px;
   font-size: 16px;
   -webkit-tap-highlight-color: transparent;
+  background: transparent;
+  border: none;
 }
 
-.category-header:active {
+.category-header-expand:active {
   @apply bg-gray-100;
 }
 
-.category-header:disabled {
+.category-header-expand:disabled {
   @apply cursor-default;
 }
 
@@ -220,6 +276,10 @@ const updateMiniPcDetails = (value: string): void => {
   @apply font-semibold text-gray-800;
 }
 
+.category-name--disabled {
+  @apply text-gray-400;
+}
+
 .category-progress {
   @apply text-sm font-medium text-gray-400 flex-shrink-0;
 }
@@ -230,6 +290,10 @@ const updateMiniPcDetails = (value: string): void => {
 
 .progress--complete {
   color: #75AE93;
+}
+
+.category-switch {
+  @apply mr-3 flex-shrink-0;
 }
 
 .category-items {

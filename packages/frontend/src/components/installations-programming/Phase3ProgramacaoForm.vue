@@ -1,20 +1,101 @@
 <template>
   <div class="phase3-form">
-    <!-- Software -->
-    <div class="form-field">
-      <label class="form-label" for="phase3Software">Software</label>
-      <input
-        id="phase3Software"
-        type="text"
-        class="form-input"
-        :class="{ 'field-invalid': hasError('software') }"
-        :value="modelValue.software"
-        :disabled="disabled"
-        placeholder="Software"
-        @input="updateField('software', ($event.target as HTMLInputElement).value)"
-      >
-      <span v-if="hasError('software')" class="field-error">Campo obrigatório</span>
-    </div>
+    <!-- Software Selection (cascading dropdowns) -->
+    <fieldset class="form-field">
+      <legend class="form-label" :class="{ 'text-red-600': hasError('software') }">Software</legend>
+
+      <!-- Brand dropdown -->
+      <div class="dropdown-field">
+        <label class="dropdown-label" for="phase3Brand">Marca</label>
+        <select
+          id="phase3Brand"
+          class="form-select"
+          :class="{ 'field-invalid': hasError('software') && !selectedBrand }"
+          :disabled="disabled"
+          :value="modelValue.software?.brand ?? ''"
+          @change="onBrandChange(($event.target as HTMLSelectElement).value)"
+        >
+          <option value="" disabled>Selecione uma marca...</option>
+          <option v-for="h in SOFTWARE_HIERARCHY" :key="h.brand" :value="h.brand">
+            {{ h.brand }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Sub-product dropdown (conditional) -->
+      <div v-if="currentHierarchy?.subProducts" class="dropdown-field">
+        <label class="dropdown-label" for="phase3SubProduct">Sub-produto</label>
+        <select
+          id="phase3SubProduct"
+          class="form-select"
+          :class="{ 'field-invalid': hasError('software') && !modelValue.software?.subProduct }"
+          :disabled="disabled"
+          :value="modelValue.software?.subProduct ?? ''"
+          @change="onSubProductChange(($event.target as HTMLSelectElement).value)"
+        >
+          <option value="" disabled>Selecione um sub-produto...</option>
+          <option v-for="sp in currentHierarchy.subProducts" :key="sp.name" :value="sp.name">
+            {{ sp.name }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Module dropdown (conditional — Pix sub-products) -->
+      <div v-if="currentSubProduct?.modules" class="dropdown-field">
+        <label class="dropdown-label" for="phase3Module">Módulo</label>
+        <select
+          id="phase3Module"
+          class="form-select"
+          :class="{ 'field-invalid': hasError('software') && !modelValue.software?.module }"
+          :disabled="disabled"
+          :value="modelValue.software?.module ?? ''"
+          @change="onModuleChange(($event.target as HTMLSelectElement).value)"
+        >
+          <option value="" disabled>Selecione um módulo...</option>
+          <option v-for="mod in currentSubProduct.modules" :key="mod" :value="mod">
+            {{ mod }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Tier dropdown (conditional — Zon Soft sub-products) -->
+      <div v-if="currentSubProduct?.tiers" class="dropdown-field">
+        <label class="dropdown-label" for="phase3Tier">Plano</label>
+        <select
+          id="phase3Tier"
+          class="form-select"
+          :class="{ 'field-invalid': hasError('software') && !modelValue.software?.tier }"
+          :disabled="disabled"
+          :value="modelValue.software?.tier ?? ''"
+          @change="onTierChange(($event.target as HTMLSelectElement).value)"
+        >
+          <option value="" disabled>Selecione um plano...</option>
+          <option v-for="t in currentSubProduct.tiers" :key="t" :value="t">
+            {{ t }}
+          </option>
+        </select>
+      </div>
+
+      <!-- License type dropdown (conditional — PT CERT) -->
+      <div v-if="currentHierarchy?.licenseTypes" class="dropdown-field">
+        <label class="dropdown-label" for="phase3LicenseType">Tipo de Licença</label>
+        <select
+          id="phase3LicenseType"
+          class="form-select"
+          :class="{ 'field-invalid': hasError('software') && !modelValue.software?.licenseType }"
+          :disabled="disabled"
+          :value="modelValue.software?.licenseType ?? ''"
+          @change="onLicenseTypeChange(($event.target as HTMLSelectElement).value)"
+        >
+          <option value="" disabled>Selecione um tipo...</option>
+          <option v-for="lt in currentHierarchy.licenseTypes" :key="lt" :value="lt">
+            {{ lt }}
+          </option>
+        </select>
+      </div>
+
+      <span v-if="hasError('software')" class="field-error">Selecione o software completo</span>
+    </fieldset>
 
     <!-- Identificação / Referência -->
     <div class="form-field">
@@ -101,7 +182,9 @@
 </template>
 
 <script setup lang="ts">
-import type { Phase3ProgramacaoData } from '@clever/shared';
+import { computed } from 'vue';
+import type { Phase3ProgramacaoData, SoftwareSelection } from '@clever/shared';
+import { SOFTWARE_HIERARCHY } from '@clever/shared';
 
 interface Props {
   modelValue: Phase3ProgramacaoData;
@@ -118,12 +201,78 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: Phase3ProgramacaoData): void;
 }>();
 
+// ── Computed helpers ────────────────────────────────────────────────
+
+const selectedBrand = computed(() => props.modelValue.software?.brand ?? '');
+
+const currentHierarchy = computed(() => {
+  if (!selectedBrand.value) return undefined;
+  return SOFTWARE_HIERARCHY.find((h) => h.brand === selectedBrand.value);
+});
+
+const currentSubProduct = computed(() => {
+  const subProductName = props.modelValue.software?.subProduct;
+  if (!subProductName || !currentHierarchy.value?.subProducts) return undefined;
+  return currentHierarchy.value.subProducts.find((sp) => sp.name === subProductName);
+});
+
+// ── Event handlers ──────────────────────────────────────────────────
+
 const hasError = (field: string): boolean => props.validationErrors.includes(field);
 
 const updateField = (field: keyof Phase3ProgramacaoData, value: string | boolean): void => {
   emit('update:modelValue', {
     ...props.modelValue,
     [field]: value,
+  });
+};
+
+const updateSoftware = (selection: SoftwareSelection | null): void => {
+  emit('update:modelValue', {
+    ...props.modelValue,
+    software: selection,
+  });
+};
+
+const onBrandChange = (brand: string): void => {
+  if (!brand) {
+    updateSoftware(null);
+    return;
+  }
+  // Reset all sub-fields when brand changes
+  updateSoftware({ brand });
+};
+
+const onSubProductChange = (subProduct: string): void => {
+  if (!props.modelValue.software) return;
+  // Reset module and tier when subProduct changes
+  updateSoftware({
+    brand: props.modelValue.software.brand,
+    subProduct,
+  });
+};
+
+const onModuleChange = (module: string): void => {
+  if (!props.modelValue.software) return;
+  updateSoftware({
+    ...props.modelValue.software,
+    module,
+  });
+};
+
+const onTierChange = (tier: string): void => {
+  if (!props.modelValue.software) return;
+  updateSoftware({
+    ...props.modelValue.software,
+    tier,
+  });
+};
+
+const onLicenseTypeChange = (licenseType: string): void => {
+  if (!props.modelValue.software) return;
+  updateSoftware({
+    ...props.modelValue.software,
+    licenseType,
   });
 };
 </script>
@@ -140,6 +289,38 @@ const updateField = (field: keyof Phase3ProgramacaoData, value: string | boolean
 .form-label {
   @apply block text-sm font-medium text-gray-700;
   font-size: 16px;
+}
+
+.dropdown-field {
+  @apply flex flex-col gap-1 mt-2;
+}
+
+.dropdown-label {
+  @apply block text-xs font-medium text-gray-500;
+  font-size: 14px;
+}
+
+.form-select {
+  @apply w-full rounded-md border border-gray-300 px-3 py-2
+         text-gray-700 bg-white
+         focus:outline-none focus:ring-2 focus:border-transparent
+         appearance-none;
+  min-height: 44px;
+  font-size: 16px;
+  --tw-ring-color: #75AE93;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+.form-select:focus {
+  --tw-ring-color: #75AE93;
+}
+
+.form-select:disabled {
+  @apply bg-gray-50 cursor-not-allowed opacity-75;
 }
 
 .form-input,

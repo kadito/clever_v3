@@ -32,23 +32,20 @@ interface UpdatePayload {
 function createDefaultInstallationData(): Omit<InstallationSevenPhasesData, 'technician'> {
   return {
     clientId: '',
-    installationType: '' as InstallationSevenPhasesData['installationType'],
-    equipmentMarca: '',
-    equipmentModelo: '',
-    equipmentNumeroSerie: '',
-    equipmentFornecedor: '',
+    installationEntries: [],
     phase1: {},
     phase2: {
-      equipmentConditionOk: null,
-      equipamentoCliente: '',
+      equipamentoCliente: null,
+      equipamentoClienteDescricao: '',
       verificacaoCabo: false,
+      verificacaoTransformador: false,
       verificacaoFechadura: false,
       verificacaoChaves: false,
-      verificacaoTestes: false,
+      verificacaoTestesEquipamento: false,
       observacoes: '',
     },
     phase3: {
-      software: '',
+      software: null,
       identificacaoReferencia: '',
       numeroLicenca: '',
       verificacaoInicioProgramacao: false,
@@ -56,14 +53,15 @@ function createDefaultInstallationData(): Omit<InstallationSevenPhasesData, 'tec
       notasProgramacao: '',
     },
     phase4: {
-      materialAdicional: '',
       checklist: {
-        pos: { items: {} },
-        impressora: { items: {} },
-        gavetaMetalica: { items: {} },
-        cpa: { items: {}, miniPcDetails: '' },
-        acessorios: { items: {} },
+        pos: { enabled: true, items: {} },
+        impressora: { enabled: true, items: {} },
+        gavetaMetalica: { enabled: true, items: {} },
+        cpa: { enabled: true, items: {}, miniPcDetails: '' },
+        acessorios: { enabled: true, items: {} },
       },
+      equipamentoAdicional: true,
+      equipamentoAdicionalMotivo: '',
     },
     phase5: {
       nrFatura: '',
@@ -84,6 +82,8 @@ function createDefaultInstallationData(): Omit<InstallationSevenPhasesData, 'tec
       vectronConnectConfigurado: null,
       vectronConnectCodigo: '',
       vectronConnectMotivo: '',
+      falhasDetectadas: null,
+      falhasDescricao: '',
     },
     phase7: {
       dumpLido: false,
@@ -121,11 +121,7 @@ function validateCreate(requestData: Record<string, unknown>, userContext?: User
     ...defaults,
     technician,
     clientId: (data.clientId as string) || defaults.clientId,
-    installationType: (data.installationType as string) || defaults.installationType,
-    equipmentMarca: (data.equipmentMarca as string) || defaults.equipmentMarca,
-    equipmentModelo: (data.equipmentModelo as string) || defaults.equipmentModelo,
-    equipmentNumeroSerie: (data.equipmentNumeroSerie as string) || defaults.equipmentNumeroSerie,
-    equipmentFornecedor: (data.equipmentFornecedor as string) || defaults.equipmentFornecedor,
+    installationEntries: (data.installationEntries as unknown[]) || defaults.installationEntries,
   };
 
   // Update original request
@@ -194,11 +190,7 @@ function handleSaveAction(
 
   // Merge top-level fields if provided
   if (data.clientId !== undefined) merged.clientId = data.clientId;
-  if (data.installationType !== undefined) merged.installationType = data.installationType;
-  if (data.equipmentMarca !== undefined) merged.equipmentMarca = data.equipmentMarca;
-  if (data.equipmentModelo !== undefined) merged.equipmentModelo = data.equipmentModelo;
-  if (data.equipmentNumeroSerie !== undefined) merged.equipmentNumeroSerie = data.equipmentNumeroSerie;
-  if (data.equipmentFornecedor !== undefined) merged.equipmentFornecedor = data.equipmentFornecedor;
+  if (data.installationEntries !== undefined) merged.installationEntries = data.installationEntries;
 
   // Merge phase data (shallow merge per phase)
   if (data.phase1) merged.phase1 = { ...existing.phase1, ...(data.phase1 as Record<string, unknown>) };
@@ -246,11 +238,7 @@ function handleCompletePhaseAction(
 
   // Merge top-level fields if provided
   if (data.clientId !== undefined) merged.clientId = data.clientId;
-  if (data.installationType !== undefined) merged.installationType = data.installationType;
-  if (data.equipmentMarca !== undefined) merged.equipmentMarca = data.equipmentMarca;
-  if (data.equipmentModelo !== undefined) merged.equipmentModelo = data.equipmentModelo;
-  if (data.equipmentNumeroSerie !== undefined) merged.equipmentNumeroSerie = data.equipmentNumeroSerie;
-  if (data.equipmentFornecedor !== undefined) merged.equipmentFornecedor = data.equipmentFornecedor;
+  if (data.installationEntries !== undefined) merged.installationEntries = data.installationEntries;
 
   // Merge phase data
   if (data.phase1) merged.phase1 = { ...existing.phase1, ...(data.phase1 as Record<string, unknown>) };
@@ -387,7 +375,7 @@ function extractIndexFields(content: InstallationSevenPhases): Record<string, un
     clientId: data.clientId || '',
     technicianName,
     technicianUserId: tech?.userId || '',
-    installationType: data.installationType || '',
+    installationTypes: (data.installationEntries || []).map((e: { tipo: string }) => e.tipo),
     currentPhase: data.currentPhase || 1,
     status: data.status || 'in_progress',
     isCompleted: data.status === 'complete',

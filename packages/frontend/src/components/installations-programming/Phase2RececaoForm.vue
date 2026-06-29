@@ -2,31 +2,16 @@
   <div class="phase2-form">
     <!-- Equipamento do Cliente -->
     <div class="form-field">
-      <label class="form-label" for="phase2EquipamentoCliente">Equipamento do Cliente</label>
-      <textarea
-        id="phase2EquipamentoCliente"
-        class="form-textarea"
-        :value="modelValue.equipamentoCliente"
-        :disabled="disabled"
-        placeholder="Descreva o equipamento do cliente..."
-        rows="3"
-        @input="updateField('equipamentoCliente', ($event.target as HTMLTextAreaElement).value)"
-      ></textarea>
-    </div>
-
-    <!-- Equipment Condition Toggle -->
-    <div class="form-field">
-      <label class="form-label" :class="{ 'text-red-600': hasError('equipmentConditionOk') }">Equipamento em boas condições?</label>
+      <label class="form-label" :class="{ 'text-red-600': hasError('equipamentoClienteDescricao') }">Equipamento do Cliente</label>
       <div class="toggle-group">
         <button
           type="button"
           class="toggle-btn"
           :class="[
-            modelValue.equipmentConditionOk === true ? 'toggle-btn-active-yes' : 'toggle-btn-inactive',
-            hasError('equipmentConditionOk') ? 'ring-2 ring-red-500' : ''
+            modelValue.equipamentoCliente === true ? 'toggle-btn-active-yes' : 'toggle-btn-inactive',
           ]"
           :disabled="disabled"
-          @click="updateField('equipmentConditionOk', true)"
+          @click="updateField('equipamentoCliente', true)"
         >
           Sim
         </button>
@@ -34,22 +19,38 @@
           type="button"
           class="toggle-btn"
           :class="[
-            modelValue.equipmentConditionOk === false ? 'toggle-btn-active-no' : 'toggle-btn-inactive',
-            hasError('equipmentConditionOk') ? 'ring-2 ring-red-500' : ''
+            modelValue.equipamentoCliente === false ? 'toggle-btn-active-no' : 'toggle-btn-inactive',
           ]"
           :disabled="disabled"
-          @click="updateField('equipmentConditionOk', false)"
+          @click="updateField('equipamentoCliente', false)"
         >
           Não
         </button>
       </div>
-      <span v-if="hasError('equipmentConditionOk')" class="field-error">Selecione uma opção</span>
     </div>
 
-    <!-- Conditional Verification Fields (shown when equipmentConditionOk === false) -->
-    <div v-if="modelValue.equipmentConditionOk === false" class="verification-fields">
-      <!-- Cabo -->
-      <div class="form-field">
+    <!-- Equipamento do Cliente — Descrição (conditional: visible when SIM) -->
+    <div v-if="modelValue.equipamentoCliente === true" class="form-field">
+      <label class="form-label" :class="{ 'text-red-600': hasError('equipamentoClienteDescricao') }" for="phase2EquipamentoClienteDescricao">Descrição do equipamento</label>
+      <textarea
+        id="phase2EquipamentoClienteDescricao"
+        class="form-textarea"
+        :class="{ 'border-red-500': hasError('equipamentoClienteDescricao') }"
+        :value="modelValue.equipamentoClienteDescricao"
+        :disabled="disabled"
+        placeholder="Descreva o equipamento do cliente..."
+        rows="3"
+        @input="updateField('equipamentoClienteDescricao', ($event.target as HTMLTextAreaElement).value)"
+      ></textarea>
+      <span v-if="hasError('equipamentoClienteDescricao')" class="field-error">Descrição do equipamento é obrigatória</span>
+    </div>
+
+    <!-- Verificações — Always visible -->
+    <div class="form-field">
+      <span class="form-label section-label">Verificações</span>
+
+      <div class="verification-fields">
+        <!-- Cabo -->
         <div class="toggle-field">
           <span class="form-label">Cabo</span>
           <button
@@ -65,10 +66,25 @@
             <span class="switch-thumb" />
           </button>
         </div>
-      </div>
 
-      <!-- Fechadura -->
-      <div class="form-field">
+        <!-- Transformador -->
+        <div class="toggle-field">
+          <span class="form-label">Transformador</span>
+          <button
+            type="button"
+            role="switch"
+            :aria-checked="modelValue.verificacaoTransformador"
+            aria-label="Transformador"
+            class="switch"
+            :class="{ 'switch--on': modelValue.verificacaoTransformador }"
+            :disabled="disabled"
+            @click="updateField('verificacaoTransformador', !modelValue.verificacaoTransformador)"
+          >
+            <span class="switch-thumb" />
+          </button>
+        </div>
+
+        <!-- Fechadura -->
         <div class="toggle-field">
           <span class="form-label">Fechadura</span>
           <button
@@ -84,10 +100,8 @@
             <span class="switch-thumb" />
           </button>
         </div>
-      </div>
 
-      <!-- Chaves -->
-      <div class="form-field">
+        <!-- Chaves -->
         <div class="toggle-field">
           <span class="form-label">Chaves</span>
           <button
@@ -103,21 +117,19 @@
             <span class="switch-thumb" />
           </button>
         </div>
-      </div>
 
-      <!-- Testes ao equipamento -->
-      <div class="form-field">
+        <!-- Testes ao equipamento -->
         <div class="toggle-field">
           <span class="form-label">Testes ao equipamento</span>
           <button
             type="button"
             role="switch"
-            :aria-checked="modelValue.verificacaoTestes"
+            :aria-checked="modelValue.verificacaoTestesEquipamento"
             aria-label="Testes ao equipamento"
             class="switch"
-            :class="{ 'switch--on': modelValue.verificacaoTestes }"
+            :class="{ 'switch--on': modelValue.verificacaoTestesEquipamento }"
             :disabled="disabled"
-            @click="updateField('verificacaoTestes', !modelValue.verificacaoTestes)"
+            @click="updateField('verificacaoTestesEquipamento', !modelValue.verificacaoTestesEquipamento)"
           >
             <span class="switch-thumb" />
           </button>
@@ -183,7 +195,10 @@ const updateField = (field: keyof Phase2RececaoData, value: string | boolean | n
   font-size: 16px;
 }
 
-.form-input,
+.section-label {
+  @apply text-base font-semibold text-gray-800;
+}
+
 .form-textarea {
   @apply w-full rounded-md border border-gray-300 px-3 py-2
          text-gray-700 placeholder-gray-400
@@ -193,12 +208,10 @@ const updateField = (field: keyof Phase2RececaoData, value: string | boolean | n
   --tw-ring-color: #75AE93;
 }
 
-.form-input:focus,
 .form-textarea:focus {
   --tw-ring-color: #75AE93;
 }
 
-.form-input:disabled,
 .form-textarea:disabled {
   @apply bg-gray-50 cursor-not-allowed opacity-75;
 }
@@ -244,7 +257,7 @@ const updateField = (field: keyof Phase2RececaoData, value: string | boolean | n
 }
 
 .verification-fields {
-  @apply flex flex-col gap-4 pl-2 border-l-2 border-red-300;
+  @apply flex flex-col gap-3 mt-2;
 }
 
 /* Toggle field layout */

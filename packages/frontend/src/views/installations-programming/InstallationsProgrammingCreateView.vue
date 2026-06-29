@@ -68,8 +68,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import type { InstallationType } from '@clever/shared';
+import type { InstallationEntry } from '@clever/shared';
 import Phase1SetupForm from '@/components/installations-programming/Phase1SetupForm.vue';
+
 import BackButton from '@/components/common/BackButton.vue';
 import { useApi } from '@/composables/useApi';
 
@@ -82,11 +83,7 @@ const error = ref<string | null>(null);
 // ── Phase 1 form data ───────────────────────────────────────────────
 const formData = ref({
   clientId: '',
-  installationType: '' as InstallationType,
-  equipmentMarca: '',
-  equipmentModelo: '',
-  equipmentNumeroSerie: '',
-  equipmentFornecedor: '',
+  installationEntries: [] as InstallationEntry[],
 });
 
 // ── Submit handler ──────────────────────────────────────────────────
@@ -97,11 +94,7 @@ const handleSubmit = async (): Promise<void> => {
   const payload = {
     data: {
       clientId: formData.value.clientId,
-      installationType: formData.value.installationType,
-      equipmentMarca: formData.value.equipmentMarca,
-      equipmentModelo: formData.value.equipmentModelo,
-      equipmentNumeroSerie: formData.value.equipmentNumeroSerie,
-      equipmentFornecedor: formData.value.equipmentFornecedor,
+      installationEntries: formData.value.installationEntries,
     },
   };
 
