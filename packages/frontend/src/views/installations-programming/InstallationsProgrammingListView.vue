@@ -145,11 +145,11 @@ const router = useRouter();
 const api = useApi<InstallationsProgramming>('installations-programming');
 
 // State
-const installations = ref<ContentWithRelations<InstallationsProgramming['data']>[]>([]);
 const isLoading = ref(false);
 const searchQuery = ref('');
 const error = ref<string | null>(null);
 const itemsPerPage = ref(10);
+let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
 // Clear error
 const clearError = () => {
@@ -164,37 +164,8 @@ const getAdaptedData = (item: BaseContent): InstallationSevenPhasesData => {
 
 // Computed
 const displayedInstallations = computed(() => {
-  if (!searchQuery.value) {
-    return installations.value;
-  }
-
-  const query = searchQuery.value.toLowerCase();
-  return installations.value.filter(item => {
-    // Search in client name (from relations)
-    if (item.relations?.client) {
-      const clientRelation = item.relations.client;
-      if (clientRelation && typeof clientRelation === 'object' && 'nomeEmpresa' in clientRelation) {
-        const clientName = (
-          clientRelation.nomeComercial ||
-          clientRelation.nomeEmpresa ||
-          ''
-        ).toLowerCase();
-        if (clientName.includes(query)) return true;
-      }
-    }
-
-    // Search in technician name
-    const techName = getTechnicianDisplayName(item.data.technician);
-    if (techName.toLowerCase().includes(query)) return true;
-
-    // Search in installation type
-    const adapted = adaptLegacyData(item.data);
-    if (adapted.installationType && adapted.installationType.toLowerCase().includes(query)) {
-      return true;
-    }
-
-    return false;
-  });
+  // Backend handles search filtering - just return the API results
+  return api.items.value;
 });
 
 // Helper: get technician display name from TechnicianUser object
@@ -395,10 +366,43 @@ const formatDate = (dateString: string): string => {
 // Event handlers
 const handleSearch = (query: string) => {
   searchQuery.value = query;
+  
+  // Clear existing timeout
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+
+  // Debounce search API call (300ms)
+  searchTimeout = setTimeout(async () => {
+    isLoading.value = true;
+    clearError();
+
+    if (query.trim()) {
+      await api.search(query, { limit: itemsPerPage.value })
+        .catch((err) => {
+          console.error('Search error:', JSON.stringify(err, null, 2));
+          error.value = err instanceof Error ? err.message : 'Erro ao pesquisar instalações';
+        })
+        .finally(() => {
+          isLoading.value = false;
+        });
+    } else {
+      // Empty search - load all items
+      await loadInstallations();
+    }
+  }, 300);
 };
 
 const handleClearSearch = () => {
   searchQuery.value = '';
+  
+  // Clear timeout if pending
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+  
+  // Reload all items
+  loadInstallations();
 };
 
 const handleItemClick = (item: BaseContent) => {
@@ -416,43 +420,37 @@ const handleEdit = (item: BaseContent) => {
 // Pagination handlers
 const handlePageChange = async (page: number) => {
   isLoading.value = true;
-  await api.fetchList({ page, limit: itemsPerPage.value }).then(() => {
-    if (api.items.value) {
-      installations.value = (
-        api.items.value as ContentWithRelations<InstallationsProgramming['data']>[]
-      ).sort((a, b) => {
-        const createdA = new Date(a.createdAt);
-        const createdB = new Date(b.createdAt);
-        return createdB.getTime() - createdA.getTime();
-      });
-    }
-  }).catch((err) => {
-    console.error('Error changing page:', JSON.stringify(err, null, 2));
-    error.value = err instanceof Error ? err.message : 'Erro ao carregar instalações';
-  }).finally(() => {
-    isLoading.value = false;
-  });
+  
+  const searchParams = searchQuery.value 
+    ? { page, limit: itemsPerPage.value, search: searchQuery.value }
+    : { page, limit: itemsPerPage.value };
+
+  await api.fetchList(searchParams)
+    .catch((err) => {
+      console.error('Error changing page:', JSON.stringify(err, null, 2));
+      error.value = err instanceof Error ? err.message : 'Erro ao carregar instalações';
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
 };
 
 const handleItemsPerPageChange = async (limit: number) => {
   itemsPerPage.value = limit;
   isLoading.value = true;
-  await api.fetchList({ page: 1, limit }).then(() => {
-    if (api.items.value) {
-      installations.value = (
-        api.items.value as ContentWithRelations<InstallationsProgramming['data']>[]
-      ).sort((a, b) => {
-        const createdA = new Date(a.createdAt);
-        const createdB = new Date(b.createdAt);
-        return createdB.getTime() - createdA.getTime();
-      });
-    }
-  }).catch((err) => {
-    console.error('Error changing items per page:', JSON.stringify(err, null, 2));
-    error.value = err instanceof Error ? err.message : 'Erro ao carregar instalações';
-  }).finally(() => {
-    isLoading.value = false;
-  });
+  
+  const searchParams = searchQuery.value 
+    ? { page: 1, limit, search: searchQuery.value }
+    : { page: 1, limit };
+
+  await api.fetchList(searchParams)
+    .catch((err) => {
+      console.error('Error changing items per page:', JSON.stringify(err, null, 2));
+      error.value = err instanceof Error ? err.message : 'Erro ao carregar instalações';
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
 };
 
 // Data loading
@@ -460,24 +458,14 @@ const loadInstallations = async () => {
   isLoading.value = true;
   clearError();
 
-  await api.fetchList({ limit: itemsPerPage.value }).then(() => {
-    if (api.items.value) {
-      installations.value = (
-        api.items.value as ContentWithRelations<InstallationsProgramming['data']>[]
-      ).sort((a, b) => {
-        const createdA = new Date(a.createdAt);
-        const createdB = new Date(b.createdAt);
-        return createdB.getTime() - createdA.getTime();
-      });
-    } else {
-      throw new Error('Erro ao carregar instalações');
-    }
-  }).catch((err) => {
-    console.error('Error loading installations:', JSON.stringify(err, null, 2));
-    error.value = err instanceof Error ? err.message : 'Erro ao carregar instalações';
-  }).finally(() => {
-    isLoading.value = false;
-  });
+  await api.fetchList({ limit: itemsPerPage.value })
+    .catch((err) => {
+      console.error('Error loading installations:', JSON.stringify(err, null, 2));
+      error.value = err instanceof Error ? err.message : 'Erro ao carregar instalações';
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
 };
 
 // Lifecycle

@@ -168,12 +168,11 @@ const api = useApi<Client>('clients');
 const errorHandler = useErrorHandler();
 
 // State
-const clients = ref<Client[]>([]);
 const isLoading = ref(false);
 const searchQuery = ref('');
 const error = ref<string | null>(null);
-const hasFetched = ref(false);
 const itemsPerPage = ref(10);
+let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
 // Clear error function
 const clearError = () => {
@@ -182,32 +181,8 @@ const clearError = () => {
 
 // Computed properties
 const displayedClients = computed(() => {
-  let items = clients.value;
-
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase();
-    items = items.filter(client => {
-      const data = client.data;
-      return (
-        data.nomeEmpresa?.toLowerCase().includes(query) ||
-        data.nomeComercial?.toLowerCase().includes(query) ||
-        data.contribuinte?.toLowerCase().includes(query) ||
-        data.responsavel?.toLowerCase().includes(query) ||
-        data.localidade?.toLowerCase().includes(query) ||
-        data.telefoneContato?.toLowerCase().includes(query) ||
-        data.email?.toLowerCase().includes(query) ||
-        data.emailContato?.toLowerCase().includes(query) ||
-        data.softwares?.some(s => s.name.toLowerCase().includes(query))
-      );
-    });
-  }
-
-  // Sort alphabetically by nomeComercial || nomeEmpresa using localeCompare pt-PT
-  return [...items].sort((a, b) => {
-    const nameA = (a.data.nomeComercial || a.data.nomeEmpresa || '').toLowerCase();
-    const nameB = (b.data.nomeComercial || b.data.nomeEmpresa || '').toLowerCase();
-    return nameA.localeCompare(nameB, 'pt-PT');
-  });
+  // Backend handles sorting and filtering - just return the API results
+  return api.items.value;
 });
 
 // Display functions for ContentListTemplate
@@ -269,10 +244,43 @@ const getClientIconClass = (item: BaseContent): string => {
 // Event handlers
 const handleSearch = (query: string) => {
   searchQuery.value = query;
+  
+  // Clear existing timeout
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+
+  // Debounce search API call (300ms)
+  searchTimeout = setTimeout(async () => {
+    isLoading.value = true;
+    clearError();
+
+    if (query.trim()) {
+      await api.search(query, { limit: itemsPerPage.value })
+        .catch((err) => {
+          console.error('Search error:', JSON.stringify(err, null, 2));
+          error.value = err instanceof Error ? err.message : 'Erro ao pesquisar clientes';
+        })
+        .finally(() => {
+          isLoading.value = false;
+        });
+    } else {
+      // Empty search - load all items
+      await loadClients();
+    }
+  }, 300);
 };
 
 const handleClearSearch = () => {
   searchQuery.value = '';
+  
+  // Clear timeout if pending
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+  
+  // Reload all items
+  loadClients();
 };
 
 const handleClientClick = (item: BaseContent) => {
@@ -292,32 +300,38 @@ const handleEdit = (item: BaseContent) => {
 // Page change handler
 const handlePageChange = async (page: number) => {
   isLoading.value = true;
-  await api.fetchList({ page, limit: itemsPerPage.value }).then(() => {
-    if (api.items.value) {
-      clients.value = api.items.value;
-    }
-  }).catch((err) => {
-    console.error('Error changing page:', JSON.stringify(err, null, 2));
-    error.value = err instanceof Error ? err.message : 'Erro ao carregar clientes';
-  }).finally(() => {
-    isLoading.value = false;
-  });
+  
+  const searchParams = searchQuery.value 
+    ? { page, limit: itemsPerPage.value, search: searchQuery.value }
+    : { page, limit: itemsPerPage.value };
+
+  await api.fetchList(searchParams)
+    .catch((err) => {
+      console.error('Error changing page:', JSON.stringify(err, null, 2));
+      error.value = err instanceof Error ? err.message : 'Erro ao carregar clientes';
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
 };
 
 // Items per page change handler
 const handleItemsPerPageChange = async (limit: number) => {
   itemsPerPage.value = limit;
   isLoading.value = true;
-  await api.fetchList({ page: 1, limit }).then(() => {
-    if (api.items.value) {
-      clients.value = api.items.value;
-    }
-  }).catch((err) => {
-    console.error('Error changing items per page:', JSON.stringify(err, null, 2));
-    error.value = err instanceof Error ? err.message : 'Erro ao carregar clientes';
-  }).finally(() => {
-    isLoading.value = false;
-  });
+  
+  const searchParams = searchQuery.value 
+    ? { page: 1, limit, search: searchQuery.value }
+    : { page: 1, limit };
+
+  await api.fetchList(searchParams)
+    .catch((err) => {
+      console.error('Error changing items per page:', JSON.stringify(err, null, 2));
+      error.value = err instanceof Error ? err.message : 'Erro ao carregar clientes';
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
 };
 
 // Data loading
@@ -325,18 +339,14 @@ const loadClients = async () => {
   isLoading.value = true;
   clearError();
 
-  await api.fetchList({ limit: itemsPerPage.value }).then(() => {
-    if (api.items.value) {
-      clients.value = api.items.value;
-    } else {
-      throw new Error('Erro ao carregar clientes');
-    }
-  }).catch((err) => {
-    console.error('Error loading clients:', JSON.stringify(err, null, 2));
-    error.value = err instanceof Error ? err.message : 'Erro ao carregar clientes';
-  }).finally(() => {
-    isLoading.value = false;
-  });
+  await api.fetchList({ limit: itemsPerPage.value })
+    .catch((err) => {
+      console.error('Error loading clients:', JSON.stringify(err, null, 2));
+      error.value = err instanceof Error ? err.message : 'Erro ao carregar clientes';
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
 };
 
 // Lifecycle
