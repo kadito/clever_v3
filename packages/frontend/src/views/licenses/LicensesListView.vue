@@ -169,12 +169,11 @@ const errorHandler = useErrorHandler();
 const { filterOptions, selectedMonth, clearFilter, filterParams, filterItems } = useExpirationFilter();
 
 // State
-const licenses = ref<ContentWithRelations<License['data']>[]>([]);
 const isLoading = ref(false);
 const searchQuery = ref('');
 const error = ref<string | null>(null);
-const hasFetched = ref(false);
 const itemsPerPage = ref(10);
+let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
 // Clear error function
 const clearError = () => {
@@ -183,24 +182,8 @@ const clearError = () => {
 
 // Computed properties
 const displayedLicenses = computed(() => {
-  let items = licenses.value as unknown as import('@clever/shared').BaseContent[];
-
-  // Client-side search filtering
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase();
-    items = items.filter((item) => {
-      const data = item.data as Record<string, unknown>;
-      const clientName = (data.clientName as string) || '';
-      const softwareNames = ((data.software as Record<string, unknown>)?.name as string[]) || [];
-      return (
-        clientName.toLowerCase().includes(query) ||
-        softwareNames.some((s) => s.toLowerCase().includes(query))
-      );
-    });
-  }
-
-  // Client-side expiration date filtering
-  return filterItems(items) as typeof licenses.value;
+  // Backend handles search filtering - apply client-side expiration filter only
+  return filterItems(api.items.value as unknown as import('@clever/shared').BaseContent[]) as ContentWithRelations<License['data']>[];
 });
 
 // Display functions for ContentListTemplate
@@ -382,10 +365,43 @@ const formatDate = (dateString: string): string => {
 // Event handlers
 const handleSearch = (query: string) => {
   searchQuery.value = query;
+  
+  // Clear existing timeout
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+
+  // Debounce search API call (300ms)
+  searchTimeout = setTimeout(async () => {
+    isLoading.value = true;
+    clearError();
+
+    if (query.trim()) {
+      await api.search(query, { limit: itemsPerPage.value, ...filterParams.value })
+        .catch((err) => {
+          console.error('Search error:', JSON.stringify(err, null, 2));
+          error.value = err instanceof Error ? err.message : 'Erro ao pesquisar licenças';
+        })
+        .finally(() => {
+          isLoading.value = false;
+        });
+    } else {
+      // Empty search - load all items
+      await loadLicenses();
+    }
+  }, 300);
 };
 
 const handleClearSearch = () => {
   searchQuery.value = '';
+  
+  // Clear timeout if pending
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+  
+  // Reload all items
+  loadLicenses();
 };
 
 const handleLicenseClick = (item: BaseContent) => {
@@ -405,40 +421,38 @@ const handleEdit = (item: BaseContent) => {
 // Page change handler
 const handlePageChange = async (page: number) => {
   isLoading.value = true;
-  await api.fetchList({ page, limit: itemsPerPage.value, ...filterParams.value }).then(() => {
-    if (api.items.value) {
-      licenses.value = (api.items.value as ContentWithRelations<License['data']>[]).sort((a, b) => {
-        const dateA = new Date(a.createdAt);
-        const dateB = new Date(b.createdAt);
-        return dateB.getTime() - dateA.getTime();
-      });
-    }
-  }).catch((err) => {
-    console.error('Error changing page:', JSON.stringify(err, null, 2));
-    error.value = err instanceof Error ? err.message : 'Erro ao carregar licenças';
-  }).finally(() => {
-    isLoading.value = false;
-  });
+  
+  const searchParams = searchQuery.value 
+    ? { page, limit: itemsPerPage.value, search: searchQuery.value, ...filterParams.value }
+    : { page, limit: itemsPerPage.value, ...filterParams.value };
+
+  await api.fetchList(searchParams)
+    .catch((err) => {
+      console.error('Error changing page:', JSON.stringify(err, null, 2));
+      error.value = err instanceof Error ? err.message : 'Erro ao carregar licenças';
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
 };
 
 // Items per page change handler
 const handleItemsPerPageChange = async (limit: number) => {
   itemsPerPage.value = limit;
   isLoading.value = true;
-  await api.fetchList({ page: 1, limit, ...filterParams.value }).then(() => {
-    if (api.items.value) {
-      licenses.value = (api.items.value as ContentWithRelations<License['data']>[]).sort((a, b) => {
-        const dateA = new Date(a.createdAt);
-        const dateB = new Date(b.createdAt);
-        return dateB.getTime() - dateA.getTime();
-      });
-    }
-  }).catch((err) => {
-    console.error('Error changing items per page:', JSON.stringify(err, null, 2));
-    error.value = err instanceof Error ? err.message : 'Erro ao carregar licenças';
-  }).finally(() => {
-    isLoading.value = false;
-  });
+  
+  const searchParams = searchQuery.value 
+    ? { page: 1, limit, search: searchQuery.value, ...filterParams.value }
+    : { page: 1, limit, ...filterParams.value };
+
+  await api.fetchList(searchParams)
+    .catch((err) => {
+      console.error('Error changing items per page:', JSON.stringify(err, null, 2));
+      error.value = err instanceof Error ? err.message : 'Erro ao carregar licenças';
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
 };
 
 // Data loading
@@ -448,17 +462,6 @@ const loadLicenses = async () => {
     clearError();
 
     await api.fetchList({ limit: itemsPerPage.value, ...filterParams.value });
-
-    if (api.items.value) {
-      // Sort licenses by creation date (most recent first)
-      licenses.value = (api.items.value as ContentWithRelations<License['data']>[]).sort((a, b) => {
-        const dateA = new Date(a.createdAt);
-        const dateB = new Date(b.createdAt);
-        return dateB.getTime() - dateA.getTime();
-      });
-    } else {
-      throw new Error('Erro ao carregar licenças');
-    }
   } catch (err) {
     console.error('Error loading licenses:', JSON.stringify(err, null, 2));
     error.value = err instanceof Error ? err.message : 'Erro ao carregar licenças';

@@ -250,12 +250,11 @@ const {
 } = useDailyRecordsFilters();
 
 // State
-const dailyRecords = ref<ContentWithRelations<DailyRecord['data']>[]>([]);
 const isLoading = ref(false);
 const searchQuery = ref('');
 const error = ref<string | null>(null);
-const hasFetched = ref(false);
 const itemsPerPage = ref(10);
+let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
 // Clear error function
 const clearError = () => {
@@ -264,29 +263,8 @@ const clearError = () => {
 
 // Computed properties
 const displayedDailyRecords = computed(() => {
-  if (!searchQuery.value) {
-    return dailyRecords.value;
-  }
-
-  const query = searchQuery.value.toLowerCase();
-  return dailyRecords.value.filter(record => {
-    const data = record.data;
-
-    // Search in date
-    if (formatDate(data.dataRegistro).toLowerCase().includes(query)) {
-      return true;
-    }
-
-    // Search in activities
-    return data.atividades.some(activity => {
-      return (
-        activity.tipoAtividade.toLowerCase().includes(query) ||
-        activity.assunto.toLowerCase().includes(query) ||
-        activity.descricao?.toLowerCase().includes(query) ||
-        (activity.tipoLigacao !== 'Nenhuma' && activity.tipoLigacao.toLowerCase().includes(query))
-      );
-    });
-  });
+  // Backend handles search filtering - apply client-side date filter only
+  return filterByDate(api.items.value);
 });
 
 // Display functions for ContentListTemplate
@@ -429,10 +407,43 @@ const formatDate = (dateString: string): string => {
 // Event handlers
 const handleSearch = (query: string) => {
   searchQuery.value = query;
+  
+  // Clear existing timeout
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+
+  // Debounce search API call (300ms)
+  searchTimeout = setTimeout(async () => {
+    isLoading.value = true;
+    clearError();
+
+    if (query.trim()) {
+      await api.search(query, { limit: itemsPerPage.value, ...filterParams.value })
+        .catch((err) => {
+          console.error('Search error:', JSON.stringify(err, null, 2));
+          error.value = err instanceof Error ? err.message : 'Erro ao pesquisar registos diários';
+        })
+        .finally(() => {
+          isLoading.value = false;
+        });
+    } else {
+      // Empty search - load all items
+      await loadDailyRecords();
+    }
+  }, 300);
 };
 
 const handleClearSearch = () => {
   searchQuery.value = '';
+  
+  // Clear timeout if pending
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+  
+  // Reload all items
+  loadDailyRecords();
 };
 
 const handleDailyRecordClick = (item: BaseContent) => {
@@ -452,52 +463,38 @@ const handleEdit = (item: BaseContent) => {
 // Page change handler
 const handlePageChange = async (page: number) => {
   isLoading.value = true;
-  await api.fetchList({ page, limit: itemsPerPage.value, ...filterParams.value }).then(() => {
-    if (api.items.value) {
-      dailyRecords.value = (api.items.value as ContentWithRelations<DailyRecord['data']>[]).sort(
-        (a, b) => {
-          const dateA = new Date(a.data.dataRegistro);
-          const dateB = new Date(b.data.dataRegistro);
-          const dateDiff = dateB.getTime() - dateA.getTime();
-          if (dateDiff !== 0) return dateDiff;
-          const createdA = new Date(a.createdAt);
-          const createdB = new Date(b.createdAt);
-          return createdB.getTime() - createdA.getTime();
-        }
-      );
-    }
-  }).catch((err) => {
-    console.error('Error changing page:', JSON.stringify(err, null, 2));
-    error.value = err instanceof Error ? err.message : 'Erro ao carregar registos diários';
-  }).finally(() => {
-    isLoading.value = false;
-  });
+  
+  const searchParams = searchQuery.value 
+    ? { page, limit: itemsPerPage.value, search: searchQuery.value, ...filterParams.value }
+    : { page, limit: itemsPerPage.value, ...filterParams.value };
+
+  await api.fetchList(searchParams)
+    .catch((err) => {
+      console.error('Error changing page:', JSON.stringify(err, null, 2));
+      error.value = err instanceof Error ? err.message : 'Erro ao carregar registos diários';
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
 };
 
 // Items per page change handler
 const handleItemsPerPageChange = async (limit: number) => {
   itemsPerPage.value = limit;
   isLoading.value = true;
-  await api.fetchList({ page: 1, limit, ...filterParams.value }).then(() => {
-    if (api.items.value) {
-      dailyRecords.value = (api.items.value as ContentWithRelations<DailyRecord['data']>[]).sort(
-        (a, b) => {
-          const dateA = new Date(a.data.dataRegistro);
-          const dateB = new Date(b.data.dataRegistro);
-          const dateDiff = dateB.getTime() - dateA.getTime();
-          if (dateDiff !== 0) return dateDiff;
-          const createdA = new Date(a.createdAt);
-          const createdB = new Date(b.createdAt);
-          return createdB.getTime() - createdA.getTime();
-        }
-      );
-    }
-  }).catch((err) => {
-    console.error('Error changing items per page:', JSON.stringify(err, null, 2));
-    error.value = err instanceof Error ? err.message : 'Erro ao carregar registos diários';
-  }).finally(() => {
-    isLoading.value = false;
-  });
+  
+  const searchParams = searchQuery.value 
+    ? { page: 1, limit, search: searchQuery.value, ...filterParams.value }
+    : { page: 1, limit, ...filterParams.value };
+
+  await api.fetchList(searchParams)
+    .catch((err) => {
+      console.error('Error changing items per page:', JSON.stringify(err, null, 2));
+      error.value = err instanceof Error ? err.message : 'Erro ao carregar registos diários';
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
 };
 
 // Data loading
@@ -508,28 +505,7 @@ const loadDailyRecords = async () => {
 
     console.log('Loading daily records...');
     await api.fetchList({ limit: itemsPerPage.value, ...filterParams.value });
-
-    if (api.items.value) {
-      // Sort daily records by date descending (newest first) - as per requirements 12.5
-      dailyRecords.value = (api.items.value as ContentWithRelations<DailyRecord['data']>[]).sort(
-        (a, b) => {
-          // Primary sort: record date (most recent first)
-          const dateA = new Date(a.data.dataRegistro);
-          const dateB = new Date(b.data.dataRegistro);
-          const dateDiff = dateB.getTime() - dateA.getTime();
-
-          if (dateDiff !== 0) return dateDiff;
-
-          // Secondary sort: creation date (most recent first)
-          const createdA = new Date(a.createdAt);
-          const createdB = new Date(b.createdAt);
-          return createdB.getTime() - createdA.getTime();
-        }
-      );
-      console.log(`Loaded ${dailyRecords.value.length} daily records`);
-    } else {
-      throw new Error('Erro ao carregar registos diários');
-    }
+    console.log(`Loaded ${api.items.value.length} daily records`);
   } catch (err) {
     console.error('Error loading daily records:', JSON.stringify(err, null, 2));
     error.value = err instanceof Error ? err.message : 'Erro ao carregar registos diários';

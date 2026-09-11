@@ -239,12 +239,11 @@ const api = useApi<RemoteAssistance>('remote-assistance');
 const errorHandler = useErrorHandler();
 
 // State
-const remoteAssistance = ref<ContentWithRelations<RemoteAssistance['data']>[]>([]);
 const isLoading = ref(false);
 const searchQuery = ref('');
 const error = ref<string | null>(null);
-const hasFetched = ref(false);
 const itemsPerPage = ref(10);
+let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
 // Clear error function
 const clearError = () => {
@@ -253,42 +252,8 @@ const clearError = () => {
 
 // Computed properties
 const displayedRemoteAssistance = computed(() => {
-  if (!searchQuery.value) {
-    return remoteAssistance.value;
-  }
-
-  const query = searchQuery.value.toLowerCase();
-  return remoteAssistance.value.filter(assistance => {
-    const data = assistance.data;
-
-    // Search in client name (from relations)
-    if (assistance.relations?.client) {
-      const clientRelation = assistance.relations.client;
-      if (clientRelation && typeof clientRelation === 'object' && 'nomeEmpresa' in clientRelation) {
-        const clientName = (
-          clientRelation.nomeComercial ||
-          clientRelation.nomeEmpresa ||
-          ''
-        ).toLowerCase();
-        if (clientName.includes(query)) return true;
-      }
-    }
-
-    // Search in assistance data
-    return (
-      getTechnicianDisplayName(data.tecnicoResponsavel)?.toLowerCase().includes(query) ||
-      data.quemAtendeu?.toLowerCase().includes(query) ||
-      data.motivoPedido?.toLowerCase().includes(query) ||
-      data.relatorioAssistencia?.toLowerCase().includes(query) ||
-      data.relatorio?.toLowerCase().includes(query) ||
-      getAssistanceNumber(assistance).toLowerCase().includes(query) ||
-      (data.contrato && 'contrato'.includes(query)) ||
-      (data.garantia && 'garantia'.includes(query)) ||
-      (data.resolvido && 'resolvido'.includes(query)) ||
-      (hasBillableValue(data) && ('faturável'.includes(query) || 'pago'.includes(query))) ||
-      (!hasBillableValue(data) && ('gratuito'.includes(query) || 'sem custo'.includes(query)))
-    );
-  });
+  // Backend handles search filtering - just return the API results
+  return api.items.value;
 });
 
 // Display functions for ContentListTemplate
@@ -520,10 +485,43 @@ const getTechnicianDisplayName = (technician: TechnicianUser | string | undefine
 // Event handlers
 const handleSearch = (query: string) => {
   searchQuery.value = query;
+  
+  // Clear existing timeout
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+
+  // Debounce search API call (300ms)
+  searchTimeout = setTimeout(async () => {
+    isLoading.value = true;
+    clearError();
+
+    if (query.trim()) {
+      await api.search(query, { limit: itemsPerPage.value })
+        .catch((err) => {
+          console.error('Search error:', JSON.stringify(err, null, 2));
+          error.value = err instanceof Error ? err.message : 'Erro ao pesquisar assistências remotas';
+        })
+        .finally(() => {
+          isLoading.value = false;
+        });
+    } else {
+      // Empty search - load all items
+      await loadRemoteAssistance();
+    }
+  }, 300);
 };
 
 const handleClearSearch = () => {
   searchQuery.value = '';
+  
+  // Clear timeout if pending
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+  
+  // Reload all items
+  loadRemoteAssistance();
 };
 
 const handleRemoteAssistanceClick = (item: BaseContent) => {
@@ -543,52 +541,38 @@ const handleEdit = (item: BaseContent) => {
 // Page change handler
 const handlePageChange = async (page: number) => {
   isLoading.value = true;
-  await api.fetchList({ page, limit: itemsPerPage.value }).then(() => {
-    if (api.items.value) {
-      remoteAssistance.value = (
-        api.items.value as ContentWithRelations<RemoteAssistance['data']>[]
-      ).sort((a, b) => {
-        const dateA = new Date(a.data.dataAssistencia || a.createdAt);
-        const dateB = new Date(b.data.dataAssistencia || b.createdAt);
-        const dateDiff = dateB.getTime() - dateA.getTime();
-        if (dateDiff !== 0) return dateDiff;
-        const createdA = new Date(a.createdAt);
-        const createdB = new Date(b.createdAt);
-        return createdB.getTime() - createdA.getTime();
-      });
-    }
-  }).catch((err) => {
-    console.error('Error changing page:', JSON.stringify(err, null, 2));
-    error.value = err instanceof Error ? err.message : 'Erro ao carregar assistências remotas';
-  }).finally(() => {
-    isLoading.value = false;
-  });
+  
+  const searchParams = searchQuery.value 
+    ? { page, limit: itemsPerPage.value, search: searchQuery.value }
+    : { page, limit: itemsPerPage.value };
+
+  await api.fetchList(searchParams)
+    .catch((err) => {
+      console.error('Error changing page:', JSON.stringify(err, null, 2));
+      error.value = err instanceof Error ? err.message : 'Erro ao carregar assistências remotas';
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
 };
 
 // Items per page change handler
 const handleItemsPerPageChange = async (limit: number) => {
   itemsPerPage.value = limit;
   isLoading.value = true;
-  await api.fetchList({ page: 1, limit }).then(() => {
-    if (api.items.value) {
-      remoteAssistance.value = (
-        api.items.value as ContentWithRelations<RemoteAssistance['data']>[]
-      ).sort((a, b) => {
-        const dateA = new Date(a.data.dataAssistencia || a.createdAt);
-        const dateB = new Date(b.data.dataAssistencia || b.createdAt);
-        const dateDiff = dateB.getTime() - dateA.getTime();
-        if (dateDiff !== 0) return dateDiff;
-        const createdA = new Date(a.createdAt);
-        const createdB = new Date(b.createdAt);
-        return createdB.getTime() - createdA.getTime();
-      });
-    }
-  }).catch((err) => {
-    console.error('Error changing items per page:', JSON.stringify(err, null, 2));
-    error.value = err instanceof Error ? err.message : 'Erro ao carregar assistências remotas';
-  }).finally(() => {
-    isLoading.value = false;
-  });
+  
+  const searchParams = searchQuery.value 
+    ? { page: 1, limit, search: searchQuery.value }
+    : { page: 1, limit };
+
+  await api.fetchList(searchParams)
+    .catch((err) => {
+      console.error('Error changing items per page:', JSON.stringify(err, null, 2));
+      error.value = err instanceof Error ? err.message : 'Erro ao carregar assistências remotas';
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
 };
 
 // Data loading
@@ -598,27 +582,6 @@ const loadRemoteAssistance = async () => {
     clearError();
 
     await api.fetchList({ limit: itemsPerPage.value });
-
-    if (api.items.value) {
-      // Sort remote assistance by assistance date (most recent first) - as per requirements 8.6
-      remoteAssistance.value = (
-        api.items.value as ContentWithRelations<RemoteAssistance['data']>[]
-      ).sort((a, b) => {
-        // Primary sort: assistance date (most recent first)
-        const dateA = new Date(a.data.dataAssistencia || a.createdAt);
-        const dateB = new Date(b.data.dataAssistencia || b.createdAt);
-        const dateDiff = dateB.getTime() - dateA.getTime();
-
-        if (dateDiff !== 0) return dateDiff;
-
-        // Secondary sort: creation date (most recent first)
-        const createdA = new Date(a.createdAt);
-        const createdB = new Date(b.createdAt);
-        return createdB.getTime() - createdA.getTime();
-      });
-    } else {
-      throw new Error('Erro ao carregar assistências remotas');
-    }
   } catch (err) {
     console.error('Error loading remote assistance:', JSON.stringify(err, null, 2));
     error.value = err instanceof Error ? err.message : 'Erro ao carregar assistências remotas';

@@ -185,12 +185,11 @@ const api = useApi<WorkSheet>('work-sheets');
 const errorHandler = useErrorHandler();
 
 // State
-const workSheets = ref<ContentWithRelations<WorkSheet['data']>[]>([]);
 const isLoading = ref(false);
 const searchQuery = ref('');
 const error = ref<string | null>(null);
-const hasFetched = ref(false);
 const itemsPerPage = ref(10);
+let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
 // Clear error function
 const clearError = () => {
@@ -199,21 +198,8 @@ const clearError = () => {
 
 // Computed properties
 const displayedWorkSheets = computed(() => {
-  if (!searchQuery.value) {
-    return workSheets.value;
-  }
-
-  const query = searchQuery.value.toLowerCase();
-  return workSheets.value.filter(workSheet => {
-    const data = workSheet.data;
-    const technicianName = getTechnicianDisplayName(data.otherData?.technician).toLowerCase();
-    return (
-      technicianName.includes(query) ||
-      data.otherData?.serviceType?.toLowerCase().includes(query) ||
-      data.request?.reason?.toLowerCase().includes(query) ||
-      data.displacement?.paymentMethod?.toLowerCase().includes(query)
-    );
-  });
+  // Backend handles search filtering - just return the API results
+  return api.items.value;
 });
 
 // Display functions for ContentListTemplate
@@ -390,10 +376,43 @@ const getTechnicianDisplayName = (technician: TechnicianUser | string | undefine
 // Event handlers
 const handleSearch = (query: string) => {
   searchQuery.value = query;
+  
+  // Clear existing timeout
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+
+  // Debounce search API call (300ms)
+  searchTimeout = setTimeout(async () => {
+    isLoading.value = true;
+    clearError();
+
+    if (query.trim()) {
+      await api.search(query, { limit: itemsPerPage.value })
+        .catch((err) => {
+          console.error('Search error:', JSON.stringify(err, null, 2));
+          error.value = err instanceof Error ? err.message : 'Erro ao pesquisar folhas de obra';
+        })
+        .finally(() => {
+          isLoading.value = false;
+        });
+    } else {
+      // Empty search - load all items
+      await loadWorkSheets();
+    }
+  }, 300);
 };
 
 const handleClearSearch = () => {
   searchQuery.value = '';
+  
+  // Clear timeout if pending
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+  
+  // Reload all items
+  loadWorkSheets();
 };
 
 const handleWorkSheetClick = (item: BaseContent) => {
@@ -413,44 +432,38 @@ const handleEdit = (item: BaseContent) => {
 // Page change handler
 const handlePageChange = async (page: number) => {
   isLoading.value = true;
-  await api.fetchList({ page, limit: itemsPerPage.value }).then(() => {
-    if (api.items.value) {
-      workSheets.value = (api.items.value as ContentWithRelations<WorkSheet['data']>[]).sort(
-        (a, b) => {
-          const dateA = new Date(a.createdAt);
-          const dateB = new Date(b.createdAt);
-          return dateB.getTime() - dateA.getTime();
-        }
-      );
-    }
-  }).catch((err) => {
-    console.error('Error changing page:', JSON.stringify(err, null, 2));
-    error.value = err instanceof Error ? err.message : 'Erro ao carregar folhas de obra';
-  }).finally(() => {
-    isLoading.value = false;
-  });
+  
+  const searchParams = searchQuery.value 
+    ? { page, limit: itemsPerPage.value, search: searchQuery.value }
+    : { page, limit: itemsPerPage.value };
+
+  await api.fetchList(searchParams)
+    .catch((err) => {
+      console.error('Error changing page:', JSON.stringify(err, null, 2));
+      error.value = err instanceof Error ? err.message : 'Erro ao carregar folhas de obra';
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
 };
 
 // Items per page change handler
 const handleItemsPerPageChange = async (limit: number) => {
   itemsPerPage.value = limit;
   isLoading.value = true;
-  await api.fetchList({ page: 1, limit }).then(() => {
-    if (api.items.value) {
-      workSheets.value = (api.items.value as ContentWithRelations<WorkSheet['data']>[]).sort(
-        (a, b) => {
-          const dateA = new Date(a.createdAt);
-          const dateB = new Date(b.createdAt);
-          return dateB.getTime() - dateA.getTime();
-        }
-      );
-    }
-  }).catch((err) => {
-    console.error('Error changing items per page:', JSON.stringify(err, null, 2));
-    error.value = err instanceof Error ? err.message : 'Erro ao carregar folhas de obra';
-  }).finally(() => {
-    isLoading.value = false;
-  });
+  
+  const searchParams = searchQuery.value 
+    ? { page: 1, limit, search: searchQuery.value }
+    : { page: 1, limit };
+
+  await api.fetchList(searchParams)
+    .catch((err) => {
+      console.error('Error changing items per page:', JSON.stringify(err, null, 2));
+      error.value = err instanceof Error ? err.message : 'Erro ao carregar folhas de obra';
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
 };
 
 // Data loading
@@ -461,20 +474,7 @@ const loadWorkSheets = async () => {
 
     console.log('Loading work sheets...');
     await api.fetchList({ limit: itemsPerPage.value });
-
-    if (api.items.value) {
-      // Sort work sheets by creation date (most recent first)
-      workSheets.value = (api.items.value as ContentWithRelations<WorkSheet['data']>[]).sort(
-        (a, b) => {
-          const dateA = new Date(a.createdAt);
-          const dateB = new Date(b.createdAt);
-          return dateB.getTime() - dateA.getTime();
-        }
-      );
-      console.log(`Loaded ${workSheets.value.length} work sheets`);
-    } else {
-      throw new Error('Erro ao carregar folhas de obra');
-    }
+    console.log(`Loaded ${api.items.value.length} work sheets`);
   } catch (err) {
     console.error('Error loading work sheets:', JSON.stringify(err, null, 2));
     error.value = err instanceof Error ? err.message : 'Erro ao carregar folhas de obra';
