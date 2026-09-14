@@ -724,7 +724,10 @@ const isFormValidSimple = computed(() => {
       // Check regular required fields
       if (field.required) {
         const value = currentFormData[field.key];
-        const isEmpty = !value || (typeof value === 'string' && value.trim() === '');
+        // For boolean fields (switch, checkbox), false is a valid value
+        const isEmpty = typeof value === 'boolean'
+          ? false
+          : !value || (typeof value === 'string' && value.trim() === '');
 
         if (isEmpty) {
           return false;
@@ -738,7 +741,10 @@ const isFormValidSimple = computed(() => {
         
         if (isRequired) {
           const value = currentFormData[field.key];
-          const isEmpty = !value || (typeof value === 'string' && value.trim() === '');
+          // For boolean fields (switch, checkbox), false is a valid value
+          const isEmpty = typeof value === 'boolean'
+            ? false
+            : !value || (typeof value === 'string' && value.trim() === '');
 
           if (isEmpty) {
             return false;
