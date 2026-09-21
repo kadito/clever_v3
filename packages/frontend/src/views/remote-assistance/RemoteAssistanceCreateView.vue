@@ -569,11 +569,19 @@ const fetchClientContracts = async (clientId: string) => {
 
 // Methods
 const handleClientSelected = (client: Client | null) => {
+  console.log('handleClientSelected called with client:', JSON.stringify({
+    clientId: client?.uuid,
+    clientName: client?.data?.nomeEmpresa,
+  }, null, 2));
+  
   selectedClient.value = client;
   
   // Immediately fetch contracts for the selected client
   if (client?.uuid) {
+    console.log('Calling fetchClientContracts for clientId:', client.uuid);
     fetchClientContracts(client.uuid);
+  } else {
+    console.log('No client UUID - skipping fetchClientContracts');
   }
 };
 
