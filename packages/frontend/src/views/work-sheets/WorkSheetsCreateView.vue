@@ -400,7 +400,8 @@ const fetchClientContracts = async (clientId: string) => {
     return;
   }
   isLoadingContracts.value = true;
-  await contractsApi.fetchList({})
+  // Fetch ALL contracts (no pagination limit)
+  await contractsApi.fetchList({ limit: 1000 })
     .then(() => {
       clientContracts.value = (contractsApi.items.value || []).filter(
         (c: Contract) => c.data.clientId === clientId

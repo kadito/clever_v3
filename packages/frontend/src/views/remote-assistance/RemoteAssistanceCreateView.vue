@@ -519,7 +519,8 @@ const fetchClientContracts = async (clientId: string) => {
   
   console.log('fetchClientContracts - Starting fetch for clientId:', JSON.stringify({ clientId }, null, 2));
   
-  await contractsApi.fetchList({})
+  // Fetch ALL contracts (no pagination limit)
+  await contractsApi.fetchList({ limit: 1000 })
     .then(() => {
       console.log('fetchClientContracts - Raw API response:', JSON.stringify({
         totalItems: contractsApi.items.value?.length || 0,
