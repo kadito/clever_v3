@@ -519,22 +519,20 @@ const fetchClientContracts = async (clientId: string) => {
   
   console.log('fetchClientContracts - Starting fetch for clientId:', JSON.stringify({ clientId }, null, 2));
   
-  // Fetch ALL contracts (no pagination limit)
-  await contractsApi.fetchList({ limit: 1000 })
+  // Fetch contracts filtered by clientId (server-side)
+  await contractsApi.fetchList({ clientId })
     .then(() => {
-      console.log('fetchClientContracts - Raw API response:', JSON.stringify({
+      console.log('fetchClientContracts - Server-filtered API response:', JSON.stringify({
         totalItems: contractsApi.items.value?.length || 0,
-        firstFewItems: contractsApi.items.value?.slice(0, 3).map((c: Contract) => ({
+        contracts: contractsApi.items.value?.map((c: Contract) => ({
           uuid: c.uuid,
           clientId: c.data.clientId,
         })),
       }, null, 2));
       
-      clientContracts.value = (contractsApi.items.value || []).filter(
-        (c: Contract) => c.data.clientId === clientId
-      );
+      clientContracts.value = contractsApi.items.value || [];
       
-      console.log('fetchClientContracts - Filtered contracts for client:', JSON.stringify({
+      console.log('fetchClientContracts - Contracts for client:', JSON.stringify({
         clientId,
         filteredCount: clientContracts.value.length,
         contracts: clientContracts.value.map(c => ({

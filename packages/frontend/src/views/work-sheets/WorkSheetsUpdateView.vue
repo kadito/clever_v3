@@ -405,11 +405,9 @@ const fetchClientContracts = async (clientId: string) => {
     return;
   }
   isLoadingContracts.value = true;
-  await contractsApi.fetchList({ limit: 1000 })
+  await contractsApi.fetchList({ clientId })
     .then(() => {
-      clientContracts.value = (contractsApi.items.value || []).filter(
-        (c: Contract) => c.data.clientId === clientId
-      );
+      clientContracts.value = contractsApi.items.value || [];
       
       // In update view: Only auto-set if contracts exist AND no payment method is currently set
       // This prevents overriding existing payment methods when editing a record

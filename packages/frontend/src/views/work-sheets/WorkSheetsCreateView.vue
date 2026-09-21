@@ -400,12 +400,10 @@ const fetchClientContracts = async (clientId: string) => {
     return;
   }
   isLoadingContracts.value = true;
-  // Fetch ALL contracts (no pagination limit)
-  await contractsApi.fetchList({ limit: 1000 })
+  // Fetch contracts filtered by clientId (server-side)
+  await contractsApi.fetchList({ clientId })
     .then(() => {
-      clientContracts.value = (contractsApi.items.value || []).filter(
-        (c: Contract) => c.data.clientId === clientId
-      );
+      clientContracts.value = contractsApi.items.value || [];
       
       // Auto-set payment method to CONTRATO if contracts exist
       if (clientContracts.value.length >= 1) {
