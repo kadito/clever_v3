@@ -55,7 +55,28 @@
         <!-- Custom payment method radio buttons -->
         <template #field-paymentMethod="{ formData, error, updateFieldValue }">
           <div class="payment-method-selector">
-            <label class="payment-label">Método de Pagamento</label>
+            <label class="payment-label">
+              Método de Pagamento
+              <span
+                v-if="paymentMethodAutoSet && !isAdmin"
+                class="ml-2 text-xs text-gray-500"
+              >
+                <svg
+                  class="w-3 h-3 inline"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  />
+                </svg>
+                Cliente tem contrato - apenas Admin pode alterar
+              </span>
+            </label>
             <div class="payment-options">
               <label
                 v-for="method in paymentMethods"
@@ -63,12 +84,14 @@
                 :class="[
                   'payment-option',
                   formData?.paymentMethod === method.value ? 'selected' : '',
+                  paymentMethodAutoSet && !isAdmin ? 'readonly' : '',
                 ]"
               >
                 <input
                   type="radio"
                   :value="method.value"
                   :checked="formData?.paymentMethod === method.value"
+                  :disabled="paymentMethodAutoSet && !isAdmin"
                   name="paymentMethod"
                   @change="updateFieldValue('paymentMethod', method.value)"
                 >
@@ -86,6 +109,27 @@
 
         <!-- Contract auto-fetch display (conditional on paymentMethod === 'Contrato') -->
         <template #field-contractId="{ formData, error, updateFieldValue }">
+          <div>
+            <label
+              v-if="paymentMethodAutoSet && !isAdmin"
+              class="text-xs text-gray-500 mb-2 block"
+            >
+              <svg
+                class="w-3 h-3 inline"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
+              </svg>
+              Contrato selecionado automaticamente - apenas Admin pode alterar
+            </label>
+          </div>
           <div
             v-if="isLoadingContracts"
             class="text-sm text-gray-500 py-2"
@@ -103,8 +147,12 @@
             <select
               v-if="clientContracts.length > 1"
               :value="formData?.contractId || ''"
+              :disabled="paymentMethodAutoSet && !isAdmin"
               class="form-input mb-2"
-              :class="{ 'border-red-500': !!error }"
+              :class="{ 
+                'border-red-500': !!error,
+                'bg-gray-100 cursor-not-allowed': paymentMethodAutoSet && !isAdmin
+              }"
               @change="(e: Event) => updateFieldValue('contractId', (e.target as HTMLSelectElement).value)"
             >
               <option value="">
@@ -398,6 +446,7 @@ import ContentUpdateTemplate from '@/components/common/ContentUpdateTemplate.vue
 import FileUploadZone from '@/components/common/FileUploadZone.vue';
 import { remoteAssistanceFormSections } from '@/config/remote-assistance-form-sections';
 import { useApi } from '@/composables/useApi';
+import { usePermissions } from '@/composables/usePermissions';
 import { useSharedFormData } from '@/composables/useSharedFormData';
 import { useFileUpload } from '@/composables/useFileUpload';
 import type { FileReference } from '@clever/shared';
@@ -417,6 +466,13 @@ const {
 const { formData: currentFormData, updateFieldValue } = useSharedFormData(
   'remote-assistance-update'
 );
+
+// Permissions
+const { permissions } = usePermissions();
+const isAdmin = computed(() => permissions.value.canDelete);
+
+// Track if payment method was auto-set by contract detection
+const paymentMethodAutoSet = ref(false);
 
 // File upload state
 const { uploadFiles, deleteFile, uploading, deleting, error: fileError } = useFileUpload();
@@ -488,6 +544,7 @@ const getContractDates = (contract: Contract): string => {
 const fetchClientContracts = async (clientId: string) => {
   if (!clientId) {
     clientContracts.value = [];
+    paymentMethodAutoSet.value = false;
     return;
   }
   isLoadingContracts.value = true;
@@ -496,14 +553,37 @@ const fetchClientContracts = async (clientId: string) => {
       clientContracts.value = (contractsApiForFetch.items.value || []).filter(
         (c: Contract) => c.data.clientId === clientId
       );
-      // Auto-select if only one contract and no contract already selected
-      if (clientContracts.value.length === 1 && !currentFormData.value?.contractId) {
+      
+      // In update view: Only auto-set if contracts exist AND no payment method is currently set
+      // This prevents overriding existing payment methods when editing a record
+      const currentPaymentMethod = currentFormData.value?.paymentMethod;
+      
+      if (clientContracts.value.length >= 1 && !currentPaymentMethod) {
+        console.log('Client has contracts - auto-setting payment method to Contrato:', JSON.stringify({
+          clientId,
+          contractCount: clientContracts.value.length,
+          firstContract: clientContracts.value[0].uuid
+        }, null, 2));
+        
+        updateFieldValue('paymentMethod', 'Contrato');
         updateFieldValue('contractId', clientContracts.value[0].uuid);
+        paymentMethodAutoSet.value = true;
+      } else if (clientContracts.value.length >= 1 && currentPaymentMethod === 'Contrato') {
+        // Mark as auto-set if payment method is already Contrato
+        paymentMethodAutoSet.value = true;
+        
+        // Select first contract if none is selected
+        if (!currentFormData.value?.contractId && clientContracts.value.length >= 1) {
+          updateFieldValue('contractId', clientContracts.value[0].uuid);
+        }
+      } else {
+        paymentMethodAutoSet.value = false;
       }
     })
     .catch((err: unknown) => {
       console.error('Error fetching contracts:', JSON.stringify(err, null, 2));
       clientContracts.value = [];
+      paymentMethodAutoSet.value = false;
     })
     .finally(() => {
       isLoadingContracts.value = false;
@@ -580,8 +660,8 @@ const loadRemoteAssistance = async () => {
       ? currentItem.value.data.anexosFiles
       : [];
 
-    // Fetch contracts if payment method is Contrato
-    if (currentItem.value.data?.paymentMethod === 'Contrato' && currentItem.value.data?.clientId) {
+    // Always fetch contracts if client exists to enable auto-selection
+    if (currentItem.value.data?.clientId) {
       await fetchClientContracts(currentItem.value.data.clientId);
     }
   }
@@ -640,7 +720,11 @@ const clearError = () => {
 
 const handleClientSelected = (client: Client | null) => {
   selectedClient.value = client;
-  // Client data is now handled through relations, no need to auto-populate
+  
+  // Immediately fetch contracts for the selected client
+  if (client?.uuid) {
+    fetchClientContracts(client.uuid);
+  }
 };
 
 const validateUpdateForm = (data: Record<string, any>): Record<string, string> => {
@@ -949,13 +1033,19 @@ watch(
 // Clear contractId when payment method changes away from Contrato
 watch(
   () => currentFormData.value?.paymentMethod,
-  (paymentMethod) => {
+  (paymentMethod, oldValue) => {
     const currentFormDataValue = currentFormData.value;
+
+    // If payment method changed manually (not by auto-set), clear the auto-set flag
+    if (oldValue && paymentMethod !== oldValue && paymentMethod !== 'Contrato') {
+      paymentMethodAutoSet.value = false;
+    }
 
     if (paymentMethod !== 'Contrato') {
       updateFieldValue('contractId', '');
       clientContracts.value = [];
-    } else if (currentFormDataValue?.clientId) {
+    } else if (currentFormDataValue?.clientId && !paymentMethodAutoSet.value) {
+      // Only fetch if not already auto-set
       fetchClientContracts(currentFormDataValue.clientId);
     }
   }
@@ -964,7 +1054,12 @@ watch(
 // Fetch contracts when client changes and payment method is Contrato
 watch(
   () => currentFormData.value?.clientId,
-  (newClientId) => {
+  (newClientId, oldClientId) => {
+    // Reset auto-set flag when client changes
+    if (oldClientId && newClientId !== oldClientId) {
+      paymentMethodAutoSet.value = false;
+    }
+    
     if (currentFormData.value?.paymentMethod === 'Contrato' && newClientId) {
       updateFieldValue('contractId', '');
       fetchClientContracts(newClientId);
@@ -1060,6 +1155,25 @@ onMounted(() => {
   background-color: #75ae93;
   color: white;
   font-weight: 600;
+}
+
+.payment-option.readonly {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f3f4f6;
+}
+
+.payment-option.readonly:hover {
+  border-color: #ddd;
+  background-color: #f3f4f6;
+}
+
+.payment-option.readonly.selected {
+  opacity: 1;
+  border-color: #75ae93;
+  background-color: #75ae93;
+  color: white;
+  cursor: not-allowed;
 }
 
 .payment-option span {

@@ -1,0 +1,543 @@
+[
+  {
+    "uuid": "f8055d70-cce5-48c8-b67b-28cbe8b859ee",
+    "clientId": "944241ef-b8e5-438b-b490-92e06ea54a9e",
+    "type": "CPA",
+    "planId": "cpa_premium",
+    "planName": "PREMIUM CARE",
+    "current": {
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "CPA",
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 3,
+      "manutencoesPorAno": 2
+    },
+    "issues": [
+      "Deslocações: 0 → 3",
+      "Manutenções: 0 → 2"
+    ]
+  },
+  {
+    "uuid": "f8055d70-cce5-48c8-b67b-28cbe8b859ee",
+    "clientId": "944241ef-b8e5-438b-b490-92e06ea54a9e",
+    "type": "S&H",
+    "planId": "sh_simple",
+    "planName": "SIMPLE",
+    "current": {
+      "horasAssistenciaAnual": 10,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "S&H",
+      "horasAssistenciaAnual": 10,
+      "deslocacoesPorAno": 2,
+      "manutencoesPorAno": 0
+    },
+    "issues": [
+      "Deslocações: 0 → 2"
+    ]
+  },
+  {
+    "uuid": "6f4788e2-e826-488f-97e4-b0bddb90266a",
+    "clientId": "d25e0e4e-43ee-420e-87c1-407b973b3f42",
+    "type": "CPA",
+    "planId": "cpa_premium",
+    "planName": "PREMIUM CARE",
+    "current": {
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "CPA",
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 3,
+      "manutencoesPorAno": 2
+    },
+    "issues": [
+      "Deslocações: 0 → 3",
+      "Manutenções: 0 → 2"
+    ]
+  },
+  {
+    "uuid": "cba34de3-072e-44b5-914c-c7c4ad1b6c12",
+    "clientId": "e0225889-aa67-431d-bec8-51fba034d80c",
+    "type": "CPA",
+    "planId": "cpa_premium",
+    "planName": "PREMIUM CARE",
+    "current": {
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "CPA",
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 3,
+      "manutencoesPorAno": 2
+    },
+    "issues": [
+      "Deslocações: 0 → 3",
+      "Manutenções: 0 → 2"
+    ]
+  },
+  {
+    "uuid": "cba34de3-072e-44b5-914c-c7c4ad1b6c12",
+    "clientId": "e0225889-aa67-431d-bec8-51fba034d80c",
+    "type": "S&H",
+    "planId": "sh_simple",
+    "planName": "SIMPLE",
+    "current": {
+      "horasAssistenciaAnual": 10,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "S&H",
+      "horasAssistenciaAnual": 10,
+      "deslocacoesPorAno": 2,
+      "manutencoesPorAno": 0
+    },
+    "issues": [
+      "Deslocações: 0 → 2"
+    ]
+  },
+  {
+    "uuid": "0ef6f082-25c8-40c7-b3b6-926e9caa9bff",
+    "clientId": "9ed1d1c8-c1c2-410a-aa15-d639317fea61",
+    "type": "CPA",
+    "planId": "cpa_premium",
+    "planName": "PREMIUM CARE",
+    "current": {
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "CPA",
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 3,
+      "manutencoesPorAno": 2
+    },
+    "issues": [
+      "Deslocações: 0 → 3",
+      "Manutenções: 0 → 2"
+    ]
+  },
+  {
+    "uuid": "0ef6f082-25c8-40c7-b3b6-926e9caa9bff",
+    "clientId": "9ed1d1c8-c1c2-410a-aa15-d639317fea61",
+    "type": "S&H",
+    "planId": "sh_simple",
+    "planName": "SIMPLE",
+    "current": {
+      "horasAssistenciaAnual": 10,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "S&H",
+      "horasAssistenciaAnual": 10,
+      "deslocacoesPorAno": 2,
+      "manutencoesPorAno": 0
+    },
+    "issues": [
+      "Deslocações: 0 → 2"
+    ]
+  },
+  {
+    "uuid": "9d7a669c-d57b-4dc4-a8d0-6f0c57308380",
+    "clientId": "8ad327d0-5eca-4025-ab0b-9cb5f349d295",
+    "type": "CPA",
+    "planId": "cpa_premium",
+    "planName": "PREMIUM CARE",
+    "current": {
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "CPA",
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 3,
+      "manutencoesPorAno": 2
+    },
+    "issues": [
+      "Deslocações: 0 → 3",
+      "Manutenções: 0 → 2"
+    ]
+  },
+  {
+    "uuid": "9d7a669c-d57b-4dc4-a8d0-6f0c57308380",
+    "clientId": "8ad327d0-5eca-4025-ab0b-9cb5f349d295",
+    "type": "S&H",
+    "planId": "sh_simple",
+    "planName": "SIMPLE",
+    "current": {
+      "horasAssistenciaAnual": 10,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "S&H",
+      "horasAssistenciaAnual": 10,
+      "deslocacoesPorAno": 2,
+      "manutencoesPorAno": 0
+    },
+    "issues": [
+      "Deslocações: 0 → 2"
+    ]
+  },
+  {
+    "uuid": "3f1d272d-8e29-4641-9141-1b2d4734d33f",
+    "clientId": "4a3594f8-08a9-4eca-931a-f886e0ff0c73",
+    "type": "CPA",
+    "planId": "cpa_professional",
+    "planName": "PROFESSIONAL CARE",
+    "current": {
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "CPA",
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 2,
+      "manutencoesPorAno": 1
+    },
+    "issues": [
+      "Deslocações: 0 → 2",
+      "Manutenções: 0 → 1"
+    ]
+  },
+  {
+    "uuid": "9cb734b7-acaa-4ab3-86d1-257c73297588",
+    "clientId": "9ce7d05b-95e2-4395-8837-d0b2de7a0f7c",
+    "type": "CPA",
+    "planId": "cpa_premium",
+    "planName": "PREMIUM CARE",
+    "current": {
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "CPA",
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 3,
+      "manutencoesPorAno": 2
+    },
+    "issues": [
+      "Deslocações: 0 → 3",
+      "Manutenções: 0 → 2"
+    ]
+  },
+  {
+    "uuid": "9cb734b7-acaa-4ab3-86d1-257c73297588",
+    "clientId": "9ce7d05b-95e2-4395-8837-d0b2de7a0f7c",
+    "type": "S&H",
+    "planId": "sh_simple",
+    "planName": "SIMPLE",
+    "current": {
+      "horasAssistenciaAnual": 10,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "S&H",
+      "horasAssistenciaAnual": 10,
+      "deslocacoesPorAno": 2,
+      "manutencoesPorAno": 0
+    },
+    "issues": [
+      "Deslocações: 0 → 2"
+    ]
+  },
+  {
+    "uuid": "833805aa-bbec-4dae-9dcf-24e8211fe5d8",
+    "clientId": "121082fb-8964-4421-b471-805fb30e8f00",
+    "type": "CPA",
+    "planId": "cpa_premium",
+    "planName": "PREMIUM CARE",
+    "current": {
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "CPA",
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 3,
+      "manutencoesPorAno": 2
+    },
+    "issues": [
+      "Deslocações: 0 → 3",
+      "Manutenções: 0 → 2"
+    ]
+  },
+  {
+    "uuid": "99b7a351-baf2-4dd6-bf67-53fa446ca4ad",
+    "clientId": "3b4f3fe3-e8a7-49f1-8f53-c9a0997633a4",
+    "type": "CPA",
+    "planId": "cpa_premium",
+    "planName": "PREMIUM CARE",
+    "current": {
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "CPA",
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 3,
+      "manutencoesPorAno": 2
+    },
+    "issues": [
+      "Deslocações: 0 → 3",
+      "Manutenções: 0 → 2"
+    ]
+  },
+  {
+    "uuid": "3e856a92-56cb-4d54-a699-31a972db3d7d",
+    "clientId": "584fbe6c-cf75-4e41-899d-f30a13caeb00",
+    "type": "CPA",
+    "planId": "cpa_professional",
+    "planName": "PROFESSIONAL CARE",
+    "current": {
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "CPA",
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 2,
+      "manutencoesPorAno": 1
+    },
+    "issues": [
+      "Deslocações: 0 → 2",
+      "Manutenções: 0 → 1"
+    ]
+  },
+  {
+    "uuid": "6f2f9305-308f-40ac-80ec-037a4cee1d9b",
+    "clientId": "bd9bdbfd-7fb0-4cd9-8a72-c3e919e7c5e1",
+    "type": "CPA",
+    "planId": "cpa_premium",
+    "planName": "PREMIUM CARE",
+    "current": {
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "CPA",
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 3,
+      "manutencoesPorAno": 2
+    },
+    "issues": [
+      "Deslocações: 0 → 3",
+      "Manutenções: 0 → 2"
+    ]
+  },
+  {
+    "uuid": "4a3081f1-8c65-43b7-80db-8e17e1554522",
+    "clientId": "ca4772e5-a990-4865-a325-19adccca7209",
+    "type": "CPA",
+    "planId": "cpa_essential",
+    "planName": "ESSENTIAL CARE",
+    "current": {
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 1
+    },
+    "expected": {
+      "type": "CPA",
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 1,
+      "manutencoesPorAno": 1
+    },
+    "issues": [
+      "Deslocações: 0 → 1"
+    ]
+  },
+  {
+    "uuid": "bf7c32eb-9ee7-4312-869d-14619cf8c5d1",
+    "clientId": "d73dadbc-de1a-4939-83d7-6cad2a3f93b6",
+    "type": "CPA",
+    "planId": "cpa_essential",
+    "planName": "ESSENTIAL CARE",
+    "current": {
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 1
+    },
+    "expected": {
+      "type": "CPA",
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 1,
+      "manutencoesPorAno": 1
+    },
+    "issues": [
+      "Deslocações: 0 → 1"
+    ]
+  },
+  {
+    "uuid": "bee962a5-2815-48c6-bb0c-aa4ae35c275e",
+    "clientId": "7c99e72b-733f-411e-80ea-c515f036434e",
+    "type": "CPA",
+    "planId": "cpa_premium",
+    "planName": "PREMIUM CARE",
+    "current": {
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "CPA",
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 3,
+      "manutencoesPorAno": 2
+    },
+    "issues": [
+      "Deslocações: 0 → 3",
+      "Manutenções: 0 → 2"
+    ]
+  },
+  {
+    "uuid": "7b1f4d66-87d2-46cc-b108-5e80138d5a63",
+    "clientId": "3652c175-347f-4c1d-a258-9c92a1f55bfa",
+    "type": "CPA",
+    "planId": "cpa_premium",
+    "planName": "PREMIUM CARE",
+    "current": {
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "CPA",
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 3,
+      "manutencoesPorAno": 2
+    },
+    "issues": [
+      "Deslocações: 0 → 3",
+      "Manutenções: 0 → 2"
+    ]
+  },
+  {
+    "uuid": "7b1f4d66-87d2-46cc-b108-5e80138d5a63",
+    "clientId": "3652c175-347f-4c1d-a258-9c92a1f55bfa",
+    "type": "S&H",
+    "planId": "sh_simple",
+    "planName": "SIMPLE",
+    "current": {
+      "horasAssistenciaAnual": 10,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "S&H",
+      "horasAssistenciaAnual": 10,
+      "deslocacoesPorAno": 2,
+      "manutencoesPorAno": 0
+    },
+    "issues": [
+      "Deslocações: 0 → 2"
+    ]
+  },
+  {
+    "uuid": "92a03198-49f1-497f-84b1-7926b3b11d4b",
+    "clientId": "21f9afd5-ac93-480c-9a64-dc1d640b616a",
+    "type": "CPA",
+    "planId": "cpa_professional",
+    "planName": "PROFESSIONAL CARE",
+    "current": {
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "CPA",
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 2,
+      "manutencoesPorAno": 1
+    },
+    "issues": [
+      "Deslocações: 0 → 2",
+      "Manutenções: 0 → 1"
+    ]
+  },
+  {
+    "uuid": "842e96ca-36ff-4ac9-9179-5cbc6c156e67",
+    "clientId": "a0d1169b-169a-4f2e-82d9-19e1b1424ab1",
+    "type": "CPA",
+    "planId": "cpa_premium",
+    "planName": "PREMIUM CARE",
+    "current": {
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "CPA",
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 3,
+      "manutencoesPorAno": 2
+    },
+    "issues": [
+      "Deslocações: 0 → 3",
+      "Manutenções: 0 → 2"
+    ]
+  },
+  {
+    "uuid": "88d6c22c-62bb-4059-a485-619b1c47e427",
+    "clientId": "0cd3c78f-6d61-4af7-ad6d-e60fff077e14",
+    "type": "CPA",
+    "planId": "cpa_premium",
+    "planName": "PREMIUM CARE",
+    "current": {
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 0,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "CPA",
+      "horasAssistenciaAnual": 0,
+      "deslocacoesPorAno": 3,
+      "manutencoesPorAno": 2
+    },
+    "issues": [
+      "Deslocações: 0 → 3",
+      "Manutenções: 0 → 2"
+    ]
+  },
+  {
+    "uuid": "88d6c22c-62bb-4059-a485-619b1c47e427",
+    "clientId": "0cd3c78f-6d61-4af7-ad6d-e60fff077e14",
+    "type": "S&H",
+    "planId": "sh_simple",
+    "planName": "SIMPLE",
+    "current": {
+      "horasAssistenciaAnual": 10,
+      "deslocacoesPorAno": 3,
+      "manutencoesPorAno": 0
+    },
+    "expected": {
+      "type": "S&H",
+      "horasAssistenciaAnual": 10,
+      "deslocacoesPorAno": 2,
+      "manutencoesPorAno": 0
+    },
+    "issues": [
+      "Deslocações: 3 → 2"
+    ]
+  }
+]

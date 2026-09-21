@@ -94,7 +94,28 @@
 
     <template #field-paymentMethod="{ formData, error, updateFieldValue }">
       <div class="payment-method-selector">
-        <label class="payment-label">Método de Pagamento</label>
+        <label class="payment-label">
+          Método de Pagamento
+          <span
+            v-if="paymentMethodAutoSet && !isAdmin"
+            class="ml-2 text-xs text-gray-500"
+          >
+            <svg
+              class="w-3 h-3 inline"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              />
+            </svg>
+            Cliente tem contrato - apenas Admin pode alterar
+          </span>
+        </label>
         <div class="payment-options">
           <label
             v-for="method in paymentMethods"
@@ -102,12 +123,14 @@
             :class="[
               'payment-option',
               formData?.paymentMethod === method.value ? 'selected' : '',
+              paymentMethodAutoSet && !isAdmin ? 'readonly' : '',
             ]"
           >
             <input
               type="radio"
               :value="method.value"
               :checked="formData?.paymentMethod === method.value"
+              :disabled="paymentMethodAutoSet && !isAdmin"
               name="paymentMethod"
               @change="updateFieldValue('paymentMethod', method.value)"
             >
@@ -125,6 +148,27 @@
 
     <!-- Contract auto-fetch display (conditional on paymentMethod === 'CONTRATO') -->
     <template #field-contractId="{ formData, error, updateFieldValue }">
+      <div>
+        <label
+          v-if="paymentMethodAutoSet && !isAdmin"
+          class="text-xs text-gray-500 mb-2 block"
+        >
+          <svg
+            class="w-3 h-3 inline"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+            />
+          </svg>
+          Contrato selecionado automaticamente - apenas Admin pode alterar
+        </label>
+      </div>
       <div
         v-if="isLoadingContracts"
         class="text-sm text-gray-500 py-2"
@@ -141,8 +185,12 @@
         <select
           v-if="clientContracts.length > 1"
           :value="formData?.contractId || ''"
+          :disabled="paymentMethodAutoSet && !isAdmin"
           class="form-input mb-2"
-          :class="{ 'border-red-500': !!error }"
+          :class="{ 
+            'border-red-500': !!error,
+            'bg-gray-100 cursor-not-allowed': paymentMethodAutoSet && !isAdmin
+          }"
           @change="(e: Event) => updateFieldValue('contractId', (e.target as HTMLSelectElement).value)"
         >
           <option value="">
@@ -249,6 +297,7 @@ import ContentCreateTemplate from '@/components/common/ContentCreateTemplate.vue
 import { workSheetsFormSections } from '@/config/work-sheets-form-sections';
 import { useSharedFormData } from '@/composables/useSharedFormData';
 import { useApi } from '@/composables/useApi';
+import { usePermissions } from '@/composables/usePermissions';
 import contractPlansConfig from '@/config/contract-plans.json';
 
 const router = useRouter();
@@ -256,9 +305,16 @@ const router = useRouter();
 // API composable
 const api = useApi('work-sheets');
 
+// Permissions
+const { permissions } = usePermissions();
+const isAdmin = computed(() => permissions.value.canDelete);
+
 // State
 const isSaving = ref(false);
 const error = ref<string | null>(null);
+
+// Track if payment method was auto-set by contract detection
+const paymentMethodAutoSet = ref(false);
 
 // Clear error function
 const clearError = () => {
@@ -340,6 +396,7 @@ const pricing = computed(() => {
 const fetchClientContracts = async (clientId: string) => {
   if (!clientId) {
     clientContracts.value = [];
+    paymentMethodAutoSet.value = false;
     return;
   }
   isLoadingContracts.value = true;
@@ -348,13 +405,26 @@ const fetchClientContracts = async (clientId: string) => {
       clientContracts.value = (contractsApi.items.value || []).filter(
         (c: Contract) => c.data.clientId === clientId
       );
+      
+      // Auto-set payment method to CONTRATO if contracts exist
       if (clientContracts.value.length >= 1) {
+        console.log('Client has contracts - auto-setting payment method to CONTRATO:', JSON.stringify({
+          clientId,
+          contractCount: clientContracts.value.length,
+          firstContract: clientContracts.value[0].uuid
+        }, null, 2));
+        
+        updateFieldValue('paymentMethod', 'CONTRATO');
         updateFieldValue('contractId', clientContracts.value[0].uuid);
+        paymentMethodAutoSet.value = true;
+      } else {
+        paymentMethodAutoSet.value = false;
       }
     })
     .catch((err: unknown) => {
       console.error('Error fetching contracts:', JSON.stringify(err, null, 2));
       clientContracts.value = [];
+      paymentMethodAutoSet.value = false;
     })
     .finally(() => {
       isLoadingContracts.value = false;
@@ -365,7 +435,11 @@ const fetchClientContracts = async (clientId: string) => {
 const handleClientSelected = (client: Client | null) => {
   console.log('Client selected:', JSON.stringify(client, null, 2));
   selectedClient.value = client;
-  // Client data will be handled on the backend side when creating the work sheet
+  
+  // Immediately fetch contracts for the selected client
+  if (client?.uuid) {
+    fetchClientContracts(client.uuid);
+  }
 };
 
 // Signature handling
@@ -659,14 +733,20 @@ watch(
 // Clear conditional fields when dependencies change
 watch(
   () => formData.value?.paymentMethod,
-  newValue => {
+  (newValue, oldValue) => {
+    // If payment method changed manually (not by auto-set), clear the auto-set flag
+    if (oldValue && newValue !== oldValue && newValue !== 'CONTRATO') {
+      paymentMethodAutoSet.value = false;
+    }
+    
     if (newValue !== 'CONTRATO') {
       updateFieldValue('warranty', false);
       updateFieldValue('contract', false);
       updateFieldValue('contractYear', new Date().getFullYear().toString());
       updateFieldValue('contractId', '');
       clientContracts.value = [];
-    } else if (formData.value?.clientId) {
+    } else if (formData.value?.clientId && !paymentMethodAutoSet.value) {
+      // Only fetch if not already auto-set
       fetchClientContracts(formData.value.clientId);
     }
   }
@@ -675,7 +755,12 @@ watch(
 // Fetch contracts when client changes and payment method is CONTRATO
 watch(
   () => formData.value?.clientId,
-  (newClientId) => {
+  (newClientId, oldClientId) => {
+    // Reset auto-set flag when client changes
+    if (oldClientId && newClientId !== oldClientId) {
+      paymentMethodAutoSet.value = false;
+    }
+    
     if (formData.value?.paymentMethod === 'CONTRATO' && newClientId) {
       updateFieldValue('contractId', '');
       fetchClientContracts(newClientId);
@@ -836,6 +921,25 @@ watch(
   background-color: #75ae93;
   color: white;
   font-weight: 600;
+}
+
+.payment-option.readonly {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f3f4f6;
+}
+
+.payment-option.readonly:hover {
+  border-color: #ddd;
+  background-color: #f3f4f6;
+}
+
+.payment-option.readonly.selected {
+  opacity: 1;
+  border-color: #75ae93;
+  background-color: #75ae93;
+  color: white;
+  cursor: not-allowed;
 }
 
 .payment-option span {

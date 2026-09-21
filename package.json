@@ -22,7 +22,10 @@
     "type-check:backend": "pnpm --filter @clever/backend type-check",
     "check-all": "pnpm type-check && pnpm lint && pnpm format:check",
     "deploy:test": "pnpm build && wrangler deploy",
-    "deploy:prod": "pnpm build && wrangler deploy --env production"
+    "deploy:prod": "pnpm build && wrangler deploy --env production",
+    "audit-contracts": "tsx scripts/audit-contract-benefits.ts",
+    "fix-contracts": "tsx scripts/fix-contract-benefits.ts",
+    "migrate-legacy": "tsx scripts/migrate-legacy-contract.ts"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.0.0",
@@ -32,6 +35,7 @@
     "fast-check": "^4.5.3",
     "js-yaml": "^4.1.1",
     "prettier": "^3.0.0",
+    "tsx": "^4.23.15",
     "typescript": "^5.0.0",
     "vitest": "^1.6.1",
     "wrangler": "^3.114.16"
