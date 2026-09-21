@@ -407,12 +407,6 @@ const fetchClientContracts = async (clientId: string) => {
       
       // Auto-set payment method to CONTRATO if contracts exist
       if (clientContracts.value.length >= 1) {
-        console.log('Client has contracts - auto-setting payment method to CONTRATO:', JSON.stringify({
-          clientId,
-          contractCount: clientContracts.value.length,
-          firstContract: clientContracts.value[0].uuid
-        }, null, 2));
-        
         updateFieldValue('paymentMethod', 'CONTRATO');
         updateFieldValue('contractId', clientContracts.value[0].uuid);
         paymentMethodAutoSet.value = true;
@@ -432,7 +426,6 @@ const fetchClientContracts = async (clientId: string) => {
 
 // Methods
 const handleClientSelected = (client: Client | null) => {
-  console.log('Client selected:', JSON.stringify(client, null, 2));
   selectedClient.value = client;
   
   // Immediately fetch contracts for the selected client
@@ -755,8 +748,6 @@ watch(
 watch(
   () => formData.value?.clientId,
   (newClientId, oldClientId) => {
-    console.log('clientId watcher triggered:', JSON.stringify({ newClientId, oldClientId }, null, 2));
-    
     // Reset auto-set flag when client changes
     if (oldClientId && newClientId !== oldClientId) {
       paymentMethodAutoSet.value = false;
@@ -764,10 +755,8 @@ watch(
     
     // Always fetch contracts when client changes (to enable auto-selection)
     if (newClientId) {
-      console.log('Fetching contracts for new client:', newClientId);
       fetchClientContracts(newClientId);
     } else {
-      console.log('No clientId - clearing contracts');
       clientContracts.value = [];
       paymentMethodAutoSet.value = false;
     }

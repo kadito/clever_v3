@@ -517,43 +517,17 @@ const fetchClientContracts = async (clientId: string) => {
   }
   isLoadingContracts.value = true;
   
-  console.log('fetchClientContracts - Starting fetch for clientId:', JSON.stringify({ clientId }, null, 2));
-  
   // Fetch contracts filtered by clientId (server-side)
   await contractsApi.fetchList({ clientId })
     .then(() => {
-      console.log('fetchClientContracts - Server-filtered API response:', JSON.stringify({
-        totalItems: contractsApi.items.value?.length || 0,
-        contracts: contractsApi.items.value?.map((c: Contract) => ({
-          uuid: c.uuid,
-          clientId: c.data.clientId,
-        })),
-      }, null, 2));
-      
       clientContracts.value = contractsApi.items.value || [];
-      
-      console.log('fetchClientContracts - Contracts for client:', JSON.stringify({
-        clientId,
-        filteredCount: clientContracts.value.length,
-        contracts: clientContracts.value.map(c => ({
-          uuid: c.uuid,
-          clientId: c.data.clientId,
-        })),
-      }, null, 2));
       
       // Auto-set payment method to Contrato if contracts exist
       if (clientContracts.value.length >= 1) {
-        console.log('Client has contracts - auto-setting payment method to Contrato:', JSON.stringify({
-          clientId,
-          contractCount: clientContracts.value.length,
-          firstContract: clientContracts.value[0].uuid
-        }, null, 2));
-        
         updateFieldValue('paymentMethod', 'Contrato');
         updateFieldValue('contractId', clientContracts.value[0].uuid);
         paymentMethodAutoSet.value = true;
       } else {
-        console.log('fetchClientContracts - No contracts found for client:', JSON.stringify({ clientId }, null, 2));
         paymentMethodAutoSet.value = false;
       }
     })
@@ -569,19 +543,11 @@ const fetchClientContracts = async (clientId: string) => {
 
 // Methods
 const handleClientSelected = (client: Client | null) => {
-  console.log('handleClientSelected called with client:', JSON.stringify({
-    clientId: client?.uuid,
-    clientName: client?.data?.nomeEmpresa,
-  }, null, 2));
-  
   selectedClient.value = client;
   
   // Immediately fetch contracts for the selected client
   if (client?.uuid) {
-    console.log('Calling fetchClientContracts for clientId:', client.uuid);
     fetchClientContracts(client.uuid);
-  } else {
-    console.log('No client UUID - skipping fetchClientContracts');
   }
 };
 
@@ -945,8 +911,6 @@ watch(
 watch(
   () => formData.value?.clientId,
   (newClientId, oldClientId) => {
-    console.log('clientId watcher triggered:', JSON.stringify({ newClientId, oldClientId }, null, 2));
-    
     // Reset auto-set flag when client changes
     if (oldClientId && newClientId !== oldClientId) {
       paymentMethodAutoSet.value = false;
@@ -954,10 +918,8 @@ watch(
     
     // Always fetch contracts when client changes (to enable auto-selection)
     if (newClientId) {
-      console.log('Fetching contracts for new client:', newClientId);
       fetchClientContracts(newClientId);
     } else {
-      console.log('No clientId - clearing contracts');
       clientContracts.value = [];
       paymentMethodAutoSet.value = false;
     }
