@@ -941,20 +941,25 @@ watch(
   }
 );
 
-// Fetch contracts when client changes and payment method is Contrato
+// Fetch contracts when client changes
 watch(
   () => formData.value?.clientId,
   (newClientId, oldClientId) => {
+    console.log('clientId watcher triggered:', JSON.stringify({ newClientId, oldClientId }, null, 2));
+    
     // Reset auto-set flag when client changes
     if (oldClientId && newClientId !== oldClientId) {
       paymentMethodAutoSet.value = false;
     }
     
-    if (formData.value?.paymentMethod === 'Contrato' && newClientId) {
-      updateFieldValue('contractId', '');
+    // Always fetch contracts when client changes (to enable auto-selection)
+    if (newClientId) {
+      console.log('Fetching contracts for new client:', newClientId);
       fetchClientContracts(newClientId);
     } else {
+      console.log('No clientId - clearing contracts');
       clientContracts.value = [];
+      paymentMethodAutoSet.value = false;
     }
   }
 );
