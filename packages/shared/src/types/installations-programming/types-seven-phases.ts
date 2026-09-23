@@ -163,7 +163,7 @@ export const PHASE_NAMES_SEVEN = [
 
 /** Checklist item keys per category */
 export const CHECKLIST_ITEMS_SEVEN = {
-  pos: ['caboPower', 'transformador', 'caboRede', 'displayCliente', 'impressora', 'autocolantes'],
+  pos: ['caboPower', 'transformador', 'caboRede', 'displayCliente', 'autocolantes'],
   impressora: ['rolo', 'caboPower', 'transformador', 'caboLigacaoPOS', 'fichaAdaptadorRS232', 'autocolantes'],
   gavetaMetalica: ['chaves', 'autocolantes'],
   cpa: ['base', 'parafusos', 'transformador', 'caboComunicacaoMoedasNotas', 'caboRede', 'caboSerie'],
@@ -177,7 +177,6 @@ export const CHECKLIST_LABELS_SEVEN = {
     transformador: 'Transformador',
     caboRede: 'Cabo Rede',
     displayCliente: 'Display cliente',
-    impressora: 'Impressora',
     autocolantes: 'Autocolantes',
   },
   impressora: {

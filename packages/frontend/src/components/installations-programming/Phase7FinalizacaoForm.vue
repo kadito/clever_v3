@@ -38,30 +38,30 @@
       </div>
     </div>
 
-    <!-- Fotos de Instalação — Upload Zone (hidden when disabled) -->
+    <!-- Fotos e ficheiros da instalação — Upload Zone (hidden when disabled) -->
     <div
       v-if="!disabled"
       class="form-field"
     >
       <FileUploadZone
         field-name="fotosInstalacao"
-        label="Fotos de Instalação"
+        label="Fotos e ficheiros da instalação"
         :multiple="true"
-        :accept-documents="false"
+        :accept-documents="true"
         :existing-files="modelValue.fotosInstalacao"
         :disabled="disabled"
         @files-changed="handleFilesChanged"
       />
     </div>
 
-    <!-- Fotos de Instalação — Display existing photos (shown when disabled/read-only) -->
+    <!-- Fotos e ficheiros da instalação — Display existing files (shown when disabled/read-only) -->
     <div
       v-if="disabled && modelValue.fotosInstalacao.length > 0"
       class="form-field"
     >
       <FileDisplay
         :files="modelValue.fotosInstalacao"
-        label="Fotos de Instalação"
+        label="Fotos e ficheiros da instalação"
         content-type="installations-programming"
         :content-uuid="installationUuid"
       />

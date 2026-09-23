@@ -100,10 +100,12 @@
         id="phase5DataFormacao"
         type="date"
         class="form-input"
+        :class="{ 'field-invalid': hasError('dataFormacao') }"
         :value="modelValue.dataFormacao"
         :disabled="disabled"
         @input="updateField('dataFormacao', ($event.target as HTMLInputElement).value)"
       >
+      <span v-if="hasError('dataFormacao')" class="field-error">Campo obrigatório</span>
     </div>
 
     <!-- Formação Hora Inicial -->
@@ -113,10 +115,12 @@
         id="phase5FormacaoHoraInicial"
         type="time"
         class="form-input"
+        :class="{ 'field-invalid': hasError('formacaoHoraInicial') }"
         :value="modelValue.formacaoHoraInicial"
         :disabled="disabled"
         @input="updateField('formacaoHoraInicial', ($event.target as HTMLInputElement).value)"
       >
+      <span v-if="hasError('formacaoHoraInicial')" class="field-error">Campo obrigatório</span>
     </div>
 
     <!-- Formação Hora Final -->
@@ -126,10 +130,12 @@
         id="phase5FormacaoHoraFinal"
         type="time"
         class="form-input"
+        :class="{ 'field-invalid': hasError('formacaoHoraFinal') }"
         :value="modelValue.formacaoHoraFinal"
         :disabled="disabled"
         @input="updateField('formacaoHoraFinal', ($event.target as HTMLInputElement).value)"
       >
+      <span v-if="hasError('formacaoHoraFinal')" class="field-error">Campo obrigatório</span>
     </div>
 
     <!-- Quem recebeu a formação -->
@@ -139,11 +145,13 @@
         id="phase5QuemRecebeuFormacao"
         type="text"
         class="form-input"
+        :class="{ 'field-invalid': hasError('quemRecebeuFormacao') }"
         :value="modelValue.quemRecebeuFormacao"
         :disabled="disabled"
         placeholder="Quem recebeu a formação"
         @input="updateField('quemRecebeuFormacao', ($event.target as HTMLInputElement).value)"
       >
+      <span v-if="hasError('quemRecebeuFormacao')" class="field-error">Campo obrigatório</span>
     </div>
   </div>
 </template>

@@ -127,13 +127,17 @@ function validatePhase4(data: InstallationSevenPhasesData): boolean {
   return true;
 }
 
-/** Phase 5: dataInstalacao non-empty + horaInicial non-empty + horaFinal non-empty */
+/** Phase 5: Instalação (dataInstalacao + horaInicial + horaFinal) AND Formação (dataFormacao + formacaoHoraInicial + formacaoHoraFinal + quemRecebeuFormacao) all mandatory */
 function validatePhase5(data: InstallationSevenPhasesData): boolean {
   const phase5 = data.phase5;
   return (
     phase5.dataInstalacao.trim().length > 0 &&
     phase5.horaInicial.trim().length > 0 &&
-    phase5.horaFinal.trim().length > 0
+    phase5.horaFinal.trim().length > 0 &&
+    phase5.dataFormacao.trim().length > 0 &&
+    phase5.formacaoHoraInicial.trim().length > 0 &&
+    phase5.formacaoHoraFinal.trim().length > 0 &&
+    phase5.quemRecebeuFormacao.trim().length > 0
   );
 }
 
@@ -272,6 +276,10 @@ function getPhase5Errors(data: InstallationSevenPhasesData): string[] {
   if (!phase5.dataInstalacao.trim()) errors.push('dataInstalacao');
   if (!phase5.horaInicial.trim()) errors.push('horaInicial');
   if (!phase5.horaFinal.trim()) errors.push('horaFinal');
+  if (!phase5.dataFormacao.trim()) errors.push('dataFormacao');
+  if (!phase5.formacaoHoraInicial.trim()) errors.push('formacaoHoraInicial');
+  if (!phase5.formacaoHoraFinal.trim()) errors.push('formacaoHoraFinal');
+  if (!phase5.quemRecebeuFormacao.trim()) errors.push('quemRecebeuFormacao');
   return errors;
 }
 
