@@ -74,6 +74,21 @@ function validateContractCreationDirect(data: ContractCreationData): string[] {
       if (typeof data.manutencoesPorAnoCPA !== 'number' || data.manutencoesPorAnoCPA < 0) {
         errors.push('Por favor, especifique as manutenções por ano CPA');
       }
+    } else if (data.planIdCPA) {
+      // Single equipment: benefits are derived from the selected plan, not typed by
+      // the user (the form locks these fields). Every CPA plan defines at least one
+      // deslocação and one manutenção per year, so a zero/missing value here means the
+      // plan benefits were never applied. Rejecting it prevents the silent corruption
+      // that produced the zero-benefit contracts repaired in 2026-09, which blocked
+      // Assistências Remotas and Folhas de Obra paid by "Contrato".
+      // NOTE: -1 means unlimited and is valid. CPA plans define no annual hours, so
+      // horasAssistenciaAnualCPA is legitimately 0 and is not checked here.
+      if (data.deslocacoesPorAnoCPA !== -1 && (typeof data.deslocacoesPorAnoCPA !== 'number' || data.deslocacoesPorAnoCPA <= 0)) {
+        errors.push('Os benefícios do plano CPA não foram aplicados (deslocações por ano). Selecione novamente o plano CPA.');
+      }
+      if (data.manutencoesPorAnoCPA !== -1 && (typeof data.manutencoesPorAnoCPA !== 'number' || data.manutencoesPorAnoCPA <= 0)) {
+        errors.push('Os benefícios do plano CPA não foram aplicados (manutenções por ano). Selecione novamente o plano CPA.');
+      }
     }
   }
 
@@ -89,6 +104,20 @@ function validateContractCreationDirect(data: ContractCreationData): string[] {
 
     if (!data.modalidadePagamentoSH) {
       errors.push('Por favor, selecione a modalidade de pagamento S&H');
+    }
+
+    // Single equipment: benefits are derived from the selected plan (fields locked in
+    // the form). Every S&H plan defines annual hours (10 or 15) and deslocações (2 or
+    // 3), so a zero/missing value means the plan benefits were never applied.
+    // NOTE: -1 means unlimited and is valid. Every S&H plan defines manutencoesPorAno
+    // as 0, so manutencoesPorAnoSH is legitimately 0 and is not checked here.
+    if (data.planIdSH && (!data.shEquipments || data.shEquipments.length < 2)) {
+      if (data.horasAssistenciaAnualSH !== -1 && (typeof data.horasAssistenciaAnualSH !== 'number' || data.horasAssistenciaAnualSH <= 0)) {
+        errors.push('Os benefícios do plano S&H não foram aplicados (horas de assistência anual). Selecione novamente o plano S&H.');
+      }
+      if (data.deslocacoesPorAnoSH !== -1 && (typeof data.deslocacoesPorAnoSH !== 'number' || data.deslocacoesPorAnoSH <= 0)) {
+        errors.push('Os benefícios do plano S&H não foram aplicados (deslocações por ano). Selecione novamente o plano S&H.');
+      }
     }
   }
 

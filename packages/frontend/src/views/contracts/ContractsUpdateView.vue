@@ -593,6 +593,43 @@ const handleSHPlanSelection = async (planId: string) => {
   }
 };
 
+/**
+ * Re-derive plan benefits for contracts in "auto" mode (fewer than 2 equipments).
+ *
+ * In auto mode the benefit fields are locked in the form because their values belong
+ * to the selected plan, not to the user. Those values are only written when a plan is
+ * actively chosen, so a contract created by the legacy migration (or saved before the
+ * plan benefits were applied) keeps whatever it was stored with -- typically zeros.
+ * Because the fields are locked, such a contract can never be corrected from the UI.
+ *
+ * Re-deriving on load repairs those records as soon as they are opened and saved, and
+ * keeps stored values consistent with the plan catalogue. Manual mode (2+ equipments)
+ * is deliberately untouched: there the stored values are negotiated and authoritative.
+ */
+const reconcilePlanBenefits = (data: Record<string, any>): void => {
+  if (data.hasCPAContract && data.planIdCPA && (data.cpaEquipments?.length ?? 0) < 2) {
+    const planDetails = getPlanDetails('CPA', data.planIdCPA);
+    if (planDetails && 'parameters' in planDetails) {
+      const cpaPlan = planDetails as import('@clever/shared').CPAPlan;
+      updateFieldValue('manutencoesPorAnoCPA', cpaPlan.parameters.manutencoesPorAno);
+      updateFieldValue('deslocacoesPorAnoCPA', cpaPlan.parameters.deslocacoesPorAno);
+      // CPA plans define no annual hours
+      updateFieldValue('horasAssistenciaAnualCPA', 0);
+    }
+  }
+
+  if (data.hasSHContract && data.planIdSH && (data.shEquipments?.length ?? 0) < 2) {
+    const planDetails = getPlanDetails('S&H', data.planIdSH);
+    if (planDetails && 'parameters' in planDetails) {
+      const shPlan = planDetails as import('@clever/shared').SHPlan;
+      updateFieldValue('horasAssistenciaAnualSH', shPlan.parameters.horasPorAno);
+      updateFieldValue('deslocacoesPorAnoSH', shPlan.parameters.deslocacoesPorAno);
+      // S&H plans define no maintenances
+      updateFieldValue('manutencoesPorAnoSH', 0);
+    }
+  }
+};
+
 // Equipment update handler for the new system
 const handleEquipmentUpdate = (data: {
   action: string;
@@ -1110,6 +1147,11 @@ const loadContract = async () => {
         shEquipments.value = [];
         updateFieldValue('shEquipments', []);
       }
+
+      // Re-derive plan-owned benefit values now that equipment counts are known, so a
+      // contract stored with unapplied (zero) plan benefits is repaired on open rather
+      // than being stuck behind locked fields.
+      reconcilePlanBenefits(data);
 
       // Set up display toggle states based on existing contract configuration
       if (data.hasCPAContract) {
