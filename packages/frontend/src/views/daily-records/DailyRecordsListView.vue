@@ -263,8 +263,9 @@ const clearError = () => {
 
 // Computed properties
 const displayedDailyRecords = computed(() => {
-  // Backend handles search filtering - apply client-side date filter only
-  return filterByDate(api.items.value);
+  // Backend handles all filtering (collaborator, date, search) in listFiltered,
+  // then paginates the filtered set. No client-side filtering here.
+  return api.items.value;
 });
 
 // Display functions for ContentListTemplate
@@ -517,21 +518,7 @@ const loadDailyRecords = async () => {
 // Watch filter changes — reset page to 1 and re-fetch
 watch([selectedCollaborator, selectedDate], async () => {
   isLoading.value = true;
-  await api.fetchList({ page: 1, limit: itemsPerPage.value, ...filterParams.value }).then(() => {
-    if (api.items.value) {
-      dailyRecords.value = (api.items.value as ContentWithRelations<DailyRecord['data']>[]).sort(
-        (a, b) => {
-          const dateA = new Date(a.data.dataRegistro);
-          const dateB = new Date(b.data.dataRegistro);
-          const dateDiff = dateB.getTime() - dateA.getTime();
-          if (dateDiff !== 0) return dateDiff;
-          const createdA = new Date(a.createdAt);
-          const createdB = new Date(b.createdAt);
-          return createdB.getTime() - createdA.getTime();
-        }
-      );
-    }
-  }).catch((err) => {
+  await api.fetchList({ page: 1, limit: itemsPerPage.value, ...filterParams.value }).catch((err) => {
     console.error('Error applying filters:', JSON.stringify(err, null, 2));
     error.value = err instanceof Error ? err.message : 'Erro ao carregar registos diários';
   }).finally(() => {
