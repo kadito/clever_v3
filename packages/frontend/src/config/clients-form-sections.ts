@@ -104,6 +104,12 @@ export const clientsFormSections: FormSection[] = [
         fullWidth: true,
         placeholder: 'PT50 0000 0000 0000 0000 0000 0',
       },
+      {
+        key: 'swiftCode',
+        label: 'Código SWIFT / BIC',
+        type: 'text',
+        placeholder: 'Ex: BCOMPTPL',
+      },
     ],
   },
   {

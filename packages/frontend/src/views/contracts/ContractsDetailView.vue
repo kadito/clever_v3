@@ -359,6 +359,40 @@
                   {{ formatPaymentMethod(contract.data.metodoPagamento) }}
                 </div>
               </div>
+              <template
+                v-if="
+                  contract?.data.metodoPagamento === 'DEBITO_DIRETO' &&
+                  contract.relations?.client &&
+                  'nomeEmpresa' in contract.relations.client
+                "
+              >
+                <div
+                  v-if="contract.relations.client.iban"
+                  class="detail-item col-span-full"
+                >
+                  <label class="detail-label">IBAN</label>
+                  <div class="detail-value font-mono">
+                    {{ contract.relations.client.iban }}
+                  </div>
+                </div>
+                <div
+                  v-if="contract.relations.client.swiftCode"
+                  class="detail-item"
+                >
+                  <label class="detail-label">Código SWIFT / BIC</label>
+                  <div class="detail-value font-mono">
+                    {{ contract.relations.client.swiftCode }}
+                  </div>
+                </div>
+                <div
+                  v-if="!contract.relations.client.iban && !contract.relations.client.swiftCode"
+                  class="detail-item col-span-full"
+                >
+                  <p class="text-sm text-amber-600">
+                    IBAN e Código SWIFT não preenchidos na ficha do cliente.
+                  </p>
+                </div>
+              </template>
             </div>
           </div>
         </div>
