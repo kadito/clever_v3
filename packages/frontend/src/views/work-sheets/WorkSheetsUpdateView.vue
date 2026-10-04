@@ -509,9 +509,11 @@ const initialFormData = computed(() => {
       data.otherData?.totallyResolved !== undefined ? data.otherData.totallyResolved : false,
     resolutionIssues: data.otherData?.resolutionIssues || '',
     dumpReading: data.otherData?.dumpReading || false,
+    dumpCode: data.otherData?.dumpCode || '',
     backup: data.otherData?.backup || false,
     remoteAccessCheck: data.otherData?.remoteAccessCheck || false,
     anydesk: data.otherData?.anydesk || false,
+    anyDeskCode: data.otherData?.anyDeskCode || '',
 
     // Service report
     serviceReport: data.otherData?.serviceReport || '',
@@ -691,18 +693,17 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
       delete fieldErrors.resolutionIssues;
     }
 
-    // Technical operations validation - all must be completed before saving
-    if (!data.dumpReading) {
-      fieldErrors.dumpReading = 'Leitura de Dump é obrigatória';
-    }
-    if (!data.backup) {
-      fieldErrors.backup = 'Cópia de Segurança é obrigatória';
-    }
-    if (!data.remoteAccessCheck) {
-      fieldErrors.remoteAccessCheck = 'Verificação do Acesso Remoto é obrigatória';
-    }
-    if (!data.anydesk) {
-      fieldErrors.anydesk = 'AnyDesk é obrigatório';
+    // Technical operations validation
+    // remoteAccessCheck and anydesk are required UNLESS serviceType is MANUTENÇÃO
+    // dumpReading and backup are always optional
+    const isManutencao = data.serviceType === 'MANUTENÇÃO';
+    if (!isManutencao) {
+      if (!data.remoteAccessCheck) {
+        fieldErrors.remoteAccessCheck = 'Verificação do Acesso Remoto é obrigatória';
+      }
+      if (!data.anydesk) {
+        fieldErrors.anydesk = 'AnyDesk é obrigatório';
+      }
     }
 
     // Service report validation
@@ -759,9 +760,11 @@ const handleUpdate = async (formData: Record<string, any>) => {
       totallyResolved: formData.totallyResolved !== undefined ? formData.totallyResolved : false,
       resolutionIssues: formData.resolutionIssues || '',
       dumpReading: formData.dumpReading || false,
+      dumpCode: formData.dumpCode || undefined,
       backup: formData.backup || false,
       remoteAccessCheck: formData.remoteAccessCheck || false,
       anydesk: formData.anydesk || false,
+      anyDeskCode: formData.anyDeskCode || undefined,
       serviceReport: formData.serviceReport || '',
       clientSignature: formData.clientSignature || '',
     },

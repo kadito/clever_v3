@@ -467,6 +467,15 @@
                     {{ item.data.otherData?.dumpReading ? 'Sim' : 'Não' }}
                   </div>
                 </div>
+                <div
+                  v-if="item.data.otherData?.dumpReading && item.data.otherData?.dumpCode"
+                  class="detail-item"
+                >
+                  <label class="detail-label">Código do Dump</label>
+                  <div class="detail-value">
+                    {{ item.data.otherData.dumpCode }}
+                  </div>
+                </div>
                 <div class="detail-item">
                   <label class="detail-label">Cópia de Segurança</label>
                   <div class="detail-value">
@@ -483,6 +492,15 @@
                   <label class="detail-label">AnyDesk</label>
                   <div class="detail-value">
                     {{ item.data.otherData?.anydesk ? 'Sim' : 'Não' }}
+                  </div>
+                </div>
+                <div
+                  v-if="item.data.otherData?.anydesk && item.data.otherData?.anyDeskCode"
+                  class="detail-item"
+                >
+                  <label class="detail-label">Código AnyDesk</label>
+                  <div class="detail-value">
+                    {{ item.data.otherData.anyDeskCode }}
                   </div>
                 </div>
                 <div
