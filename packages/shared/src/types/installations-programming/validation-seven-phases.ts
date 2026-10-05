@@ -84,15 +84,28 @@ function validatePhase2(data: InstallationSevenPhasesData): boolean {
   return true;
 }
 
-/** Phase 3: software non-null + valid selection + verificacaoInicioProgramacao + testeFinalEquipamentos */
+/** Phase 3: software non-null + valid selection + all enabled checklist groups have ≥1 item checked + testeFinalEquipamentos */
 function validatePhase3(data: InstallationSevenPhasesData): boolean {
   const phase3 = data.phase3;
-  return (
-    phase3.software !== null &&
-    validateSoftwareSelection(phase3.software) === true &&
-    phase3.verificacaoInicioProgramacao === true &&
-    phase3.testeFinalEquipamentos === true
-  );
+
+  if (phase3.software === null || validateSoftwareSelection(phase3.software) !== true) {
+    return false;
+  }
+
+  // Each enabled checklist group must have at least one item checked
+  const checklist = phase3.programacaoChecklist;
+  const groups = [checklist.programacao, checklist.leituraX, checklist.leituraZ];
+  for (const group of groups) {
+    if (group.enabled && !Object.values(group.items).some(Boolean)) {
+      return false;
+    }
+  }
+
+  // Flat teclas items are required individually
+  if (!checklist.teclas.items['leiturasGuardadas']) return false;
+  if (!checklist.teclas.items['apagarLeiturasGuardadas']) return false;
+
+  return phase3.testeFinalEquipamentos === true;
 }
 
 /**
@@ -111,6 +124,9 @@ function validatePhase4(data: InstallationSevenPhasesData): boolean {
     checklist.gavetaMetalica,
     checklist.cpa,
     checklist.acessorios,
+    checklist.balancas,
+    checklist.cctv,
+    checklist.routerSwitch,
   ];
 
   for (const category of categories) {
@@ -127,17 +143,25 @@ function validatePhase4(data: InstallationSevenPhasesData): boolean {
   return true;
 }
 
-/** Phase 5: Instalação (dataInstalacao + horaInicial + horaFinal) AND Formação (dataFormacao + formacaoHoraInicial + formacaoHoraFinal + quemRecebeuFormacao) all mandatory */
+/**
+ * Phase 5: Instalação (dataInstalacao + horaInicial + horaFinal) AND Formação
+ * (dataFormacao + formacaoHoraInicial + formacaoHoraFinal + quemRecebeuFormacao) all mandatory.
+ * At least one of nrFatura or nrGuiaTransporte must be filled.
+ */
 function validatePhase5(data: InstallationSevenPhasesData): boolean {
   const phase5 = data.phase5;
+  const hasFaturaOuGuia =
+    phase5.nrFatura.trim().length > 0 || phase5.nrGuiaTransporte.trim().length > 0;
   return (
+    hasFaturaOuGuia &&
     phase5.dataInstalacao.trim().length > 0 &&
     phase5.horaInicial.trim().length > 0 &&
     phase5.horaFinal.trim().length > 0 &&
     phase5.dataFormacao.trim().length > 0 &&
     phase5.formacaoHoraInicial.trim().length > 0 &&
     phase5.formacaoHoraFinal.trim().length > 0 &&
-    phase5.quemRecebeuFormacao.trim().length > 0
+    phase5.quemRecebeuFormacao.trim().length > 0 &&
+    phase5.assinaturaCliente.trim().length > 0
   );
 }
 
@@ -246,7 +270,18 @@ function getPhase3Errors(data: InstallationSevenPhasesData): string[] {
   if (phase3.software === null || !validateSoftwareSelection(phase3.software)) {
     errors.push('software');
   }
-  if (!phase3.verificacaoInicioProgramacao) errors.push('verificacaoInicioProgramacao');
+  const checklist = phase3.programacaoChecklist;
+  if (checklist.programacao.enabled && !Object.values(checklist.programacao.items).some(Boolean)) {
+    errors.push('checklist.programacao');
+  }
+  if (checklist.leituraX.enabled && !Object.values(checklist.leituraX.items).some(Boolean)) {
+    errors.push('checklist.leituraX');
+  }
+  if (checklist.leituraZ.enabled && !Object.values(checklist.leituraZ.items).some(Boolean)) {
+    errors.push('checklist.leituraZ');
+  }
+  if (!checklist.teclas.items['leiturasGuardadas']) errors.push('teclas.leiturasGuardadas');
+  if (!checklist.teclas.items['apagarLeiturasGuardadas']) errors.push('teclas.apagarLeiturasGuardadas');
   if (!phase3.testeFinalEquipamentos) errors.push('testeFinalEquipamentos');
   return errors;
 }
@@ -261,6 +296,9 @@ function getPhase4Errors(data: InstallationSevenPhasesData): string[] {
   if (checklist.gavetaMetalica.enabled && !hasAtLeastOneChecked(checklist.gavetaMetalica)) errors.push('checklist.gavetaMetalica');
   if (checklist.cpa.enabled && !hasAtLeastOneChecked(checklist.cpa)) errors.push('checklist.cpa');
   if (checklist.acessorios.enabled && !hasAtLeastOneChecked(checklist.acessorios)) errors.push('checklist.acessorios');
+  if (checklist.balancas.enabled && !hasAtLeastOneChecked(checklist.balancas)) errors.push('checklist.balancas');
+  if (checklist.cctv.enabled && !hasAtLeastOneChecked(checklist.cctv)) errors.push('checklist.cctv');
+  if (checklist.routerSwitch.enabled && !hasAtLeastOneChecked(checklist.routerSwitch)) errors.push('checklist.routerSwitch');
 
   // Equipamento adicional
   if (data.phase4.equipamentoAdicional === false && !data.phase4.equipamentoAdicionalMotivo.trim()) {
@@ -273,6 +311,11 @@ function getPhase4Errors(data: InstallationSevenPhasesData): string[] {
 function getPhase5Errors(data: InstallationSevenPhasesData): string[] {
   const errors: string[] = [];
   const phase5 = data.phase5;
+  // At least one of nrFatura or nrGuiaTransporte must be filled
+  if (!phase5.nrFatura.trim() && !phase5.nrGuiaTransporte.trim()) {
+    errors.push('nrFatura');
+    errors.push('nrGuiaTransporte');
+  }
   if (!phase5.dataInstalacao.trim()) errors.push('dataInstalacao');
   if (!phase5.horaInicial.trim()) errors.push('horaInicial');
   if (!phase5.horaFinal.trim()) errors.push('horaFinal');
@@ -280,6 +323,7 @@ function getPhase5Errors(data: InstallationSevenPhasesData): string[] {
   if (!phase5.formacaoHoraInicial.trim()) errors.push('formacaoHoraInicial');
   if (!phase5.formacaoHoraFinal.trim()) errors.push('formacaoHoraFinal');
   if (!phase5.quemRecebeuFormacao.trim()) errors.push('quemRecebeuFormacao');
+  if (!phase5.assinaturaCliente.trim()) errors.push('assinaturaCliente');
   return errors;
 }
 

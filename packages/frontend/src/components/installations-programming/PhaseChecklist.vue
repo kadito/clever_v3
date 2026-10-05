@@ -66,25 +66,46 @@
         :id="`category-${categoryKey}`"
         class="category-items"
       >
-        <label
+        <template
           v-for="itemKey in CHECKLIST_ITEMS_SEVEN[categoryKey]"
           :key="itemKey"
-          class="checklist-item"
         >
-          <span class="item-label">{{ CHECKLIST_LABELS_SEVEN[categoryKey][itemKey] }}</span>
-          <button
-            type="button"
-            role="switch"
-            :aria-checked="getItemValue(categoryKey, itemKey)"
-            :aria-label="CHECKLIST_LABELS_SEVEN[categoryKey][itemKey]"
-            class="switch"
-            :class="{ 'switch--on': getItemValue(categoryKey, itemKey) }"
-            :disabled="disabled"
-            @click="toggleItem(categoryKey, itemKey)"
+          <label class="checklist-item">
+            <span class="item-label">{{ CHECKLIST_LABELS_SEVEN[categoryKey][itemKey] }}</span>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="getItemValue(categoryKey, itemKey)"
+              :aria-label="CHECKLIST_LABELS_SEVEN[categoryKey][itemKey]"
+              class="switch"
+              :class="{ 'switch--on': getItemValue(categoryKey, itemKey) }"
+              :disabled="disabled"
+              @click="toggleItem(categoryKey, itemKey)"
+            >
+              <span class="switch-thumb" />
+            </button>
+          </label>
+
+          <!-- Quantidade de Câmaras — shown inline after 'camaras' item when it's TRUE -->
+          <div
+            v-if="categoryKey === 'cctv' && itemKey === 'camaras' && getItemValue(categoryKey, 'camaras')"
+            class="mini-pc-details"
           >
-            <span class="switch-thumb" />
-          </button>
-        </label>
+            <label class="mini-pc-label" for="camarasQuantidade">Quantidade de Câmaras</label>
+            <input
+              id="camarasQuantidade"
+              type="number"
+              min="0"
+              class="mini-pc-textarea"
+              style="min-height: 44px; resize: none;"
+              placeholder="0"
+              :value="(modelValue.cctv as ToggleableCctvChecklistCategory).camarasQuantidade"
+              :readonly="disabled"
+              :disabled="disabled"
+              @input="updateCctvQuantidade(Number(($event.target as HTMLInputElement).value))"
+            />
+          </div>
+        </template>
 
         <!-- CPA miniPcDetails text area -->
         <div
@@ -114,11 +135,11 @@ import {
   CHECKLIST_LABELS_SEVEN,
   CHECKLIST_CATEGORY_LABELS_SEVEN,
 } from '@clever/shared';
-import type { ToggleableChecklistCategory, ToggleableCpaChecklistCategory } from '@clever/shared';
+import type { ToggleableChecklistCategory, ToggleableCpaChecklistCategory, ToggleableCctvChecklistCategory } from '@clever/shared';
 
 type CategoryKey = keyof typeof CHECKLIST_ITEMS_SEVEN;
 
-type ChecklistModelValue = Record<string, ToggleableChecklistCategory | ToggleableCpaChecklistCategory>;
+type ChecklistModelValue = Record<string, ToggleableChecklistCategory | ToggleableCpaChecklistCategory | ToggleableCctvChecklistCategory>;
 
 interface Props {
   modelValue: ChecklistModelValue;
@@ -220,6 +241,20 @@ const updateMiniPcDetails = (value: string): void => {
     cpa: {
       ...props.modelValue.cpa,
       miniPcDetails: value,
+    },
+  };
+
+  emit('update:modelValue', updatedChecklist);
+};
+
+const updateCctvQuantidade = (value: number): void => {
+  if (props.disabled) return;
+
+  const updatedChecklist: ChecklistModelValue = {
+    ...props.modelValue,
+    cctv: {
+      ...props.modelValue.cctv,
+      camarasQuantidade: value,
     },
   };
 
