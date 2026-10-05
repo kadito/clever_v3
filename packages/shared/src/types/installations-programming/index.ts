@@ -35,12 +35,14 @@ export type {
   Phase1SetupData,
   Phase2RececaoData,
   Phase3ProgramacaoData,
+  Phase3ChecklistCategory,
   Phase4PreparacaoData,
   Phase5InstalacaoData,
   Phase6TestesData,
   Phase7FinalizacaoData,
   ToggleableChecklistCategory,
   ToggleableCpaChecklistCategory,
+  ToggleableCctvChecklistCategory,
   InstallationSevenPhasesData,
   InstallationSevenPhases,
 } from './types-seven-phases';
@@ -52,6 +54,10 @@ export {
   CHECKLIST_LABELS_SEVEN,
   CHECKLIST_CATEGORY_LABELS_SEVEN,
   INSTALLATION_TYPES,
+  PHASE3_CHECKLIST_ITEMS,
+  PHASE3_CHECKLIST_LABELS,
+  PHASE3_CHECKLIST_GROUP_LABELS,
+  PHASE3_CHECKLIST_INDENT,
 } from './types-seven-phases';
 
 // Export seven-phase validation

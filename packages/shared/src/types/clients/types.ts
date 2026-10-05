@@ -52,6 +52,7 @@ export interface ClientData {
 
   // Financial Information
   iban?: string; // Bank account
+  swiftCode?: string; // SWIFT/BIC code
 
   // Software Configuration (new structure)
   softwares: ClientSoftware[];

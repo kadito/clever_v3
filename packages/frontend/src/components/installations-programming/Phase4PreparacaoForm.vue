@@ -61,10 +61,10 @@
 </template>
 
 <script setup lang="ts">
-import type { Phase4PreparacaoData, ToggleableChecklistCategory, ToggleableCpaChecklistCategory } from '@clever/shared';
+import type { Phase4PreparacaoData, ToggleableChecklistCategory, ToggleableCpaChecklistCategory, ToggleableCctvChecklistCategory } from '@clever/shared';
 import PhaseChecklist from '@/components/installations-programming/PhaseChecklist.vue';
 
-type ChecklistModelValue = Record<string, ToggleableChecklistCategory | ToggleableCpaChecklistCategory>;
+type ChecklistModelValue = Record<string, ToggleableChecklistCategory | ToggleableCpaChecklistCategory | ToggleableCctvChecklistCategory>;
 
 interface Props {
   modelValue: Phase4PreparacaoData;

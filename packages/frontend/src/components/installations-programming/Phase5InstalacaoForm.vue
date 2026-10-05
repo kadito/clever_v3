@@ -10,6 +10,7 @@
         id="phase5NrFatura"
         type="text"
         class="form-input"
+        :class="{ 'field-invalid': hasError('nrFatura') }"
         :value="modelValue.nrFatura"
         :disabled="disabled"
         placeholder="N.º Fatura"
@@ -24,11 +25,15 @@
         id="phase5NrGuiaTransporte"
         type="text"
         class="form-input"
+        :class="{ 'field-invalid': hasError('nrGuiaTransporte') }"
         :value="modelValue.nrGuiaTransporte"
         :disabled="disabled"
         placeholder="N.º Guia de Transporte"
         @input="updateField('nrGuiaTransporte', ($event.target as HTMLInputElement).value)"
       >
+      <span v-if="hasError('nrFatura') && hasError('nrGuiaTransporte')" class="field-error">
+        Preencha pelo menos o N.º Fatura ou o N.º Guia de Transporte
+      </span>
     </div>
 
     <!-- Data Instalação -->
@@ -153,11 +158,26 @@
       >
       <span v-if="hasError('quemRecebeuFormacao')" class="field-error">Campo obrigatório</span>
     </div>
+
+    <!-- Assinatura do Cliente -->
+    <div class="form-field">
+      <label class="form-label" :class="{ 'text-red-600': hasError('assinaturaCliente') }">
+        Assinatura do Cliente
+      </label>
+      <SignaturePad
+        :model-value="modelValue.assinaturaCliente"
+        :disabled="disabled"
+        :has-error="hasError('assinaturaCliente')"
+        @update:model-value="updateField('assinaturaCliente', $event ?? '')"
+      />
+      <span v-if="hasError('assinaturaCliente')" class="field-error">Assinatura obrigatória</span>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { Phase5InstalacaoData } from '@clever/shared';
+import SignaturePad from '@/components/forms/SignaturePad.vue';
 
 interface Props {
   modelValue: Phase5InstalacaoData;

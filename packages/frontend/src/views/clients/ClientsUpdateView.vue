@@ -672,6 +672,7 @@ const validateUpdateForm = (data: Record<string, any>): Record<string, string> =
       codigoPostal: data.codigoPostal,
       localidade: data.localidade,
       iban: data.iban,
+      swiftCode: data.swiftCode,
       softwares: data.softwares,
       ...serviceFlags, // Spread the service boolean flags
       dumpsLink: data.dumpsLink,
@@ -745,6 +746,7 @@ const handleUpdate = async (formData: Record<string, any>) => {
       codigoPostal: formData.codigoPostal,
       localidade: formData.localidade,
       iban: formData.iban,
+      swiftCode: formData.swiftCode,
       softwares: formData.softwares || [],
       ...serviceFlags, // Spread the service boolean flags
       dumpsLink: formData.dumpsLink,

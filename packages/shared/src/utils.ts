@@ -46,7 +46,7 @@ export function getContentTypeFromRelation(relationField: string): string | null
  * Defines which fields to extract for display in relation information
  */
 export const BASIC_FIELD_DEFINITIONS: Record<string, string[]> = {
-  clients: ['nomeEmpresa', 'nomeComercial', 'contribuinte', 'localidade'],
+  clients: ['nomeEmpresa', 'nomeComercial', 'contribuinte', 'localidade', 'iban', 'swiftCode'],
   contracts: [
     'numeroContrato',
     'paymentFrequency',

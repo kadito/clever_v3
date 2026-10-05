@@ -9,9 +9,9 @@ describe('WORK_SHEET_CONSTANTS', () => {
    * Validates: Requirements PRICE-BR-001, PRICE-BR-002, PRICE-BR-003, PRICE-BR-004, PRICE-BR-005, PRICE-BR-009, PRICE-BR-011
    */
   it('MI-01: should have correct constant values matching spec', () => {
-    expect(WORK_SHEET_CONSTANTS.HOURLY_RATE_WEEKDAY).toBe(55.0);
-    expect(WORK_SHEET_CONSTANTS.HOURLY_RATE_WEEKEND_HOLIDAY).toBe(70.0);
-    expect(WORK_SHEET_CONSTANTS.MILEAGE_RATE_PER_KM).toBe(0.45);
+    expect(WORK_SHEET_CONSTANTS.HOURLY_RATE_WEEKDAY).toBe(60.0);
+    expect(WORK_SHEET_CONSTANTS.HOURLY_RATE_WEEKEND_HOLIDAY).toBe(75.0);
+    expect(WORK_SHEET_CONSTANTS.MILEAGE_RATE_PER_KM).toBe(0.50);
     expect(WORK_SHEET_CONSTANTS.TRAVEL_FEE_SHORT).toBe(45.0);
     expect(WORK_SHEET_CONSTANTS.TRAVEL_FEE_LONG).toBe(60.0);
     expect(WORK_SHEET_CONSTANTS.TRAVEL_FEE_THRESHOLD_KM).toBe(180);
@@ -43,9 +43,9 @@ describe('calculateWorkSheetPricing', () => {
 
     const result = calculateWorkSheetPricing(input);
 
-    expect(result.hourlyRate).toBe(55);
+    expect(result.hourlyRate).toBe(60);
     expect(result.laborHours).toBe(2);
-    expect(result.laborPrice).toBe(110);
+    expect(result.laborPrice).toBe(120);
   });
 
   /**
@@ -62,9 +62,9 @@ describe('calculateWorkSheetPricing', () => {
 
     const result = calculateWorkSheetPricing(input);
 
-    expect(result.hourlyRate).toBe(70);
+    expect(result.hourlyRate).toBe(75);
     expect(result.laborHours).toBe(2);
-    expect(result.laborPrice).toBe(140);
+    expect(result.laborPrice).toBe(150);
   });
 
   /**
@@ -82,7 +82,7 @@ describe('calculateWorkSheetPricing', () => {
     const result = calculateWorkSheetPricing(input);
 
     expect(result.laborHours).toBe(1);
-    expect(result.laborPrice).toBe(55);
+    expect(result.laborPrice).toBe(60);
   });
 
   /**
@@ -102,7 +102,7 @@ describe('calculateWorkSheetPricing', () => {
       const result = calculateWorkSheetPricing(input);
 
       expect(result.travelFee).toBe(45);
-      expect(result.mileagePrice).toBe(81); // 180 × 0.45
+      expect(result.mileagePrice).toBe(90); // 180 × 0.50
     });
 
     it('181km gets long fee (€60)', () => {
@@ -135,7 +135,7 @@ describe('calculateWorkSheetPricing', () => {
 
     const result = calculateWorkSheetPricing(input);
 
-    expect(result.mileagePrice).toBe(90); // 200 × 0.45
+    expect(result.mileagePrice).toBe(100); // 200 × 0.50
     expect(result.travelFee).toBe(60); // >180km
   });
 
@@ -152,7 +152,7 @@ describe('calculateWorkSheetPricing', () => {
 
     const result = calculateWorkSheetPricing(input);
 
-    expect(result.hourlyRate).toBe(55); // hourlyRate still set based on weekendHoliday
+    expect(result.hourlyRate).toBe(60); // hourlyRate still set based on weekendHoliday
     expect(result.laborHours).toBe(0);
     expect(result.laborPrice).toBe(0);
     expect(result.travelFee).toBe(0);
@@ -175,7 +175,7 @@ describe('calculateWorkSheetPricing', () => {
     const result = calculateWorkSheetPricing(input);
 
     expect(result.laborHours).toBe(4);
-    expect(result.laborPrice).toBe(220); // 4h × €55
+    expect(result.laborPrice).toBe(240); // 4h × €60
   });
 
   /**
@@ -195,7 +195,7 @@ describe('calculateWorkSheetPricing', () => {
 
     expect(result.travelFee).toBe(0);
     expect(result.mileagePrice).toBe(0);
-    expect(result.totalPrice).toBe(110); // laborPrice only (2h × €55)
+    expect(result.totalPrice).toBe(120); // laborPrice only (2h × €60)
     expect(result.hasDisplacement).toBe(false);
   });
 });

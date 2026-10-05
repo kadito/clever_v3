@@ -250,18 +250,17 @@ export function validateWorkSheetCreation(data: WorkSheetCreationData): string[]
     );
   }
 
-  // Technical operations validation - all must be completed before saving
-  if (!data.otherData?.dumpReading) {
-    errors.push('Leitura de Dump é obrigatória');
-  }
-  if (!data.otherData?.backup) {
-    errors.push('Cópia de Segurança é obrigatória');
-  }
-  if (!data.otherData?.remoteAccessCheck) {
-    errors.push('Verificação do Acesso Remoto é obrigatória');
-  }
-  if (!data.otherData?.anydesk) {
-    errors.push('AnyDesk é obrigatório');
+  // Technical operations validation
+  // remoteAccessCheck and anydesk are required UNLESS serviceType is MANUTENÇÃO
+  // dumpReading and backup are always optional
+  const isManutencao = data.otherData?.serviceType === 'MANUTENÇÃO';
+  if (!isManutencao) {
+    if (!data.otherData?.remoteAccessCheck) {
+      errors.push('Verificação do Acesso Remoto é obrigatória');
+    }
+    if (!data.otherData?.anydesk) {
+      errors.push('AnyDesk é obrigatório');
+    }
   }
 
   // Service report validation

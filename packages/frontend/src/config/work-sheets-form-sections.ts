@@ -252,6 +252,17 @@ export const workSheetsFormSections: FormSection[] = [
         defaultValue: false,
       },
       {
+        key: 'dumpCode',
+        label: 'Código do Dump',
+        type: 'text',
+        fullWidth: true,
+        placeholder: 'Insira o código do Dump...',
+        conditional: {
+          dependsOn: 'dumpReading',
+          showWhen: (value: any) => value === true,
+        },
+      },
+      {
         key: 'backup',
         label: 'Cópia de Segurança',
         type: 'switch',
@@ -274,6 +285,17 @@ export const workSheetsFormSections: FormSection[] = [
         fullWidth: false,
         switchLabel: 'Foi utilizado AnyDesk',
         defaultValue: false,
+      },
+      {
+        key: 'anyDeskCode',
+        label: 'Código AnyDesk',
+        type: 'text',
+        fullWidth: true,
+        placeholder: 'Insira o código AnyDesk...',
+        conditional: {
+          dependsOn: 'anydesk',
+          showWhen: (value: any) => value === true,
+        },
       },
       {
         key: 'resolutionIssues',

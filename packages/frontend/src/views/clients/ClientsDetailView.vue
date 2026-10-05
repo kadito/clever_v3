@@ -455,7 +455,7 @@
 
         <!-- Financial Information Section -->
         <div
-          v-if="item.data.iban"
+          v-if="item.data.iban || item.data.swiftCode"
           class="detail-section"
         >
           <div class="bg-white rounded-touch border border-gray-200">
@@ -468,10 +468,22 @@
             </div>
             <div class="p-4 sm:p-6">
               <div class="detail-grid">
-                <div class="detail-item col-span-full">
+                <div
+                  v-if="item.data.iban"
+                  class="detail-item col-span-full"
+                >
                   <label class="detail-label">IBAN</label>
                   <div class="detail-value font-mono">
                     {{ item.data.iban }}
+                  </div>
+                </div>
+                <div
+                  v-if="item.data.swiftCode"
+                  class="detail-item"
+                >
+                  <label class="detail-label">Código SWIFT / BIC</label>
+                  <div class="detail-value font-mono">
+                    {{ item.data.swiftCode }}
                   </div>
                 </div>
               </div>

@@ -70,7 +70,6 @@ interface OldSevenPhaseData {
     software?: string;
     identificacaoReferencia?: string;
     numeroLicenca?: string;
-    verificacaoInicioProgramacao?: boolean;
     testeFinalEquipamentos?: boolean;
     notasProgramacao?: string;
   };
@@ -136,7 +135,12 @@ function mapLegacyPhase1ToPhase3(legacyPhase1: Phase1Data | undefined): Phase3Pr
       software: null,
       identificacaoReferencia: '',
       numeroLicenca: '',
-      verificacaoInicioProgramacao: false,
+      programacaoChecklist: {
+        programacao: { enabled: true, items: {} },
+        leituraX: { enabled: true, items: {} },
+        leituraZ: { enabled: true, items: {} },
+        teclas: { enabled: true, items: {} },
+      },
       testeFinalEquipamentos: false,
       notasProgramacao: '',
     };
@@ -151,7 +155,12 @@ function mapLegacyPhase1ToPhase3(legacyPhase1: Phase1Data | undefined): Phase3Pr
     software,
     identificacaoReferencia: legacyPhase1.numeroEquipamento || '',
     numeroLicenca: legacyPhase1.numeroSerie || '',
-    verificacaoInicioProgramacao: Boolean(legacyPhase1.leiturasGuardadas),
+    programacaoChecklist: {
+      programacao: { enabled: true, items: {} },
+      leituraX: { enabled: true, items: {} },
+      leituraZ: { enabled: true, items: {} },
+      teclas: { enabled: true, items: {} },
+    },
     testeFinalEquipamentos: legacyPhase1.testeFinal ?? false,
     notasProgramacao: '',
   };
@@ -191,6 +200,19 @@ function mapLegacyChecklistToPhase4(legacyPhase2: Phase2Data | undefined, materi
       acessorios: {
         enabled: true,
         items: mapChecklistItems('acessorios', legacy.acessorios),
+      },
+      balancas: {
+        enabled: true,
+        items: initChecklistItems('balancas'),
+      },
+      cctv: {
+        enabled: true,
+        items: initChecklistItems('cctv'),
+        camarasQuantidade: 0,
+      },
+      routerSwitch: {
+        enabled: true,
+        items: initChecklistItems('routerSwitch'),
       },
     },
     equipamentoAdicional: true,
@@ -233,7 +255,12 @@ function mapOldPhase3ToNew(oldPhase3: OldSevenPhaseData['phase3']): Phase3Progra
     software,
     identificacaoReferencia: oldPhase3.identificacaoReferencia || '',
     numeroLicenca: oldPhase3.numeroLicenca || '',
-    verificacaoInicioProgramacao: oldPhase3.verificacaoInicioProgramacao ?? false,
+    programacaoChecklist: {
+      programacao: { enabled: true, items: {} },
+      leituraX: { enabled: true, items: {} },
+      leituraZ: { enabled: true, items: {} },
+      teclas: { enabled: true, items: {} },
+    },
     testeFinalEquipamentos: oldPhase3.testeFinalEquipamentos ?? false,
     notasProgramacao: oldPhase3.notasProgramacao || '',
   };
@@ -265,6 +292,9 @@ function mapOldPhase4ToNew(oldPhase4: OldSevenPhaseData['phase4']): Phase4Prepar
       gavetaMetalica: mapCategory('gavetaMetalica', checklist?.gavetaMetalica?.items),
       cpa: mapCpaCategory(checklist?.cpa?.items, checklist?.cpa?.miniPcDetails),
       acessorios: mapCategory('acessorios', checklist?.acessorios?.items),
+      balancas: { enabled: true, items: initChecklistItems('balancas') },
+      cctv: { enabled: true, items: initChecklistItems('cctv'), camarasQuantidade: 0 },
+      routerSwitch: { enabled: true, items: initChecklistItems('routerSwitch') },
     },
     equipamentoAdicional: true,
     equipamentoAdicionalMotivo: oldPhase4.materialAdicional || '',
@@ -305,6 +335,7 @@ function mapLegacyPhase3ToPhase5(legacyPhase3: Phase3Data | undefined): Phase5In
       formacaoHoraInicial: '',
       formacaoHoraFinal: '',
       quemRecebeuFormacao: '',
+      assinaturaCliente: '',
     };
   }
 
@@ -319,6 +350,7 @@ function mapLegacyPhase3ToPhase5(legacyPhase3: Phase3Data | undefined): Phase5In
     formacaoHoraInicial: legacyPhase3.horaInicialFormacao || '',
     formacaoHoraFinal: legacyPhase3.horaFinalFormacao || '',
     quemRecebeuFormacao: legacyPhase3.quemRecebeuFormacao || '',
+    assinaturaCliente: '',
   };
 }
 
@@ -452,6 +484,9 @@ function createDefaultPhase4(): Phase4PreparacaoData {
       gavetaMetalica: { enabled: true, items: initChecklistItems('gavetaMetalica') },
       cpa: { enabled: true, items: initChecklistItems('cpa'), miniPcDetails: '' },
       acessorios: { enabled: true, items: initChecklistItems('acessorios') },
+      balancas: { enabled: true, items: initChecklistItems('balancas') },
+      cctv: { enabled: true, items: initChecklistItems('cctv'), camarasQuantidade: 0 },
+      routerSwitch: { enabled: true, items: initChecklistItems('routerSwitch') },
     },
     equipamentoAdicional: true,
     equipamentoAdicionalMotivo: '',

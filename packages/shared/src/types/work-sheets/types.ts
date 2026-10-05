@@ -7,11 +7,11 @@ import type { TechnicianUser } from '../../types';
  */
 export const WORK_SHEET_CONSTANTS = {
   /** Hourly rate for weekdays (€) */
-  HOURLY_RATE_WEEKDAY: 55.0,
+  HOURLY_RATE_WEEKDAY: 60.0,
   /** Hourly rate for weekends/holidays (€) */
-  HOURLY_RATE_WEEKEND_HOLIDAY: 70.0,
+  HOURLY_RATE_WEEKEND_HOLIDAY: 75.0,
   /** Mileage rate per km (€) */
-  MILEAGE_RATE_PER_KM: 0.45,
+  MILEAGE_RATE_PER_KM: 0.50,
   /** Travel fee for distances up to 180km (€) */
   TRAVEL_FEE_SHORT: 45.0,
   /** Travel fee for distances over 180km (€) */
@@ -76,9 +76,11 @@ export interface WorkSheetOtherData {
   totallyResolved: boolean; // TOTALMENTE RESOLVIDO
   resolutionIssues?: string; // OBSERVAÇÕES SOBRE PROBLEMAS NÃO RESOLVIDOS
   dumpReading: boolean; // LEITURA DE DUMP
+  dumpCode?: string; // CÓDIGO DO DUMP (shown when dumpReading is true)
   backup: boolean; // CÓPIA DE SEGURANÇA
   remoteAccessCheck: boolean; // VERIFICAÇÃO DO ACESSO REMOTO
   anydesk: boolean; // ANYDESK
+  anyDeskCode?: string; // CÓDIGO ANYDESK (shown when anydesk is true)
 
   // Service Report
   serviceReport: string; // DESCRIÇÃO DETALHADA DO SERVIÇO
