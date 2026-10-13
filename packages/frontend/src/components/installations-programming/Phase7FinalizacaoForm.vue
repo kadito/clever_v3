@@ -45,13 +45,14 @@
     >
       <FileUploadZone
         field-name="fotosInstalacao"
-        label="Fotos e ficheiros da instalação"
+        label="Fotos e ficheiros da instalação *"
         :multiple="true"
         :accept-documents="true"
         :existing-files="modelValue.fotosInstalacao"
         :disabled="disabled"
         @files-changed="handleFilesChanged"
       />
+      <span v-if="hasError('fotosInstalacao')" class="field-error">Campo obrigatório</span>
     </div>
 
     <!-- Fotos e ficheiros da instalação — Display existing files (shown when disabled/read-only) -->
@@ -101,6 +102,8 @@ const updateField = (field: keyof Phase7FinalizacaoData, value: boolean): void =
 const handleFilesChanged = (payload: { fieldName: string; newFiles: File[]; removedKeys: string[] }): void => {
   emit('files-changed', payload);
 };
+
+const hasError = (field: string): boolean => props.validationErrors.includes(field);
 </script>
 
 <style scoped>
@@ -115,6 +118,10 @@ const handleFilesChanged = (payload: { fieldName: string; newFiles: File[]; remo
 .form-label {
   @apply block text-sm font-medium text-gray-700;
   font-size: 16px;
+}
+
+.field-error {
+  @apply text-xs text-red-600 mt-0.5;
 }
 
 /* Toggle field layout */
