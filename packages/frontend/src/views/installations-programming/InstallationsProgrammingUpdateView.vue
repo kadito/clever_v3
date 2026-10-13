@@ -337,11 +337,27 @@ const buildCurrentPhaseData = (): InstallationSevenPhasesData => {
     return {} as InstallationSevenPhasesData;
   }
 
-  // Merge phase1 form data into the installation data for validation
+  // Merge phase1 form data into the installation data for validation.
+  // For Phase 7, also count pending (not-yet-uploaded) files so validation
+  // doesn't block completion when the user selected files but hasn't saved yet.
+  const phase7 = installationData.value.phase7;
+  const mergedPhase7 =
+    viewingPhase.value === 7 && pendingFiles.value.length > 0
+      ? {
+          ...phase7,
+          fotosInstalacao: [
+            ...phase7.fotosInstalacao,
+            // Placeholder entries for pending files — just need a non-empty count
+            ...pendingFiles.value.map((f) => f.name),
+          ],
+        }
+      : phase7;
+
   return {
     ...installationData.value,
     clientId: phase1FormData.clientId,
     installationEntries: phase1FormData.installationEntries,
+    phase7: mergedPhase7,
   };
 };
 
@@ -399,6 +415,22 @@ const handleComplete = async (): Promise<void> => {
   isSaving.value = true;
   error.value = null;
 
+  // For Phase 7: upload pending files FIRST so the backend can validate
+  // fotosInstalacao.length >= 1 against the already-persisted file list.
+  if (viewingPhase.value === 7 && pendingFiles.value.length > 0) {
+    await handleFileOperations()
+      .catch((err: unknown) => {
+        error.value = err instanceof Error ? err.message : 'Erro ao carregar ficheiros';
+        isSaving.value = false;
+      });
+
+    if (error.value) return;
+
+    // Reload so installationData.phase7.fotosInstalacao is up to date before
+    // building the payload — backend validation reads from the merged record.
+    await reloadData();
+  }
+
   const phasePayload = buildPhasePayload();
   const payload = {
     data: {
@@ -414,11 +446,6 @@ const handleComplete = async (): Promise<void> => {
     .then(async (response) => {
       if (!response) {
         throw new Error('Erro ao concluir fase');
-      }
-
-      // Handle file operations for Phase 7
-      if (viewingPhase.value === 7) {
-        await handleFileOperations();
       }
 
       // Phase 7 completion → navigate to detail view
