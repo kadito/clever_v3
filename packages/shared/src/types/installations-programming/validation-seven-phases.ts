@@ -202,10 +202,14 @@ function validatePhase6(data: InstallationSevenPhasesData): boolean {
   return anydeskValid && vectronValid;
 }
 
-/** Phase 7: dumpLido = true + copiaSeguranca = true */
+/** Phase 7: dumpLido = true + copiaSeguranca = true + at least one foto/ficheiro da instalação */
 function validatePhase7(data: InstallationSevenPhasesData): boolean {
   const phase7 = data.phase7;
-  return phase7.dumpLido === true && phase7.copiaSeguranca === true;
+  return (
+    phase7.dumpLido === true &&
+    phase7.copiaSeguranca === true &&
+    phase7.fotosInstalacao.length >= 1
+  );
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────
@@ -364,5 +368,6 @@ function getPhase7Errors(data: InstallationSevenPhasesData): string[] {
   const phase7 = data.phase7;
   if (!phase7.dumpLido) errors.push('dumpLido');
   if (!phase7.copiaSeguranca) errors.push('copiaSeguranca');
+  if (phase7.fotosInstalacao.length === 0) errors.push('fotosInstalacao');
   return errors;
 }
