@@ -112,6 +112,7 @@
           :model-value="installationData.phase3"
           :disabled="isPhaseDisabled"
           :validation-errors="validationErrors"
+          :has-pos-installation="hasPosInstallation"
           @update:model-value="installationData.phase3 = $event"
         />
 
@@ -268,6 +269,11 @@ const showUnlockButton = computed(() => {
   const status = installationData.value.phaseStatuses[viewingPhase.value - 1];
   return status === 'completed' && canUnlockPhase(userType.value);
 });
+
+// At least one Phase 1 installation entry is POS → Phase 3 Leituras toggles are shown + mandatory
+const hasPosInstallation = computed(() =>
+  phase1FormData.installationEntries.some((entry) => entry.tipo === 'POS')
+);
 
 // ── Populate form data from loaded record ───────────────────────────
 const populateFromData = (data: InstallationSevenPhasesData): void => {

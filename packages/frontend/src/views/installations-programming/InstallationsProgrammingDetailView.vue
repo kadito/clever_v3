@@ -120,6 +120,7 @@
           v-if="viewingPhase === 3"
           :model-value="installationData.phase3"
           :disabled="true"
+          :has-pos-installation="hasPosInstallation"
           @update:model-value="() => {}"
         />
 
@@ -248,6 +249,11 @@ const phase1FormData = computed(() => ({
 }));
 
 // ── Computed ────────────────────────────────────────────────────────
+
+/** At least one installation entry is POS → Phase 3 Leituras toggles are shown */
+const hasPosInstallation = computed(() =>
+  (installationData.value?.installationEntries ?? []).some((entry) => entry.tipo === 'POS')
+);
 
 /** Page title: short ID */
 const pageTitle = computed((): string => {
@@ -407,6 +413,16 @@ const cancelDelete = (): void => {
 <style scoped>
 .detail-view {
   @apply max-w-2xl mx-auto px-4 py-6;
+  /* On mobile the fixed action bar (~92px: 44px button + 2rem padding) sits at
+     the bottom — push content clear of it with margin so the last fields show */
+  padding-bottom: calc(7rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 640px) {
+  .detail-view {
+    /* sm+ has no fixed bar — reset to the normal vertical padding */
+    padding-bottom: 1.5rem;
+  }
 }
 
 .loading-state {

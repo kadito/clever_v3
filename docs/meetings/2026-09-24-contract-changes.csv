@@ -1,0 +1,26 @@
+﻿Cliente;Tipo;Plano;Deslocações (antes);Deslocações (depois);Manutenções (antes);Manutenções (depois);Horas (antes);Horas (depois);Alterações;Contrato (uuid);Cliente (id)
+Adega 25 de Abril;CPA;PREMIUM CARE;0;3;0;2;0;0;Deslocações: 0 → 3 | Manutenções: 0 → 2;99b7a351-baf2-4dd6-bf67-53fa446ca4ad;3b4f3fe3-e8a7-49f1-8f53-c9a0997633a4
+Basilios Restaurante;CPA;ESSENTIAL CARE;0;1;1;1;0;0;Deslocações: 0 → 1;4a3081f1-8c65-43b7-80db-8e17e1554522;ca4772e5-a990-4865-a325-19adccca7209
+Brejo Doce Pastelaria;CPA;PREMIUM CARE;0;3;0;2;0;0;Deslocações: 0 → 3 | Manutenções: 0 → 2;833805aa-bbec-4dae-9dcf-24e8211fe5d8;121082fb-8964-4421-b471-805fb30e8f00
+Doce M Confeitaria Artesanal;CPA;PREMIUM CARE;0;3;0;2;0;0;Deslocações: 0 → 3 | Manutenções: 0 → 2;f8055d70-cce5-48c8-b67b-28cbe8b859ee;944241ef-b8e5-438b-b490-92e06ea54a9e
+Doce M Confeitaria Artesanal;S&H;SIMPLE;0;2;0;0;10;10;Deslocações: 0 → 2;f8055d70-cce5-48c8-b67b-28cbe8b859ee;944241ef-b8e5-438b-b490-92e06ea54a9e
+Fluxo Principal - Unipessoal Lda;CPA;PREMIUM CARE;0;3;0;2;0;0;Deslocações: 0 → 3 | Manutenções: 0 → 2;bee962a5-2815-48c6-bb0c-aa4ae35c275e;7c99e72b-733f-411e-80ea-c515f036434e
+Frutaria Tropical;CPA;PROFESSIONAL CARE;0;2;0;1;0;0;Deslocações: 0 → 2 | Manutenções: 0 → 1;3f1d272d-8e29-4641-9141-1b2d4734d33f;4a3594f8-08a9-4eca-931a-f886e0ff0c73
+Gafaniz & Gafaniz Lda;CPA;PREMIUM CARE;0;3;0;2;0;0;Deslocações: 0 → 3 | Manutenções: 0 → 2;842e96ca-36ff-4ac9-9179-5cbc6c156e67;a0d1169b-169a-4f2e-82d9-19e1b1424ab1
+Ondagalapos;CPA;PREMIUM CARE;0;3;0;2;0;0;Deslocações: 0 → 3 | Manutenções: 0 → 2;6f2f9305-308f-40ac-80ec-037a4cee1d9b;bd9bdbfd-7fb0-4cd9-8a72-c3e919e7c5e1
+Pastelaria Doces Suspiros;CPA;PREMIUM CARE;0;3;0;2;0;0;Deslocações: 0 → 3 | Manutenções: 0 → 2;9cb734b7-acaa-4ab3-86d1-257c73297588;9ce7d05b-95e2-4395-8837-d0b2de7a0f7c
+Pastelaria Doces Suspiros;S&H;SIMPLE;0;2;0;0;10;10;Deslocações: 0 → 2;9cb734b7-acaa-4ab3-86d1-257c73297588;9ce7d05b-95e2-4395-8837-d0b2de7a0f7c
+Pastelaria Horizonte;CPA;PREMIUM CARE;0;3;0;2;0;0;Deslocações: 0 → 3 | Manutenções: 0 → 2;7b1f4d66-87d2-46cc-b108-5e80138d5a63;3652c175-347f-4c1d-a258-9c92a1f55bfa
+Pastelaria Horizonte;S&H;SIMPLE;0;2;0;0;10;10;Deslocações: 0 → 2;7b1f4d66-87d2-46cc-b108-5e80138d5a63;3652c175-347f-4c1d-a258-9c92a1f55bfa
+Pastelaria Manos do 8;CPA;PREMIUM CARE;0;3;0;2;0;0;Deslocações: 0 → 3 | Manutenções: 0 → 2;0ef6f082-25c8-40c7-b3b6-926e9caa9bff;9ed1d1c8-c1c2-410a-aa15-d639317fea61
+Pastelaria Manos do 8;S&H;SIMPLE;0;2;0;0;10;10;Deslocações: 0 → 2;0ef6f082-25c8-40c7-b3b6-926e9caa9bff;9ed1d1c8-c1c2-410a-aa15-d639317fea61
+Pastelaria Princesa;CPA;PROFESSIONAL CARE;0;2;0;1;0;0;Deslocações: 0 → 2 | Manutenções: 0 → 1;3e856a92-56cb-4d54-a699-31a972db3d7d;584fbe6c-cf75-4e41-899d-f30a13caeb00
+Pão Quente Volta de Mar;CPA;PREMIUM CARE;0;3;0;2;0;0;Deslocações: 0 → 3 | Manutenções: 0 → 2;88d6c22c-62bb-4059-a485-619b1c47e427;0cd3c78f-6d61-4af7-ad6d-e60fff077e14
+Pão Quente Volta de Mar;S&H;SIMPLE;3;2;0;0;10;10;Deslocações: 3 → 2;88d6c22c-62bb-4059-a485-619b1c47e427;0cd3c78f-6d61-4af7-ad6d-e60fff077e14
+Quotidiano Cordato - LDA;CPA;ESSENTIAL CARE;0;1;1;1;0;0;Deslocações: 0 → 1;bf7c32eb-9ee7-4312-869d-14619cf8c5d1;d73dadbc-de1a-4939-83d7-6cad2a3f93b6
+Restaurante Toucinho;CPA;PREMIUM CARE;0;3;0;2;0;0;Deslocações: 0 → 3 | Manutenções: 0 → 2;6f4788e2-e826-488f-97e4-b0bddb90266a;d25e0e4e-43ee-420e-87c1-407b973b3f42
+Taberna D’Vila;CPA;PREMIUM CARE;0;3;0;2;0;0;Deslocações: 0 → 3 | Manutenções: 0 → 2;9d7a669c-d57b-4dc4-a8d0-6f0c57308380;8ad327d0-5eca-4025-ab0b-9cb5f349d295
+Taberna D’Vila;S&H;SIMPLE;0;2;0;0;10;10;Deslocações: 0 → 2;9d7a669c-d57b-4dc4-a8d0-6f0c57308380;8ad327d0-5eca-4025-ab0b-9cb5f349d295
+Tasca da Fatinha;CPA;PROFESSIONAL CARE;0;2;0;1;0;0;Deslocações: 0 → 2 | Manutenções: 0 → 1;92a03198-49f1-497f-84b1-7926b3b11d4b;21f9afd5-ac93-480c-9a64-dc1d640b616a
+Via Rápida;CPA;PREMIUM CARE;0;3;0;2;0;0;Deslocações: 0 → 3 | Manutenções: 0 → 2;cba34de3-072e-44b5-914c-c7c4ad1b6c12;e0225889-aa67-431d-bec8-51fba034d80c
+Via Rápida;S&H;SIMPLE;0;2;0;0;10;10;Deslocações: 0 → 2;cba34de3-072e-44b5-914c-c7c4ad1b6c12;e0225889-aa67-431d-bec8-51fba034d80c

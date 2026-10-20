@@ -196,42 +196,46 @@
       </div>
     </div>
 
-    <!-- Leituras Guardadas + Apagar Leituras Guardadas (flat toggles) -->
-    <div class="form-field">
-      <div class="toggle-field">
-        <span class="form-label">Leituras Guardadas</span>
-        <button
-          type="button"
-          role="switch"
-          :aria-checked="getItemValue('teclas', 'leiturasGuardadas')"
-          aria-label="Leituras Guardadas"
-          class="switch"
-          :class="{ 'switch--on': getItemValue('teclas', 'leiturasGuardadas') }"
-          :disabled="disabled"
-          @click="toggleItem('teclas', 'leiturasGuardadas')"
-        >
-          <span class="switch-thumb" />
-        </button>
+    <!-- Leituras Guardadas + Apagar Leituras Guardadas (POS installations only, mandatory) -->
+    <template v-if="hasPosInstallation">
+      <div class="form-field">
+        <div class="toggle-field">
+          <span class="form-label" :class="{ 'text-red-600': hasError('leiturasGuardadas') }">Leituras Guardadas</span>
+          <button
+            type="button"
+            role="switch"
+            :aria-checked="getItemValue('teclas', 'leiturasGuardadas')"
+            aria-label="Leituras Guardadas"
+            class="switch"
+            :class="{ 'switch--on': getItemValue('teclas', 'leiturasGuardadas'), 'ring-2 ring-red-500': hasError('leiturasGuardadas') }"
+            :disabled="disabled"
+            @click="toggleItem('teclas', 'leiturasGuardadas')"
+          >
+            <span class="switch-thumb" />
+          </button>
+        </div>
+        <span v-if="hasError('leiturasGuardadas')" class="field-error">Deve ser ativado</span>
       </div>
-    </div>
 
-    <div class="form-field">
-      <div class="toggle-field">
-        <span class="form-label">Apagar Leituras Guardadas</span>
-        <button
-          type="button"
-          role="switch"
-          :aria-checked="getItemValue('teclas', 'apagarLeiturasGuardadas')"
-          aria-label="Apagar Leituras Guardadas"
-          class="switch"
-          :class="{ 'switch--on': getItemValue('teclas', 'apagarLeiturasGuardadas') }"
-          :disabled="disabled"
-          @click="toggleItem('teclas', 'apagarLeiturasGuardadas')"
-        >
-          <span class="switch-thumb" />
-        </button>
+      <div class="form-field">
+        <div class="toggle-field">
+          <span class="form-label" :class="{ 'text-red-600': hasError('apagarLeiturasGuardadas') }">Apagar Leituras Guardadas</span>
+          <button
+            type="button"
+            role="switch"
+            :aria-checked="getItemValue('teclas', 'apagarLeiturasGuardadas')"
+            aria-label="Apagar Leituras Guardadas"
+            class="switch"
+            :class="{ 'switch--on': getItemValue('teclas', 'apagarLeiturasGuardadas'), 'ring-2 ring-red-500': hasError('apagarLeiturasGuardadas') }"
+            :disabled="disabled"
+            @click="toggleItem('teclas', 'apagarLeiturasGuardadas')"
+          >
+            <span class="switch-thumb" />
+          </button>
+        </div>
+        <span v-if="hasError('apagarLeiturasGuardadas')" class="field-error">Deve ser ativado</span>
       </div>
-    </div>
+    </template>
 
     <!-- Teste final de todos os equipamentos e acessórios (toggle switch) -->
     <div class="form-field">
@@ -286,11 +290,14 @@ interface Props {
   modelValue: Phase3ProgramacaoData;
   disabled?: boolean;
   validationErrors?: string[];
+  /** When true, at least one Phase 1 entry is POS → the Leituras toggles are shown and mandatory */
+  hasPosInstallation?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   validationErrors: () => [],
+  hasPosInstallation: false,
 });
 
 const emit = defineEmits<{

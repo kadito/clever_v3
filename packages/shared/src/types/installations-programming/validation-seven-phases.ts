@@ -101,11 +101,20 @@ function validatePhase3(data: InstallationSevenPhasesData): boolean {
     }
   }
 
-  // Flat teclas items are required individually
-  if (!checklist.teclas.items['leiturasGuardadas']) return false;
-  if (!checklist.teclas.items['apagarLeiturasGuardadas']) return false;
+  // When any installation entry is POS, leiturasGuardadas + apagarLeiturasGuardadas are mandatory
+  if (hasPosInstallation(data)) {
+    const teclas = checklist.teclas.items;
+    if (teclas.leiturasGuardadas !== true || teclas.apagarLeiturasGuardadas !== true) {
+      return false;
+    }
+  }
 
   return phase3.testeFinalEquipamentos === true;
+}
+
+/** True when at least one Phase 1 installation entry has tipo === 'POS' */
+function hasPosInstallation(data: InstallationSevenPhasesData): boolean {
+  return data.installationEntries.some((entry) => entry.tipo === 'POS');
 }
 
 /**
@@ -284,8 +293,11 @@ function getPhase3Errors(data: InstallationSevenPhasesData): string[] {
   if (checklist.leituraZ.enabled && !Object.values(checklist.leituraZ.items).some(Boolean)) {
     errors.push('checklist.leituraZ');
   }
-  if (!checklist.teclas.items['leiturasGuardadas']) errors.push('teclas.leiturasGuardadas');
-  if (!checklist.teclas.items['apagarLeiturasGuardadas']) errors.push('teclas.apagarLeiturasGuardadas');
+  if (hasPosInstallation(data)) {
+    const teclas = checklist.teclas.items;
+    if (teclas.leiturasGuardadas !== true) errors.push('leiturasGuardadas');
+    if (teclas.apagarLeiturasGuardadas !== true) errors.push('apagarLeiturasGuardadas');
+  }
   if (!phase3.testeFinalEquipamentos) errors.push('testeFinalEquipamentos');
   return errors;
 }
