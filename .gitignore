@@ -149,3 +149,8 @@ scripts/**/migration-success.json
 scripts/**/migration-errors.json
 migration-success.json
 migration-errors.json
+
+# Generated reports / captures (keep local, don't track)
+*.har
+contract-changes-*.csv
+contract-issues-*.json
