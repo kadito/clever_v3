@@ -57,7 +57,12 @@ export interface WorkSheetDisplacementData {
  * Service details, technical operations, and additional information
  */
 export interface WorkSheetOtherData {
-  serviceType: 'ASSISTÊNCIA PRESENCIAL' | 'MANUTENÇÃO' | 'INSTALAÇÃO' | ''; // TIPO DE SERVIÇO
+  serviceType:
+    | 'MANUTENÇÃO'
+    | 'ASSISTÊNCIA PRESENCIAL CPA'
+    | 'ASSISTÊNCIA PRESENCIAL SOFTWARE'
+    | 'INSTALAÇÃO'
+    | ''; // TIPO DE SERVIÇO
   technician: TechnicianUser; // TÉCNICO RESPONSÁVEL - Changed from string to TechnicianUser object
   serviceObservations?: string; // OBSERVAÇÕES DO SERVIÇO
 
@@ -65,6 +70,9 @@ export interface WorkSheetOtherData {
   warranty: boolean; // GARANTIA
   contract: boolean; // CONTRATO
   contractYear: string; // ANO DE CONTRATO
+
+  // Extra hours flag — only relevant for ASSISTÊNCIA PRESENCIAL CPA + CONTRATO
+  horasExtra: boolean; // HORAS EXTRA
 
   // Material & Equipment
   materialUsed: boolean; // MATERIAL UTILIZADO
@@ -186,7 +194,11 @@ export interface WorkSheetDisplayData {
 export interface WorkSheetSearchFilters {
   clientName?: string;
   technician?: string;
-  serviceType?: 'ASSISTÊNCIA PRESENCIAL' | 'MANUTENÇÃO' | 'INSTALAÇÃO';
+  serviceType?:
+    | 'MANUTENÇÃO'
+    | 'ASSISTÊNCIA PRESENCIAL CPA'
+    | 'ASSISTÊNCIA PRESENCIAL SOFTWARE'
+    | 'INSTALAÇÃO';
   paymentMethod?: 'PENDENTE' | 'CARTÃO MB' | 'DINHEIRO' | 'TRANSFERÊNCIA BANCÁRIA' | 'CONTRATO' | 'GARANTIA';
   contractId?: string;
   assistanceDateFrom?: string;

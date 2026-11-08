@@ -89,10 +89,23 @@ export const workSheetsFormSections: FormSection[] = [
         fullWidth: false,
         options: [
           { value: '', label: '--' },
-          { value: 'ASSISTÊNCIA PRESENCIAL', label: 'ASSISTÊNCIA PRESENCIAL' },
           { value: 'MANUTENÇÃO', label: 'MANUTENÇÃO' },
+          { value: 'ASSISTÊNCIA PRESENCIAL CPA', label: 'ASSISTÊNCIA PRESENCIAL CPA' },
+          { value: 'ASSISTÊNCIA PRESENCIAL SOFTWARE', label: 'ASSISTÊNCIA PRESENCIAL SOFTWARE' },
           { value: 'INSTALAÇÃO', label: 'INSTALAÇÃO' },
         ],
+      },
+      {
+        key: 'horasExtra',
+        label: 'Horas Extra',
+        type: 'switch',
+        fullWidth: false,
+        switchLabel: 'Incluir horas no desconto do contrato',
+        defaultValue: false,
+        conditional: {
+          dependsOn: 'serviceType',
+          showWhen: (value: any) => value === 'ASSISTÊNCIA PRESENCIAL CPA',
+        },
       },
       {
         key: 'serviceObservations',

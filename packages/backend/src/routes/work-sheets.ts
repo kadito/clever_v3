@@ -16,7 +16,6 @@ import type {
   WorkSheet,
   WorkSheetData,
   WorkSheetCreationData,
-  WorkSheetUpdateData,
   UserContext,
   StorageBucket,
   ApiResponse,
@@ -88,6 +87,7 @@ function validateWorkSheetCreate(requestData: any, userContext?: UserContext): v
       warranty: workSheetData.otherData?.warranty || false,
       contract: workSheetData.otherData?.contract || false,
       contractYear: workSheetData.otherData?.contractYear || '',
+      horasExtra: workSheetData.otherData?.horasExtra || false,
       materialUsed: workSheetData.otherData?.materialUsed || false,
       materialDetails: workSheetData.otherData?.materialDetails || '',
       equipment: workSheetData.otherData?.equipment || false,
@@ -407,6 +407,13 @@ workSheetsRouter.post('/', async (c: Context) => {
     // Override contractId — always resolved from client, never from body
     contentData.contractId = resolvedContractId;
 
+    // Normalise horasExtra — only valid for ASSISTÊNCIA PRESENCIAL CPA (REQ-05.3)
+    if (contentData.otherData?.serviceType !== 'ASSISTÊNCIA PRESENCIAL CPA') {
+      if (contentData.otherData) {
+        contentData.otherData.horasExtra = false;
+      }
+    }
+
     // ========================================================================
     // Build pricing snapshot from current constants (PRICE-BR-001, PRICE-AC-013)
     // ========================================================================
@@ -593,6 +600,13 @@ workSheetsRouter.put('/:uuid', async (c: Context) => {
     }
 
     const contentData = requestData.data || requestData;
+
+    // Normalise horasExtra — only valid for ASSISTÊNCIA PRESENCIAL CPA (REQ-05.3)
+    if (contentData.otherData?.serviceType !== 'ASSISTÊNCIA PRESENCIAL CPA') {
+      if (contentData.otherData) {
+        contentData.otherData.horasExtra = false;
+      }
+    }
 
     // Merge existing data with update payload (same logic as ContentStorageService.update)
     const mergedData = { ...existingRecord.data, ...contentData };

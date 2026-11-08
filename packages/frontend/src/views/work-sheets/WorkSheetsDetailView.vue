@@ -117,6 +117,15 @@
                     {{ item.data.otherData?.serviceType || '-' }}
                   </div>
                 </div>
+                <div
+                  v-if="item.data.otherData?.serviceType === 'ASSISTÊNCIA PRESENCIAL CPA' && item.data.otherData?.horasExtra"
+                  class="detail-item"
+                >
+                  <label class="detail-label">Horas Extra</label>
+                  <div class="detail-value">
+                    Sim
+                  </div>
+                </div>
                 <div class="detail-item">
                   <label class="detail-label">Técnico Responsável</label>
                   <div class="detail-value">

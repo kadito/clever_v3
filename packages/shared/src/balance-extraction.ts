@@ -115,36 +115,64 @@ export function extractWorkSheetDebtTransaction(workSheet: WorkSheet): Transacti
   }
 
   const paymentMethod = workSheet.data.displacement.paymentMethod;
+  const serviceType = workSheet.data.otherData.serviceType;
 
-  // Contract payment - consume contract resources
-  if (paymentMethod === 'CONTRATO') {
-    const changes: TransactionChanges = {
-      contractUsageChanges: {
-        // Consume 1 maintenance visit
-        manutencoesPorAno: -1,
-      },
-    };
-
-    // Consume displacements if there was a displacement
-    if (workSheet.data.displacement.hasDisplacement) {
-      // For work sheets, we consume 1 displacement per visit
-      // (regardless of actual kilometers - that's the business rule)
-      changes.contractUsageChanges!.deslocacoesPorAno = -1;
-    }
-
-    return changes;
+  // Non-contract payment — add to debt
+  if (paymentMethod !== 'CONTRATO') {
+    const snapshotPrice = workSheet.data.pricingSnapshot?.calculated.totalPrice;
+    const totalPrice = (snapshotPrice != null && Number.isFinite(snapshotPrice))
+      ? snapshotPrice
+      : calculateWorkSheetTotals(workSheet.data).totalPrice;
+    return { balanceChange: totalPrice };
   }
 
-  // Other payment methods - add to debt
-  // Use anchored price if available; fallback to deprecated calculation for legacy
-  const snapshotPrice = workSheet.data.pricingSnapshot?.calculated.totalPrice;
-  const totalPrice = (snapshotPrice != null && Number.isFinite(snapshotPrice))
-    ? snapshotPrice
-    : calculateWorkSheetTotals(workSheet.data).totalPrice;
+  // CONTRATO payment — consume resources by service type
+  switch (serviceType) {
+    case 'MANUTENÇÃO':
+      // 1 manutenção + 1 deslocação (always together, REQ-07.2)
+      return {
+        contractUsageChanges: {
+          manutencoesPorAno: -1,
+          deslocacoesPorAno: -1,
+        },
+      };
 
-  return {
-    balanceChange: totalPrice,
-  };
+    // Legacy value treated identically to CPA presential (REQ-07.6)
+    case 'ASSISTÊNCIA PRESENCIAL' as string:
+    case 'ASSISTÊNCIA PRESENCIAL CPA': {
+      const changes: TransactionChanges = {
+        contractUsageChanges: {
+          deslocacoesPorAno: -1,
+        },
+      };
+      // Consume hours only when horasExtra flag is set (REQ-07.3)
+      if (workSheet.data.otherData.horasExtra) {
+        const horasTotais = workSheet.data.request.totalHours || '0:00';
+        const [h, m] = horasTotais.split(':').map(Number);
+        const totalHours = (h || 0) + ((m || 0) / 60);
+        if (totalHours > 0) {
+          changes.contractUsageChanges!.horasAssistenciaAnuais = -totalHours;
+        }
+      }
+      return changes;
+    }
+
+    case 'ASSISTÊNCIA PRESENCIAL SOFTWARE':
+      // 1 deslocação from S&H resources (REQ-07.4)
+      // Note: current model has a single ContractUsage pool — per-section
+      // split (CPA vs S&H) is handled in the Saldo redesign spec.
+      return {
+        contractUsageChanges: {
+          deslocacoesPorAno: -1,
+        },
+      };
+
+    case 'INSTALAÇÃO':
+    case '':
+    default:
+      // No consumption for installations or unset type (REQ-07.5)
+      return { contractUsageChanges: {} };
+  }
 }
 
 // ============================================================================

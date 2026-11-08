@@ -224,9 +224,22 @@ export function validateWorkSheetCreation(data: WorkSheetCreationData): string[]
   }
 
   // Service type validation
-  const validServiceTypes = ['ASSISTÊNCIA PRESENCIAL', 'MANUTENÇÃO', 'INSTALAÇÃO', ''];
+  const validServiceTypes = [
+    'ASSISTÊNCIA PRESENCIAL CPA',
+    'ASSISTÊNCIA PRESENCIAL SOFTWARE',
+    'MANUTENÇÃO',
+    'INSTALAÇÃO',
+    '',
+    // Legacy value — accepted for backward compatibility with existing records
+    'ASSISTÊNCIA PRESENCIAL',
+  ];
   if (data.otherData?.serviceType && !validServiceTypes.includes(data.otherData.serviceType)) {
     errors.push('Tipo de serviço inválido');
+  }
+
+  // Service type required when payment method is CONTRATO
+  if (data.displacement?.paymentMethod === 'CONTRATO' && !data.otherData?.serviceType) {
+    errors.push('Tipo de serviço obrigatório quando o pagamento é por contrato');
   }
 
   // Conditional field validation
@@ -251,10 +264,12 @@ export function validateWorkSheetCreation(data: WorkSheetCreationData): string[]
   }
 
   // Technical operations validation
-  // remoteAccessCheck and anydesk are required UNLESS serviceType is MANUTENÇÃO
+  // remoteAccessCheck and anydesk are required UNLESS serviceType is MANUTENÇÃO or INSTALAÇÃO
   // dumpReading and backup are always optional
-  const isManutencao = data.otherData?.serviceType === 'MANUTENÇÃO';
-  if (!isManutencao) {
+  const isManutencaoOrInstalacao =
+    data.otherData?.serviceType === 'MANUTENÇÃO' ||
+    data.otherData?.serviceType === 'INSTALAÇÃO';
+  if (!isManutencaoOrInstalacao) {
     if (!data.otherData?.remoteAccessCheck) {
       errors.push('Verificação do Acesso Remoto é obrigatória');
     }
