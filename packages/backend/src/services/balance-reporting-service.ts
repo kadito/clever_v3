@@ -4,7 +4,9 @@ import type {
   PeriodsIndexEntry,
   TransactionsIndexEntry,
   BalanceTransaction,
+  Contract,
 } from '@clever/shared';
+import { computeCurrentPeriodWindow } from '@clever/shared';
 
 export interface BalanceSummary {
   totalClients: number;
@@ -102,65 +104,156 @@ export class BalanceReportingService {
 
   /**
    * Export a one-row-per-client summary CSV.
-   * Columns: client id, name, euro debt, and per-section remaining/original resources.
+   *
+   * Contract-driven: every non-deleted contract produces a row, so expired and
+   * blank-date contracts are included (not just those with an active period).
+   * Each section carries a status:
+   *   Ativo     — the current 1-year period contains today
+   *   Expirado  — the contract has ended; shows the last valid period
+   *   Sem datas — the contract has no inicio/fim dates
    */
   async exportClientSummaryCSV(): Promise<string> {
-    const periods = await this.getAllActivePeriods();
-
-    // Client names from the clients index
+    const contracts = await this.loadContracts();
     const names = await this.loadClientNames();
+    const periods = await this.getAllPeriods(); // active + closed, for remaining resources
 
-    // Group active periods by client, then by section
-    const byClient = new Map<string, { CPA?: ContractPeriod; SH?: ContractPeriod }>();
+    // Index stored periods by contractId+section so we can read remaining resources.
+    const periodByKey = new Map<string, ContractPeriod>();
     for (const p of periods) {
-      const entry = byClient.get(p.clientId) ?? {};
-      entry[p.section] = p;
-      byClient.set(p.clientId, entry);
+      periodByKey.set(`${p.contractId}:${p.section}`, p);
     }
 
     const header = [
       'Client ID',
       'Cliente',
       'Dívida (€)',
+      'CPA Estado',
       'CPA Período',
       'CPA Manutenções (rem/orig)',
       'CPA Deslocações (rem/orig)',
       'CPA Horas (rem/orig)',
+      'SH Estado',
       'SH Período',
       'SH Manutenções (rem/orig)',
       'SH Deslocações (rem/orig)',
       'SH Horas (rem/orig)',
     ].join(',');
 
+    const csvCell = (v: string) => (/[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
     const fmt = (rem: number, orig: number) =>
       `${rem === -1 ? 'Ilimitado' : rem}/${orig === -1 ? 'Ilimitado' : orig}`;
-    const win = (p?: ContractPeriod) => (p ? `${p.periodStart} a ${p.periodEnd}` : '-');
-    const res = (p: ContractPeriod | undefined, key: keyof ContractPeriod['remainingResources']) =>
-      p ? fmt(p.remainingResources[key], p.originalResources[key]) : '-';
-    const csvCell = (v: string) => (/[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
+
+    // Build the three cells (estado, período, resources) for one section.
+    const sectionCells = (
+      contract: Contract,
+      section: 'CPA' | 'SH'
+    ): string[] => {
+      const active = section === 'CPA' ? contract.data.hasCPAContract : contract.data.hasSHContract;
+      if (!active) return ['-', '-', '-', '-', '-'];
+
+      const inicio = section === 'CPA' ? contract.data.inicioContratoCPA : contract.data.inicioContratoSH;
+      const fim = section === 'CPA' ? contract.data.fimContratoCPA : contract.data.fimContratoSH;
+
+      const window = computeCurrentPeriodWindow(inicio, fim);
+      const stored = periodByKey.get(`${contract.uuid}:${section}`);
+
+      // Original resources straight from the contract (fallback when no stored period).
+      const orig =
+        section === 'CPA'
+          ? {
+              m: contract.data.manutencoesPorAnoCPA ?? 0,
+              d: contract.data.deslocacoesPorAnoCPA ?? 0,
+              h: contract.data.horasAssistenciaAnualCPA ?? 0,
+            }
+          : {
+              m: contract.data.manutencoesPorAnoSH ?? 0,
+              d: contract.data.deslocacoesPorAnoSH ?? 0,
+              h: contract.data.horasAssistenciaAnualSH ?? 0,
+            };
+
+      if (!window) {
+        return ['Sem datas', '-', fmt(orig.m, orig.m), fmt(orig.d, orig.d), fmt(orig.h, orig.h)];
+      }
+
+      const estado = window.isActive ? 'Ativo' : 'Expirado';
+      const periodo = `${window.periodStart} a ${window.periodEnd}`;
+
+      // Prefer the stored period's remaining resources; fall back to contract originals.
+      const rem = stored
+        ? stored.remainingResources
+        : { manutencoesPorAno: orig.m, deslocacoesPorAno: orig.d, horasAssistenciaAnuais: orig.h };
+      const og = stored ? stored.originalResources : { manutencoesPorAno: orig.m, deslocacoesPorAno: orig.d, horasAssistenciaAnuais: orig.h };
+
+      return [
+        estado,
+        periodo,
+        fmt(rem.manutencoesPorAno, og.manutencoesPorAno),
+        fmt(rem.deslocacoesPorAno, og.deslocacoesPorAno),
+        fmt(rem.horasAssistenciaAnuais, og.horasAssistenciaAnuais),
+      ];
+    };
 
     const rows: string[] = [];
-    for (const [clientId, sections] of byClient.entries()) {
+    for (const contract of contracts) {
+      const clientId = contract.data.clientId;
+      if (!clientId) continue;
+
       const debt = await this.getClientEuroDebt(clientId);
       const name = names.get(clientId) ?? '';
+
       rows.push(
         [
           clientId,
           csvCell(name),
           debt.toFixed(2),
-          win(sections.CPA),
-          res(sections.CPA, 'manutencoesPorAno'),
-          res(sections.CPA, 'deslocacoesPorAno'),
-          res(sections.CPA, 'horasAssistenciaAnuais'),
-          win(sections.SH),
-          res(sections.SH, 'manutencoesPorAno'),
-          res(sections.SH, 'deslocacoesPorAno'),
-          res(sections.SH, 'horasAssistenciaAnuais'),
+          ...sectionCells(contract, 'CPA'),
+          ...sectionCells(contract, 'SH'),
         ].join(',')
       );
     }
 
     return [header, ...rows].join('\n');
+  }
+
+  /** Load all non-deleted contracts via the contracts index. */
+  private async loadContracts(): Promise<Contract[]> {
+    const idxObj = await this.r2Bucket.get('indexes/contracts-index.json').catch(() => null);
+    if (!idxObj) return [];
+    const data = (await idxObj.json()) as { items?: { uuid: string; isDeleted?: boolean }[] };
+    const items = (data.items ?? []).filter((it) => !it.isDeleted);
+
+    const contracts: Contract[] = [];
+    for (const it of items) {
+      const obj = await this.r2Bucket.get(`content/contracts/${it.uuid}.json`).catch(() => null);
+      if (!obj) continue;
+      const c = (await obj.json()) as Contract;
+      if (c.isDeleted) continue;
+      contracts.push(c);
+    }
+    return contracts;
+  }
+
+  /** All periods (active + closed) across all clients. */
+  private async getAllPeriods(): Promise<ContractPeriod[]> {
+    const periods: ContractPeriod[] = [];
+    let cursor: string | undefined;
+    do {
+      const list = await this.r2Bucket.list({ prefix: 'balance/', cursor });
+      for (const object of list.objects) {
+        if (!object.key.endsWith('/periods-index.json')) continue;
+        const data = await this.r2Bucket.get(object.key);
+        if (!data) continue;
+        const index = (await data.json()) as PeriodsIndexEntry[];
+        const clientId = object.key.split('/')[1];
+        for (const entry of index) {
+          const periodObj = await this.r2Bucket.get(`balance/${clientId}/periods/${entry.periodId}.json`);
+          if (!periodObj) continue;
+          periods.push((await periodObj.json()) as ContractPeriod);
+        }
+      }
+      cursor = list.truncated ? list.cursor : undefined;
+    } while (cursor);
+    return periods;
   }
 
   /** Map clientId -> display name, from the clients index. */
