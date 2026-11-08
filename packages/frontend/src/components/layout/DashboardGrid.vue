@@ -1,23 +1,52 @@
 <template>
-  <div class="dashboard-grid">
-    <router-link
-      v-for="contentType in contentTypes"
-      :key="contentType"
-      :to="{ name: `${contentType}-list` }"
-      class="content-tile group"
+  <div>
+    <div class="dashboard-grid">
+      <router-link
+        v-for="contentType in contentTypes"
+        :key="contentType"
+        :to="{ name: `${contentType}-list` }"
+        class="content-tile group"
+      >
+        <!-- Icon -->
+        <div class="content-tile-icon group-hover:scale-110 transition-transform duration-200">
+          {{ getContentTypeIcon(contentType) }}
+        </div>
+
+        <!-- Title -->
+        <h3 class="content-tile-title">
+          {{ getContentTypeDisplayName(contentType) }}
+        </h3>
+
+        <!-- Arrow indicator -->
+        <div class="content-tile-arrow">
+          <svg
+            class="w-4 h-4 text-primary-400 group-hover:text-primary-600 group-hover:translate-x-1 transition-all duration-200"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </div>
+      </router-link>
+    </div>
+
+    <!-- Reports section (Admin only) -->
+    <div
+      v-if="permissions.canDelete"
+      class="reports-section"
     >
-      <!-- Icon -->
-      <div class="content-tile-icon group-hover:scale-110 transition-transform duration-200">
-        {{ getContentTypeIcon(contentType) }}
-      </div>
-
-      <!-- Title -->
-      <h3 class="content-tile-title">
-        {{ getContentTypeDisplayName(contentType) }}
-      </h3>
-
-      <!-- Arrow indicator -->
-      <div class="content-tile-arrow">
+      <router-link
+        :to="{ name: 'balance-report' }"
+        class="report-link group"
+      >
+        <span class="report-icon">📊</span>
+        <span class="report-title">Relatório de Saldos</span>
         <svg
           class="w-4 h-4 text-primary-400 group-hover:text-primary-600 group-hover:translate-x-1 transition-all duration-200"
           fill="none"
@@ -31,13 +60,16 @@
             d="M9 5l7 7-7 7"
           />
         </svg>
-      </div>
-    </router-link>
+      </router-link>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { contentTypes, getContentTypeDisplayName, getContentTypeIcon } from '../../router';
+import { usePermissions } from '@/composables/usePermissions';
+
+const { permissions } = usePermissions();
 </script>
 
 <style scoped>
@@ -143,5 +175,28 @@ import { contentTypes, getContentTypeDisplayName, getContentTypeIcon } from '../
 
 .content-tile.loading .content-tile-icon {
   @apply animate-pulse;
+}
+
+/* Reports section */
+.reports-section {
+  @apply mt-6;
+}
+
+.report-link {
+  @apply flex items-center gap-3 bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-all duration-200;
+  min-height: 44px;
+}
+
+.report-link:hover {
+  @apply border-primary-200 -translate-y-0.5 shadow-lg;
+}
+
+.report-icon {
+  @apply text-xl flex-shrink-0;
+  line-height: 1;
+}
+
+.report-title {
+  @apply text-sm font-semibold text-gray-900 flex-1;
 }
 </style>

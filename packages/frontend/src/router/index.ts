@@ -208,6 +208,15 @@ const router = createRouter({
 
     // Balance routes
     {
+      path: '/balance/report',
+      name: 'balance-report',
+      component: () => import('../views/balance/BalanceReportView.vue'),
+      meta: {
+        title: 'Relatório de Saldos',
+        requiresAuth: true,
+      },
+    },
+    {
       path: '/balance/:clientId/transactions',
       name: 'transaction-history',
       component: () => import('../views/balance/TransactionHistoryView.vue'),

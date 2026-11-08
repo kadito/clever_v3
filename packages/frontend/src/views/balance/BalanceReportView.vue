@@ -7,10 +7,10 @@
           Relatório de Saldos
         </h1>
         <p class="view-subtitle">
-          Visão geral dos saldos de todos os clientes
+          Períodos de contrato ativos de todos os clientes
         </p>
       </div>
-      
+
       <button
         class="export-button"
         :disabled="isLoading"
@@ -33,61 +33,6 @@
       </button>
     </div>
 
-    <!-- Filters -->
-    <div class="filters-section">
-      <div class="filter-group">
-        <label
-          for="min-debt"
-          class="filter-label"
-        >Dívida Mínima (€)</label>
-        <input 
-          id="min-debt"
-          v-model.number="filters.minDebt" 
-          type="number" 
-          class="filter-input"
-          placeholder="0"
-          @change="loadReport"
-        >
-      </div>
-
-      <div class="filter-group">
-        <label
-          for="max-debt"
-          class="filter-label"
-        >Dívida Máxima (€)</label>
-        <input 
-          id="max-debt"
-          v-model.number="filters.maxDebt" 
-          type="number" 
-          class="filter-input"
-          placeholder="Sem limite"
-          @change="loadReport"
-        >
-      </div>
-
-      <div class="filter-group">
-        <label
-          for="low-usage"
-          class="filter-label"
-        >Apenas Uso Baixo</label>
-        <input 
-          id="low-usage"
-          v-model="filters.lowUsageOnly" 
-          type="checkbox" 
-          class="filter-checkbox"
-          @change="loadReport"
-        >
-      </div>
-
-      <button 
-        class="clear-filters-btn" 
-        :disabled="!hasActiveFilters"
-        @click="clearFilters"
-      >
-        Limpar Filtros
-      </button>
-    </div>
-
     <!-- Summary Statistics -->
     <div
       v-if="summary && !isLoading"
@@ -95,7 +40,7 @@
     >
       <div class="summary-card">
         <div class="summary-label">
-          Total de Clientes
+          Clientes com Período Ativo
         </div>
         <div class="summary-value">
           {{ summary.totalClients }}
@@ -104,37 +49,19 @@
 
       <div class="summary-card">
         <div class="summary-label">
-          Clientes com Dívida
-        </div>
-        <div class="summary-value text-red-600">
-          {{ summary.clientsWithDebt }}
-        </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="summary-label">
-          Dívida Total
-        </div>
-        <div class="summary-value text-red-600">
-          {{ formatCurrency(summary.totalDebt) }}
-        </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="summary-label">
-          Dívida Média
+          Períodos Ativos
         </div>
         <div class="summary-value">
-          {{ formatCurrency(summary.averageDebt) }}
+          {{ summary.totalActivePeriods }}
         </div>
       </div>
 
       <div class="summary-card">
         <div class="summary-label">
-          Uso Baixo
+          Períodos com Recursos Esgotados
         </div>
         <div class="summary-value text-yellow-600">
-          {{ summary.clientsWithLowUsage }}
+          {{ summary.periodsExhausted }}
         </div>
       </div>
     </div>
@@ -179,54 +106,49 @@
       </button>
     </div>
 
-    <!-- Balances Table -->
+    <!-- Periods Table -->
     <div
-      v-else-if="balances.length > 0"
+      v-else-if="periods.length > 0"
       class="table-container"
     >
       <table class="balances-table">
         <thead>
           <tr>
             <th>Cliente</th>
-            <th>Dívida</th>
+            <th>Secção</th>
+            <th>Período</th>
             <th>Manutenções</th>
             <th>Deslocações</th>
             <th>Horas Assist.</th>
-            <th>Uso Baixo</th>
-            <th>Última Atualização</th>
           </tr>
         </thead>
         <tbody>
           <tr
-            v-for="balance in balances"
-            :key="balance.clientId"
+            v-for="period in periods"
+            :key="period.uuid"
           >
             <td>
               <router-link
-                :to="`/clients/${balance.clientId}`"
+                :to="`/clients/${period.clientId}`"
                 class="client-link"
               >
-                {{ balance.clientId.substring(0, 8) }}...
+                {{ period.clientId.substring(0, 8) }}...
               </router-link>
             </td>
-            <td :class="{ 'text-red-600 font-semibold': balance.balance > 0 }">
-              {{ formatCurrency(balance.balance) }}
-            </td>
-            <td>{{ formatUsageValue(balance.contracts.manutencoesPorAno) }}</td>
-            <td>{{ formatUsageValue(balance.contracts.deslocacoesPorAno) }}</td>
-            <td>{{ formatUsageValue(balance.contracts.horasAssistenciaAnuais) }}</td>
             <td>
-              <span
-                v-if="balance.hasLowUsage"
-                class="low-usage-badge"
-              >Sim</span>
-              <span
-                v-else
-                class="normal-usage-badge"
-              >Não</span>
+              <span class="section-badge">{{ period.section }}</span>
             </td>
-            <td class="text-sm text-gray-500">
-              {{ formatDate(balance.lastUpdated) }}
+            <td class="text-sm">
+              {{ formatDate(period.periodStart) }} a {{ formatDate(period.periodEnd) }}
+            </td>
+            <td :class="resourceClass(period, 'manutencoesPorAno')">
+              {{ formatResource(period, 'manutencoesPorAno') }}
+            </td>
+            <td :class="resourceClass(period, 'deslocacoesPorAno')">
+              {{ formatResource(period, 'deslocacoesPorAno') }}
+            </td>
+            <td :class="resourceClass(period, 'horasAssistenciaAnuais')">
+              {{ formatResource(period, 'horasAssistenciaAnuais') }}
             </td>
           </tr>
         </tbody>
@@ -239,7 +161,7 @@
       class="empty-state"
     >
       <p class="empty-message">
-        Sem dados de saldo disponíveis
+        Sem períodos de contrato ativos
       </p>
     </div>
   </div>
@@ -248,68 +170,30 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { usePermissions } from '@/composables/usePermissions';
-import { useRouter } from 'vue-router';
+import type { ContractPeriod } from '@clever/shared';
 
 interface BalanceSummary {
   totalClients: number;
-  clientsWithDebt: number;
-  totalDebt: number;
-  averageDebt: number;
-  clientsWithLowUsage: number;
+  totalActivePeriods: number;
+  periodsExhausted: number;
 }
 
-interface ClientBalanceReport {
-  clientId: string;
-  balance: number;
-  contracts: {
-    manutencoesPorAno: number;
-    deslocacoesPorAno: number;
-    horasAssistenciaAnuais: number;
-  };
-  hasLowUsage: boolean;
-  lastUpdated: string;
-}
+type ResourceKey = keyof ContractPeriod['remainingResources'];
 
-const router = useRouter();
 const { permissions } = usePermissions();
 
-const balances = ref<ClientBalanceReport[]>([]);
+const periods = ref<ContractPeriod[]>([]);
 const summary = ref<BalanceSummary | null>(null);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
 
-const filters = ref({
-  minDebt: undefined as number | undefined,
-  maxDebt: undefined as number | undefined,
-  lowUsageOnly: false,
-});
-
-// Check if user is admin
-const isAdmin = computed(() => {
-  // This should check if user has admin permissions
-  // For now, we'll use a simple check
-  return permissions.value.canDelete; // Admin users can delete
-});
-
-const hasActiveFilters = computed(() => {
-  return filters.value.minDebt !== undefined || 
-         filters.value.maxDebt !== undefined || 
-         filters.value.lowUsageOnly;
-});
+const isAdmin = computed(() => permissions.value.canDelete);
 
 const loadReport = async () => {
   isLoading.value = true;
   error.value = null;
 
-  const params = new URLSearchParams();
-  if (filters.value.minDebt !== undefined) params.append('minDebt', filters.value.minDebt.toString());
-  if (filters.value.maxDebt !== undefined) params.append('maxDebt', filters.value.maxDebt.toString());
-  if (filters.value.lowUsageOnly) params.append('lowUsageThreshold', '20');
-
-  const queryString = params.toString();
-  const url = `/api/balance/report${queryString ? `?${queryString}` : ''}`;
-
-  await fetch(url)
+  await fetch('/api/balance/report')
     .then(async response => {
       if (!response.ok) {
         if (response.status === 403) {
@@ -320,8 +204,10 @@ const loadReport = async () => {
       return response.json();
     })
     .then(data => {
-      balances.value = data.balances || [];
-      summary.value = data.summary || null;
+      // Endpoint returns { success, data: { summary, periods } }
+      const payload = data?.data ?? {};
+      periods.value = payload.periods ?? [];
+      summary.value = payload.summary ?? null;
     })
     .catch(err => {
       console.error('Error loading report:', JSON.stringify(err, null, 2));
@@ -332,21 +218,8 @@ const loadReport = async () => {
     });
 };
 
-const clearFilters = () => {
-  filters.value = {
-    minDebt: undefined,
-    maxDebt: undefined,
-    lowUsageOnly: false,
-  };
-  loadReport();
-};
-
 const exportToCSV = async () => {
-  // One row per client (summary). The period-based model no longer uses the
-  // old debt/usage filters for the export.
-  const url = '/api/balance/report/export?summary=true';
-
-  await fetch(url)
+  await fetch('/api/balance/report/export?summary=true')
     .then(async response => {
       if (!response.ok) {
         throw new Error('Erro ao exportar relatório');
@@ -354,7 +227,6 @@ const exportToCSV = async () => {
       return response.text();
     })
     .then(csv => {
-      // Create download link
       const blob = new Blob([csv], { type: 'text/csv' });
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -369,22 +241,25 @@ const exportToCSV = async () => {
     });
 };
 
-const formatCurrency = (value: number): string => {
-  return new Intl.NumberFormat('pt-PT', {
-    style: 'currency',
-    currency: 'EUR',
-  }).format(value);
+const formatResource = (period: ContractPeriod, key: ResourceKey): string => {
+  const rem = period.remainingResources[key];
+  const orig = period.originalResources[key];
+  if (rem === -1 || orig === -1) return 'Ilimitado';
+  return `${rem} / ${orig}`;
 };
 
-const formatUsageValue = (value: number): string => {
-  if (value === -1) {
-    return 'Ilimitado';
-  }
-  return value.toString();
+const resourceClass = (period: ContractPeriod, key: ResourceKey): string => {
+  const rem = period.remainingResources[key];
+  const orig = period.originalResources[key];
+  // Red when an actual (non-unlimited) allowance is exhausted.
+  if (orig > 0 && rem !== -1 && rem <= 0) return 'text-red-600 font-semibold';
+  return '';
 };
 
 const formatDate = (dateString: string): string => {
+  if (!dateString) return '-';
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) return dateString;
   return new Intl.DateTimeFormat('pt-PT', {
     day: '2-digit',
     month: '2-digit',
@@ -392,13 +267,11 @@ const formatDate = (dateString: string): string => {
   }).format(date);
 };
 
-// Check admin access on mount
 onMounted(() => {
   if (!isAdmin.value) {
     error.value = 'Acesso negado. Apenas administradores podem ver este relatório.';
     return;
   }
-  
   loadReport();
 });
 </script>
@@ -467,74 +340,6 @@ onMounted(() => {
   cursor: not-allowed;
 }
 
-/* Filters */
-.filters-section {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  padding: 1rem;
-  background-color: #ffffff;
-  border-radius: 0.5rem;
-  border: 1px solid #e5e7eb;
-}
-
-@media (min-width: 768px) {
-  .filters-section {
-    grid-template-columns: repeat(3, 1fr) auto;
-  }
-}
-
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.filter-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
-}
-
-.filter-input {
-  padding: 0.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  min-height: 44px;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-.filter-checkbox {
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-}
-
-.clear-filters-btn {
-  padding: 0.5rem 1rem;
-  background-color: #6b7280;
-  color: white;
-  border: none;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  min-height: 44px;
-  align-self: end;
-}
-
-.clear-filters-btn:hover:not(:disabled) {
-  background-color: #4b5563;
-}
-
-.clear-filters-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 /* Summary */
 .summary-section {
   display: grid;
@@ -545,7 +350,7 @@ onMounted(() => {
 
 @media (min-width: 768px) {
   .summary-section {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -672,24 +477,14 @@ onMounted(() => {
   color: #5a8a73;
 }
 
-.low-usage-badge {
+.section-badge {
   display: inline-block;
-  padding: 0.25rem 0.75rem;
-  background-color: #fef3c7;
-  color: #92400e;
+  padding: 0.125rem 0.5rem;
+  background-color: #eef2ff;
+  color: #3730a3;
   border-radius: 0.25rem;
   font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.normal-usage-badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  background-color: #d1fae5;
-  color: #065f46;
-  border-radius: 0.25rem;
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* Empty State */
