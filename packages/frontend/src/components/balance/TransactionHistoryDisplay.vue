@@ -295,8 +295,10 @@ const loadTransactions = async () => {
       }
       return response.json();
     })
-    .then(data => {
-      transactions.value = data;
+    .then(response => {
+      // API returns { success, data: BalanceTransaction[] }
+      const list = Array.isArray(response) ? response : (response?.data ?? []);
+      transactions.value = list;
       currentPage.value = 1; // Reset to first page on new load
     })
     .catch(err => {
@@ -351,8 +353,8 @@ const formatDate = (dateString: string): string => {
 
 const formatSourceType = (source: string): string => {
   const sourceMap: Record<string, string> = {
-    'contract': 'Contrato',
-    'contract-renovation': 'Renovação de Contrato',
+    'contract-period-open': 'Abertura de Período',
+    'contract-period-close': 'Encerramento de Período',
     'work-sheet': 'Folha de Obra',
     'remote-assistance': 'Assistência Remota',
   };
@@ -361,8 +363,8 @@ const formatSourceType = (source: string): string => {
 
 const getSourceLink = (transaction: BalanceTransaction): string | null => {
   const typeMap: Record<string, string> = {
-    'contract': 'contracts',
-    'contract-renovation': 'contracts',
+    'contract-period-open': 'contracts',
+    'contract-period-close': 'contracts',
     'work-sheet': 'work-sheets',
     'remote-assistance': 'remote-assistance',
   };

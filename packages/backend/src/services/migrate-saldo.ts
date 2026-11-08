@@ -1,0 +1,230 @@
+/**
+ * Saldo migration — wipe + deterministic rebuild.
+ *
+ * Deletes all existing balance/ data for every client, then rebuilds periods and
+ * transactions from the current contracts, work sheets, and remote assistances.
+ *
+ * Invoked via the dev-only POST /admin/migrate-saldo route in index.ts.
+ */
+
+import type {
+  StorageBucket,
+  Contract,
+  WorkSheet,
+  RemoteAssistance,
+} from '@clever/shared';
+import {
+  getSectionForServiceType,
+  extractWorkSheetDebtTransaction,
+  extractRemoteAssistanceDebtTransaction,
+  hasTransactionChanges,
+} from '@clever/shared';
+import { createBalancePeriodService } from './balance-service';
+
+const MIGRATION_USER = 'migration';
+
+interface ClientReport {
+  clientId: string;
+  cpaPeriod: boolean;
+  shPeriod: boolean;
+  workSheets: { consumed: number; debt: number };
+  remoteAssistances: { consumed: number; debt: number };
+  errors: string[];
+}
+
+interface MigrationReport {
+  clientsProcessed: number;
+  clients: ClientReport[];
+  errors: string[];
+}
+
+/**
+ * List all keys under a prefix, paginating through R2.
+ */
+async function listKeys(r2: StorageBucket, prefix: string): Promise<string[]> {
+  const keys: string[] = [];
+  let cursor: string | undefined;
+  do {
+    const list = await r2.list({ prefix, cursor });
+    for (const o of list.objects) keys.push(o.key);
+    cursor = list.truncated ? list.cursor : undefined;
+  } while (cursor);
+  return keys;
+}
+
+async function readJson<T>(r2: StorageBucket, key: string): Promise<T | null> {
+  const obj = await r2.get(key).catch(() => null);
+  if (!obj) return null;
+  return (await obj.json()) as T;
+}
+
+/**
+ * Wipe all balance data for a client.
+ */
+async function wipeClientBalance(r2: StorageBucket, clientId: string): Promise<void> {
+  const keys = await listKeys(r2, `balance/${clientId}/`);
+  await Promise.all(keys.map((k) => r2.delete(k).catch(() => undefined)));
+  // Old single-index key (may not be under the listed prefix depending on R2)
+  await r2.delete(`balance/${clientId}/index.json`).catch(() => undefined);
+}
+
+/**
+ * Collect all non-deleted content of a type, keyed by clientId.
+ */
+async function loadContentByClient<T extends { data: { clientId?: string }; isDeleted?: boolean }>(
+  r2: StorageBucket,
+  contentType: string
+): Promise<Map<string, T[]>> {
+  const keys = await listKeys(r2, `content/${contentType}/`);
+  const byClient = new Map<string, T[]>();
+
+  for (const key of keys) {
+    // Skip file-attachment sub-keys — only read top-level {uuid}.json
+    const rest = key.slice(`content/${contentType}/`.length);
+    if (rest.includes('/')) continue;
+    if (!rest.endsWith('.json')) continue;
+
+    const item = await readJson<T>(r2, key);
+    if (!item || item.isDeleted) continue;
+    const clientId = item.data.clientId;
+    if (!clientId) continue;
+
+    const arr = byClient.get(clientId) ?? [];
+    arr.push(item);
+    byClient.set(clientId, arr);
+  }
+
+  return byClient;
+}
+
+export async function migrateSaldo(r2: StorageBucket): Promise<MigrationReport> {
+  const report: MigrationReport = { clientsProcessed: 0, clients: [], errors: [] };
+  const periodService = createBalancePeriodService(r2);
+
+  // Load all content grouped by client
+  const contractsByClient = await loadContentByClient<Contract>(r2, 'contracts');
+  const workSheetsByClient = await loadContentByClient<WorkSheet>(r2, 'work-sheets');
+  const remoteByClient = await loadContentByClient<RemoteAssistance>(r2, 'remote-assistance');
+
+  // Every client that has a contract gets a rebuild
+  const clientIds = new Set<string>([...contractsByClient.keys()]);
+
+  for (const clientId of clientIds) {
+    const clientReport: ClientReport = {
+      clientId,
+      cpaPeriod: false,
+      shPeriod: false,
+      workSheets: { consumed: 0, debt: 0 },
+      remoteAssistances: { consumed: 0, debt: 0 },
+      errors: [],
+    };
+
+    try {
+      // 1. Wipe
+      await wipeClientBalance(r2, clientId);
+
+      // 2. Open periods from current contracts
+      const contracts = contractsByClient.get(clientId) ?? [];
+      for (const contract of contracts) {
+        if (contract.data.hasCPAContract) {
+          await periodService.openPeriod(
+            clientId, contract.uuid, 'CPA',
+            {
+              manutencoesPorAno: contract.data.manutencoesPorAnoCPA ?? 0,
+              deslocacoesPorAno: contract.data.deslocacoesPorAnoCPA ?? 0,
+              horasAssistenciaAnuais: contract.data.horasAssistenciaAnualCPA ?? 0,
+            },
+            contract.data.inicioContratoCPA,
+            contract.data.fimContratoCPA,
+            MIGRATION_USER
+          );
+          clientReport.cpaPeriod = true;
+        }
+        if (contract.data.hasSHContract) {
+          await periodService.openPeriod(
+            clientId, contract.uuid, 'SH',
+            {
+              manutencoesPorAno: contract.data.manutencoesPorAnoSH ?? 0,
+              deslocacoesPorAno: contract.data.deslocacoesPorAnoSH ?? 0,
+              horasAssistenciaAnuais: contract.data.horasAssistenciaAnualSH ?? 0,
+            },
+            contract.data.inicioContratoSH,
+            contract.data.fimContratoSH,
+            MIGRATION_USER
+          );
+          clientReport.shPeriod = true;
+        }
+      }
+
+      // 3. Replay work sheets, sorted by request.date ascending
+      const workSheets = (workSheetsByClient.get(clientId) ?? [])
+        .filter((ws) => ws.data.displacement?.paymentMethod === 'CONTRATO')
+        .sort((a, b) => (a.data.request.date || '').localeCompare(b.data.request.date || ''));
+
+      for (const ws of workSheets) {
+        const section = getSectionForServiceType(ws.data.otherData.serviceType);
+        if (!section) continue; // INSTALAÇÃO
+
+        const contractId = ws.data.contractId;
+        const activePeriod = contractId
+          ? await periodService.getActivePeriodForDate(clientId, contractId, section, ws.data.request.date)
+          : null;
+
+        const changes = extractWorkSheetDebtTransaction(ws, activePeriod);
+        if (!hasTransactionChanges(changes)) continue;
+
+        const periodId = activePeriod?.uuid ?? 'no-period';
+        const resolvedContractId = activePeriod?.contractId ?? contractId ?? 'unknown';
+
+        await periodService.createDebtTransaction(
+          clientId, resolvedContractId, periodId, ws.uuid, 'work-sheet', changes, MIGRATION_USER,
+          { paymentMethod: 'CONTRATO', section, serviceDetails: { serviceType: ws.data.otherData.serviceType } }
+        );
+
+        if (changes.balanceChange) clientReport.workSheets.debt++;
+        else clientReport.workSheets.consumed++;
+      }
+
+      // 4. Replay remote assistances, sorted by dataPedido ascending
+      const remotes = (remoteByClient.get(clientId) ?? [])
+        .filter((ra) => ra.data.paymentMethod === 'Contrato')
+        .sort((a, b) => (a.data.dataPedido || '').localeCompare(b.data.dataPedido || ''));
+
+      for (const ra of remotes) {
+        const contractId = ra.data.contractId;
+        const activePeriod = contractId
+          ? await periodService.getActivePeriodForDate(clientId, contractId, 'SH', ra.data.dataPedido)
+          : null;
+
+        const changes = extractRemoteAssistanceDebtTransaction(ra, activePeriod);
+        if (!hasTransactionChanges(changes)) continue;
+
+        const periodId = activePeriod?.uuid ?? 'no-period';
+        const resolvedContractId = activePeriod?.contractId ?? contractId ?? 'unknown';
+
+        await periodService.createDebtTransaction(
+          clientId, resolvedContractId, periodId, ra.uuid, 'remote-assistance', changes, MIGRATION_USER,
+          { paymentMethod: 'Contrato', section: 'SH', serviceDetails: { horasTotais: ra.data.horasTotais } }
+        );
+
+        if (changes.balanceChange) clientReport.remoteAssistances.debt++;
+        else clientReport.remoteAssistances.consumed++;
+      }
+
+      console.log('[migrate] client', clientId, JSON.stringify({
+        cpa: clientReport.cpaPeriod, sh: clientReport.shPeriod,
+        ws: clientReport.workSheets, ra: clientReport.remoteAssistances,
+      }));
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      clientReport.errors.push(msg);
+      report.errors.push(`client ${clientId}: ${msg}`);
+      console.error('[migrate] error for client', clientId, msg);
+    }
+
+    report.clients.push(clientReport);
+    report.clientsProcessed++;
+  }
+
+  return report;
+}

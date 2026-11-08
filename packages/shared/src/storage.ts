@@ -18,10 +18,22 @@ export interface StorageBucket {
     }
   ): Promise<StorageObject>;
   delete(key: string): Promise<void>;
+  /** R2 prefix listing — present on the real R2 binding. */
+  list(options?: { prefix?: string; cursor?: string; limit?: number }): Promise<StorageList>;
 }
 
 export interface StorageObject {
   json(): Promise<any>;
+}
+
+export interface StorageListObject {
+  key: string;
+}
+
+export interface StorageList {
+  objects: StorageListObject[];
+  truncated: boolean;
+  cursor?: string;
 }
 
 /**

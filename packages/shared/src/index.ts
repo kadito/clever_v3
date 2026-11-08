@@ -8,7 +8,6 @@ export * from './storage';
 export * from './relation-type-guards';
 export * from './permissions';
 export * from './balance-types';
-export * from './balance-utils';
 export * from './balance-extraction';
 export * from './file-validation';
 

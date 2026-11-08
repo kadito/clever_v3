@@ -150,6 +150,10 @@ scripts/**/migration-errors.json
 migration-success.json
 migration-errors.json
 
+# R2 bucket backups (local snapshots — data, never commit)
+scripts/**/*-backup-*/
+*-backup-*/
+
 # Generated reports / captures (keep local, don't track)
 *.har
 contract-changes-*.csv

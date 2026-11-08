@@ -338,6 +338,42 @@
         </div>
       </div>
 
+      <!-- Renewal Section (Admin only) -->
+      <div
+        v-if="permissions.canDelete && (contract?.data.hasCPAContract || contract?.data.hasSHContract)"
+        class="detail-section"
+      >
+        <div class="bg-white rounded-touch border border-gray-200">
+          <div
+            class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-gray-50 rounded-t-touch"
+          >
+            <h2 class="text-lg font-semibold text-gray-900">
+              Renovação de Contrato
+            </h2>
+          </div>
+          <div class="p-4 sm:p-6 flex flex-wrap gap-3">
+            <button
+              v-if="contract?.data.hasCPAContract"
+              type="button"
+              class="renovar-btn"
+              :disabled="isRenewing"
+              @click="handleRenovar('CPA')"
+            >
+              Renovar CPA
+            </button>
+            <button
+              v-if="contract?.data.hasSHContract"
+              type="button"
+              class="renovar-btn"
+              :disabled="isRenewing"
+              @click="handleRenovar('SH')"
+            >
+              Renovar S&H
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Payment Method Section -->
       <div class="detail-section">
         <div class="bg-white rounded-touch border border-gray-200">
@@ -463,6 +499,19 @@
     @cancel="cancelDelete"
     @close="cancelDelete"
   />
+
+  <!-- Renewal Confirmation Dialog -->
+  <ConfirmationDialog
+    :is-open="showRenovarConfirm"
+    title="Confirmar Renovação"
+    :message="renovarMessage"
+    :is-loading="isRenewing"
+    confirm-text="Renovar"
+    cancel-text="Cancelar"
+    @confirm="confirmRenovar"
+    @cancel="cancelRenovar"
+    @close="cancelRenovar"
+  />
 </template>
 
 <script setup lang="ts">
@@ -475,6 +524,7 @@ import ConfirmationDialog from '@/components/common/ConfirmationDialog.vue';
 import ClientInfoSection from '@/components/common/ClientInfoSection.vue';
 import { useApi } from '@/composables/useApi';
 import { useErrorHandler } from '@/composables/useErrorHandler';
+import { usePermissions } from '@/composables/usePermissions';
 
 // Router
 const route = useRoute();
@@ -483,6 +533,7 @@ const router = useRouter();
 // Composables
 const api = useApi<Contract>('contracts');
 const errorHandler = useErrorHandler();
+const { permissions } = usePermissions();
 
 // State
 const contract = ref<ContentWithRelations<Contract['data']> | null>(null);
@@ -494,6 +545,12 @@ const isDeleting = ref(false);
 const showDeleteConfirm = ref(false);
 const confirmDeleteTitle = ref('Confirmar Eliminação');
 const confirmDeleteMessage = ref('');
+
+// Renewal state
+const isRenewing = ref(false);
+const showRenovarConfirm = ref(false);
+const renovarMessage = ref('');
+const renovarSection = ref<'CPA' | 'SH' | null>(null);
 
 // Clear error function
 const clearError = () => {
@@ -768,6 +825,59 @@ const cancelDelete = () => {
   showDeleteConfirm.value = false;
 };
 
+// Renewal functionality
+const handleRenovar = (section: 'CPA' | 'SH') => {
+  if (!contract.value) return;
+  renovarSection.value = section;
+  renovarMessage.value =
+    `Tem a certeza que pretende renovar o contrato ${section}? ` +
+    `O período atual será encerrado e os recursos repõem-se aos valores originais do plano.`;
+  showRenovarConfirm.value = true;
+};
+
+const confirmRenovar = async () => {
+  if (!contract.value || !renovarSection.value) return;
+
+  const section = renovarSection.value;
+  const uuid = contract.value.uuid;
+
+  isRenewing.value = true;
+  clearError();
+
+  await fetch(`/api/contracts/${uuid}/renovar`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ section }),
+  })
+    .then(async (response) => {
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Erro ao renovar o contrato');
+      }
+      return response.json();
+    })
+    .then((data) => {
+      console.log('Contract renewed:', JSON.stringify(data, null, 2));
+      showRenovarConfirm.value = false;
+      renovarSection.value = null;
+      // Reload the contract to reflect the new period state
+      return loadContract();
+    })
+    .catch((err) => {
+      console.error('Error renewing contract:', JSON.stringify(err, null, 2));
+      error.value = err instanceof Error ? err.message : 'Erro ao renovar o contrato';
+      showRenovarConfirm.value = false;
+    })
+    .finally(() => {
+      isRenewing.value = false;
+    });
+};
+
+const cancelRenovar = () => {
+  showRenovarConfirm.value = false;
+  renovarSection.value = null;
+};
+
 // Data loading
 const loadContract = async () => {
   const uuid = route.params.uuid as string;
@@ -829,6 +939,12 @@ onMounted(() => {
 
 .detail-label {
   @apply text-xs font-medium text-gray-500 uppercase tracking-wide;
+}
+
+.renovar-btn {
+  @apply px-4 py-2 bg-[#75AE93] text-white rounded-touch text-sm font-medium;
+  @apply hover:bg-[#5a8a73] disabled:opacity-50 disabled:cursor-not-allowed;
+  min-height: 44px;
 }
 
 .detail-value {

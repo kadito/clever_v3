@@ -38,11 +38,10 @@ import {
 } from '@clever/shared';
 import type { RemoteAssistancePricingSnapshot } from '@clever/shared';
 import { autoAssignTechnician, validateTechnicianAssignment } from '../utils/technician-assignment';
-import { createBalanceService, ValidationError } from '../services/balance-service';
+import { createBalancePeriodService } from '../services/balance-service';
 import { createBalanceMiddleware } from '../middleware/balance-middleware';
 import { requireUserContext } from '../middleware/clerk';
 import { requireDeletePermission } from '../middleware/permissions';
-import { extractRemoteAssistanceDebtTransaction, hasTransactionChanges } from '@clever/shared';
 import type { FileReference } from '@clever/shared';
 
 /**
@@ -425,33 +424,9 @@ remoteAssistanceRouter.post('/', async (c: Context) => {
     contentData.contractId = resolvedContractId;
 
     // ========================================================================
-    // Validate resource availability BEFORE creating content (REQ-04.4)
-    // If resources are insufficient, reject with HTTP 400 — content NOT created
+    // Resource pre-validation removed — the period-aware extraction handles
+    // D8/D9 by converting to euro debt instead of blocking creation.
     // ========================================================================
-    const balanceService = createBalanceService(r2Bucket);
-
-    if (paymentMethod === 'Contrato' && clientId) {
-      // Build the same changes that the balance middleware would create
-      const proposedChanges = extractRemoteAssistanceDebtTransaction({
-        data: contentData,
-      } as unknown as RemoteAssistance);
-
-      if (hasTransactionChanges(proposedChanges)) {
-        try {
-          await balanceService.validateResourceAvailability(clientId, proposedChanges);
-        } catch (validationError) {
-          if (validationError instanceof ValidationError) {
-            const response: ApiResponse = {
-              success: false,
-              error: validationError.message,
-              timestamp: new Date().toISOString(),
-            };
-            return c.json(response, 400);
-          }
-          throw validationError;
-        }
-      }
-    }
 
     // Create remote assistance using storage service
     const { ContentStorageService } = await import('@clever/shared');
@@ -487,7 +462,7 @@ remoteAssistanceRouter.post('/', async (c: Context) => {
 
     // Process balance update asynchronously (don't await - fire and forget)
     // Requirements: 12.5 - Async processing doesn't block content creation
-    const balanceMiddleware = createBalanceMiddleware(balanceService);
+    const balanceMiddleware = createBalanceMiddleware(createBalancePeriodService(r2Bucket));
     
     console.log('REMOTE ASSISTANCE CREATED - About to call balance middleware:', JSON.stringify({
       remoteAssistanceId: newRemoteAssistance.uuid,

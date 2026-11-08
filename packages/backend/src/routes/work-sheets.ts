@@ -32,10 +32,9 @@ import {
 } from '@clever/shared';
 import type { WorkSheetPricingSnapshot } from '@clever/shared';
 import { autoAssignTechnician, validateTechnicianAssignment } from '../utils/technician-assignment';
-import { createBalanceService, ValidationError } from '../services/balance-service';
+import { createBalancePeriodService } from '../services/balance-service';
 import { createBalanceMiddleware } from '../middleware/balance-middleware';
 import { requireUserContext } from '../middleware/clerk';
-import { extractWorkSheetDebtTransaction, hasTransactionChanges } from '@clever/shared';
 
 /**
  * Work sheet-specific validation for create operations
@@ -439,33 +438,9 @@ workSheetsRouter.post('/', async (c: Context) => {
     contentData.pricingSnapshot = pricingSnapshot;
 
     // ========================================================================
-    // Validate resource availability BEFORE creating content (REQ-04.4)
-    // If resources are insufficient, reject with HTTP 400 — content NOT created
+    // Resource pre-validation removed — the period-aware extraction handles
+    // D8/D9 by converting to euro debt instead of blocking creation.
     // ========================================================================
-    const balanceService = createBalanceService(r2Bucket);
-
-    if (paymentMethod === 'CONTRATO' && clientId) {
-      // Build the same changes that the balance middleware would create
-      const proposedChanges = extractWorkSheetDebtTransaction({
-        data: contentData,
-      } as unknown as WorkSheet);
-
-      if (hasTransactionChanges(proposedChanges)) {
-        try {
-          await balanceService.validateResourceAvailability(clientId, proposedChanges);
-        } catch (validationError) {
-          if (validationError instanceof ValidationError) {
-            const response: ApiResponse = {
-              success: false,
-              error: validationError.message,
-              timestamp: new Date().toISOString(),
-            };
-            return c.json(response, 400);
-          }
-          throw validationError;
-        }
-      }
-    }
 
     // Create work sheet using storage service
     const { ContentStorageService } = await import('@clever/shared');
@@ -474,7 +449,7 @@ workSheetsRouter.post('/', async (c: Context) => {
 
     // Process balance update asynchronously (don't await - fire and forget)
     // Requirements: 12.5 - Async processing doesn't block content creation
-    const balanceMiddleware = createBalanceMiddleware(balanceService);
+    const balanceMiddleware = createBalanceMiddleware(createBalancePeriodService(r2Bucket));
     
     console.log('WORK SHEET CREATED - About to call balance middleware:', JSON.stringify({
       workSheetId: newWorkSheet.uuid,

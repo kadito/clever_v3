@@ -21,14 +21,16 @@ import type {
   StorageBucket,
   ApiResponse,
   ContentWithRelations,
+  ContractPeriod,
 } from '@clever/shared';
 import {
   getContractSummary,
   hasActiveContract,
   ContentStorageService,
+  extractContractSectionResources,
   // Note: sanitizeContractData will be added when contract validation is fully implemented
 } from '@clever/shared';
-import { createBalanceService } from '../services/balance-service';
+import { createBalancePeriodService } from '../services/balance-service';
 import { createBalanceMiddleware } from '../middleware/balance-middleware';
 import { requireDeletePermission } from '../middleware/permissions';
 import { requireUserContext } from '../middleware/clerk';
@@ -491,8 +493,7 @@ contractsRouter.post('/', async (c: Context) => {
 
     // Process balance update asynchronously (don't await - fire and forget)
     // Requirements: 12.5 - Async processing doesn't block content creation
-    const balanceService = createBalanceService(r2Bucket);
-    const balanceMiddleware = createBalanceMiddleware(balanceService);
+    const balanceMiddleware = createBalanceMiddleware(createBalancePeriodService(r2Bucket));
     
     console.log('CONTRACT CREATED - About to call balance middleware:', JSON.stringify({
       contractId: newContract.uuid,
@@ -625,8 +626,7 @@ contractsRouter.put('/:uuid', async (c: Context) => {
 
     // Process balance update asynchronously (don't await - fire and forget)
     // Requirements: 12.5 - Async processing doesn't block content creation
-    const balanceService = createBalanceService(r2Bucket);
-    const balanceMiddleware = createBalanceMiddleware(balanceService);
+    const balanceMiddleware = createBalanceMiddleware(createBalancePeriodService(r2Bucket));
     
     // Call balance middleware hook without awaiting
     // Pass both current and previous contract for renovation detection
@@ -744,6 +744,92 @@ contractsRouter.delete('/:uuid', requireDeletePermission, async (c: Context) => 
     timestamp: new Date().toISOString(),
   };
   return c.json(response);
+});
+
+// ============================================================================
+// POST /:uuid/renovar — manual contract renewal (Admin only)
+// Closes the active period for the given section and opens a new one with the
+// plan's original resource values and the same contract dates.
+// ============================================================================
+
+contractsRouter.post('/:uuid/renovar', requireDeletePermission, async (c: Context) => {
+  try {
+    const user = requireUserContext(c);
+    const uuid = c.req.param('uuid');
+    const r2Bucket = c.env?.R2_BUCKET as StorageBucket;
+
+    if (!r2Bucket) {
+      return c.json<ApiResponse>({ success: false, error: 'Armazenamento não disponível', timestamp: new Date().toISOString() }, 500);
+    }
+
+    let body: { section?: string };
+    try {
+      body = await c.req.json();
+    } catch {
+      return c.json<ApiResponse>({ success: false, error: 'Corpo do pedido inválido', timestamp: new Date().toISOString() }, 400);
+    }
+
+    const section = body.section;
+    if (section !== 'CPA' && section !== 'SH') {
+      return c.json<ApiResponse>({ success: false, error: 'Secção inválida. Use "CPA" ou "SH".', timestamp: new Date().toISOString() }, 400);
+    }
+
+    // Read the contract
+    const contractObject = await r2Bucket.get(`content/contracts/${uuid}.json`)
+      .then((obj) => (obj ? (obj.json() as Promise<Contract>) : null))
+      .catch(() => null);
+
+    if (!contractObject || contractObject.isDeleted) {
+      return c.json<ApiResponse>({ success: false, error: 'Contrato não encontrado.', timestamp: new Date().toISOString() }, 404);
+    }
+
+    // Validate the section is active on the contract
+    const sectionActive = section === 'CPA' ? contractObject.data.hasCPAContract : contractObject.data.hasSHContract;
+    if (!sectionActive) {
+      return c.json<ApiResponse>({ success: false, error: `O contrato não tem secção ${section} ativa.`, timestamp: new Date().toISOString() }, 400);
+    }
+
+    const clientId = contractObject.data.clientId;
+    const periodService = createBalancePeriodService(r2Bucket);
+
+    // Find the active period
+    const index = await periodService.getPeriodsIndex(clientId);
+    const activeEntry = index.find(
+      (e) => e.contractId === uuid && e.section === section && e.status === 'active'
+    );
+
+    if (!activeEntry) {
+      return c.json<ApiResponse>({ success: false, error: `Sem período ativo para a secção ${section}.`, timestamp: new Date().toISOString() }, 404);
+    }
+
+    // Close the current period
+    const closedPeriod = await periodService.closePeriod(clientId, activeEntry.periodId, user.userId);
+
+    // Open a new period with original plan values + same dates
+    const resources = extractContractSectionResources(contractObject, section);
+    const start = section === 'CPA' ? contractObject.data.inicioContratoCPA : contractObject.data.inicioContratoSH;
+    const end = section === 'CPA' ? contractObject.data.fimContratoCPA : contractObject.data.fimContratoSH;
+
+    const newPeriod = await periodService.openPeriod(
+      clientId, uuid, section, resources, start, end, user.userId, activeEntry.periodId
+    );
+
+    console.log('Contract renewed:', JSON.stringify({
+      contractId: uuid, section, clientId,
+      closedPeriodId: closedPeriod.uuid, newPeriodId: newPeriod.uuid,
+    }, null, 2));
+
+    return c.json<ApiResponse<{ closedPeriod: ContractPeriod; newPeriod: ContractPeriod }>>({
+      success: true,
+      data: { closedPeriod, newPeriod },
+      timestamp: new Date().toISOString(),
+    }, 200);
+  } catch (error) {
+    console.error('Error renewing contract:', JSON.stringify({
+      error: error instanceof Error ? error.message : String(error),
+    }, null, 2));
+    return c.json<ApiResponse>({ success: false, error: 'Erro ao renovar o contrato', timestamp: new Date().toISOString() }, 500);
+  }
 });
 
 export default contractsRouter;

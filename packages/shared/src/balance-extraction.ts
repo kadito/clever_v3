@@ -1,85 +1,66 @@
 /**
- * Cliente Balance System - Transaction Extraction Logic
- * 
- * This module provides functions to extract transaction data from source content
- * (contracts, work sheets, remote assistance) and convert them into TransactionChanges
- * that can be applied to client balances.
- * 
- * Design Principles:
- * - Extraction logic is centralized and testable
- * - Handles both CPA and S&H contracts
- * - Negative values for DEBT transactions (consumption)
- * - Positive values for ADD transactions (addition)
- * - Garantia payment method results in no transaction
- * 
- * Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 4.1, 4.2, 4.3, 4.4, 4.5, 5.1, 5.2, 5.3, 5.4, 5.5
+ * Balance Extraction — Period-Aware Transaction Logic
+ *
+ * Extracts TransactionChanges from content records, respecting the active period:
+ *
+ * D8: No active period on request date → euro debt (not contract consumption)
+ * D9: Period active but resource exhausted (=== 0) → euro debt
+ * D10: User can always select CONTRATO; balance can go negative (debt tracked as balanceChange)
+ *
+ * All functions require an `activePeriod` parameter. Pass `null` when no period
+ * was found for the relevant section on the request date.
  */
 
-import type { TransactionChanges } from './balance-types';
+import type { TransactionChanges, ContractPeriod, ContractPeriodResources } from './balance-types';
 import type { Contract } from './types/contracts/types';
 import type { WorkSheet } from './types/work-sheets/types';
 import type { RemoteAssistance } from './types/remote-assistance/types';
 import { calculateWorkSheetTotals } from './types/work-sheets/validation';
 
 // ============================================================================
+// Section Routing Helper
+// ============================================================================
+
+/**
+ * Maps a work-sheet serviceType to a contract section (CPA or SH).
+ * Returns null for types that do not consume any contract resources.
+ */
+export function getSectionForServiceType(
+  serviceType: string
+): 'CPA' | 'SH' | null {
+  if (serviceType === 'MANUTENÇÃO' || serviceType === 'ASSISTÊNCIA PRESENCIAL CPA') {
+    return 'CPA';
+  }
+  if (serviceType === 'ASSISTÊNCIA PRESENCIAL SOFTWARE') {
+    return 'SH';
+  }
+  return null; // INSTALAÇÃO or empty — no contract consumption
+}
+
+// ============================================================================
 // Contract ADD Transaction Extraction
 // ============================================================================
 
 /**
- * Extract ADD transaction from contract creation or renovation.
- * 
- * Handles both CPA and S&H contract sections:
- * - CPA contracts: Extract maintenance, displacements, and hours from CPA fields
- * - S&H contracts: Extract maintenance, displacements, and hours from S&H fields
- * - Both: Sum values from both sections
- * 
- * All values are positive (adding resources to client balance).
- * 
- * @param contract - Contract content with CPA and/or S&H sections
- * @returns TransactionChanges with positive contract usage values
- * 
- * Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7
+ * Extract resources from a contract section for a period-open transaction.
+ * Called when opening a CPA or SH period.
  */
-export function extractContractAddTransaction(contract: Contract): TransactionChanges {
-  const changes: TransactionChanges = {
-    contractUsageChanges: {
-      manutencoesPorAno: 0,
-      deslocacoesPorAno: 0,
-      horasAssistenciaAnuais: 0,
-    },
+export function extractContractSectionResources(
+  contract: Contract,
+  section: 'CPA' | 'SH'
+): ContractPeriodResources {
+  if (section === 'CPA') {
+    return {
+      manutencoesPorAno: contract.data.manutencoesPorAnoCPA ?? 0,
+      deslocacoesPorAno: contract.data.deslocacoesPorAnoCPA ?? 0,
+      horasAssistenciaAnuais: contract.data.horasAssistenciaAnualCPA ?? 0,
+    };
+  }
+  return {
+    manutencoesPorAno: contract.data.manutencoesPorAnoSH ?? 0,
+    deslocacoesPorAno: contract.data.deslocacoesPorAnoSH ?? 0,
+    horasAssistenciaAnuais: contract.data.horasAssistenciaAnualSH ?? 0,
   };
-
-  // Extract from CPA contract if present
-  if (contract.data.hasCPAContract) {
-    // Add maintenance visits from CPA
-    changes.contractUsageChanges!.manutencoesPorAno! += 
-      contract.data.manutencoesPorAnoCPA || 0;
-    
-    // Add displacements from CPA
-    changes.contractUsageChanges!.deslocacoesPorAno! += 
-      contract.data.deslocacoesPorAnoCPA || 0;
-    
-    // Add assistance hours from CPA
-    changes.contractUsageChanges!.horasAssistenciaAnuais! += 
-      contract.data.horasAssistenciaAnualCPA || 0;
-  }
-
-  // Extract from S&H contract if present
-  if (contract.data.hasSHContract) {
-    // Add maintenance visits from S&H
-    changes.contractUsageChanges!.manutencoesPorAno! += 
-      contract.data.manutencoesPorAnoSH || 0;
-    
-    // Add displacements from S&H
-    changes.contractUsageChanges!.deslocacoesPorAno! += 
-      contract.data.deslocacoesPorAnoSH || 0;
-    
-    // Add assistance hours from S&H
-    changes.contractUsageChanges!.horasAssistenciaAnuais! += 
-      contract.data.horasAssistenciaAnualSH || 0;
-  }
-
-  return changes;
 }
 
 // ============================================================================
@@ -87,29 +68,16 @@ export function extractContractAddTransaction(contract: Contract): TransactionCh
 // ============================================================================
 
 /**
- * Extract DEBT transaction from work sheet creation.
- * 
- * Warranty and payment method determine transaction type:
- * - Warranty work (otherData.warranty = true): No transaction (warranty work, no cost to client)
- * - "CONTRATO" payment: Consume contract resources (maintenance visit + displacements)
- * - Other payment methods: Add to client debt (totalValue calculated from hours and displacement)
- * 
- * For contract payment:
- * - Consumes 1 maintenance visit (manutencoesPorAno: -1)
- * - Consumes displacements if applicable (deslocacoesPorAno: negative value)
- * - Note: Work sheets don't consume assistance hours (those are for remote assistance)
- * 
- * For other payment methods:
- * - Adds totalValue to client debt (balanceChange: positive value)
- * - totalValue should be calculated from hours worked and displacement costs
- * 
- * @param workSheet - Work sheet content with payment method and service details
- * @returns TransactionChanges with negative contract usage or positive balance change
- * 
- * Validates: Requirements 4.1, 4.2, 4.3, 4.4, 4.5
+ * Extract DEBT transaction changes from a work sheet.
+ *
+ * @param workSheet - Work sheet content
+ * @param activePeriod - Active period for the relevant section on request.date, or null
  */
-export function extractWorkSheetDebtTransaction(workSheet: WorkSheet): TransactionChanges {
-  // Warranty work - no transaction
+export function extractWorkSheetDebtTransaction(
+  workSheet: WorkSheet,
+  activePeriod: ContractPeriod | null
+): TransactionChanges {
+  // Warranty work — no transaction
   if (workSheet.data.otherData.warranty) {
     return { contractUsageChanges: {} };
   }
@@ -117,35 +85,52 @@ export function extractWorkSheetDebtTransaction(workSheet: WorkSheet): Transacti
   const paymentMethod = workSheet.data.displacement.paymentMethod;
   const serviceType = workSheet.data.otherData.serviceType;
 
-  // Non-contract payment — add to debt
+  // Non-contract payment — add to euro debt
   if (paymentMethod !== 'CONTRATO') {
     const snapshotPrice = workSheet.data.pricingSnapshot?.calculated.totalPrice;
-    const totalPrice = (snapshotPrice != null && Number.isFinite(snapshotPrice))
-      ? snapshotPrice
-      : calculateWorkSheetTotals(workSheet.data).totalPrice;
+    const totalPrice =
+      snapshotPrice != null && Number.isFinite(snapshotPrice)
+        ? snapshotPrice
+        : calculateWorkSheetTotals(workSheet.data).totalPrice;
     return { balanceChange: totalPrice };
   }
 
   // CONTRATO payment — consume resources by service type
+  const snapshotPrice = workSheet.data.pricingSnapshot?.calculated.totalPrice;
+  const fallbackPrice =
+    snapshotPrice != null && Number.isFinite(snapshotPrice)
+      ? snapshotPrice
+      : calculateWorkSheetTotals(workSheet.data).totalPrice;
+
   switch (serviceType) {
-    case 'MANUTENÇÃO':
-      // 1 manutenção + 1 deslocação (always together, REQ-07.2)
+    case 'MANUTENÇÃO': {
+      // D8: no active period → euro debt
+      if (!activePeriod) return { balanceChange: fallbackPrice };
+      // D9: manutenção or deslocação exhausted → euro debt
+      const r = activePeriod.remainingResources;
+      if (isExhausted(r.manutencoesPorAno) || isExhausted(r.deslocacoesPorAno)) {
+        return { balanceChange: fallbackPrice };
+      }
       return {
         contractUsageChanges: {
           manutencoesPorAno: -1,
           deslocacoesPorAno: -1,
         },
       };
+    }
 
-    // Legacy value treated identically to CPA presential (REQ-07.6)
-    case 'ASSISTÊNCIA PRESENCIAL' as string:
     case 'ASSISTÊNCIA PRESENCIAL CPA': {
+      // D8: no active period → euro debt
+      if (!activePeriod) return { balanceChange: fallbackPrice };
+      const r = activePeriod.remainingResources;
+      // D9: deslocação exhausted → euro debt
+      if (isExhausted(r.deslocacoesPorAno)) return { balanceChange: fallbackPrice };
+
       const changes: TransactionChanges = {
-        contractUsageChanges: {
-          deslocacoesPorAno: -1,
-        },
+        contractUsageChanges: { deslocacoesPorAno: -1 },
       };
-      // Consume hours only when horasExtra flag is set (REQ-07.3)
+
+      // horasExtra: also consume assistance hours
       if (workSheet.data.otherData.horasExtra) {
         const horasTotais = workSheet.data.request.totalHours || '0:00';
         const [h, m] = horasTotais.split(':').map(Number);
@@ -157,20 +142,20 @@ export function extractWorkSheetDebtTransaction(workSheet: WorkSheet): Transacti
       return changes;
     }
 
-    case 'ASSISTÊNCIA PRESENCIAL SOFTWARE':
-      // 1 deslocação from S&H resources (REQ-07.4)
-      // Note: current model has a single ContractUsage pool — per-section
-      // split (CPA vs S&H) is handled in the Saldo redesign spec.
+    case 'ASSISTÊNCIA PRESENCIAL SOFTWARE': {
+      // D8: no active period → euro debt
+      if (!activePeriod) return { balanceChange: fallbackPrice };
+      const r = activePeriod.remainingResources;
+      // D9: deslocação exhausted → euro debt
+      if (isExhausted(r.deslocacoesPorAno)) return { balanceChange: fallbackPrice };
       return {
-        contractUsageChanges: {
-          deslocacoesPorAno: -1,
-        },
+        contractUsageChanges: { deslocacoesPorAno: -1 },
       };
+    }
 
     case 'INSTALAÇÃO':
     case '':
     default:
-      // No consumption for installations or unset type (REQ-07.5)
       return { contractUsageChanges: {} };
   }
 }
@@ -180,166 +165,80 @@ export function extractWorkSheetDebtTransaction(workSheet: WorkSheet): Transacti
 // ============================================================================
 
 /**
- * Extract DEBT transaction from remote assistance creation.
- * 
- * Payment method determines transaction type:
- * - "Garantia": No transaction (warranty work, no cost to client)
- * - "Contrato": Consume contract assistance hours
- * - Other methods: Add to client debt (valorAssist field)
- * 
- * For contract payment:
- * - Consumes assistance hours based on duration (horasAssistenciaAnuais: negative value)
- * - Duration is calculated from inicioAssistencia and fimAssistencia
- * - Hours are rounded to nearest 15-minute interval
- * 
- * For other payment methods:
- * - Adds valorAssist to client debt (balanceChange: positive value)
- * - valorAssist is calculated based on business hours vs after-hours rates
- * 
- * @param remoteAssistance - Remote assistance content with payment method and duration
- * @returns TransactionChanges with negative assistance hours or positive balance change
- * 
- * Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5
+ * Extract DEBT transaction changes from a remote assistance.
+ *
+ * @param remoteAssistance - Remote assistance content
+ * @param activePeriod - Active SH period on dataPedido, or null
  */
 export function extractRemoteAssistanceDebtTransaction(
-  remoteAssistance: RemoteAssistance
+  remoteAssistance: RemoteAssistance,
+  activePeriod: ContractPeriod | null
 ): TransactionChanges {
   const paymentMethod = remoteAssistance.data.paymentMethod;
 
-  // Garantia - no transaction (warranty work)
+  // Garantia — no transaction
   if (paymentMethod === 'Garantia') {
     return { contractUsageChanges: {} };
   }
 
-  // Contract payment - consume assistance hours
-  if (paymentMethod === 'Contrato') {
-    // Calculate duration in hours from horasTotais field
-    // horasTotais is in format "HH:MM"
-    const horasTotais = remoteAssistance.data.horasTotais || '0:00';
-    const [hours, minutes] = horasTotais.split(':').map(Number);
-    const totalHours = hours + (minutes / 60);
-
-    return {
-      contractUsageChanges: {
-        // Consume assistance hours (negative value)
-        horasAssistenciaAnuais: -totalHours,
-      },
-    };
+  // Non-contract payment — add to euro debt
+  if (paymentMethod !== 'Contrato') {
+    return { balanceChange: remoteAssistance.data.valorAssist || 0 };
   }
 
-  // Other payment methods - add to debt
-  // valorAssist is already calculated in the remote assistance data
+  // Contrato payment — consume SH assistance hours
+  const fallbackPrice = remoteAssistance.data.valorAssist || 0;
+
+  // D8: no active period → euro debt
+  if (!activePeriod) return { balanceChange: fallbackPrice };
+
+  const r = activePeriod.remainingResources;
+  // D9: hours exhausted → euro debt
+  if (isExhausted(r.horasAssistenciaAnuais)) return { balanceChange: fallbackPrice };
+
+  // Calculate duration in decimal hours from horasTotais (HH:MM)
+  const horasTotais = remoteAssistance.data.horasTotais || '0:00';
+  const [h, m] = horasTotais.split(':').map(Number);
+  const totalHours = (h || 0) + ((m || 0) / 60);
+
+  if (totalHours <= 0) {
+    return { contractUsageChanges: {} };
+  }
+
   return {
-    balanceChange: remoteAssistance.data.valorAssist || 0,
+    contractUsageChanges: {
+      horasAssistenciaAnuais: -totalHours,
+    },
   };
 }
 
 // ============================================================================
-// Utility Functions
+// Utility
 // ============================================================================
 
 /**
- * Check if a transaction has any changes.
- * Used to determine if a transaction should be created.
- * 
- * @param changes - TransactionChanges to check
- * @returns true if there are any changes, false otherwise
+ * A resource counter is exhausted when it is exactly 0.
+ * -1 (unlimited) is never exhausted.
+ * Negative values (over-consumed) are treated as exhausted.
+ */
+function isExhausted(value: number): boolean {
+  return value !== -1 && value <= 0;
+}
+
+/**
+ * Check if a TransactionChanges object contains any meaningful change.
  */
 export function hasTransactionChanges(changes: TransactionChanges): boolean {
-  // Check balance change
-  if (changes.balanceChange && changes.balanceChange !== 0) {
-    return true;
-  }
-
-  // Check contract usage changes
+  if (changes.balanceChange && changes.balanceChange !== 0) return true;
   if (changes.contractUsageChanges) {
-    const usage = changes.contractUsageChanges;
+    const u = changes.contractUsageChanges;
     if (
-      (usage.manutencoesPorAno && usage.manutencoesPorAno !== 0) ||
-      (usage.deslocacoesPorAno && usage.deslocacoesPorAno !== 0) ||
-      (usage.horasAssistenciaAnuais && usage.horasAssistenciaAnuais !== 0)
+      (u.manutencoesPorAno !== undefined && u.manutencoesPorAno !== 0) ||
+      (u.deslocacoesPorAno !== undefined && u.deslocacoesPorAno !== 0) ||
+      (u.horasAssistenciaAnuais !== undefined && u.horasAssistenciaAnuais !== 0)
     ) {
       return true;
     }
   }
-
   return false;
-}
-
-/**
- * Validate that ADD transaction changes are non-negative.
- * ADD transactions should only add resources, never consume them.
- * 
- * @param changes - TransactionChanges to validate
- * @returns true if all changes are non-negative, false otherwise
- */
-export function validateAddTransactionChanges(changes: TransactionChanges): boolean {
-  // Balance changes should not be present in ADD transactions
-  if (changes.balanceChange !== undefined) {
-    return false;
-  }
-
-  // Contract usage changes should be non-negative
-  if (changes.contractUsageChanges) {
-    const usage = changes.contractUsageChanges;
-    
-    if (usage.manutencoesPorAno !== undefined && usage.manutencoesPorAno < 0) {
-      return false;
-    }
-    
-    if (usage.deslocacoesPorAno !== undefined && usage.deslocacoesPorAno < 0) {
-      return false;
-    }
-    
-    if (usage.horasAssistenciaAnuais !== undefined && usage.horasAssistenciaAnuais < 0) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-/**
- * Validate that DEBT transaction changes are appropriate.
- * DEBT transactions should either:
- * - Add to balance (positive balanceChange), OR
- * - Consume contract resources (negative contractUsageChanges)
- * But not both.
- * 
- * @param changes - TransactionChanges to validate
- * @returns true if changes are valid for DEBT transaction, false otherwise
- */
-export function validateDebtTransactionChanges(changes: TransactionChanges): boolean {
-  const hasBalanceChange = changes.balanceChange !== undefined && changes.balanceChange > 0;
-  const hasUsageChanges = changes.contractUsageChanges && 
-    Object.values(changes.contractUsageChanges).some(v => v !== undefined && v !== 0);
-
-  // Must have either balance change or usage changes, but not both
-  // (This is a business rule - either pay with money or pay with contract resources)
-  if (hasBalanceChange && hasUsageChanges) {
-    return false;
-  }
-
-  if (!hasBalanceChange && !hasUsageChanges) {
-    return false;
-  }
-
-  // If using contract resources, all changes should be negative
-  if (hasUsageChanges && changes.contractUsageChanges) {
-    const usage = changes.contractUsageChanges;
-    
-    if (usage.manutencoesPorAno !== undefined && usage.manutencoesPorAno > 0) {
-      return false;
-    }
-    
-    if (usage.deslocacoesPorAno !== undefined && usage.deslocacoesPorAno > 0) {
-      return false;
-    }
-    
-    if (usage.horasAssistenciaAnuais !== undefined && usage.horasAssistenciaAnuais > 0) {
-      return false;
-    }
-  }
-
-  return true;
 }

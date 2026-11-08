@@ -1,0 +1,10 @@
+# Archive — Shipped code, closed deals, logged wins
+
+## 2026-10-28
+
+- Bootstrapped executive-function board (goals/, schedule/, log/) for the Clever freelance project.
+- Established prior state from repo evidence: contract plan-value migration scripts (audit + fix) authored; installations-programming (instalações e programações) refactor finished; 26 contract-benefit drift rows identified in contract-issues-production.json.
+- [G1] Verified all 15 last-meeting points are implemented on the prod branch (code-level grep/read) AND deployed live to prod (confirmed by Ricardo): Instalações Phase 3 verifications checklist, Phase 4 Balanças+CCTV, client signature after formação, all formação fields mandatory, view-without-edit, mandatory photo, Fatura-OU-Guia required, preparação review, close-phase validation; Folhas de Obra Manutenção makes dump/backup optional + AnyDesk/Dump conditional code fields; pricing 60/75 + KM 0.50; client SWIFT; contract débito-direto IBAN/SWIFT display; sticky Save/Cancel bar.
+- [G1] Built scripts/export-contract-changes-csv.ts (read-only R2) → generated client-ready contract-changes-production.csv: 40 change-rows / 23 clients, real client names, columns Cliente/Tipo/Plano/Parâmetro/Valor anterior/Novo valor. One decrease outlier flagged (Pão Quente Volta de Mar, S&H Deslocações 3→2). CSV moved to docs/meetings/ for client confirmation.
+- [G1] Repo cleanup: archived 23 completed specs → .kiro/specs/_archive/ (git-tracked renames, history intact; 19 active specs remain). Deleted tracked 1.4M .har capture, empty migrate-clients-lib.js stub, accidental scripts/scripts/ nested dir, stray .DS_Store. Moved AUTHENTICATION_INTEGRATION.md + DEPLOYMENT.md → docs/, contract-issues-production.json → scripts/results/prod/contracts/. Added *.har, contract-changes-*.csv, contract-issues-*.json to .gitignore.
+- [G1] Second spec-archive pass: archived all remaining specs except daily-records-ligacao-flow (the one genuinely-unstarted spec). .kiro/specs/ now = 1 active + 41 archived. Commits e9c1e83 (cleanup) + 5087c28 (archive rest) on prod branch, not pushed.
