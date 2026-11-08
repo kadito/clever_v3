@@ -136,7 +136,8 @@ export class BalancePeriodService {
     periodStart: string,
     periodEnd: string,
     userId: string,
-    previousPeriodId?: string
+    previousPeriodId?: string,
+    isActive: boolean = true
   ): Promise<ContractPeriod> {
     // Guard: at most one active period per section
     const index = await this.getPeriodsIndex(clientId);
@@ -158,6 +159,8 @@ export class BalancePeriodService {
     const periodId = generateUUID();
     const now = new Date().toISOString();
 
+    const status: 'active' | 'closed' = isActive ? 'active' : 'closed';
+
     const period: ContractPeriod = {
       uuid: periodId,
       clientId,
@@ -165,7 +168,7 @@ export class BalancePeriodService {
       section,
       periodStart,
       periodEnd,
-      status: 'active',
+      status,
       originalResources: { ...resources },
       remainingResources: { ...resources },
       openedAt: now,
@@ -180,7 +183,7 @@ export class BalancePeriodService {
       periodId,
       contractId,
       section,
-      status: 'active',
+      status,
       periodStart,
       periodEnd,
     };

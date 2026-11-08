@@ -792,26 +792,48 @@ contractsRouter.post('/:uuid/renovar', requireDeletePermission, async (c: Contex
     const clientId = contractObject.data.clientId;
     const periodService = createBalancePeriodService(r2Bucket);
 
-    // Find the active period
+    // Find the period to renew from: the active one if present, otherwise the
+    // most recent (an expired contract's last period is stored as closed).
     const index = await periodService.getPeriodsIndex(clientId);
-    const activeEntry = index.find(
-      (e) => e.contractId === uuid && e.section === section && e.status === 'active'
-    );
+    const sectionEntries = index.filter((e) => e.contractId === uuid && e.section === section);
 
-    if (!activeEntry) {
-      return c.json<ApiResponse>({ success: false, error: `Sem período ativo para a secção ${section}.`, timestamp: new Date().toISOString() }, 404);
+    if (sectionEntries.length === 0) {
+      return c.json<ApiResponse>({ success: false, error: `Sem período para a secção ${section}.`, timestamp: new Date().toISOString() }, 404);
     }
+
+    const activeEntry =
+      sectionEntries.find((e) => e.status === 'active') ??
+      // latest by periodEnd when none is active
+      [...sectionEntries].sort((a, b) => b.periodEnd.localeCompare(a.periodEnd))[0];
+
+    // The new period is the NEXT 1-year slice: it starts where the current
+    // period ends, spans exactly 1 year, and is capped at fimContrato.
+    const contractEnd = section === 'CPA' ? contractObject.data.fimContratoCPA : contractObject.data.fimContratoSH;
+    const newStart = activeEntry.periodEnd;
+
+    // Nothing left to renew if the current period already reaches the contract end.
+    if (contractEnd && newStart >= contractEnd) {
+      return c.json<ApiResponse>({
+        success: false,
+        error: `O contrato ${section} terminou (${contractEnd}). Não há novo período para renovar.`,
+        timestamp: new Date().toISOString(),
+      }, 400);
+    }
+
+    const oneYearLater = (() => {
+      const d = new Date(`${newStart}T00:00:00Z`);
+      d.setUTCFullYear(d.getUTCFullYear() + 1);
+      return d.toISOString().slice(0, 10);
+    })();
+    const newEnd = contractEnd && oneYearLater > contractEnd ? contractEnd : oneYearLater;
 
     // Close the current period
     const closedPeriod = await periodService.closePeriod(clientId, activeEntry.periodId, user.userId);
 
-    // Open a new period with original plan values + same dates
+    // Open the next 1-year period with the plan's original resource values.
     const resources = extractContractSectionResources(contractObject, section);
-    const start = section === 'CPA' ? contractObject.data.inicioContratoCPA : contractObject.data.inicioContratoSH;
-    const end = section === 'CPA' ? contractObject.data.fimContratoCPA : contractObject.data.fimContratoSH;
-
     const newPeriod = await periodService.openPeriod(
-      clientId, uuid, section, resources, start, end, user.userId, activeEntry.periodId
+      clientId, uuid, section, resources, newStart, newEnd, user.userId, activeEntry.periodId, true
     );
 
     console.log('Contract renewed:', JSON.stringify({

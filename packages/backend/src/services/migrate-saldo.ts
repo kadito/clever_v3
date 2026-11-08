@@ -21,6 +21,7 @@ import {
   extractWorkSheetDebtTransaction,
   extractRemoteAssistanceDebtTransaction,
   hasTransactionChanges,
+  computeCurrentPeriodWindow,
 } from '@clever/shared';
 import { createBalancePeriodService } from './balance-service';
 
@@ -33,7 +34,8 @@ function makeSimPeriod(
   section: 'CPA' | 'SH',
   resources: ContractPeriodResources,
   periodStart: string,
-  periodEnd: string
+  periodEnd: string,
+  isActive: boolean
 ): ContractPeriod {
   return {
     uuid: `sim-${contractId}-${section}`,
@@ -42,7 +44,7 @@ function makeSimPeriod(
     section,
     periodStart,
     periodEnd,
-    status: 'active',
+    status: isActive ? 'active' : 'closed',
     originalResources: { ...resources },
     remainingResources: { ...resources },
     openedAt: new Date().toISOString(),
@@ -240,34 +242,50 @@ export async function migrateSaldo(
         await wipeClientBalance(r2, clientId);
       }
 
-      // 2. Open periods from current contracts
+      // 2. Open the CURRENT 1-year period for each active contract section.
+      // Periods are always exactly 1 year, anchored on inicioContrato; we open
+      // the yearly slice that contains today, bounded by fimContrato. If the
+      // contract has already expired, we still record the last valid slice so
+      // the UI can show it, but mark it inactive (no consumption lands on it).
       const contracts = contractsByClient.get(clientId) ?? [];
       for (const contract of contracts) {
         if (contract.data.hasCPAContract) {
-          const resources = {
-            manutencoesPorAno: contract.data.manutencoesPorAnoCPA ?? 0,
-            deslocacoesPorAno: contract.data.deslocacoesPorAnoCPA ?? 0,
-            horasAssistenciaAnuais: contract.data.horasAssistenciaAnualCPA ?? 0,
-          };
-          if (dryRun) {
-            simPeriods.push(makeSimPeriod(clientId, contract.uuid, 'CPA', resources, contract.data.inicioContratoCPA, contract.data.fimContratoCPA));
-          } else {
-            await periodService.openPeriod(clientId, contract.uuid, 'CPA', resources, contract.data.inicioContratoCPA, contract.data.fimContratoCPA, MIGRATION_USER);
+          const win = computeCurrentPeriodWindow(
+            contract.data.inicioContratoCPA,
+            contract.data.fimContratoCPA
+          );
+          if (win) {
+            const resources = {
+              manutencoesPorAno: contract.data.manutencoesPorAnoCPA ?? 0,
+              deslocacoesPorAno: contract.data.deslocacoesPorAnoCPA ?? 0,
+              horasAssistenciaAnuais: contract.data.horasAssistenciaAnualCPA ?? 0,
+            };
+            if (dryRun) {
+              simPeriods.push(makeSimPeriod(clientId, contract.uuid, 'CPA', resources, win.periodStart, win.periodEnd, win.isActive));
+            } else {
+              await periodService.openPeriod(clientId, contract.uuid, 'CPA', resources, win.periodStart, win.periodEnd, MIGRATION_USER, undefined, win.isActive);
+            }
+            clientReport.cpaPeriod = true;
           }
-          clientReport.cpaPeriod = true;
         }
         if (contract.data.hasSHContract) {
-          const resources = {
-            manutencoesPorAno: contract.data.manutencoesPorAnoSH ?? 0,
-            deslocacoesPorAno: contract.data.deslocacoesPorAnoSH ?? 0,
-            horasAssistenciaAnuais: contract.data.horasAssistenciaAnualSH ?? 0,
-          };
-          if (dryRun) {
-            simPeriods.push(makeSimPeriod(clientId, contract.uuid, 'SH', resources, contract.data.inicioContratoSH, contract.data.fimContratoSH));
-          } else {
-            await periodService.openPeriod(clientId, contract.uuid, 'SH', resources, contract.data.inicioContratoSH, contract.data.fimContratoSH, MIGRATION_USER);
+          const win = computeCurrentPeriodWindow(
+            contract.data.inicioContratoSH,
+            contract.data.fimContratoSH
+          );
+          if (win) {
+            const resources = {
+              manutencoesPorAno: contract.data.manutencoesPorAnoSH ?? 0,
+              deslocacoesPorAno: contract.data.deslocacoesPorAnoSH ?? 0,
+              horasAssistenciaAnuais: contract.data.horasAssistenciaAnualSH ?? 0,
+            };
+            if (dryRun) {
+              simPeriods.push(makeSimPeriod(clientId, contract.uuid, 'SH', resources, win.periodStart, win.periodEnd, win.isActive));
+            } else {
+              await periodService.openPeriod(clientId, contract.uuid, 'SH', resources, win.periodStart, win.periodEnd, MIGRATION_USER, undefined, win.isActive);
+            }
+            clientReport.shPeriod = true;
           }
-          clientReport.shPeriod = true;
         }
       }
 

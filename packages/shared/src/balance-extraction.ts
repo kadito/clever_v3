@@ -18,6 +18,105 @@ import type { RemoteAssistance } from './types/remote-assistance/types';
 import { calculateWorkSheetTotals } from './types/work-sheets/validation';
 
 // ============================================================================
+// Contract Period Window Helper
+// ============================================================================
+
+/**
+ * A single 1-year contract period window, with a flag for whether it is the
+ * currently-active slice (contains `today`) vs. an expired contract's last slice.
+ */
+export interface PeriodWindow {
+  periodStart: string; // ISO date (inclusive)
+  periodEnd: string;   // ISO date (exclusive end = start + 1 year)
+  /** True when `today` falls inside [periodStart, periodEnd) and within the contract. */
+  isActive: boolean;
+}
+
+/**
+ * Add exactly one year to an ISO date string (YYYY-MM-DD), preserving the day.
+ * Feb 29 + 1y lands on Mar 1 of a non-leap year (JS Date overflow) — acceptable.
+ */
+function addOneYear(isoDate: string): string {
+  const d = new Date(`${isoDate}T00:00:00Z`);
+  d.setUTCFullYear(d.getUTCFullYear() + 1);
+  return d.toISOString().slice(0, 10);
+}
+
+/**
+ * Compute the 1-year period window for a contract section.
+ *
+ * Rule:
+ * - Periods are exactly 1 year, anchored on `inicioContrato`.
+ * - The returned window is the yearly slice containing `today`, bounded by `fimContrato`.
+ * - If the contract has already expired (the slice containing today starts on/after
+ *   `fimContrato`, or there is no slice containing today within the contract), the
+ *   LAST valid 1-year slice (ending on/before `fimContrato`) is returned with
+ *   `isActive: false`.
+ *
+ * Returns null only when the dates are missing/invalid.
+ *
+ * @param inicio  inicioContratoCPA/SH (ISO date)
+ * @param fim     fimContratoCPA/SH (ISO date)
+ * @param today   reference date (ISO date), defaults to now
+ */
+export function computeCurrentPeriodWindow(
+  inicio: string,
+  fim: string,
+  today: string = new Date().toISOString().slice(0, 10)
+): PeriodWindow | null {
+  if (!inicio || !fim) return null;
+  if (inicio >= fim) {
+    // Degenerate range — treat the whole thing as a single inactive slice.
+    return { periodStart: inicio, periodEnd: fim || addOneYear(inicio), isActive: false };
+  }
+
+  // Walk yearly slices from inicio until the slice would start on/after fim.
+  // Bounded to guard against any date edge case producing a runaway loop.
+  let sliceStart = inicio;
+  let lastValidStart = inicio;
+  const MAX_SLICES = 100;
+
+  for (let i = 0; i < MAX_SLICES; i += 1) {
+    const sliceEnd = addOneYear(sliceStart);
+
+    // Does today fall in this slice?
+    const containsToday = sliceStart <= today && today < sliceEnd;
+
+    // Is this slice still within the contract? (its start is before fim)
+    const withinContract = sliceStart < fim;
+
+    if (containsToday && withinContract) {
+      // Active slice — but cap its end at fim so it never runs past the contract.
+      return {
+        periodStart: sliceStart,
+        periodEnd: sliceEnd > fim ? fim : sliceEnd,
+        isActive: true,
+      };
+    }
+
+    if (withinContract) {
+      lastValidStart = sliceStart;
+    }
+
+    // Advance. Stop once the next slice would begin on/after fim (contract ended).
+    const nextStart = sliceEnd;
+    if (nextStart >= fim) {
+      break;
+    }
+    sliceStart = nextStart;
+  }
+
+  // No active slice contained today → contract expired (or today is before inicio).
+  // Return the last valid slice as inactive.
+  const lastEnd = addOneYear(lastValidStart);
+  return {
+    periodStart: lastValidStart,
+    periodEnd: lastEnd > fim ? fim : lastEnd,
+    isActive: false,
+  };
+}
+
+// ============================================================================
 // Section Routing Helper
 // ============================================================================
 
