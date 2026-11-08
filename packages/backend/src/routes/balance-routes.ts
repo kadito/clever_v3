@@ -63,10 +63,20 @@ balanceRouter.get('/report/export', requireAdminAccess, async (c: Context) => {
       return c.json<ApiResponse>({ success: false, error: 'Armazenamento não disponível', timestamp: new Date().toISOString() }, 500);
     }
     const reportingService = new BalanceReportingService(r2Bucket);
-    const csv = await reportingService.exportToCSV();
+
+    // ?summary=true → one row per client; otherwise one row per active period.
+    const summary = c.req.query('summary') === 'true';
+    const csv = summary
+      ? await reportingService.exportClientSummaryCSV()
+      : await reportingService.exportToCSV();
+
+    const filename = summary
+      ? `balance-summary-${new Date().toISOString().split('T')[0]}.csv`
+      : `balance-report-${new Date().toISOString().split('T')[0]}.csv`;
+
     return c.text(csv, 200, {
       'Content-Type': 'text/csv',
-      'Content-Disposition': `attachment; filename="balance-report-${new Date().toISOString().split('T')[0]}.csv"`,
+      'Content-Disposition': `attachment; filename="${filename}"`,
     });
   } catch (error) {
     console.error('Error exporting balance report:', JSON.stringify({

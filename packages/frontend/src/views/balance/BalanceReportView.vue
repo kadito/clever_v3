@@ -342,13 +342,9 @@ const clearFilters = () => {
 };
 
 const exportToCSV = async () => {
-  const params = new URLSearchParams();
-  if (filters.value.minDebt !== undefined) params.append('minDebt', filters.value.minDebt.toString());
-  if (filters.value.maxDebt !== undefined) params.append('maxDebt', filters.value.maxDebt.toString());
-  if (filters.value.lowUsageOnly) params.append('lowUsageThreshold', '20');
-
-  const queryString = params.toString();
-  const url = `/api/balance/report/export${queryString ? `?${queryString}` : ''}`;
+  // One row per client (summary). The period-based model no longer uses the
+  // old debt/usage filters for the export.
+  const url = '/api/balance/report/export?summary=true';
 
   await fetch(url)
     .then(async response => {
@@ -360,12 +356,12 @@ const exportToCSV = async () => {
     .then(csv => {
       // Create download link
       const blob = new Blob([csv], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
+      const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = url;
-      link.download = `balance-report-${new Date().toISOString().split('T')[0]}.csv`;
+      link.href = downloadUrl;
+      link.download = `balance-summary-${new Date().toISOString().split('T')[0]}.csv`;
       link.click();
-      window.URL.revokeObjectURL(url);
+      window.URL.revokeObjectURL(downloadUrl);
     })
     .catch(err => {
       console.error('Error exporting report:', JSON.stringify(err, null, 2));
