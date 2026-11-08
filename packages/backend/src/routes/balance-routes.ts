@@ -43,9 +43,16 @@ balanceRouter.get('/report', requireAdminAccess, async (c: Context) => {
     const summary = await reportingService.getSummaryStatistics();
     const periods = await reportingService.getAllActivePeriods();
 
-    return c.json<ApiResponse<{ summary: typeof summary; periods: ContractPeriod[] }>>({
+    // Resolve client display names for the clients present in these periods.
+    const nameMap = await reportingService.loadClientNames();
+    const names: Record<string, string> = {};
+    for (const p of periods) {
+      names[p.clientId] = nameMap.get(p.clientId) ?? '';
+    }
+
+    return c.json<ApiResponse<{ summary: typeof summary; periods: ContractPeriod[]; names: Record<string, string> }>>({
       success: true,
-      data: { summary, periods },
+      data: { summary, periods, names },
       timestamp: new Date().toISOString(),
     }, 200);
   } catch (error) {

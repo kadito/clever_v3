@@ -257,7 +257,7 @@ export class BalanceReportingService {
   }
 
   /** Map clientId -> display name, from the clients index. */
-  private async loadClientNames(): Promise<Map<string, string>> {
+  async loadClientNames(): Promise<Map<string, string>> {
     const map = new Map<string, string>();
     const obj = await this.r2Bucket.get('indexes/clients-index.json').catch(() => null);
     if (!obj) return map;

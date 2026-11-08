@@ -132,7 +132,7 @@
                 :to="`/clients/${period.clientId}`"
                 class="client-link"
               >
-                {{ period.clientId.substring(0, 8) }}...
+                {{ clientName(period.clientId) }}
               </router-link>
             </td>
             <td>
@@ -183,9 +183,15 @@ type ResourceKey = keyof ContractPeriod['remainingResources'];
 const { permissions } = usePermissions();
 
 const periods = ref<ContractPeriod[]>([]);
+const names = ref<Record<string, string>>({});
 const summary = ref<BalanceSummary | null>(null);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
+
+const clientName = (clientId: string): string => {
+  const name = names.value[clientId];
+  return name && name.trim() ? name : `${clientId.substring(0, 8)}...`;
+};
 
 const isAdmin = computed(() => permissions.value.canDelete);
 
@@ -204,9 +210,10 @@ const loadReport = async () => {
       return response.json();
     })
     .then(data => {
-      // Endpoint returns { success, data: { summary, periods } }
+      // Endpoint returns { success, data: { summary, periods, names } }
       const payload = data?.data ?? {};
       periods.value = payload.periods ?? [];
+      names.value = payload.names ?? {};
       summary.value = payload.summary ?? null;
     })
     .catch(err => {
