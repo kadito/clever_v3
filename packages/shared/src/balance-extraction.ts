@@ -47,16 +47,17 @@ function addOneYear(isoDate: string): string {
  *
  * Rule:
  * - Periods are exactly 1 year, anchored on `inicioContrato`.
- * - The returned window is the yearly slice containing `today`, bounded by `fimContrato`.
- * - If the contract has already expired (the slice containing today starts on/after
- *   `fimContrato`, or there is no slice containing today within the contract), the
- *   LAST valid 1-year slice (ending on/before `fimContrato`) is returned with
- *   `isActive: false`.
+ * - The returned window is the yearly slice containing `today`.
+ * - **No end date (`fim` empty):** the contract is open-ended and active. The slice
+ *   containing today is returned as active, with no upper bound.
+ * - **With an end date:** the window is bounded by `fim`. If the contract has expired
+ *   (no slice contains today within the contract), the LAST valid slice is returned
+ *   with `isActive: false`.
  *
- * Returns null only when the dates are missing/invalid.
+ * Returns null only when `inicio` is missing (cannot anchor the periods).
  *
- * @param inicio  inicioContratoCPA/SH (ISO date)
- * @param fim     fimContratoCPA/SH (ISO date)
+ * @param inicio  inicioContratoCPA/SH (ISO date) — required
+ * @param fim     fimContratoCPA/SH (ISO date) — optional; empty = open-ended
  * @param today   reference date (ISO date), defaults to now
  */
 export function computeCurrentPeriodWindow(
@@ -64,29 +65,47 @@ export function computeCurrentPeriodWindow(
   fim: string,
   today: string = new Date().toISOString().slice(0, 10)
 ): PeriodWindow | null {
-  if (!inicio || !fim) return null;
-  if (inicio >= fim) {
-    // Degenerate range — treat the whole thing as a single inactive slice.
-    return { periodStart: inicio, periodEnd: fim || addOneYear(inicio), isActive: false };
+  // A start date is mandatory to anchor the yearly slices.
+  if (!inicio) return null;
+
+  const MAX_SLICES = 100;
+
+  // Open-ended contract (no end date): walk yearly slices from inicio and return
+  // the one containing today as active. No upper bound.
+  if (!fim) {
+    let sliceStart = inicio;
+    for (let i = 0; i < MAX_SLICES; i += 1) {
+      const sliceEnd = addOneYear(sliceStart);
+      if (sliceStart <= today && today < sliceEnd) {
+        return { periodStart: sliceStart, periodEnd: sliceEnd, isActive: true };
+      }
+      // today is before the contract start → first slice, inactive
+      if (today < sliceStart) {
+        return { periodStart: sliceStart, periodEnd: sliceEnd, isActive: false };
+      }
+      sliceStart = sliceEnd;
+    }
+    // Fallback (today absurdly far in the future): last computed slice.
+    return { periodStart: sliceStart, periodEnd: addOneYear(sliceStart), isActive: true };
   }
 
-  // Walk yearly slices from inicio until the slice would start on/after fim.
-  // Bounded to guard against any date edge case producing a runaway loop.
+  if (inicio >= fim) {
+    // Degenerate range — treat the whole thing as a single inactive slice.
+    return { periodStart: inicio, periodEnd: addOneYear(inicio), isActive: false };
+  }
+
+  // Bounded contract: walk yearly slices from inicio until a slice starts on/after fim.
   let sliceStart = inicio;
   let lastValidStart = inicio;
-  const MAX_SLICES = 100;
 
   for (let i = 0; i < MAX_SLICES; i += 1) {
     const sliceEnd = addOneYear(sliceStart);
 
-    // Does today fall in this slice?
     const containsToday = sliceStart <= today && today < sliceEnd;
-
-    // Is this slice still within the contract? (its start is before fim)
     const withinContract = sliceStart < fim;
 
     if (containsToday && withinContract) {
-      // Active slice — but cap its end at fim so it never runs past the contract.
+      // Active slice — cap its end at fim so it never runs past the contract.
       return {
         periodStart: sliceStart,
         periodEnd: sliceEnd > fim ? fim : sliceEnd,
@@ -98,7 +117,6 @@ export function computeCurrentPeriodWindow(
       lastValidStart = sliceStart;
     }
 
-    // Advance. Stop once the next slice would begin on/after fim (contract ended).
     const nextStart = sliceEnd;
     if (nextStart >= fim) {
       break;
@@ -107,7 +125,6 @@ export function computeCurrentPeriodWindow(
   }
 
   // No active slice contained today → contract expired (or today is before inicio).
-  // Return the last valid slice as inactive.
   const lastEnd = addOneYear(lastValidStart);
   return {
     periodStart: lastValidStart,

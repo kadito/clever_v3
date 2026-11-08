@@ -108,9 +108,9 @@ export class BalanceReportingService {
    * Contract-driven: every non-deleted contract produces a row, so expired and
    * blank-date contracts are included (not just those with an active period).
    * Each section carries a status:
-   *   Ativo     — the current 1-year period contains today
-   *   Expirado  — the contract has ended; shows the last valid period
-   *   Sem datas — the contract has no inicio/fim dates
+   *   Ativo     — the current 1-year period contains today (incl. open-ended contracts with no end date)
+   *   Expirado  — the contract has an end date and has ended; shows the last valid period
+   *   Sem datas — the contract has no START date (cannot anchor periods)
    */
   async exportClientSummaryCSV(): Promise<string> {
     const contracts = await this.loadContracts();
