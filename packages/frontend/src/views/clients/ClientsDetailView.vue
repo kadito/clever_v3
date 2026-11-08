@@ -794,6 +794,19 @@
     @cancel="cancelDelete"
     @close="cancelDelete"
   />
+
+  <!-- Recalculate Balance Confirmation Dialog -->
+  <ConfirmationDialog
+    :is-open="showRecalculateConfirm"
+    title="Recalcular Saldo"
+    message="Tem a certeza que pretende recalcular o saldo deste cliente? O saldo será reconstruído a partir dos contratos, folhas de obra e assistências atuais."
+    :is-loading="isRecalculating"
+    confirm-text="Recalcular"
+    cancel-text="Cancelar"
+    @confirm="confirmRecalculateBalance"
+    @cancel="cancelRecalculateBalance"
+    @close="cancelRecalculateBalance"
+  />
 </template>
 
 <script setup lang="ts">
@@ -836,6 +849,7 @@ const confirmDeleteMessage = ref('');
 
 // Recalculation state
 const isRecalculating = ref(false);
+const showRecalculateConfirm = ref(false);
 
 // Clear error function
 const clearError = () => {
@@ -1067,14 +1081,17 @@ const cancelDelete = () => {
 
 // Balance recalculation — rebuilds this client's periods + transactions
 // from current contracts, work sheets, and remote assistances.
-const handleRecalculateBalance = async () => {
+const handleRecalculateBalance = () => {
   if (!client.value) return;
+  showRecalculateConfirm.value = true;
+};
 
-  const confirmed = window.confirm(
-    'Tem a certeza que pretende recalcular o saldo deste cliente? O saldo será reconstruído a partir dos contratos, folhas de obra e assistências atuais.'
-  );
+const cancelRecalculateBalance = () => {
+  showRecalculateConfirm.value = false;
+};
 
-  if (!confirmed) return;
+const confirmRecalculateBalance = async () => {
+  if (!client.value) return;
 
   isRecalculating.value = true;
   error.value = null;
@@ -1097,11 +1114,14 @@ const handleRecalculateBalance = async () => {
     })
     .then(data => {
       console.log('Balance recalculated:', JSON.stringify(data, null, 2));
+      showRecalculateConfirm.value = false;
       // Force the balance component to reload the rebuilt periods
       balanceKey.value++;
     })
     .catch(err => {
       console.error('Error recalculating balance:', JSON.stringify(err, null, 2));
+      // Close the dialog and surface the error in the view (not inside the dialog)
+      showRecalculateConfirm.value = false;
       error.value = err instanceof Error ? err.message : 'Erro ao recalcular saldo';
     })
     .finally(() => {
