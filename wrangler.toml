@@ -28,8 +28,10 @@ local_protocol = "http"
 upstream_protocol = "https"
 
 # Performance limits
+# Raised from 50ms to give the per-client Saldo rebuild headroom on the
+# deployed Worker. Normal requests stay well under this.
 [limits]
-cpu_ms = 50
+cpu_ms = 300
 
 # Production environment (deployed)
 [env.production]

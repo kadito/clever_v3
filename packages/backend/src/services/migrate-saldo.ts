@@ -95,16 +95,54 @@ async function wipeClientBalance(r2: StorageBucket, clientId: string): Promise<v
   await r2.delete(`balance/${clientId}/index.json`).catch(() => undefined);
 }
 
+interface ContentIndexItem {
+  uuid: string;
+  clientId?: string;
+  isDeleted?: boolean;
+}
+
 /**
- * Collect all non-deleted content of a type, keyed by clientId.
+ * Collect non-deleted content of a type, keyed by clientId.
+ *
+ * When `onlyClientId` is given, this uses the content index
+ * (indexes/{type}-index.json) to find just that client's content UUIDs and
+ * fetches only those objects — so a single-client rebuild never parses the
+ * whole dataset. This keeps per-invocation CPU low on the deployed Worker.
+ *
+ * When `onlyClientId` is omitted, it lists and parses every object (full run).
  */
 async function loadContentByClient<T extends { data: { clientId?: string }; isDeleted?: boolean }>(
   r2: StorageBucket,
-  contentType: string
+  contentType: string,
+  onlyClientId?: string
 ): Promise<Map<string, T[]>> {
-  const keys = await listKeys(r2, `content/${contentType}/`);
   const byClient = new Map<string, T[]>();
 
+  // Scoped path: read the index, fetch only this client's content objects.
+  if (onlyClientId) {
+    const index = await readJson<{ items?: ContentIndexItem[] }>(
+      r2,
+      `indexes/${contentType}-index.json`
+    );
+    const items = index?.items ?? [];
+    const uuids = items
+      .filter((it) => !it.isDeleted && it.clientId === onlyClientId)
+      .map((it) => it.uuid);
+
+    for (const uuid of uuids) {
+      const item = await readJson<T>(r2, `content/${contentType}/${uuid}.json`);
+      if (!item || item.isDeleted) continue;
+      if (item.data.clientId !== onlyClientId) continue;
+      const arr = byClient.get(onlyClientId) ?? [];
+      arr.push(item);
+      byClient.set(onlyClientId, arr);
+    }
+
+    return byClient;
+  }
+
+  // Full path: list and parse every object of this type.
+  const keys = await listKeys(r2, `content/${contentType}/`);
   for (const key of keys) {
     // Skip file-attachment sub-keys — only read top-level {uuid}.json
     const rest = key.slice(`content/${contentType}/`.length);
@@ -143,10 +181,11 @@ export async function migrateSaldo(
   const report: MigrationReport = { clientsProcessed: 0, clients: [], errors: [] };
   const periodService = createBalancePeriodService(r2);
 
-  // Load all content grouped by client
-  const contractsByClient = await loadContentByClient<Contract>(r2, 'contracts');
-  const workSheetsByClient = await loadContentByClient<WorkSheet>(r2, 'work-sheets');
-  const remoteByClient = await loadContentByClient<RemoteAssistance>(r2, 'remote-assistance');
+  // Load content grouped by client. When scoped to one client, only that
+  // client's records are read (via the content index) — not the whole dataset.
+  const contractsByClient = await loadContentByClient<Contract>(r2, 'contracts', onlyClientId);
+  const workSheetsByClient = await loadContentByClient<WorkSheet>(r2, 'work-sheets', onlyClientId);
+  const remoteByClient = await loadContentByClient<RemoteAssistance>(r2, 'remote-assistance', onlyClientId);
 
   // Every client that has a contract gets a rebuild, unless scoped to one.
   let clientIds = new Set<string>([...contractsByClient.keys()]);
