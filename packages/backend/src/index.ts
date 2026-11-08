@@ -43,9 +43,16 @@ app.get('/api/health', c => {
 // Dev-only Saldo migration route — wipes and rebuilds all balance data.
 // Never registered in production. Protected by X-Admin-Token.
 app.post('/admin/migrate-saldo', async c => {
-  const env = c.env as { ENVIRONMENT?: string; ADMIN_MIGRATION_TOKEN?: string; R2_BUCKET?: StorageBucket };
+  const env = c.env as {
+    NODE_ENV?: string;
+    ENVIRONMENT?: string;
+    ADMIN_MIGRATION_TOKEN?: string;
+    R2_BUCKET?: StorageBucket;
+  };
 
-  if (env?.ENVIRONMENT === 'production') {
+  // Block in production. wrangler.toml sets NODE_ENV ("test" | "production");
+  // also honour ENVIRONMENT if it is ever set.
+  if (env?.NODE_ENV === 'production' || env?.ENVIRONMENT === 'production') {
     return c.text('Not Found', 404);
   }
 
@@ -59,8 +66,12 @@ app.post('/admin/migrate-saldo', async c => {
     return c.json({ success: false, error: 'Storage not available' }, 500);
   }
 
-  const report = await migrateSaldo(r2Bucket);
-  return c.json({ success: true, data: report, timestamp: new Date().toISOString() });
+  // Optional scoping: ?clientId=<uuid> for a single client, ?dryRun=true to preview.
+  const clientId = c.req.query('clientId') || undefined;
+  const dryRun = c.req.query('dryRun') === 'true';
+
+  const report = await migrateSaldo(r2Bucket, { clientId, dryRun });
+  return c.json({ success: true, dryRun, clientId: clientId ?? 'all', data: report, timestamp: new Date().toISOString() });
 });
 
 // Static assets middleware with SPA fallback

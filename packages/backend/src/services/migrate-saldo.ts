@@ -12,6 +12,9 @@ import type {
   Contract,
   WorkSheet,
   RemoteAssistance,
+  ContractPeriod,
+  ContractPeriodResources,
+  TransactionChanges,
 } from '@clever/shared';
 import {
   getSectionForServiceType,
@@ -22,6 +25,30 @@ import {
 import { createBalancePeriodService } from './balance-service';
 
 const MIGRATION_USER = 'migration';
+
+/** Build an in-memory ContractPeriod for dry-run simulation (not persisted). */
+function makeSimPeriod(
+  clientId: string,
+  contractId: string,
+  section: 'CPA' | 'SH',
+  resources: ContractPeriodResources,
+  periodStart: string,
+  periodEnd: string
+): ContractPeriod {
+  return {
+    uuid: `sim-${contractId}-${section}`,
+    clientId,
+    contractId,
+    section,
+    periodStart,
+    periodEnd,
+    status: 'active',
+    originalResources: { ...resources },
+    remainingResources: { ...resources },
+    openedAt: new Date().toISOString(),
+    openedBy: MIGRATION_USER,
+  };
+}
 
 interface ClientReport {
   clientId: string;
@@ -97,7 +124,22 @@ async function loadContentByClient<T extends { data: { clientId?: string }; isDe
   return byClient;
 }
 
-export async function migrateSaldo(r2: StorageBucket): Promise<MigrationReport> {
+export interface MigrateSaldoOptions {
+  /** Restrict the rebuild to a single client (its UUID). Omit to process all clients. */
+  clientId?: string;
+  /**
+   * When true, nothing is written or wiped — the report shows what WOULD happen.
+   * Dry run needs read access only.
+   */
+  dryRun?: boolean;
+}
+
+export async function migrateSaldo(
+  r2: StorageBucket,
+  options: MigrateSaldoOptions = {}
+): Promise<MigrationReport> {
+  const { clientId: onlyClientId, dryRun = false } = options;
+
   const report: MigrationReport = { clientsProcessed: 0, clients: [], errors: [] };
   const periodService = createBalancePeriodService(r2);
 
@@ -106,8 +148,15 @@ export async function migrateSaldo(r2: StorageBucket): Promise<MigrationReport> 
   const workSheetsByClient = await loadContentByClient<WorkSheet>(r2, 'work-sheets');
   const remoteByClient = await loadContentByClient<RemoteAssistance>(r2, 'remote-assistance');
 
-  // Every client that has a contract gets a rebuild
-  const clientIds = new Set<string>([...contractsByClient.keys()]);
+  // Every client that has a contract gets a rebuild, unless scoped to one.
+  let clientIds = new Set<string>([...contractsByClient.keys()]);
+  if (onlyClientId) {
+    if (!clientIds.has(onlyClientId)) {
+      report.errors.push(`client ${onlyClientId} has no contract — nothing to rebuild`);
+      return report;
+    }
+    clientIds = new Set<string>([onlyClientId]);
+  }
 
   for (const clientId of clientIds) {
     const clientReport: ClientReport = {
@@ -119,39 +168,66 @@ export async function migrateSaldo(r2: StorageBucket): Promise<MigrationReport> 
       errors: [],
     };
 
+    // In-memory period simulation for dry run, so D8/D9 counts stay accurate
+    // without writing anything to R2.
+    const simPeriods: ContractPeriod[] = [];
+
+    const findSimPeriod = (contractId: string | undefined, section: 'CPA' | 'SH', date: string) => {
+      if (!contractId) return null;
+      return (
+        simPeriods.find(
+          (p) =>
+            p.contractId === contractId &&
+            p.section === section &&
+            p.status === 'active' &&
+            p.periodStart <= date &&
+            date <= p.periodEnd
+        ) ?? null
+      );
+    };
+
+    const applySimConsumption = (period: ContractPeriod | null, changes: TransactionChanges) => {
+      if (!period || !changes.contractUsageChanges) return;
+      const u = changes.contractUsageChanges;
+      const r = period.remainingResources;
+      if (u.manutencoesPorAno !== undefined && r.manutencoesPorAno !== -1) r.manutencoesPorAno += u.manutencoesPorAno;
+      if (u.deslocacoesPorAno !== undefined && r.deslocacoesPorAno !== -1) r.deslocacoesPorAno += u.deslocacoesPorAno;
+      if (u.horasAssistenciaAnuais !== undefined && r.horasAssistenciaAnuais !== -1) r.horasAssistenciaAnuais += u.horasAssistenciaAnuais;
+    };
+
     try {
-      // 1. Wipe
-      await wipeClientBalance(r2, clientId);
+      // 1. Wipe (skipped on dry run)
+      if (!dryRun) {
+        await wipeClientBalance(r2, clientId);
+      }
 
       // 2. Open periods from current contracts
       const contracts = contractsByClient.get(clientId) ?? [];
       for (const contract of contracts) {
         if (contract.data.hasCPAContract) {
-          await periodService.openPeriod(
-            clientId, contract.uuid, 'CPA',
-            {
-              manutencoesPorAno: contract.data.manutencoesPorAnoCPA ?? 0,
-              deslocacoesPorAno: contract.data.deslocacoesPorAnoCPA ?? 0,
-              horasAssistenciaAnuais: contract.data.horasAssistenciaAnualCPA ?? 0,
-            },
-            contract.data.inicioContratoCPA,
-            contract.data.fimContratoCPA,
-            MIGRATION_USER
-          );
+          const resources = {
+            manutencoesPorAno: contract.data.manutencoesPorAnoCPA ?? 0,
+            deslocacoesPorAno: contract.data.deslocacoesPorAnoCPA ?? 0,
+            horasAssistenciaAnuais: contract.data.horasAssistenciaAnualCPA ?? 0,
+          };
+          if (dryRun) {
+            simPeriods.push(makeSimPeriod(clientId, contract.uuid, 'CPA', resources, contract.data.inicioContratoCPA, contract.data.fimContratoCPA));
+          } else {
+            await periodService.openPeriod(clientId, contract.uuid, 'CPA', resources, contract.data.inicioContratoCPA, contract.data.fimContratoCPA, MIGRATION_USER);
+          }
           clientReport.cpaPeriod = true;
         }
         if (contract.data.hasSHContract) {
-          await periodService.openPeriod(
-            clientId, contract.uuid, 'SH',
-            {
-              manutencoesPorAno: contract.data.manutencoesPorAnoSH ?? 0,
-              deslocacoesPorAno: contract.data.deslocacoesPorAnoSH ?? 0,
-              horasAssistenciaAnuais: contract.data.horasAssistenciaAnualSH ?? 0,
-            },
-            contract.data.inicioContratoSH,
-            contract.data.fimContratoSH,
-            MIGRATION_USER
-          );
+          const resources = {
+            manutencoesPorAno: contract.data.manutencoesPorAnoSH ?? 0,
+            deslocacoesPorAno: contract.data.deslocacoesPorAnoSH ?? 0,
+            horasAssistenciaAnuais: contract.data.horasAssistenciaAnualSH ?? 0,
+          };
+          if (dryRun) {
+            simPeriods.push(makeSimPeriod(clientId, contract.uuid, 'SH', resources, contract.data.inicioContratoSH, contract.data.fimContratoSH));
+          } else {
+            await periodService.openPeriod(clientId, contract.uuid, 'SH', resources, contract.data.inicioContratoSH, contract.data.fimContratoSH, MIGRATION_USER);
+          }
           clientReport.shPeriod = true;
         }
       }
@@ -166,20 +242,25 @@ export async function migrateSaldo(r2: StorageBucket): Promise<MigrationReport> 
         if (!section) continue; // INSTALAÇÃO
 
         const contractId = ws.data.contractId;
-        const activePeriod = contractId
-          ? await periodService.getActivePeriodForDate(clientId, contractId, section, ws.data.request.date)
-          : null;
+        const activePeriod = dryRun
+          ? findSimPeriod(contractId, section, ws.data.request.date)
+          : contractId
+            ? await periodService.getActivePeriodForDate(clientId, contractId, section, ws.data.request.date)
+            : null;
 
         const changes = extractWorkSheetDebtTransaction(ws, activePeriod);
         if (!hasTransactionChanges(changes)) continue;
 
-        const periodId = activePeriod?.uuid ?? 'no-period';
-        const resolvedContractId = activePeriod?.contractId ?? contractId ?? 'unknown';
-
-        await periodService.createDebtTransaction(
-          clientId, resolvedContractId, periodId, ws.uuid, 'work-sheet', changes, MIGRATION_USER,
-          { paymentMethod: 'CONTRATO', section, serviceDetails: { serviceType: ws.data.otherData.serviceType } }
-        );
+        if (dryRun) {
+          applySimConsumption(activePeriod, changes);
+        } else {
+          const periodId = activePeriod?.uuid ?? 'no-period';
+          const resolvedContractId = activePeriod?.contractId ?? contractId ?? 'unknown';
+          await periodService.createDebtTransaction(
+            clientId, resolvedContractId, periodId, ws.uuid, 'work-sheet', changes, MIGRATION_USER,
+            { paymentMethod: 'CONTRATO', section, serviceDetails: { serviceType: ws.data.otherData.serviceType } }
+          );
+        }
 
         if (changes.balanceChange) clientReport.workSheets.debt++;
         else clientReport.workSheets.consumed++;
@@ -192,26 +273,31 @@ export async function migrateSaldo(r2: StorageBucket): Promise<MigrationReport> 
 
       for (const ra of remotes) {
         const contractId = ra.data.contractId;
-        const activePeriod = contractId
-          ? await periodService.getActivePeriodForDate(clientId, contractId, 'SH', ra.data.dataPedido)
-          : null;
+        const activePeriod = dryRun
+          ? findSimPeriod(contractId, 'SH', ra.data.dataPedido)
+          : contractId
+            ? await periodService.getActivePeriodForDate(clientId, contractId, 'SH', ra.data.dataPedido)
+            : null;
 
         const changes = extractRemoteAssistanceDebtTransaction(ra, activePeriod);
         if (!hasTransactionChanges(changes)) continue;
 
-        const periodId = activePeriod?.uuid ?? 'no-period';
-        const resolvedContractId = activePeriod?.contractId ?? contractId ?? 'unknown';
-
-        await periodService.createDebtTransaction(
-          clientId, resolvedContractId, periodId, ra.uuid, 'remote-assistance', changes, MIGRATION_USER,
-          { paymentMethod: 'Contrato', section: 'SH', serviceDetails: { horasTotais: ra.data.horasTotais } }
-        );
+        if (dryRun) {
+          applySimConsumption(activePeriod, changes);
+        } else {
+          const periodId = activePeriod?.uuid ?? 'no-period';
+          const resolvedContractId = activePeriod?.contractId ?? contractId ?? 'unknown';
+          await periodService.createDebtTransaction(
+            clientId, resolvedContractId, periodId, ra.uuid, 'remote-assistance', changes, MIGRATION_USER,
+            { paymentMethod: 'Contrato', section: 'SH', serviceDetails: { horasTotais: ra.data.horasTotais } }
+          );
+        }
 
         if (changes.balanceChange) clientReport.remoteAssistances.debt++;
         else clientReport.remoteAssistances.consumed++;
       }
 
-      console.log('[migrate] client', clientId, JSON.stringify({
+      console.log('[migrate]', dryRun ? '(dry-run)' : '(live)', 'client', clientId, JSON.stringify({
         cpa: clientReport.cpaPeriod, sh: clientReport.shPeriod,
         ws: clientReport.workSheets, ra: clientReport.remoteAssistances,
       }));
