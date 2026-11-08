@@ -256,7 +256,7 @@
               </h2>
               <div class="flex gap-2">
                 <button
-                  v-if="permissions.canViewAuditTrail"
+                  v-if="permissions.canDelete"
                   class="text-sm px-3 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700 transition-colors"
                   style="min-height: 44px; min-width: 44px;"
                   :disabled="isRecalculating"
@@ -275,76 +275,11 @@
               </div>
             </div>
             <div class="p-4 sm:p-6">
-              <!-- Loading State -->
-              <div
-                v-if="isBalanceLoading"
-                class="flex items-center justify-center py-4"
-              >
-                <div class="balance-spinner" />
-                <span class="ml-2 text-sm text-gray-500">A carregar saldo...</span>
-              </div>
-
-              <!-- Balance Display -->
-              <div
-                v-else
-                class="detail-grid"
-              >
-                <!-- Dívida -->
-                <div class="detail-item">
-                  <label class="detail-label">Dívida</label>
-                  <div
-                    class="detail-value text-lg font-semibold"
-                    :class="balanceData.balance > 0 ? 'text-red-600' : 'text-gray-900'"
-                  >
-                    {{ balanceData.balance }}€
-                  </div>
-                </div>
-
-                <!-- Manutenções restantes -->
-                <div class="detail-item">
-                  <label class="detail-label">Manutenções restantes</label>
-                  <div
-                    class="detail-value text-lg font-semibold px-2 py-1 rounded"
-                    :class="isResourceLow('manutencoesPorAno') ? 'bg-yellow-50 text-yellow-800 border border-yellow-400' : ''"
-                  >
-                    <span>{{ formatResourceValue(balanceData.contracts.manutencoesPorAno) }}</span>
-                    <span
-                      v-if="isResourceLow('manutencoesPorAno')"
-                      class="ml-1"
-                    >⚠️</span>
-                  </div>
-                </div>
-
-                <!-- Deslocações restantes -->
-                <div class="detail-item">
-                  <label class="detail-label">Deslocações restantes</label>
-                  <div
-                    class="detail-value text-lg font-semibold px-2 py-1 rounded"
-                    :class="isResourceLow('deslocacoesPorAno') ? 'bg-yellow-50 text-yellow-800 border border-yellow-400' : ''"
-                  >
-                    <span>{{ formatResourceValue(balanceData.contracts.deslocacoesPorAno) }}</span>
-                    <span
-                      v-if="isResourceLow('deslocacoesPorAno')"
-                      class="ml-1"
-                    >⚠️</span>
-                  </div>
-                </div>
-
-                <!-- Horas restantes -->
-                <div class="detail-item">
-                  <label class="detail-label">Horas restantes</label>
-                  <div
-                    class="detail-value text-lg font-semibold px-2 py-1 rounded"
-                    :class="isResourceLow('horasAssistenciaAnuais') ? 'bg-yellow-50 text-yellow-800 border border-yellow-400' : ''"
-                  >
-                    <span>{{ formatResourceValue(balanceData.contracts.horasAssistenciaAnuais) }}</span>
-                    <span
-                      v-if="isResourceLow('horasAssistenciaAnuais')"
-                      class="ml-1"
-                    >⚠️</span>
-                  </div>
-                </div>
-              </div>
+              <!-- Period-based balance display (:key forces refresh after recalculate) -->
+              <ClientBalanceDisplay
+                :key="balanceKey"
+                :client-id="item.uuid"
+              />
             </div>
           </div>
         </div>
@@ -869,6 +804,7 @@ import { isRelationError, isResolvedRelation } from '@clever/shared';
 import ContentDetailTemplate from '@/components/common/ContentDetailTemplate.vue';
 import ConfirmationDialog from '@/components/common/ConfirmationDialog.vue';
 import RelationInfoDisplay from '@/components/common/RelationInfoDisplay.vue';
+import ClientBalanceDisplay from '@/components/balance/ClientBalanceDisplay.vue';
 import { useApi } from '@/composables/useApi';
 import { useErrorHandler } from '@/composables/useErrorHandler';
 import { usePermissions } from '@/composables/usePermissions';
@@ -900,22 +836,6 @@ const confirmDeleteMessage = ref('');
 
 // Recalculation state
 const isRecalculating = ref(false);
-
-// Balance state
-const isBalanceLoading = ref(false);
-const balanceData = ref({
-  balance: 0,
-  contracts: {
-    manutencoesPorAno: 0,
-    deslocacoesPorAno: 0,
-    horasAssistenciaAnuais: 0,
-  },
-});
-const initialResources = ref({
-  manutencoesPorAno: 0,
-  deslocacoesPorAno: 0,
-  horasAssistenciaAnuais: 0,
-});
 
 // Clear error function
 const clearError = () => {
@@ -1145,76 +1065,13 @@ const cancelDelete = () => {
   showDeleteConfirm.value = false;
 };
 
-// Balance display helpers
-const formatResourceValue = (value: number): string => {
-  if (value === -1) return 'Ilimitado';
-  return value.toString();
-};
-
-const isResourceLow = (field: 'manutencoesPorAno' | 'deslocacoesPorAno' | 'horasAssistenciaAnuais'): boolean => {
-  const current = balanceData.value.contracts[field];
-  const initial = initialResources.value[field];
-
-  // Unlimited (-1) never shows warning
-  if (current === -1 || initial === -1) return false;
-  // Zero initial means no contract resources — no warning
-  if (initial === 0) return false;
-
-  const percentageRemaining = (current / initial) * 100;
-  return percentageRemaining < 20;
-};
-
-// Load balance data
-const loadBalance = (clientId: string) => {
-  isBalanceLoading.value = true;
-
-  fetch(`/api/balance/${clientId}`)
-    .then(async (response) => {
-      if (!response.ok) {
-        if (response.status === 404 || response.status === 403) {
-          // No balance or no permission — show zeros
-          console.log('Balance not available:', response.status);
-          return null;
-        }
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Erro ao carregar saldo');
-      }
-      return response.json();
-    })
-    .then((data) => {
-      if (data && data.data) {
-        console.log('Balance loaded:', JSON.stringify(data.data, null, 2));
-        balanceData.value = {
-          balance: data.data.balance ?? 0,
-          contracts: {
-            manutencoesPorAno: data.data.contracts?.manutencoesPorAno ?? 0,
-            deslocacoesPorAno: data.data.contracts?.deslocacoesPorAno ?? 0,
-            horasAssistenciaAnuais: data.data.contracts?.horasAssistenciaAnuais ?? 0,
-          },
-        };
-        // Store initial resources for low-usage calculation
-        initialResources.value = {
-          manutencoesPorAno: data.data.contracts?.manutencoesPorAno ?? 0,
-          deslocacoesPorAno: data.data.contracts?.deslocacoesPorAno ?? 0,
-          horasAssistenciaAnuais: data.data.contracts?.horasAssistenciaAnuais ?? 0,
-        };
-      }
-    })
-    .catch((err) => {
-      console.error('Error loading balance:', JSON.stringify(err, null, 2));
-      // On error, keep zeros — don't show error to user
-    })
-    .finally(() => {
-      isBalanceLoading.value = false;
-    });
-};
-
-// Balance recalculation
+// Balance recalculation — rebuilds this client's periods + transactions
+// from current contracts, work sheets, and remote assistances.
 const handleRecalculateBalance = async () => {
   if (!client.value) return;
 
   const confirmed = window.confirm(
-    'Tem a certeza que pretende recalcular o saldo deste cliente? Esta operação irá recalcular o saldo a partir de todas as transações.'
+    'Tem a certeza que pretende recalcular o saldo deste cliente? O saldo será reconstruído a partir dos contratos, folhas de obra e assistências atuais.'
   );
 
   if (!confirmed) return;
@@ -1222,13 +1079,12 @@ const handleRecalculateBalance = async () => {
   isRecalculating.value = true;
   error.value = null;
 
-  // Get auth token
   const token = await window.Clerk?.session?.getToken();
 
   await fetch(`/api/balance/${client.value.uuid}/recalculate`, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
   })
@@ -1241,12 +1097,8 @@ const handleRecalculateBalance = async () => {
     })
     .then(data => {
       console.log('Balance recalculated:', JSON.stringify(data, null, 2));
-      // Refresh inline balance display
-      if (client.value) {
-        loadBalance(client.value.uuid);
-      }
+      // Force the balance component to reload the rebuilt periods
       balanceKey.value++;
-      alert('Saldo recalculado com sucesso!');
     })
     .catch(err => {
       console.error('Error recalculating balance:', JSON.stringify(err, null, 2));
@@ -1274,8 +1126,7 @@ const loadClient = async () => {
 
     if (api.currentItem.value) {
       client.value = api.currentItem.value;
-      // Load balance data for the client
-      loadBalance(clientId);
+      // Balance is loaded by the ClientBalanceDisplay component itself.
     } else {
       throw new Error('Cliente não encontrado');
     }

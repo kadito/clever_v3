@@ -17,7 +17,9 @@ import type {
 } from '@clever/shared';
 import { createBalancePeriodService } from '../services/balance-service';
 import { BalanceReportingService } from '../services/balance-reporting-service';
+import { migrateSaldo } from '../services/migrate-saldo';
 import { requireAuth, requireAdminAccess, requireUserContext } from '../middleware/clerk';
+import { requireDeletePermission } from '../middleware/permissions';
 
 const balanceRouter = new Hono();
 
@@ -117,6 +119,48 @@ balanceRouter.get('/:clientId/periods', requireAdminAccess, async (c: Context) =
       error: error instanceof Error ? error.message : String(error),
     }, null, 2));
     return c.json<ApiResponse>({ success: false, error: 'Erro ao obter períodos do cliente', timestamp: new Date().toISOString() }, 500);
+  }
+});
+
+// ============================================================================
+// POST /:clientId/recalculate — rebuild one client's balance (Admin only)
+// Wipes and rebuilds this client's periods + transactions from current
+// contracts, work sheets, and remote assistances. Same logic as the migration,
+// scoped to a single client.
+// ============================================================================
+
+balanceRouter.post('/:clientId/recalculate', requireDeletePermission, async (c: Context) => {
+  try {
+    const user = requireUserContext(c);
+    const clientId = c.req.param('clientId');
+    const r2Bucket = c.env?.R2_BUCKET as StorageBucket;
+
+    if (!r2Bucket) {
+      return c.json<ApiResponse>({ success: false, error: 'Armazenamento não disponível', timestamp: new Date().toISOString() }, 500);
+    }
+    if (!UUID_REGEX.test(clientId)) {
+      return c.json<ApiResponse>({ success: false, error: 'Formato de ID de cliente inválido', timestamp: new Date().toISOString() }, 400);
+    }
+
+    console.log('Recalculating balance for client:', JSON.stringify({ clientId, userId: user.userId }, null, 2));
+
+    const report = await migrateSaldo(r2Bucket, { clientId });
+
+    // migrateSaldo records a top-level error when the client has no contract
+    if (report.clientsProcessed === 0 && report.errors.length > 0) {
+      return c.json<ApiResponse>({ success: false, error: report.errors[0], timestamp: new Date().toISOString() }, 404);
+    }
+
+    return c.json<ApiResponse<typeof report>>({
+      success: true,
+      data: report,
+      timestamp: new Date().toISOString(),
+    }, 200);
+  } catch (error) {
+    console.error('Error recalculating balance:', JSON.stringify({
+      error: error instanceof Error ? error.message : String(error),
+    }, null, 2));
+    return c.json<ApiResponse>({ success: false, error: 'Erro ao recalcular saldo', timestamp: new Date().toISOString() }, 500);
   }
 });
 
