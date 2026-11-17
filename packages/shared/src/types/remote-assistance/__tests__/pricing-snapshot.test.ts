@@ -133,7 +133,7 @@ describe('MI-02: calculateRemoteAssistancePricing() with rateOverrides', () => {
     expect(result.totalValue).toBe(140);
   });
 
-  it('Contrato payment → zero-cost regardless of custom rates', () => {
+  it('Contrato payment → isZeroCost but full price with custom rates', () => {
     const result = calculateRemoteAssistancePricing({
       ...baseInput,
       paymentMethod: 'Contrato',
@@ -141,12 +141,13 @@ describe('MI-02: calculateRemoteAssistancePricing() with rateOverrides', () => {
     });
 
     expect(result.isZeroCost).toBe(true);
-    expect(result.totalValue).toBe(0);
-    expect(result.businessHoursValue).toBe(0);
-    expect(result.offHoursValue).toBe(0);
+    expect(result.totalValue).toBeGreaterThan(0);
+    expect(result.totalValue).toBe(
+      calculateRemoteAssistancePricing({ ...baseInput, paymentMethod: 'Faturação', rateOverrides: customRates }).totalValue
+    );
   });
 
-  it('Garantia payment → zero-cost regardless of custom rates', () => {
+  it('Garantia payment → isZeroCost but full price with custom rates', () => {
     const result = calculateRemoteAssistancePricing({
       ...baseInput,
       paymentMethod: 'Garantia',
@@ -154,7 +155,7 @@ describe('MI-02: calculateRemoteAssistancePricing() with rateOverrides', () => {
     });
 
     expect(result.isZeroCost).toBe(true);
-    expect(result.totalValue).toBe(0);
+    expect(result.totalValue).toBeGreaterThan(0);
   });
 });
 
@@ -245,9 +246,8 @@ describe('MI-04: createRemoteAssistancePricingSnapshot() shape validation', () =
     });
 
     expect(snapshot.calculated.isZeroCost).toBe(true);
-    expect(snapshot.calculated.totalValue).toBe(0);
-    expect(snapshot.calculated.businessHoursValue).toBe(0);
-    expect(snapshot.calculated.offHoursValue).toBe(0);
+    expect(snapshot.calculated.totalValue).toBeGreaterThan(0);
+    expect(snapshot.calculated.totalMinutes).toBeGreaterThan(0);
   });
 
   it('zero-cost behavior for Garantia payment method', () => {
@@ -257,7 +257,7 @@ describe('MI-04: createRemoteAssistancePricingSnapshot() shape validation', () =
     });
 
     expect(snapshot.calculated.isZeroCost).toBe(true);
-    expect(snapshot.calculated.totalValue).toBe(0);
+    expect(snapshot.calculated.totalValue).toBeGreaterThan(0);
   });
 
   it('snapshot satisfies RemoteAssistancePricingSnapshot interface', () => {

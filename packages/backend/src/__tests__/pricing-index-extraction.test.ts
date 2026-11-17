@@ -179,7 +179,7 @@ describe('MI-28: Remote Assistance extractIndexFields — correct value fields',
     expect(hasBillableValue).toBe(true);
   });
 
-  it('stores zero values when paymentMethod is Contrato', () => {
+  it('stores full price but valorAssist 0 when paymentMethod is Contrato', () => {
     const pricing = calculateRemoteAssistancePricing({
       startTime: '09:00',
       endTime: '10:00',
@@ -187,10 +187,10 @@ describe('MI-28: Remote Assistance extractIndexFields — correct value fields',
       paymentMethod: 'Contrato',
     });
 
-    expect(pricing.totalValue).toBe(0);
-    expect(pricing.businessHoursValue).toBe(0);
-    expect(pricing.offHoursValue).toBe(0);
+    expect(pricing.totalValue).toBe(45);
+    expect(pricing.businessHoursValue).toBe(45);
     expect(pricing.isZeroCost).toBe(true);
+    expect(pricing.isZeroCost ? 0 : pricing.totalValue).toBe(0);
 
     const hasBillableValue = 'Faturação' === 'Contrato' && pricing.totalValue > 0;
     expect(hasBillableValue).toBe(false);
@@ -218,7 +218,7 @@ describe('MI-28: Remote Assistance extractIndexFields — correct value fields',
       paymentMethod: 'Garantia',
     });
 
-    expect(pricing.totalValue).toBe(0);
+    expect(pricing.totalValue).toBe(45);
     expect(pricing.isZeroCost).toBe(true);
 
     const hasBillableValue = 'Faturação' === 'Garantia' && pricing.totalValue > 0;

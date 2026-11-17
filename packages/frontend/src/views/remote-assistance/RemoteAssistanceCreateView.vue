@@ -865,7 +865,7 @@ watch(
   ([startTime, endTime]) => {
     if (startTime && endTime) {
       const result = pricingResult.value;
-      updateFieldValue('valorAssist', result?.totalValue ?? 0);
+      updateFieldValue('valorAssist', result?.isZeroCost ? 0 : (result?.totalValue ?? 0));
 
       // Update total hours field with rounded hours
       const roundedDuration = calculateRoundedTotalHours(startTime, endTime);

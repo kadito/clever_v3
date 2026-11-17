@@ -155,7 +155,7 @@ async function simulatePostHandler(
   contentData.pricingSnapshot = pricingSnapshot;
 
   // 4. Update valorAssist from snapshot for backward compat
-  contentData.valorAssist = pricingSnapshot.calculated.totalValue;
+  contentData.valorAssist = pricingSnapshot.calculated.isZeroCost ? 0 : pricingSnapshot.calculated.totalValue;
 
   // 5. Create using ContentStorageService
   const storage = new ContentStorageService<RemoteAssistance>(r2, 'remote-assistance');
@@ -226,7 +226,7 @@ async function simulatePutHandler(
 
   // 5. Attach updated snapshot and update valorAssist
   contentData.pricingSnapshot = updatedSnapshot;
-  contentData.valorAssist = updatedSnapshot.calculated.totalValue;
+  contentData.valorAssist = updatedSnapshot.calculated.isZeroCost ? 0 : updatedSnapshot.calculated.totalValue;
 
   // 6. Save using ContentStorageService
   const storage = new ContentStorageService<RemoteAssistance>(r2, 'remote-assistance');
@@ -399,7 +399,7 @@ describe('MI-09: Remote Assistance POST handler (snapshot integration)', () => {
     expect(data.valorAssist).toBe(snapshot.calculated.totalValue);
   });
 
-  it('Contrato/Garantia payment → isZeroCost=true, totalValue=0', async () => {
+  it('Contrato payment → isZeroCost=true, full price stored, valorAssist=0', async () => {
     const contentData = {
       clientId: 'client-001',
       clienteName: 'Test Client',
@@ -433,7 +433,9 @@ describe('MI-09: Remote Assistance POST handler (snapshot integration)', () => {
     const snapshot = data.pricingSnapshot as RemoteAssistancePricingSnapshot;
 
     expect(snapshot.calculated.isZeroCost).toBe(true);
-    expect(snapshot.calculated.totalValue).toBe(0);
+    expect(snapshot.calculated.totalValue).toBe(90);
+    expect(snapshot.calculated.businessHoursValue).toBe(90);
+    expect(snapshot.calculated.totalMinutes).toBe(120);
     expect(data.valorAssist).toBe(0);
   });
 

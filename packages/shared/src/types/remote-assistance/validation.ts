@@ -122,7 +122,7 @@ function zeroPricingResult(isZeroCost: boolean = false): RemoteAssistancePricing
  * Calculates remote assistance pricing with minute-level split billing.
  *
  * Algorithm:
- * 1. If paymentMethod is Contrato or Garantia → zero-cost result
+ * 1. Contrato or Garantia are priced like any other method, flagged isZeroCost
  * 2. If isWeekendOrHoliday → entire duration at off-hours rate €60/h
  * 3. Otherwise: split session into segments by boundary crossings (09:00, 12:30, 14:30, 18:00)
  * 4. Round TOTAL duration up to 15-min ceiling, distribute proportionally across segments
@@ -147,17 +147,15 @@ export function calculateRemoteAssistancePricing(
     businessHoursAfternoonEnd: REMOTE_ASSISTANCE_CONSTANTS.BUSINESS_HOURS_AFTERNOON_END,
   };
 
-  // 1. Contract/Warranty → zero-cost
-  if (paymentMethod === 'Contrato' || paymentMethod === 'Garantia') {
-    return zeroPricingResult(true);
-  }
+  // Contract/Warranty: the full price is still calculated (stored for later debt), but nothing is billed
+  const isZeroCost = paymentMethod === 'Contrato' || paymentMethod === 'Garantia';
 
   // Validate inputs
   const startMinutes = parseTimeToMinutesRA(startTime);
   const endMinutes = parseTimeToMinutesRA(endTime);
 
   if (startMinutes === null || endMinutes === null) {
-    return zeroPricingResult();
+    return zeroPricingResult(isZeroCost);
   }
 
   // Calculate raw duration handling overnight wrap-around
@@ -169,7 +167,7 @@ export function calculateRemoteAssistancePricing(
     totalMinutes = (endMinutes + 24 * 60) - startMinutes;
   } else {
     // Duration exactly 0
-    return zeroPricingResult();
+    return zeroPricingResult(isZeroCost);
   }
 
   // Round total up to 15-min ceiling
@@ -188,7 +186,7 @@ export function calculateRemoteAssistancePricing(
       billingMinutes,
       businessMinutes: 0,
       offHoursMinutes: billingMinutes,
-      isZeroCost: false,
+      isZeroCost,
       breakdown: [{
         startMinute: startMinutes,
         endMinute: endMinutes <= startMinutes ? endMinutes + 24 * 60 : endMinutes,
@@ -371,7 +369,7 @@ export function calculateRemoteAssistancePricing(
     billingMinutes,
     businessMinutes: distributedBusinessMinutes,
     offHoursMinutes: distributedOffHoursMinutes,
-    isZeroCost: false,
+    isZeroCost,
     breakdown,
   };
 }

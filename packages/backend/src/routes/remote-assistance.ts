@@ -320,7 +320,7 @@ remoteAssistanceConfig.extractIndexFields = (content: RemoteAssistance) => {
       return {
         businessHoursValue: pricing.businessHoursValue,
         afterHoursValue: pricing.offHoursValue,
-        valorAssist: pricing.totalValue,
+        valorAssist: pricing.isZeroCost ? 0 : pricing.totalValue,
         hasBillableValue: data.paymentMethod === 'Faturação' && pricing.totalValue > 0,
       };
     })(),
@@ -456,7 +456,7 @@ remoteAssistanceRouter.post('/', async (c: Context) => {
     contentData.pricingSnapshot = pricingSnapshot;
 
     // Update valorAssist from snapshot for backward compat with balance extraction
-    contentData.valorAssist = pricingSnapshot.calculated.totalValue;
+    contentData.valorAssist = pricingSnapshot.calculated.isZeroCost ? 0 : pricingSnapshot.calculated.totalValue;
 
     const newRemoteAssistance = await storage.create(contentData, { userId: user.userId });
 
@@ -637,7 +637,7 @@ remoteAssistanceRouter.put('/:uuid', async (c: Context) => {
     contentData.pricingSnapshot = updatedSnapshot;
 
     // Update valorAssist from recalculated snapshot for backward compat with balance extraction
-    contentData.valorAssist = updatedSnapshot.calculated.totalValue;
+    contentData.valorAssist = updatedSnapshot.calculated.isZeroCost ? 0 : updatedSnapshot.calculated.totalValue;
 
     // Use ContentStorageService for the actual update (handles versioning, indexing, relations)
     const { ContentStorageService } = await import('@clever/shared');

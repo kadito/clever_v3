@@ -219,7 +219,7 @@ describe('calculateRemoteAssistancePricing', () => {
    * MI-18: Contrato → zero cost
    * Validates: Requirements PRICE-AC-011
    */
-  it('MI-18: Contrato payment method → zero cost result', () => {
+  it('MI-18: Contrato payment method → full price, isZeroCost', () => {
     const input: RemoteAssistancePricingInput = {
       ...baseInput,
       startTime: '09:00',
@@ -230,19 +230,18 @@ describe('calculateRemoteAssistancePricing', () => {
     const result = calculateRemoteAssistancePricing(input);
 
     expect(result.isZeroCost).toBe(true);
-    expect(result.totalValue).toBe(0);
-    expect(result.businessHoursValue).toBe(0);
+    expect(result.totalValue).toBe(45);
+    expect(result.businessHoursValue).toBe(45);
     expect(result.offHoursValue).toBe(0);
-    expect(result.totalMinutes).toBe(0);
-    expect(result.billingMinutes).toBe(0);
-    expect(result.breakdown).toHaveLength(0);
+    expect(result.totalMinutes).toBe(60);
+    expect(result.billingMinutes).toBe(60);
   });
 
   /**
    * MI-19: Garantia → zero cost
    * Validates: Requirements PRICE-AC-011
    */
-  it('MI-19: Garantia payment method → zero cost result', () => {
+  it('MI-19: Garantia payment method → full price, isZeroCost', () => {
     const input: RemoteAssistancePricingInput = {
       ...baseInput,
       startTime: '09:00',
@@ -253,12 +252,11 @@ describe('calculateRemoteAssistancePricing', () => {
     const result = calculateRemoteAssistancePricing(input);
 
     expect(result.isZeroCost).toBe(true);
-    expect(result.totalValue).toBe(0);
-    expect(result.businessHoursValue).toBe(0);
+    expect(result.totalValue).toBe(45);
+    expect(result.businessHoursValue).toBe(45);
     expect(result.offHoursValue).toBe(0);
-    expect(result.totalMinutes).toBe(0);
-    expect(result.billingMinutes).toBe(0);
-    expect(result.breakdown).toHaveLength(0);
+    expect(result.totalMinutes).toBe(60);
+    expect(result.billingMinutes).toBe(60);
   });
 
   /**
