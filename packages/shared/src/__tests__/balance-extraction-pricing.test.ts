@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { extractWorkSheetDebtTransaction } from '../balance-extraction';
+import { extractWorkSheetDebtTransaction, extractRemoteAssistanceDebtTransaction } from '../balance-extraction';
+import type { ContractPeriod } from '../balance-types';
+import type { RemoteAssistance } from '../types/remote-assistance/types';
 import type { WorkSheet } from '../types/work-sheets/types';
 import type { WorkSheetPricingSnapshot } from '../types/work-sheets/types';
 
@@ -154,5 +156,43 @@ describe('MI-11: extractWorkSheetDebtTransaction() with anchored pricing', () =>
 
     // 0 is a valid finite number — should NOT trigger fallback
     expect(result.balanceChange).toBe(0);
+  });
+});
+
+describe('extractRemoteAssistanceDebtTransaction() Contrato pricing and partial hours', () => {
+  function buildAssistance(valorAssist: number, totalValue?: number): RemoteAssistance {
+    return {
+      data: {
+        paymentMethod: 'Contrato',
+        horasTotais: '02:00',
+        valorAssist,
+        pricingSnapshot: totalValue === undefined ? undefined : { calculated: { totalValue } },
+      },
+    } as unknown as RemoteAssistance;
+  }
+
+  function buildPeriod(horasAssistenciaAnuais: number): ContractPeriod {
+    return { remainingResources: { horasAssistenciaAnuais } } as unknown as ContractPeriod;
+  }
+
+  it('charges the stored snapshot price when there is no active period', () => {
+    expect(extractRemoteAssistanceDebtTransaction(buildAssistance(0, 80), null).balanceChange).toBe(80);
+  });
+
+  it('falls back to valorAssist when there is no snapshot price', () => {
+    expect(extractRemoteAssistanceDebtTransaction(buildAssistance(50), buildPeriod(0)).balanceChange).toBe(50);
+  });
+
+  it('consumes the remaining hours and charges the excess proportionally', () => {
+    const result = extractRemoteAssistanceDebtTransaction(buildAssistance(0, 100), buildPeriod(0.5));
+    expect(result.contractUsageChanges).toEqual({ horasAssistenciaAnuais: -0.5 });
+    expect(result.balanceChange).toBe(75);
+  });
+
+  it('never splits when hours are unlimited or fully cover the assistance', () => {
+    expect(extractRemoteAssistanceDebtTransaction(buildAssistance(0, 100), buildPeriod(-1))).toEqual({
+      contractUsageChanges: { horasAssistenciaAnuais: -2 },
+    });
+    expect(extractRemoteAssistanceDebtTransaction(buildAssistance(0, 100), buildPeriod(2)).balanceChange).toBeUndefined();
   });
 });

@@ -303,7 +303,10 @@ export function extractRemoteAssistanceDebtTransaction(
   }
 
   // Contrato payment — consume SH assistance hours
-  const fallbackPrice = remoteAssistance.data.valorAssist || 0;
+  const snapshotPrice = remoteAssistance.data.pricingSnapshot?.calculated?.totalValue;
+  const fallbackPrice = Number.isFinite(snapshotPrice)
+    ? (snapshotPrice as number)
+    : remoteAssistance.data.valorAssist || 0;
 
   // D8: no active period → euro debt
   if (!activePeriod) return { balanceChange: fallbackPrice };
@@ -319,6 +322,15 @@ export function extractRemoteAssistanceDebtTransaction(
 
   if (totalHours <= 0) {
     return { contractUsageChanges: {} };
+  }
+
+  // Partial hours: consume what is left, charge the excess proportionally in euros
+  if (r.horasAssistenciaAnuais !== -1 && r.horasAssistenciaAnuais < totalHours) {
+    const excessHours = totalHours - r.horasAssistenciaAnuais;
+    return {
+      contractUsageChanges: { horasAssistenciaAnuais: -r.horasAssistenciaAnuais },
+      balanceChange: Math.round(fallbackPrice * (excessHours / totalHours) * 100) / 100,
+    };
   }
 
   return {
