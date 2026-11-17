@@ -36,7 +36,7 @@
 
     <!-- Periods Display -->
     <div
-      v-else-if="periods.length > 0"
+      v-else-if="periods.length > 0 || transactionCount > 0"
       class="balance-content"
     >
       <!-- Euro debt (if any) -->
@@ -52,7 +52,14 @@
         </div>
       </div>
 
-      <!-- One card per active period -->
+      <p
+        v-if="!hasActivePeriod"
+        class="no-balance-hint"
+      >
+        Sem período de contrato ativo
+      </p>
+
+      <!-- One card per displayed period (active ones, or the latest closed one) -->
       <div
         v-for="period in periods"
         :key="period.uuid"
@@ -60,6 +67,10 @@
       >
         <div class="period-header">
           <span class="period-badge">{{ period.section }}</span>
+          <span
+            v-if="period.status === 'closed'"
+            class="period-closed"
+          >Fechado</span>
           <span class="period-window">
             {{ formatDate(period.periodStart) }} → {{ formatDate(period.periodEnd) }}
           </span>
@@ -90,9 +101,15 @@
           </div>
         </div>
       </div>
+
+      <!-- Transactions (including no-period debts) -->
+      <TransactionHistoryDisplay
+        v-if="transactionCount > 0"
+        :client-id="clientId"
+      />
     </div>
 
-    <!-- No periods State -->
+    <!-- No periods and no transactions State -->
     <div
       v-else
       class="no-balance-state"
@@ -111,7 +128,7 @@
         />
       </svg>
       <p class="no-balance-message">
-        Sem períodos de contrato ativos
+        Sem período de contrato ativo
       </p>
       <p class="no-balance-hint">
         Os períodos são criados automaticamente quando um contrato é adicionado a este cliente.
@@ -121,8 +138,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import type { ContractPeriod } from '@clever/shared';
+import TransactionHistoryDisplay from './TransactionHistoryDisplay.vue';
 
 interface Props {
   clientId: string;
@@ -132,6 +150,8 @@ const props = defineProps<Props>();
 
 const periods = ref<ContractPeriod[]>([]);
 const euroDebt = ref(0);
+const transactionCount = ref(0);
+const hasActivePeriod = computed<boolean>(() => periods.value.some((p) => p.status === 'active'));
 const isLoading = ref(false);
 const error = ref<string | null>(null);
 
@@ -183,7 +203,7 @@ const loadPeriods = async () => {
 
   console.log('ClientBalanceDisplay: Loading periods for client:', props.clientId);
 
-  await fetch(`/api/balance/${props.clientId}/periods?status=active`)
+  await fetch(`/api/balance/${props.clientId}/periods`)
     .then(async (response) => {
       if (!response.ok) {
         if (response.status === 404) {
@@ -198,7 +218,11 @@ const loadPeriods = async () => {
     .then((data) => {
       if (data && Array.isArray(data.data)) {
         console.log('ClientBalanceDisplay: Periods received:', JSON.stringify(data.data, null, 2));
-        periods.value = data.data;
+        const activePeriods: ContractPeriod[] = data.data.filter((p: ContractPeriod) => p.status === 'active');
+        const latestPeriod: ContractPeriod[] = [...data.data]
+          .sort((a: ContractPeriod, b: ContractPeriod) => b.periodEnd.localeCompare(a.periodEnd))
+          .slice(0, 1);
+        periods.value = activePeriods.length > 0 ? activePeriods : latestPeriod;
       }
     })
     .catch((err) => {
@@ -209,18 +233,19 @@ const loadPeriods = async () => {
       isLoading.value = false;
     });
 
-  // Load euro debt total from DEBT transactions
+  // Load euro debt total from the client's transactions
   await loadEuroDebt();
 };
 
 const loadEuroDebt = async () => {
-  await fetch(`/api/balance/${props.clientId}/transactions?type=DEBT&limit=1000`)
+  await fetch(`/api/balance/${props.clientId}/transactions?limit=1000`)
     .then(async (response) => {
       if (!response.ok) return null;
       return response.json();
     })
     .then((data) => {
       const list = data && Array.isArray(data.data) ? data.data : [];
+      transactionCount.value = list.length;
       euroDebt.value = list.reduce((sum: number, t: { changes?: { balanceChange?: number } }) => {
         return sum + (t.changes?.balanceChange ?? 0);
       }, 0);
@@ -353,6 +378,15 @@ watch(() => props.clientId, () => {
   border-radius: 0.25rem;
   font-size: 0.875rem;
   font-weight: 700;
+}
+
+.period-closed {
+  padding: 0.25rem 0.5rem;
+  background-color: #e5e7eb;
+  color: #374151;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 .period-window {
