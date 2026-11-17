@@ -101,12 +101,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Transactions (including no-period debts) -->
-      <TransactionHistoryDisplay
-        v-if="transactionCount > 0"
-        :client-id="clientId"
-      />
     </div>
 
     <!-- No periods and no transactions State -->
@@ -140,7 +134,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import type { ContractPeriod } from '@clever/shared';
-import TransactionHistoryDisplay from './TransactionHistoryDisplay.vue';
 
 interface Props {
   clientId: string;
