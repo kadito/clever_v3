@@ -125,7 +125,7 @@ export interface ContractData {
   // CPA Contract Information
   hasCPAContract: boolean;
   planIdCPA: string;
-  modalidadePagamentoCPA: '' | 'MENSAL' | 'SEMESTRAL' | 'ANUAL';
+  modalidadePagamentoCPA: '' | 'MENSAL' | 'TRIMESTRAL' | 'SEMESTRAL' | 'ANUAL';
   hasPOSPackage: boolean;
 
   // CPA Price (manual — set when 2+ equipments, undefined in auto mode)
@@ -147,7 +147,7 @@ export interface ContractData {
   hasSHContract: boolean;
   planIdSH: string;
   distanceSH: 'under180km' | 'over180km' | '';
-  modalidadePagamentoSH: '' | 'MENSAL' | 'ANUAL';
+  modalidadePagamentoSH: '' | 'MENSAL' | 'TRIMESTRAL' | 'SEMESTRAL' | 'ANUAL';
 
   // S&H Price (manual — set when 2+ equipments, undefined in auto mode)
   precoSH?: number;

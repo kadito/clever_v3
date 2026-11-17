@@ -215,68 +215,36 @@ const formatPrice = (() => {
   return (price: number): string => formatter.format(price);
 })();
 
-// Compute payment options based on contract type and plan pricing structure
+// All payment periods are always offered. A period without a price in the plan config shows "Preço não definido".
+const PAYMENT_PERIODS = [
+  { id: 'MENSAL', priceKey: 'mensal' },
+  { id: 'TRIMESTRAL', priceKey: 'trimestral' },
+  { id: 'SEMESTRAL', priceKey: 'semestral' },
+  { id: 'ANUAL', priceKey: 'anual' },
+] as const;
+
 const paymentOptions = computed(() => {
   if (!planDetails.value?.prices) {
     return [];
   }
 
-  const prices = planDetails.value.prices;
-  const options: Array<{ id: string; period: string; amount: string }> = [];
-
-  try {
-    // CPA: flat pricing with mensal/semestral/anual keys
-    if (contractType?.value === 'CPA') {
-      if (prices.mensal !== undefined) {
-        options.push({
-          id: 'MENSAL',
-          period: 'MENSAL',
-          amount: formatPrice(prices.mensal),
-        });
-      }
-      if (prices.semestral !== undefined) {
-        options.push({
-          id: 'SEMESTRAL',
-          period: 'SEMESTRAL',
-          amount: formatPrice(prices.semestral),
-        });
-      }
-      if (prices.anual !== undefined) {
-        options.push({
-          id: 'ANUAL',
-          period: 'ANUAL',
-          amount: formatPrice(prices.anual),
-        });
-      }
+  // CPA: flat prices. S&H: prices per distance zone.
+  let prices: Record<string, number | undefined> = planDetails.value.prices;
+  if (contractType?.value === 'S&H') {
+    if (!distance?.value || !planDetails.value.prices[distance.value]) {
+      return [];
     }
-    // S&H: distance-based pricing with mensal/anual keys only
-    else if (contractType?.value === 'S&H') {
-      if (!distance?.value || !prices[distance.value]) {
-        return [];
-      }
-
-      const distancePrices = prices[distance.value];
-
-      if (distancePrices.mensal !== undefined) {
-        options.push({
-          id: 'MENSAL',
-          period: 'MENSAL',
-          amount: formatPrice(distancePrices.mensal),
-        });
-      }
-      if (distancePrices.anual !== undefined) {
-        options.push({
-          id: 'ANUAL',
-          period: 'ANUAL',
-          amount: formatPrice(distancePrices.anual),
-        });
-      }
-    }
-  } catch (error) {
-    console.error('Error generating payment options:', JSON.stringify(error, null, 2));
+    prices = planDetails.value.prices[distance.value];
   }
 
-  return options;
+  return PAYMENT_PERIODS.map((period) => {
+    const price = prices[period.priceKey];
+    return {
+      id: period.id,
+      period: period.id,
+      amount: price === undefined ? 'Preço não definido' : formatPrice(price),
+    };
+  });
 });
 </script>
 

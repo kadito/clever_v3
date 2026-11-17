@@ -4,7 +4,7 @@
 **Date:** 2026-11-08  
 **Prerequisite:** work-sheet-service-types spec (done)  
 **Context:** Complete redesign of the Saldo system from a perpetual accumulator to a
-contract-period model. Client decisions recorded in `docs/meetings/2026-09-24-saldo-perguntas-cliente.md`
+contract-period model. Client decisions recorded in `docs/meetings/2026-09-24/saldo-perguntas-cliente.md`
 and `docs/design/saldo-por-periodo-contrato.md`.
 
 ---

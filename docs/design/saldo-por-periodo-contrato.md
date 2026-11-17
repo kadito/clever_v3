@@ -148,7 +148,7 @@ errada (renovação-soma, 25 contratos a zero), por isso deitam-se fora e reproc
 pela lógica nova.
 
 Passos:
-1. Cliente confirma os contratos novos (em curso — CSV `2026-09-24-contract-changes.csv`).
+1. Cliente confirma os contratos novos (em curso — CSV `docs/meetings/2026-09-24/contract-changes.csv`).
 2. Apagar o saldo atual de cada cliente (índice + transações).
 3. Por cliente: **Set** do saldo pelo contrato → transação de abertura de período com os
    valores originais do plano e a janela de datas do contrato.

@@ -33,9 +33,10 @@ describe('MI-14: DynamicPlanDetails simplified pricing', () => {
         },
       });
       const paymentButtons = wrapper.findAll('.payment-option');
-      expect(paymentButtons.length).toBe(3);
+      expect(paymentButtons.length).toBe(4);
       const periodTexts = paymentButtons.map(btn => btn.find('.payment-period').text());
       expect(periodTexts).toContain('MENSAL');
+      expect(periodTexts).toContain('TRIMESTRAL');
       expect(periodTexts).toContain('SEMESTRAL');
       expect(periodTexts).toContain('ANUAL');
     });
@@ -53,7 +54,7 @@ describe('MI-14: DynamicPlanDetails simplified pricing', () => {
   });
 
   describe('S&H distance-based pricing', () => {
-    it('shows 2 payment options (MENSAL, ANUAL) when distance is provided', () => {
+    it('shows 4 payment options, missing prices marked as not defined, when distance is provided', () => {
       const wrapper = mount(DynamicPlanDetails, {
         props: {
           planDetails: shPlan,
@@ -63,10 +64,13 @@ describe('MI-14: DynamicPlanDetails simplified pricing', () => {
         },
       });
       const paymentButtons = wrapper.findAll('.payment-option');
-      expect(paymentButtons.length).toBe(2);
+      expect(paymentButtons.length).toBe(4);
       const periodTexts = paymentButtons.map(btn => btn.find('.payment-period').text());
       expect(periodTexts).toContain('MENSAL');
+      expect(periodTexts).toContain('TRIMESTRAL');
+      expect(periodTexts).toContain('SEMESTRAL');
       expect(periodTexts).toContain('ANUAL');
+      expect(paymentButtons.filter(btn => btn.text().includes('Preço não definido')).length).toBe(2);
     });
 
     it('shows distance-required notice when no distance is provided', () => {
