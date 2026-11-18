@@ -133,6 +133,37 @@ export function computeCurrentPeriodWindow(
   };
 }
 
+/** Requests dated before this are out of scope for the balance rebuild (stay as debt, no period). */
+export const BALANCE_START_DATE = '2026-01-01';
+
+/**
+ * All period windows to open for a contract section: every yearly slice that ends
+ * after `from`, up to and including the current one (see computeCurrentPeriodWindow).
+ * Earlier slices are returned inactive (closed); the current one keeps its own isActive.
+ * Slices are ordered oldest first. Returns [] when `inicio` is missing.
+ */
+export function computePeriodWindows(
+  inicio: string,
+  fim: string,
+  from: string = BALANCE_START_DATE,
+  today: string = new Date().toISOString().slice(0, 10)
+): PeriodWindow[] {
+  const current = computeCurrentPeriodWindow(inicio, fim, today);
+  if (!current) return [];
+
+  const windows: PeriodWindow[] = [];
+  let sliceStart = inicio;
+  while (sliceStart < current.periodStart) {
+    const sliceEnd = addOneYear(sliceStart);
+    if (sliceEnd > from) {
+      windows.push({ periodStart: sliceStart, periodEnd: sliceEnd, isActive: false });
+    }
+    sliceStart = sliceEnd;
+  }
+  windows.push(current);
+  return windows;
+}
+
 // ============================================================================
 // Section Routing Helper
 // ============================================================================

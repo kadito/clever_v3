@@ -120,7 +120,9 @@ export class BalanceReportingService {
     // Index stored periods by contractId+section so we can read remaining resources.
     const periodByKey = new Map<string, ContractPeriod>();
     for (const p of periods) {
-      periodByKey.set(`${p.contractId}:${p.section}`, p);
+      const key = `${p.contractId}:${p.section}`;
+      const known = periodByKey.get(key);
+      if (!known || p.periodEnd > known.periodEnd) periodByKey.set(key, p);
     }
 
     const header = [

@@ -125,6 +125,30 @@ export class BalancePeriodService {
   }
 
   /**
+   * Find the period (active or closed) that contains a date. Used by the rebuild,
+   * which opens past periods as closed. When two periods share a boundary date
+   * (end of one = start of the next), the later one wins.
+   */
+  async getPeriodForDate(
+    clientId: string,
+    contractId: string,
+    section: 'CPA' | 'SH',
+    date: string
+  ): Promise<ContractPeriod | null> {
+    const index = await this.getPeriodsIndex(clientId);
+    const match = index
+      .filter(
+        e =>
+          e.contractId === contractId &&
+          e.section === section &&
+          e.periodStart <= date &&
+          date <= e.periodEnd
+      )
+      .sort((a, b) => b.periodStart.localeCompare(a.periodStart))[0];
+    return match ? this.getPeriod(clientId, match.periodId) : null;
+  }
+
+  /**
    * Open a new period. Checks that no active period already exists for the section.
    * Creates the period document, appends to index, and writes an ADD transaction.
    */

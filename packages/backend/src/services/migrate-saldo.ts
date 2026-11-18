@@ -21,7 +21,8 @@ import {
   extractWorkSheetDebtTransaction,
   extractRemoteAssistanceDebtTransaction,
   hasTransactionChanges,
-  computeCurrentPeriodWindow,
+  computePeriodWindows,
+  BALANCE_START_DATE,
 } from '@clever/shared';
 import { createBalancePeriodService } from './balance-service';
 
@@ -214,17 +215,17 @@ export async function migrateSaldo(
     const simPeriods: ContractPeriod[] = [];
 
     const findSimPeriod = (contractId: string | undefined, section: 'CPA' | 'SH', date: string) => {
-      if (!contractId) return null;
-      return (
-        simPeriods.find(
+      if (!contractId || date < BALANCE_START_DATE) return null;
+      const matches = simPeriods
+        .filter(
           (p) =>
             p.contractId === contractId &&
             p.section === section &&
-            p.status === 'active' &&
             p.periodStart <= date &&
             date <= p.periodEnd
-        ) ?? null
-      );
+        )
+        .sort((a, b) => b.periodStart.localeCompare(a.periodStart));
+      return matches[0] ?? null;
     };
 
     const applySimConsumption = (period: ContractPeriod | null, changes: TransactionChanges) => {
@@ -242,50 +243,53 @@ export async function migrateSaldo(
         await wipeClientBalance(r2, clientId);
       }
 
-      // 2. Open the CURRENT 1-year period for each active contract section.
-      // Periods are always exactly 1 year, anchored on inicioContrato; we open
-      // the yearly slice that contains today, bounded by fimContrato. If the
-      // contract has already expired, we still record the last valid slice so
-      // the UI can show it, but mark it inactive (no consumption lands on it).
+      // 2. Open every 1-year period that ends after BALANCE_START_DATE, for each active
+      // contract section. Periods are exactly 1 year, anchored on inicioContrato and
+      // bounded by fimContrato. Past periods are stored closed; the one containing
+      // today is active. If the contract has expired, the last slice is stored closed.
       const contracts = contractsByClient.get(clientId) ?? [];
       for (const contract of contracts) {
         if (contract.data.hasCPAContract) {
-          const win = computeCurrentPeriodWindow(
+          const windows = computePeriodWindows(
             contract.data.inicioContratoCPA,
             contract.data.fimContratoCPA
           );
-          if (win) {
-            const resources = {
-              manutencoesPorAno: contract.data.manutencoesPorAnoCPA ?? 0,
-              deslocacoesPorAno: contract.data.deslocacoesPorAnoCPA ?? 0,
-              horasAssistenciaAnuais: contract.data.horasAssistenciaAnualCPA ?? 0,
-            };
+          const resources = {
+            manutencoesPorAno: contract.data.manutencoesPorAnoCPA ?? 0,
+            deslocacoesPorAno: contract.data.deslocacoesPorAnoCPA ?? 0,
+            horasAssistenciaAnuais: contract.data.horasAssistenciaAnualCPA ?? 0,
+          };
+          let previousPeriodId: string | undefined;
+          for (const win of windows) {
             if (dryRun) {
               simPeriods.push(makeSimPeriod(clientId, contract.uuid, 'CPA', resources, win.periodStart, win.periodEnd, win.isActive));
             } else {
-              await periodService.openPeriod(clientId, contract.uuid, 'CPA', resources, win.periodStart, win.periodEnd, MIGRATION_USER, undefined, win.isActive);
+              const opened = await periodService.openPeriod(clientId, contract.uuid, 'CPA', resources, win.periodStart, win.periodEnd, MIGRATION_USER, previousPeriodId, win.isActive);
+              previousPeriodId = opened.uuid;
             }
-            clientReport.cpaPeriod = true;
           }
+          if (windows.length > 0) clientReport.cpaPeriod = true;
         }
         if (contract.data.hasSHContract) {
-          const win = computeCurrentPeriodWindow(
+          const windows = computePeriodWindows(
             contract.data.inicioContratoSH,
             contract.data.fimContratoSH
           );
-          if (win) {
-            const resources = {
-              manutencoesPorAno: contract.data.manutencoesPorAnoSH ?? 0,
-              deslocacoesPorAno: contract.data.deslocacoesPorAnoSH ?? 0,
-              horasAssistenciaAnuais: contract.data.horasAssistenciaAnualSH ?? 0,
-            };
+          const resources = {
+            manutencoesPorAno: contract.data.manutencoesPorAnoSH ?? 0,
+            deslocacoesPorAno: contract.data.deslocacoesPorAnoSH ?? 0,
+            horasAssistenciaAnuais: contract.data.horasAssistenciaAnualSH ?? 0,
+          };
+          let previousPeriodId: string | undefined;
+          for (const win of windows) {
             if (dryRun) {
               simPeriods.push(makeSimPeriod(clientId, contract.uuid, 'SH', resources, win.periodStart, win.periodEnd, win.isActive));
             } else {
-              await periodService.openPeriod(clientId, contract.uuid, 'SH', resources, win.periodStart, win.periodEnd, MIGRATION_USER, undefined, win.isActive);
+              const opened = await periodService.openPeriod(clientId, contract.uuid, 'SH', resources, win.periodStart, win.periodEnd, MIGRATION_USER, previousPeriodId, win.isActive);
+              previousPeriodId = opened.uuid;
             }
-            clientReport.shPeriod = true;
           }
+          if (windows.length > 0) clientReport.shPeriod = true;
         }
       }
 
@@ -301,8 +305,8 @@ export async function migrateSaldo(
         const contractId = ws.data.contractId;
         const activePeriod = dryRun
           ? findSimPeriod(contractId, section, ws.data.request.date)
-          : contractId
-            ? await periodService.getActivePeriodForDate(clientId, contractId, section, ws.data.request.date)
+          : contractId && ws.data.request.date >= BALANCE_START_DATE
+            ? await periodService.getPeriodForDate(clientId, contractId, section, ws.data.request.date)
             : null;
 
         const changes = extractWorkSheetDebtTransaction(ws, activePeriod);
@@ -332,8 +336,8 @@ export async function migrateSaldo(
         const contractId = ra.data.contractId;
         const activePeriod = dryRun
           ? findSimPeriod(contractId, 'SH', ra.data.dataPedido)
-          : contractId
-            ? await periodService.getActivePeriodForDate(clientId, contractId, 'SH', ra.data.dataPedido)
+          : contractId && ra.data.dataPedido >= BALANCE_START_DATE
+            ? await periodService.getPeriodForDate(clientId, contractId, 'SH', ra.data.dataPedido)
             : null;
 
         const changes = extractRemoteAssistanceDebtTransaction(ra, activePeriod);
